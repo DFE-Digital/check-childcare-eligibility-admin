@@ -50,7 +50,7 @@ public class SubmitApplicationUseCase : ISubmitApplicationUseCase
         }
 
 
-        foreach (var child in request.Children.ChildList)
+        /* foreach (var child in request.Children.ChildList)
         {
             var application = new ApplicationRequest
             {
@@ -76,7 +76,7 @@ public class SubmitApplicationUseCase : ISubmitApplicationUseCase
             };
             var response = await _parentGateway.PostApplication_Fsm(application);
             responses.Add(response);
-        }
+        } */
 
         return responses;
     }

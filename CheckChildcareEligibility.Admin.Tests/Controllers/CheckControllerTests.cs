@@ -2,6 +2,7 @@
 using AutoFixture;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Controllers;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
@@ -192,7 +193,7 @@ public class CheckControllerTests : TestBase
             .Returns(validationResult);
 
         // Act
-        var result = await _sut.Enter_Details(request);
+        var result = await _sut.Enter_Details(request, CheckEligibilityType.FreeSchoolMeals);
 
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
@@ -234,11 +235,11 @@ public class CheckControllerTests : TestBase
             .Returns(validationResult);
 
         _performEligibilityCheckUseCaseMock
-            .Setup(x => x.Execute(request, _sut.HttpContext.Session))
+            .Setup(x => x.Execute(request, _sut.HttpContext.Session, CheckEligibilityType.FreeSchoolMeals))
             .ReturnsAsync(checkEligibilityResponse);
 
         // Act
-        var result = await _sut.Enter_Details(request);
+        var result = await _sut.Enter_Details(request, CheckEligibilityType.FreeSchoolMeals);
 
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
@@ -251,7 +252,7 @@ public class CheckControllerTests : TestBase
             Times.Once);
 
         _performEligibilityCheckUseCaseMock.Verify(
-            x => x.Execute(request, _sut.HttpContext.Session),
+            x => x.Execute(request, _sut.HttpContext.Session, CheckEligibilityType.FreeSchoolMeals),
             Times.Once);
     }
 
@@ -275,11 +276,11 @@ public class CheckControllerTests : TestBase
             .Returns(validationResult);
 
         _performEligibilityCheckUseCaseMock
-            .Setup(x => x.Execute(request, _sut.HttpContext.Session))
+            .Setup(x => x.Execute(request, _sut.HttpContext.Session, CheckEligibilityType.FreeSchoolMeals))
             .ReturnsAsync(checkEligibilityResponse);
 
         // Act
-        var result = await _sut.Enter_Details(request);
+        var result = await _sut.Enter_Details(request, CheckEligibilityType.FreeSchoolMeals);
 
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
@@ -296,7 +297,7 @@ public class CheckControllerTests : TestBase
             Times.Once);
 
         _performEligibilityCheckUseCaseMock.Verify(
-            x => x.Execute(request, _sut.HttpContext.Session),
+            x => x.Execute(request, _sut.HttpContext.Session, CheckEligibilityType.FreeSchoolMeals),
             Times.Once);
     }
 

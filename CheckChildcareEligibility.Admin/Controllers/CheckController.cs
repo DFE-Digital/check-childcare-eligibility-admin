@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
@@ -100,7 +101,7 @@ public class CheckController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Enter_Details(ParentGuardian request)
+    public async Task<IActionResult> Enter_Details(ParentGuardian request, CheckEligibilityType eligibilityType)
     {
         var validationResult = _validateParentDetailsUseCase.Execute(request, ModelState);
 
@@ -115,7 +116,7 @@ public class CheckController : BaseController
         TempData.Remove("FsmApplication");
         TempData.Remove("FsmEvidence");
 
-        var response = await _performEligibilityCheckUseCase.Execute(request, HttpContext.Session);
+        var response = await _performEligibilityCheckUseCase.Execute(request, HttpContext.Session, eligibilityType);
         TempData["Response"] = JsonConvert.SerializeObject(response);
 
         return RedirectToAction("Loader");

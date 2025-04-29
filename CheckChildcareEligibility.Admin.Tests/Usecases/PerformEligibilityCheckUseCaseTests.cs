@@ -1,6 +1,7 @@
 using System.Text;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
@@ -66,7 +67,7 @@ public class PerformEligibilityCheckUseCaseTests
             .ReturnsAsync(_eligibilityResponse);
 
         // Act
-        var response = await _sut.Execute(_parent, _sessionMock.Object);
+        var response = await _sut.Execute(_parent, _sessionMock.Object, CheckEligibilityType.FreeSchoolMeals);
 
         // Assert
         response.Should().BeEquivalentTo(_eligibilityResponse);
@@ -87,7 +88,7 @@ public class PerformEligibilityCheckUseCaseTests
             .ReturnsAsync(_eligibilityResponse);
 
         // Act
-        var response = await _sut.Execute(_parent, _sessionMock.Object);
+        var response = await _sut.Execute(_parent, _sessionMock.Object, CheckEligibilityType.FreeSchoolMeals);
 
         // Assert
         response.Should().BeEquivalentTo(_eligibilityResponse);
@@ -106,7 +107,7 @@ public class PerformEligibilityCheckUseCaseTests
             .ThrowsAsync(new Exception("API Error"));
 
         // Act
-        Func<Task> act = async () => await _sut.Execute(_parent, _sessionMock.Object);
+        Func<Task> act = async () => await _sut.Execute(_parent, _sessionMock.Object, CheckEligibilityType.FreeSchoolMeals);
 
         // Assert
         await act.Should().ThrowAsync<Exception>().WithMessage("API Error");

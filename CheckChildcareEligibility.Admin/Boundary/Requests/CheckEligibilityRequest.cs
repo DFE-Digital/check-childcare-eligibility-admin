@@ -4,7 +4,7 @@ namespace CheckChildcareEligibility.Admin.Boundary.Requests;
 
 public class CheckEligibilityRequestDataBase : IEligibilityServiceType
 {
-    protected CheckEligibilityType baseType;
+    public CheckEligibilityType baseType;
     public int? Sequence { get; set; }
 }
 
@@ -16,9 +16,9 @@ public interface IEligibilityServiceType
 
 public class CheckEligibilityRequestData_Fsm : CheckEligibilityRequestDataBase
 {
-    public CheckEligibilityRequestData_Fsm()
+    public CheckEligibilityRequestData_Fsm(CheckEligibilityType eligibilityType)
     {
-        baseType = CheckEligibilityType.FreeSchoolMeals;
+        baseType = eligibilityType;
     }
 
     public string? NationalInsuranceNumber { get; set; }
