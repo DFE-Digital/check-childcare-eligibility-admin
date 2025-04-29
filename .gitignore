@@ -396,16 +396,16 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-/CheckYourEligibility.WebApp/appsettings.Development.json
-/CheckYourEligibility.WebApp/appsettings.Development.json
+/CheckChildcareEligibility.WebApp/appsettings.Development.json
+/CheckChildcareEligibility.WebApp/appsettings.Development.json
 /.gitignore
-/CheckYourEligibility-FrontEnd/appsettings.json
-/CheckYourEligibility-Parent/appsettings.Development.json
-/CheckYourEligibility-Admin/appsettings.Development.json
+/CheckChildcareEligibility-FrontEnd/appsettings.json
+/CheckChildcareEligibility-Parent/appsettings.Development.json
+/CheckChildcareEligibility-Admin/appsettings.Development.json
 
 /tests/cypress.env.json
 /tests/results
-/CheckYourEligibility.Admin/appsettings.development.json
+/CheckChildcareEligibility.Admin/appsettings.development.json
 
 # Cypress
 /tests/cypress/downloads/
