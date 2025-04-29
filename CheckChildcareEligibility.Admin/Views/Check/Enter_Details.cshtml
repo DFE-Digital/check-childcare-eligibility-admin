@@ -14,6 +14,19 @@
         <partial name="_ValidationSummary" model="ViewData.ModelState"/>
     }
 
+    @if (ViewBag.eligibilityType == "2YO")
+    {
+        <h1 class="alert-warning">2 Year old early learning link was selected</h1>
+    }
+    else if (ViewBag.eligibilityType == "EYPP")
+    {
+        <h1 class="alert-warning">Early years pupil premium link was selected</h1>
+    }
+    else
+    {
+        <h1 class="alert-warning">Uh oh! Something happened that we didn't expect'</h1>
+    }
+
     <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
     <p class="govuk-body">Enter the details of the parent or guardian who applied for free school meals.</p>
     <form asp-controller="Check" asp-action="Enter_Details" method="post">

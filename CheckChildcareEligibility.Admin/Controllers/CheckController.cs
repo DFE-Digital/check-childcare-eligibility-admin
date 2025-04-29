@@ -84,8 +84,9 @@ public class CheckController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Enter_Details()
+    public async Task<IActionResult> Enter_Details(string eligibilityType)
     {
+        ViewBag.eligibilityType = eligibilityType;
         var (parent, validationErrors) = await _loadParentDetailsUseCase.Execute(
             TempData["ParentDetails"]?.ToString(),
             TempData["Errors"]?.ToString()
