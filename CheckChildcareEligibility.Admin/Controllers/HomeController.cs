@@ -11,6 +11,10 @@ public class HomeController : BaseController
         return View(_Claims);
     }
 
+    public IActionResult SingleCheckMenu()
+    {
+        return View("SingleCheckMenu");
+    }
 
     public IActionResult Privacy()
     {
