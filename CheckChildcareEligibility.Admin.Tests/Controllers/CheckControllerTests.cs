@@ -122,7 +122,7 @@ public class CheckControllerTests : TestBase
             .ReturnsAsync((expectedParent, expectedErrors));
 
         // Act
-        var result = await _sut.Enter_Details();
+        var result = await _sut.Enter_Details(expectedParent);
 
         // Assert
         result.Should().BeOfType<ViewResult>();
@@ -147,7 +147,7 @@ public class CheckControllerTests : TestBase
             .ReturnsAsync((expectedParent, expectedErrors));
 
         // Act
-        var result = await _sut.Enter_Details();
+        var result = await _sut.Enter_Details(expectedParent);
 
         // Assert
         result.Should().BeOfType<ViewResult>();
