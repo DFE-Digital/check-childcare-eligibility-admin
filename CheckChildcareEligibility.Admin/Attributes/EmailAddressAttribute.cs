@@ -11,13 +11,7 @@ public class EmailAddressAttribute : ValidationAttribute
 
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
-        // skip this validation if this is for searching application records
-        var parentObject = validationContext.ObjectInstance.GetType().GetProperty(validationContext.MemberName)
-            ?.DeclaringType;
-
-        if (parentObject == typeof(ApplicationSearch)) return ValidationResult.Success;
-
-
+        
         if (value == null) return ValidationResult.Success;
 
         if (!(value is string valueAsString))
