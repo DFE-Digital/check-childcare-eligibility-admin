@@ -13,17 +13,7 @@ public class NameAttribute : ValidationAttribute
     {
         var model = validationContext.ObjectInstance;
 
-        var firstName = model.GetType().GetProperty("FirstName").GetValue(model);
         var lastName = model.GetType().GetProperty("LastName").GetValue(model);
-
-        if (firstName == value)
-        {
-            if (value == null || value == "")
-                return ValidationResult.Success;
-
-            if (!regex.IsMatch(value.ToString()))
-                return new ValidationResult("First Name field contains an invalid character");
-        }
 
         if (lastName == value)
         {
@@ -31,7 +21,7 @@ public class NameAttribute : ValidationAttribute
                 return ValidationResult.Success;
 
             if (!regex.IsMatch(value.ToString()))
-                return new ValidationResult("Last Name field contains an invalid character");
+                return new ValidationResult("Enter a last name with valid characters");
         }
 
         return ValidationResult.Success;

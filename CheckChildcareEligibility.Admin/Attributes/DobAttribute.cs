@@ -30,13 +30,6 @@ public class DobAttribute : ValidationAttribute
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
         var model = validationContext.ObjectInstance;
-        int? childIndex = null;
-
-        if (model.GetType() == typeof(Child))
-        {
-            model = validationContext.ObjectInstance as Child;
-            childIndex = GetPropertyIntValue(model, _childIndexPropertyName);
-        }
 
         var dayString = GetPropertyStringValue(model, _dayPropertyName);
         var monthString = GetPropertyStringValue(model, _monthPropertyName);
@@ -128,9 +121,14 @@ public class DobAttribute : ValidationAttribute
             }
             else if (errorFields.Count == 4) // All fields missing
             {
-                message = childIndex != null
-                    ? $"Enter a {_fieldName} for {_objectName} {childIndex}"
-                    : $"Enter a {_fieldName}";
+                if (yearString != null && yearString.Length < 4)
+                {
+                    message = "Year must include 4 numbers";
+                }
+                else
+                {
+                    message = $"Enter a {_fieldName}";
+                }
             }
             else // Multiple but not all fields missing
             {
@@ -139,7 +137,14 @@ public class DobAttribute : ValidationAttribute
         }
         else if (errorFields.Any())
         {
-            message = "Date of birth must be a real date";
+            if (yearString.Length < 4)
+            {
+                message = "Year must include 4 numbers";
+            }
+            else
+            {
+                message = "Date of birth must be a real date";
+            }
         }
         else
         {
@@ -152,20 +157,8 @@ public class DobAttribute : ValidationAttribute
                 var dob = new DateTime(yearInt, monthInt, dayInt);
 
                 if (dob > DateTime.Now)
-                    return new ValidationResult(
-                        childIndex != null
-                            ? $"Enter a date in the past for {_objectName} {childIndex}"
-                            : "Enter a date in the past",
+                    return new ValidationResult("Date of birth must be in the past",
                         new[] { "DateOfBirth", "Day", "Month", "Year" });
-
-                if (_applyAgeRange)
-                {
-                    var age = CalculateAge(dob, DateTime.Now);
-                    if (age < 4 || age > 19)
-                        return new ValidationResult(
-                            $"Enter an age between 4 and 19 for {_objectName} {childIndex}",
-                            new[] { "DateOfBirth", "Day", "Month", "Year" });
-                }
 
                 return ValidationResult.Success;
             }

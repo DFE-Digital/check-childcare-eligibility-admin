@@ -22,18 +22,12 @@ public class NinoAttribute : ValidationAttribute
     {
         var model = (ParentGuardian)validationContext.ObjectInstance;
 
-        //If ASR is selected stop validating NIN option
-        if (model.NinAsrSelection == NinAsrSelect.AsrnSelected) return ValidationResult.Success;
-
-        //Neither option selected
-        if (model.NinAsrSelection == NinAsrSelect.None) return new ValidationResult("Please select one option");
-
-        //Nin Selected but not provided
-        if (model.NinAsrSelection == NinAsrSelect.NinSelected && value == null)
-            return new ValidationResult("National Insurance number is required");
+        //Nin not provided
+        if (value == null)
+            return new ValidationResult("Enter a National Insurance number");
 
         //Nin selected and completed - validate against regex
-        if (model.NinAsrSelection == NinAsrSelect.NinSelected && value != null)
+        if (value != null)
         {
             var nino = value.ToString().ToUpper();
             nino = string.Concat(nino
@@ -43,11 +37,9 @@ public class NinoAttribute : ValidationAttribute
                 return new ValidationResult(
                     "National Insurance number should contain no more than 9 alphanumeric characters");
 
-            if (!regex.IsMatch(nino)) return new ValidationResult("Invalid National Insurance number format");
+            if (!regex.IsMatch(nino)) return new ValidationResult("Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
 
             model.NationalInsuranceNumber = nino;
-
-            if (!regex.IsMatch(nino)) return new ValidationResult("Invalid National Insurance number format");
         }
 
         return ValidationResult.Success;
