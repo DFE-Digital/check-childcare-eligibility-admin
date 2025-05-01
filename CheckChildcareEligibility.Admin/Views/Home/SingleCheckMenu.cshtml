@@ -24,8 +24,13 @@
                 <div class="dfe-card">
                     <div class="dfe-card-container">
                         <h2 class="govuk-heading-m">
-                            <a class="govuk-link govuk-link--no-visited-state dfe-card-link--header"
-                               href="@Url.Action("Enter_Details", "Check", new { eligibilityType = "2YO" })">2 years old early learning</a>
+                            <form method="post" action="@Url.Action("SingleCheckMenu", "Home")">
+                                <input type="hidden" name="eligibilityType" value="2YO" />
+                                <button class="button-as-link-dfe-card-style govuk-link govuk-link--no-visited-state dfe-card-link--header"
+                                        type="submit">
+                                    2 years old early learning
+                                </button>
+                            </form>
                         </h2>
                         <p>15 hours free early learning for children aged 2 years in families receiving additional support.</p>
                     </div>
@@ -34,8 +39,13 @@
                 <div class="dfe-card">
                     <div class="dfe-card-container">
                         <h2 class="govuk-heading-m">
-                            <a class="govuk-link govuk-link--no-visited-state dfe-card-link--header"
-                               href="@Url.Action("Enter_Details", "Check", new { eligibilityType = "EYPP" })">Early years pupil premium</a>
+                            <form method="post" action="@Url.Action("SingleCheckMenu", "Home")">
+                                <input type="hidden" name="eligibilityType" value="EYPP" />
+                                <button class="button-as-link-dfe-card-style govuk-link govuk-link--no-visited-state dfe-card-link--header"
+                                        type="submit">
+                                    Early years pupil premium
+                                </button>
+                            </form>
                         </h2>
                         <p>
                             Extra early years provider funding for eligible children age 9 months to 2 years or eligible 3 and 4-year-olds.

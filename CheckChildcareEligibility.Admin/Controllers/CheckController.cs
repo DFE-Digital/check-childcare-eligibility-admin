@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
@@ -84,9 +85,13 @@ public class CheckController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Enter_Details(string eligibilityType)
+    public async Task<IActionResult> Enter_Details()
     {
-        ViewBag.eligibilityType = eligibilityType;
+        var eligibilityType = TempData["eligibilityType"].ToString();
+        TempData["eligibilityType"] = eligibilityType;
+        var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
+        TempData["eligibilityTypeLabel"] = label;
+
         var (parent, validationErrors) = await _loadParentDetailsUseCase.Execute(
             TempData["ParentDetails"]?.ToString(),
             TempData["Errors"]?.ToString()
@@ -103,6 +108,7 @@ public class CheckController : BaseController
     [HttpPost]
     public async Task<IActionResult> Enter_Details(ParentGuardian request)
     {
+        var eligibilityType = TempData["eligibilityType"] as string;
         var validationResult = _validateParentDetailsUseCase.Execute(request, ModelState);
 
         if (!validationResult.IsValid)

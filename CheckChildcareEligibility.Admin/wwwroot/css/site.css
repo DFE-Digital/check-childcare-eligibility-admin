@@ -169,6 +169,19 @@
         bottom: 0;
     }
 
+.button-as-link-dfe-card-style {
+    padding: 0;
+    background: none;
+    border: none;
+    color: #1d70b8;
+    font-weight: 700;
+    text-align: left;
+}
+
+    .button-as-link-dfe-card-style:hover {
+        color: #ffffff;
+    }
+
 /*END - dashboard card overrides */
 
 /*BEGIN - Accessible dashboard card links */
