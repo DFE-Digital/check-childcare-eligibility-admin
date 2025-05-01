@@ -4,6 +4,7 @@ using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
+using CheckChildcareEligibility.Admin.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Child = CheckChildcareEligibility.Admin.Models.Child;
@@ -22,7 +23,8 @@ public class CheckController : BaseController
     private readonly ILoadParentDetailsUseCase _loadParentDetailsUseCase;
     private readonly ILogger<CheckController> _logger;
     private readonly IParentGateway _parentGateway;
-    private readonly IPerformEligibilityCheckUseCase _performEligibilityCheckUseCase;
+    private readonly IPerform2YoEligibilityCheckUseCase _perform2YoEligibilityCheckUseCase;
+    private readonly IPerformEyppEligibilityCheckUseCase _performEyppEligibilityCheckUseCase;
     private readonly IProcessChildDetailsUseCase _processChildDetailsUseCase;
     private readonly IRemoveChildUseCase _removeChildUseCase;
     private readonly ISubmitApplicationUseCase _submitApplicationUseCase;
@@ -37,7 +39,8 @@ public class CheckController : BaseController
         ICheckGateway checkGateway,
         IConfiguration configuration,
         ILoadParentDetailsUseCase loadParentDetailsUseCase,
-        IPerformEligibilityCheckUseCase performEligibilityCheckUseCase,
+        IPerform2YoEligibilityCheckUseCase perform2YoEligibilityCheckUseCase,
+        IPerformEyppEligibilityCheckUseCase performEyppEligibilityCheckUseCase,
         IEnterChildDetailsUseCase enterChildDetailsUseCase,
         IProcessChildDetailsUseCase processChildDetailsUseCase,
         IGetCheckStatusUseCase getCheckStatusUseCase,
@@ -55,7 +58,8 @@ public class CheckController : BaseController
         _parentGateway = parentGateway;
         _checkGateway = checkGateway;
         _loadParentDetailsUseCase = loadParentDetailsUseCase;
-        _performEligibilityCheckUseCase = performEligibilityCheckUseCase;
+        _perform2YoEligibilityCheckUseCase = perform2YoEligibilityCheckUseCase;
+        _performEyppEligibilityCheckUseCase = performEyppEligibilityCheckUseCase;
         _enterChildDetailsUseCase = enterChildDetailsUseCase;
         _processChildDetailsUseCase = processChildDetailsUseCase;
         _getCheckStatusUseCase = getCheckStatusUseCase;
@@ -95,6 +99,8 @@ public class CheckController : BaseController
             foreach (var (key, errorList) in validationErrors)
                 foreach (var error in errorList)
                     ModelState.AddModelError(key, error);
+        
+        TempData["ParentDetails"] = parent;
 
         return View(parent);
     }
@@ -115,8 +121,22 @@ public class CheckController : BaseController
         TempData.Remove("FsmApplication");
         TempData.Remove("FsmEvidence");
 
-        var response = await _performEligibilityCheckUseCase.Execute(request, HttpContext.Session);
-        TempData["Response"] = JsonConvert.SerializeObject(response);
+        var eligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty;
+
+        if (string.IsNullOrEmpty(eligibilityType))
+            return View("Outcome/Technical_Error");
+
+        if (string.Equals(eligibilityType, "2YO", StringComparison.OrdinalIgnoreCase))
+        {
+            var response = await _perform2YoEligibilityCheckUseCase.Execute(request, HttpContext.Session);
+            TempData["Response"] = JsonConvert.SerializeObject(response);
+        }
+
+        if (string.Equals(eligibilityType, "EYPP", StringComparison.OrdinalIgnoreCase))
+        {
+            var response = await _performEyppEligibilityCheckUseCase.Execute(request, HttpContext.Session);
+            TempData["Response"] = JsonConvert.SerializeObject(response);
+        }
 
         return RedirectToAction("Loader");
     }
@@ -136,23 +156,39 @@ public class CheckController : BaseController
 
             _logger.LogError(outcome);
 
+            var eligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty;
+
+            var (parent, validationErrors) = await _loadParentDetailsUseCase.Execute(
+                TempData["ParentDetails"]?.ToString(),
+                TempData["Errors"]?.ToString()
+            );
+
+            var eligbilityOutcomeVm = new EligibilityOutcomeViewModel
+            {
+                EligibilityType = eligibilityType,
+                EligibilityTypeLabel = GetEligibilityTypeLabel(eligibilityType),
+                ParentLastName = parent?.LastName ?? string.Empty,
+                ParentDateOfBirth = parent?.DateOfBirth ?? string.Empty,
+                ParentNino = parent?.NationalInsuranceNumber ?? string.Empty
+            };
+
             var isLA = _Claims?.Organisation?.Category?.Name == Constants.CategoryTypeLA; //false=school
             switch (outcome)
             {
                 case "eligible":
-                    return View(isLA ? "Outcome/Eligible_LA" : "Outcome/Eligible");
+                    return View(isLA ? "Outcome/Eligible_LA" : "Outcome/Eligible", eligbilityOutcomeVm);
                     break;
 
                 case "notEligible":
-                    return View(isLA ? "Outcome/Not_Eligible_LA" : "Outcome/Not_Eligible");
+                    return View(isLA ? "Outcome/Not_Eligible_LA" : "Outcome/Not_Eligible", eligbilityOutcomeVm);
                     break;
 
                 case "parentNotFound":
-                    return View("Outcome/Not_Found");
+                    return View("Outcome/Not_Found", eligbilityOutcomeVm);
                     break;
 
                 case "queuedForProcessing":
-                    return View("Loader");
+                    return View("Loader", eligbilityOutcomeVm);
                     break;
 
                 default:
@@ -165,6 +201,10 @@ public class CheckController : BaseController
         }
     }
 
+    private string GetEligibilityTypeLabel(string eligibilityType)
+    {
+        return "2 years old early learning";
+    }
 
     [HttpGet]
     public IActionResult Enter_Child_Details()

@@ -35,7 +35,8 @@ builder.Services.AddScoped<IChangeChildDetailsUseCase, ChangeChildDetailsUseCase
 builder.Services.AddScoped<IEnterChildDetailsUseCase, EnterChildDetailsUseCase>();
 builder.Services.AddScoped<ILoadParentDetailsUseCase, LoadParentDetailsUseCase>();
 builder.Services.AddScoped<IProcessChildDetailsUseCase, ProcessChildDetailsUseCase>();
-builder.Services.AddScoped<IPerformEligibilityCheckUseCase, PerformEligibilityCheckUseCase>();
+builder.Services.AddScoped<IPerform2YoEligibilityCheckUseCase, Perform2YoEligibilityCheckUseCase>();
+builder.Services.AddScoped<IPerformEyppEligibilityCheckUseCase, PerformEyppEligibilityCheckUseCase>();
 builder.Services.AddScoped<IGetCheckStatusUseCase, GetCheckStatusUseCase>();
 builder.Services.AddScoped<IRegistrationResponseUseCase, RegistrationResponseUseCase>();
 builder.Services.AddScoped<IRegistrationUseCase, RegistrationUseCase>();

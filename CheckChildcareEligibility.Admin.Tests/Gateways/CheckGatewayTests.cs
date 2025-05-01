@@ -82,7 +82,7 @@ internal class CheckGatewayTests
     public async Task Given_PostCheck_When_CalledWithValidRequest_Should_ReturnCheckEligibilityResponse()
     {
         // Arrange
-        var requestBody = new CheckEligibilityRequest_Fsm();
+        var requestBody = new CheckEligibilityRequest();
         var responseContent = new CheckEligibilityResponse();
         var responseMessage = new HttpResponseMessage
         {
@@ -146,7 +146,7 @@ internal class CheckGatewayTests
         Given_PostCheck_When_ApiReturnsUnauthorized_Should_LogApiErrorAnd_Throw_UnauthorizedAccessException()
     {
         // Arrange
-        var requestBody = new CheckEligibilityRequest_Fsm();
+        var requestBody = new CheckEligibilityRequest();
         var responseMessage = new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.Unauthorized,

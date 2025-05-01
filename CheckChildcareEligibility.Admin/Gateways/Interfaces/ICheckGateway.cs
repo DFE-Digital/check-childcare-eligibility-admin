@@ -9,9 +9,9 @@ public interface ICheckGateway
     Task<CheckEligibilityBulkStatusResponse> GetBulkCheckProgress(string bulkCheckUrl);
     Task<CheckEligibilityBulkResponse> GetBulkCheckResults(string resultsUrl);
 
-    Task<CheckEligibilityResponseBulk> PostBulkCheck(CheckEligibilityRequestBulk_Fsm requestBody);
+    Task<CheckEligibilityResponseBulk> PostBulkCheck(CheckEligibilityRequestBulk requestBody);
 
     // single
-    Task<CheckEligibilityResponse> PostCheck(CheckEligibilityRequest_Fsm requestBody);
+    Task<CheckEligibilityResponse> PostCheck(CheckEligibilityRequest requestBody);
     Task<CheckEligibilityStatusResponse> GetStatus(CheckEligibilityResponse responseBody);
 }

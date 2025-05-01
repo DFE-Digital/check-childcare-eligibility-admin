@@ -6,7 +6,7 @@ using CheckChildcareEligibility.Admin.Models;
 
 namespace CheckChildcareEligibility.Admin.UseCases;
 
-public interface IPerformEligibilityCheckUseCase
+public interface IPerform2YoEligibilityCheckUseCase
 {
     Task<CheckEligibilityResponse> Execute(
         ParentGuardian parentRequest,
@@ -14,11 +14,11 @@ public interface IPerformEligibilityCheckUseCase
     );
 }
 
-public class PerformEligibilityCheckUseCase : IPerformEligibilityCheckUseCase
+public class Perform2YoEligibilityCheckUseCase : IPerform2YoEligibilityCheckUseCase
 {
     private readonly ICheckGateway _checkGateway;
 
-    public PerformEligibilityCheckUseCase(ICheckGateway checkGateway)
+    public Perform2YoEligibilityCheckUseCase(ICheckGateway checkGateway)
     {
         _checkGateway = checkGateway ?? throw new ArgumentNullException(nameof(checkGateway));
     }
@@ -54,13 +54,12 @@ public class PerformEligibilityCheckUseCase : IPerformEligibilityCheckUseCase
         }
 
         // Build ECS request
-        var checkEligibilityRequest = new CheckEligibilityRequest_Fsm
+        var checkEligibilityRequest = new CheckEligibilityRequest
         {
-            Data = new CheckEligibilityRequestData_Fsm
+            Data = new CheckEligibilityRequestData(Domain.Enums.CheckEligibilityType.TwoYearOffer)
             {
                 LastName = parentRequest.LastName,
                 NationalInsuranceNumber = parentRequest.NationalInsuranceNumber?.ToUpper(),
-                NationalAsylumSeekerServiceNumber = parentRequest.NationalAsylumSeekerServiceNumber?.ToUpper(),
                 DateOfBirth = dobString
             }
         };

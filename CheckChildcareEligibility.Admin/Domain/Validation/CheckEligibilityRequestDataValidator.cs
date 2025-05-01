@@ -7,9 +7,9 @@ using FluentValidation;
 
 namespace CheckChildcareEligibility.Admin.Domain.Validation;
 
-public class CheckEligibilityRequestDataValidator_Fsm : AbstractValidator<CheckEligibilityRequestData_Fsm>
+public class CheckEligibilityRequestDataValidator : AbstractValidator<CheckEligibilityRequestData>
 {
-    public CheckEligibilityRequestDataValidator_Fsm()
+    public CheckEligibilityRequestDataValidator()
     {
         RuleFor(x => x.LastName)
             .NotEmpty().WithMessage(ValidationMessages.LastName);
@@ -19,20 +19,9 @@ public class CheckEligibilityRequestDataValidator_Fsm : AbstractValidator<CheckE
             .Must(DataValidation.BeAValidDate)
             .WithMessage(ValidationMessages.DOB);
 
-        When(x => !string.IsNullOrEmpty(x.NationalInsuranceNumber), () =>
-        {
-            RuleFor(x => x.NationalAsylumSeekerServiceNumber)
-                .Empty()
-                .WithMessage(ValidationMessages.NI_and_NASS);
             RuleFor(x => x.NationalInsuranceNumber)
                 .NotEmpty()
                 .Must(DataValidation.BeAValidNi)
                 .WithMessage(ValidationMessages.NI);
-        }).Otherwise(() =>
-        {
-            RuleFor(x => x.NationalAsylumSeekerServiceNumber)
-                .NotEmpty()
-                .WithMessage(ValidationMessages.NI_or_NASS);
-        });
     }
 }

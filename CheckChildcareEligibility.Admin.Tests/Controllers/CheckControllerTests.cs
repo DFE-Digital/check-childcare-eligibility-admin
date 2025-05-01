@@ -10,6 +10,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
@@ -30,7 +31,8 @@ public class CheckControllerTests : TestBase
 
         // Initialize use case mocks
         _loadParentDetailsUseCaseMock = new Mock<ILoadParentDetailsUseCase>();
-        _performEligibilityCheckUseCaseMock = new Mock<IPerformEligibilityCheckUseCase>();
+        _perform2YoEligibilityCheckUseCaseMock = new Mock<IPerform2YoEligibilityCheckUseCase>();
+        _performEyppEligibilityCheckUseCaseMock = new Mock<IPerformEyppEligibilityCheckUseCase>();
         _getCheckStatusUseCaseMock = new Mock<IGetCheckStatusUseCase>();
         _enterChildDetailsUseCaseMock = new Mock<IEnterChildDetailsUseCase>();
         _processChildDetailsUseCaseMock = new Mock<IProcessChildDetailsUseCase>();
@@ -53,7 +55,8 @@ public class CheckControllerTests : TestBase
             _checkGatewayMock.Object,
             _configMock.Object,
             _loadParentDetailsUseCaseMock.Object,
-            _performEligibilityCheckUseCaseMock.Object,
+            _perform2YoEligibilityCheckUseCaseMock.Object,
+            _performEyppEligibilityCheckUseCaseMock.Object,
             _enterChildDetailsUseCaseMock.Object,
             _processChildDetailsUseCaseMock.Object,
             _getCheckStatusUseCaseMock.Object,
@@ -85,7 +88,8 @@ public class CheckControllerTests : TestBase
     // Mocks for use cases
     private ILogger<CheckController> _loggerMock;
     private Mock<ILoadParentDetailsUseCase> _loadParentDetailsUseCaseMock;
-    private Mock<IPerformEligibilityCheckUseCase> _performEligibilityCheckUseCaseMock;
+    private Mock<IPerform2YoEligibilityCheckUseCase> _perform2YoEligibilityCheckUseCaseMock;
+    private Mock<IPerformEyppEligibilityCheckUseCase> _performEyppEligibilityCheckUseCaseMock;
     private Mock<IGetCheckStatusUseCase> _getCheckStatusUseCaseMock;
     private Mock<IEnterChildDetailsUseCase> _enterChildDetailsUseCaseMock;
     private Mock<IProcessChildDetailsUseCase> _processChildDetailsUseCaseMock;
@@ -226,6 +230,14 @@ public class CheckControllerTests : TestBase
         request.Month = "01";
         request.Year = "1990";
 
+        var tempData = new TempDataDictionary(
+           new DefaultHttpContext(),
+           Mock.Of<ITempDataProvider>()
+        );
+        tempData["eligibilityType"] = "2YO";
+
+        _sut.TempData = tempData;
+
         var validationResult = new ValidationResult { IsValid = true };
         var checkEligibilityResponse = _fixture.Create<CheckEligibilityResponse>();
 
@@ -233,7 +245,7 @@ public class CheckControllerTests : TestBase
             .Setup(x => x.Execute(request, It.IsAny<ModelStateDictionary>()))
             .Returns(validationResult);
 
-        _performEligibilityCheckUseCaseMock
+        _perform2YoEligibilityCheckUseCaseMock
             .Setup(x => x.Execute(request, _sut.HttpContext.Session))
             .ReturnsAsync(checkEligibilityResponse);
 
@@ -250,7 +262,7 @@ public class CheckControllerTests : TestBase
             x => x.Execute(request, It.IsAny<ModelStateDictionary>()),
             Times.Once);
 
-        _performEligibilityCheckUseCaseMock.Verify(
+        _perform2YoEligibilityCheckUseCaseMock.Verify(
             x => x.Execute(request, _sut.HttpContext.Session),
             Times.Once);
     }
@@ -267,6 +279,14 @@ public class CheckControllerTests : TestBase
         request.Month = "01";
         request.Year = "1990";
 
+        var tempData = new TempDataDictionary(
+           new DefaultHttpContext(),
+           Mock.Of<ITempDataProvider>()
+        );
+        tempData["eligibilityType"] = "2YO";
+
+        _sut.TempData = tempData;
+
         var validationResult = new ValidationResult { IsValid = true };
         var checkEligibilityResponse = _fixture.Create<CheckEligibilityResponse>();
 
@@ -274,7 +294,7 @@ public class CheckControllerTests : TestBase
             .Setup(x => x.Execute(request, It.IsAny<ModelStateDictionary>()))
             .Returns(validationResult);
 
-        _performEligibilityCheckUseCaseMock
+        _perform2YoEligibilityCheckUseCaseMock
             .Setup(x => x.Execute(request, _sut.HttpContext.Session))
             .ReturnsAsync(checkEligibilityResponse);
 
@@ -295,7 +315,7 @@ public class CheckControllerTests : TestBase
             x => x.Execute(request, It.IsAny<ModelStateDictionary>()),
             Times.Once);
 
-        _performEligibilityCheckUseCaseMock.Verify(
+        _perform2YoEligibilityCheckUseCaseMock.Verify(
             x => x.Execute(request, _sut.HttpContext.Session),
             Times.Once);
     }
