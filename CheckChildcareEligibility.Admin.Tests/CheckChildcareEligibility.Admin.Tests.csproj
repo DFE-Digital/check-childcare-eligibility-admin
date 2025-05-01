@@ -13,7 +13,6 @@
     <ItemGroup>
         <Compile Remove="Attributes\**" />
         <Compile Remove="Models\**" />
-        <Compile Remove="Controllers\CheckControllerTests.cs" />
         <EmbeddedResource Remove="Attributes\**" />
         <EmbeddedResource Remove="Models\**" />
         <None Remove="Attributes\**" />
