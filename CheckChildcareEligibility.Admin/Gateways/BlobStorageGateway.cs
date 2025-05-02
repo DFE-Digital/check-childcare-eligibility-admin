@@ -12,8 +12,8 @@ public class BlobStorageGateway : IBlobStorageGateway
 
     public BlobStorageGateway(IConfiguration configuration, ILoggerFactory logger)
     {
-        _connectionString = configuration["AzureStorageEvidence:ConnectionString"]; // TODO: Check this
-        _blobServiceClient = new BlobServiceClient(_connectionString);
+        //_connectionString = configuration["AzureStorageEvidence:ConnectionString"]; // TODO: Check this
+        //_blobServiceClient = new BlobServiceClient(_connectionString);
         _logger = logger.CreateLogger<BlobStorageGateway>();
     }
 
