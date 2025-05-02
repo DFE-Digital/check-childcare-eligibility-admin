@@ -177,19 +177,15 @@ public class CheckController : BaseController
             {
                 case "eligible":
                     return View(isLA ? "Outcome/Eligible_LA" : "Outcome/Eligible", eligbilityOutcomeVm);
-                    break;
 
                 case "notEligible":
                     return View(isLA ? "Outcome/Not_Eligible_LA" : "Outcome/Not_Eligible", eligbilityOutcomeVm);
-                    break;
 
                 case "parentNotFound":
                     return View("Outcome/Not_Found", eligbilityOutcomeVm);
-                    break;
 
                 case "queuedForProcessing":
                     return View("Loader", eligbilityOutcomeVm);
-                    break;
 
                 default:
                     return View("Outcome/Technical_Error");
