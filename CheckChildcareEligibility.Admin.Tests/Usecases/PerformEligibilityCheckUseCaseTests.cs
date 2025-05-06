@@ -79,8 +79,6 @@ public class PerformEligibilityCheckUseCaseTests
     public async Task Execute_WithNassParent_ShouldSetNassSessionData()
     {
         // Arrange
-        _parent.NationalAsylumSeekerServiceNumber = "NASS123456";
-        _parent.NinAsrSelection = ParentGuardian.NinAsrSelect.AsrnSelected;
         _checkGatewayMock.Setup(s => s.PostCheck(It.IsAny<CheckEligibilityRequest_Fsm>()))
             .ReturnsAsync(_eligibilityResponse);
 
