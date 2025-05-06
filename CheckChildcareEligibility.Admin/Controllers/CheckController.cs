@@ -76,7 +76,7 @@ public class CheckController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Enter_Details(ParentGuardian request, CheckEligibilityType eligibilityType)
+    public async Task<IActionResult> Enter_Details(ParentGuardian request)
     {
         var eligibilityType = TempData["eligibilityType"] as string;
         var validationResult = _validateParentDetailsUseCase.Execute(request, ModelState);
@@ -92,7 +92,24 @@ public class CheckController : BaseController
         TempData.Remove("FsmApplication");
         TempData.Remove("FsmEvidence");
 
-        var response = await _performEligibilityCheckUseCase.Execute(request, HttpContext.Session, eligibilityType);
+        // Map the string values "2YO" and "EYPP" to corresponding CheckEligibilityType enum values
+        CheckEligibilityType parsedEligibilityType;
+        if (eligibilityType == "2YO")
+        {
+            parsedEligibilityType = CheckEligibilityType.TwoYearOffer;
+        }
+        else if (eligibilityType == "EYPP")
+        {
+            parsedEligibilityType = CheckEligibilityType.EarlyYearPupilPremium;
+        }
+        else
+        {
+            // Handle unexpected values
+            _logger.LogError($"Failed to map eligibility type: {eligibilityType}");
+            return View("Outcome/Technical_Error");
+        }
+
+        var response = await _performEligibilityCheckUseCase.Execute(request, HttpContext.Session, parsedEligibilityType);
         TempData["Response"] = JsonConvert.SerializeObject(response);
 
         return RedirectToAction("Loader");
