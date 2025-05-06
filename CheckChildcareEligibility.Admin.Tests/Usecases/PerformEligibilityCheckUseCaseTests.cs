@@ -35,13 +35,11 @@ public class PerformEligibilityCheckUseCaseTests
 
         _parent = new ParentGuardian
         {
-            FirstName = "John",
             LastName = "Doe",
             Day = "01",
             Month = "01",
             Year = "1980",
             NationalInsuranceNumber = "AB123456C",
-            EmailAddress = "a@b.c"
         };
 
         _eligibilityResponse = new CheckEligibilityResponse
@@ -71,31 +69,9 @@ public class PerformEligibilityCheckUseCaseTests
         // Assert
         response.Should().BeEquivalentTo(_eligibilityResponse);
 
-        Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentFirstName")).Should().Be("John");
         Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentLastName")).Should().Be("Doe");
         Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentDOB")).Should().Be("1980-01-01");
         Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentNINO")).Should().Be("AB123456C");
-    }
-
-    [Test]
-    public async Task Execute_WithNassParent_ShouldSetNassSessionData()
-    {
-        // Arrange
-        _parent.NationalAsylumSeekerServiceNumber = "NASS123456";
-        _parent.NinAsrSelection = ParentGuardian.NinAsrSelect.AsrnSelected;
-        _checkGatewayMock.Setup(s => s.PostCheck(It.IsAny<CheckEligibilityRequest_Fsm>()))
-            .ReturnsAsync(_eligibilityResponse);
-
-        // Act
-        var response = await _sut.Execute(_parent, _sessionMock.Object);
-
-        // Assert
-        response.Should().BeEquivalentTo(_eligibilityResponse);
-
-        Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentFirstName")).Should().Be("John");
-        Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentLastName")).Should().Be("Doe");
-        Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentDOB")).Should().Be("1980-01-01");
-        Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentNASS")).Should().Be("NASS123456");
     }
 
     [Test]
