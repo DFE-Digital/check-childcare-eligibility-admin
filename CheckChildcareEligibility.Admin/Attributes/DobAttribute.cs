@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Child = CheckChildcareEligibility.Admin.Models.Child;
+using Child = CheckChildcareEligibility.Admin.Models;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public class DobAttribute : ValidationAttribute

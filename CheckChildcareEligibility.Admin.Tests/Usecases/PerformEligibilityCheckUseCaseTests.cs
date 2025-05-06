@@ -1,6 +1,7 @@
 using System.Text;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
@@ -64,7 +65,7 @@ public class PerformEligibilityCheckUseCaseTests
             .ReturnsAsync(_eligibilityResponse);
 
         // Act
-        var response = await _sut.Execute(_parent, _sessionMock.Object);
+        var response = await _sut.Execute(_parent, _sessionMock.Object, CheckEligibilityType.FreeSchoolMeals);
 
         // Assert
         response.Should().BeEquivalentTo(_eligibilityResponse);
@@ -75,6 +76,25 @@ public class PerformEligibilityCheckUseCaseTests
     }
 
     [Test]
+    public async Task Execute_WithNassParent_ShouldSetNassSessionData()
+    {
+        // Arrange
+        _checkGatewayMock.Setup(s => s.PostCheck(It.IsAny<CheckEligibilityRequest_Fsm>()))
+            .ReturnsAsync(_eligibilityResponse);
+
+        // Act
+        var response = await _sut.Execute(_parent, _sessionMock.Object, CheckEligibilityType.FreeSchoolMeals);
+
+        // Assert
+        response.Should().BeEquivalentTo(_eligibilityResponse);
+
+        Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentFirstName")).Should().Be("John");
+        Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentLastName")).Should().Be("Doe");
+        Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentDOB")).Should().Be("1980-01-01");
+        Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentNASS")).Should().Be("NASS123456");
+    }
+
+    [Test]
     public async Task Execute_WhenApiThrowsException_ShouldThrow()
     {
         // Arrange
@@ -82,7 +102,7 @@ public class PerformEligibilityCheckUseCaseTests
             .ThrowsAsync(new Exception("API Error"));
 
         // Act
-        Func<Task> act = async () => await _sut.Execute(_parent, _sessionMock.Object);
+        Func<Task> act = async () => await _sut.Execute(_parent, _sessionMock.Object, CheckEligibilityType.FreeSchoolMeals);
 
         // Assert
         await act.Should().ThrowAsync<Exception>().WithMessage("API Error");

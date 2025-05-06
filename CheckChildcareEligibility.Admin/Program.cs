@@ -30,24 +30,10 @@ if (Environment.GetEnvironmentVariable("CHILDCARE_ADMIN_KEY_VAULT_NAME") != null
 builder.Services.AddServices(builder.Configuration);
 builder.Services.AddSession();
 
-builder.Services.AddScoped<IAddChildUseCase, AddChildUseCase>();
-builder.Services.AddScoped<IChangeChildDetailsUseCase, ChangeChildDetailsUseCase>();
-builder.Services.AddScoped<IEnterChildDetailsUseCase, EnterChildDetailsUseCase>();
 builder.Services.AddScoped<ILoadParentDetailsUseCase, LoadParentDetailsUseCase>();
-builder.Services.AddScoped<IProcessChildDetailsUseCase, ProcessChildDetailsUseCase>();
 builder.Services.AddScoped<IPerformEligibilityCheckUseCase, PerformEligibilityCheckUseCase>();
 builder.Services.AddScoped<IGetCheckStatusUseCase, GetCheckStatusUseCase>();
-builder.Services.AddScoped<IRegistrationResponseUseCase, RegistrationResponseUseCase>();
-builder.Services.AddScoped<IRegistrationUseCase, RegistrationUseCase>();
-builder.Services.AddScoped<IRemoveChildUseCase, RemoveChildUseCase>();
-builder.Services.AddScoped<ICreateUserUseCase, CreateUserUseCase>();
-builder.Services.AddScoped<ISendNotificationUseCase, SendNotificationUseCase>();
-builder.Services.AddScoped<ISubmitApplicationUseCase, SubmitApplicationUseCase>();
 builder.Services.AddScoped<IValidateParentDetailsUseCase, ValidateParentDetailsUseCase>();
-builder.Services.AddScoped<IInitializeCheckAnswersUseCase, InitializeCheckAnswersUseCase>();
-builder.Services.AddScoped<IUploadEvidenceFileUseCase, UploadEvidenceFileUseCase>();
-builder.Services.AddScoped<IDownloadEvidenceFileUseCase, DownloadEvidenceFileUseCase>();
-builder.Services.AddScoped<IDeleteEvidenceFileUseCase, DeleteEvidenceFileUseCase>();
 builder.Services.AddSession();
 
 var dfeSignInConfiguration = new DfeSignInConfiguration();

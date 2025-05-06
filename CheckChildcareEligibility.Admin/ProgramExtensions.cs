@@ -9,27 +9,14 @@ public static class ProgramExtensions
     {
         services.AddControllersWithViews();
 
-        services.AddHttpClient<IParentGateway, ParentGateway>(client =>
-        {
-            client.BaseAddress = new Uri(configuration["Api:Host"]);
-        });
-
-        services.AddHttpClient<IAdminGateway, AdminGateway>(client =>
-        {
-            client.BaseAddress = new Uri(configuration["Api:Host"]);
-        });
+        
 
         services.AddHttpClient<ICheckGateway, CheckGateway>(client =>
         {
             client.BaseAddress = new Uri(configuration["Api:Host"]);
         });
 
-        services.AddHttpClient<INotificationGateway, NotificationGateway>(client =>
-        {
-            client.BaseAddress = new Uri(configuration["Api:Host"]);
-        });
-
-        services.AddScoped<IBlobStorageGateway, BlobStorageGateway>();
+        
         return services;
     }
 }

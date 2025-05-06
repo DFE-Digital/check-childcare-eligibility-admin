@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
@@ -7,67 +8,36 @@ using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Child = CheckChildcareEligibility.Admin.Models.Child;
 
 namespace CheckChildcareEligibility.Admin.Controllers;
 
 public class CheckController : BaseController
 {
-    private readonly IAddChildUseCase _addChildUseCase;
-    private readonly IChangeChildDetailsUseCase _changeChildDetailsUseCase;
     private readonly ICheckGateway _checkGateway;
     private readonly IConfiguration _config;
-    private readonly ICreateUserUseCase _createUserUseCase;
-    private readonly IEnterChildDetailsUseCase _enterChildDetailsUseCase;
     private readonly IGetCheckStatusUseCase _getCheckStatusUseCase;
     private readonly ILoadParentDetailsUseCase _loadParentDetailsUseCase;
     private readonly ILogger<CheckController> _logger;
-    private readonly IParentGateway _parentGateway;
     private readonly IPerformEligibilityCheckUseCase _performEligibilityCheckUseCase;
-    private readonly IProcessChildDetailsUseCase _processChildDetailsUseCase;
-    private readonly IRemoveChildUseCase _removeChildUseCase;
-    private readonly ISubmitApplicationUseCase _submitApplicationUseCase;
     private readonly IValidateParentDetailsUseCase _validateParentDetailsUseCase;
-    private readonly IUploadEvidenceFileUseCase _uploadEvidenceFileUseCase;
-    private readonly IDeleteEvidenceFileUseCase _deleteEvidenceFileUseCase;
-
+    
 
     public CheckController(
         ILogger<CheckController> logger,
-        IParentGateway parentGateway,
         ICheckGateway checkGateway,
         IConfiguration configuration,
         ILoadParentDetailsUseCase loadParentDetailsUseCase,
         IPerformEligibilityCheckUseCase performEligibilityCheckUseCase,
-        IEnterChildDetailsUseCase enterChildDetailsUseCase,
-        IProcessChildDetailsUseCase processChildDetailsUseCase,
         IGetCheckStatusUseCase getCheckStatusUseCase,
-        IAddChildUseCase addChildUseCase,
-        IRemoveChildUseCase removeChildUseCase,
-        IChangeChildDetailsUseCase changeChildDetailsUseCase,
-        ICreateUserUseCase createUserUseCase,
-        ISubmitApplicationUseCase submitApplicationUseCase,
-        IValidateParentDetailsUseCase validateParentDetailsUseCase,
-        IUploadEvidenceFileUseCase uploadEvidenceFileUseCase,
-        IDeleteEvidenceFileUseCase deleteEvidenceFileUseCase)
+        IValidateParentDetailsUseCase validateParentDetailsUseCase)
     {
         _config = configuration;
         _logger = logger;
-        _parentGateway = parentGateway;
         _checkGateway = checkGateway;
         _loadParentDetailsUseCase = loadParentDetailsUseCase;
         _performEligibilityCheckUseCase = performEligibilityCheckUseCase;
-        _enterChildDetailsUseCase = enterChildDetailsUseCase;
-        _processChildDetailsUseCase = processChildDetailsUseCase;
         _getCheckStatusUseCase = getCheckStatusUseCase;
-        _addChildUseCase = addChildUseCase;
-        _removeChildUseCase = removeChildUseCase;
-        _changeChildDetailsUseCase = changeChildDetailsUseCase;
-        _createUserUseCase = createUserUseCase;
-        _submitApplicationUseCase = submitApplicationUseCase;
         _validateParentDetailsUseCase = validateParentDetailsUseCase;
-        _uploadEvidenceFileUseCase = uploadEvidenceFileUseCase;
-        _deleteEvidenceFileUseCase = deleteEvidenceFileUseCase;
     }
 
     [HttpGet]
@@ -122,7 +92,24 @@ public class CheckController : BaseController
         TempData.Remove("FsmApplication");
         TempData.Remove("FsmEvidence");
 
-        var response = await _performEligibilityCheckUseCase.Execute(request, HttpContext.Session);
+        // Map the string values "2YO" and "EYPP" to corresponding CheckEligibilityType enum values
+        CheckEligibilityType parsedEligibilityType;
+        if (eligibilityType == "2YO")
+        {
+            parsedEligibilityType = CheckEligibilityType.TwoYearOffer;
+        }
+        else if (eligibilityType == "EYPP")
+        {
+            parsedEligibilityType = CheckEligibilityType.EarlyYearPupilPremium;
+        }
+        else
+        {
+            // Handle unexpected values
+            _logger.LogError($"Failed to map eligibility type: {eligibilityType}");
+            return View("Outcome/Technical_Error");
+        }
+
+        var response = await _performEligibilityCheckUseCase.Execute(request, HttpContext.Session, parsedEligibilityType);
         TempData["Response"] = JsonConvert.SerializeObject(response);
 
         return RedirectToAction("Loader");
@@ -173,315 +160,4 @@ public class CheckController : BaseController
     }
 
 
-    [HttpGet]
-    public IActionResult Enter_Child_Details()
-    {
-        var childrenModel = _enterChildDetailsUseCase.Execute(
-            TempData["ChildList"] as string,
-            TempData["IsChildAddOrRemove"] as bool?);
-
-
-        return View(childrenModel);
-    }
-
-    [HttpPost]
-    public IActionResult Enter_Child_Details(Children request)
-    {
-        if (TempData["FsmApplication"] != null && TempData["IsRedirect"] != null && (bool)TempData["IsRedirect"])
-            return View("Enter_Child_Details", request);
-
-        if (!ModelState.IsValid) return View("Enter_Child_Details", request);
-
-        var fsmApplication = _processChildDetailsUseCase.Execute(request, HttpContext.Session).Result;
-
-        // Restore evidence from TempData if it exists (from ChangeChildDetails)
-        if (TempData["FsmEvidence"] != null)
-        {
-            var savedEvidence = JsonConvert.DeserializeObject<Evidence>(TempData["FsmEvidence"].ToString());
-            fsmApplication.Evidence = savedEvidence;
-
-            TempData.Remove("FsmEvidence");
-        }
-        else
-        {
-            fsmApplication.Evidence = new Evidence { EvidenceList = new List<EvidenceFile>() };
-        }
-
-        TempData["FsmApplication"] = JsonConvert.SerializeObject(fsmApplication);
-
-        return RedirectToAction("UploadEvidence");
-    }
-
-    [HttpPost]
-    public IActionResult Add_Child(Children request)
-    {
-        try
-        {
-            TempData["IsChildAddOrRemove"] = true;
-
-            var updatedChildren = _addChildUseCase.Execute(request);
-
-            TempData["ChildList"] = JsonConvert.SerializeObject(updatedChildren.ChildList);
-        }
-        catch (MaxChildrenException e)
-        {
-            TempData["ChildList"] = JsonConvert.SerializeObject(request.ChildList);
-        }
-
-        return RedirectToAction("Enter_Child_Details");
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Remove_Child(Children request, int index)
-    {
-        try
-        {
-            TempData["IsChildAddOrRemove"] = true;
-
-            var updatedChildren = await _removeChildUseCase.Execute(request, index);
-
-            TempData["ChildList"] = JsonConvert.SerializeObject(updatedChildren.ChildList);
-
-            return RedirectToAction("Enter_Child_Details");
-        }
-
-        catch (RemoveChildValidationException e)
-        {
-            ModelState.AddModelError(string.Empty, e.Message);
-            return RedirectToAction("Enter_Child_Details");
-        }
-    }
-
-    [HttpGet]
-    public IActionResult Check_Answers()
-    {
-        if (TempData["FsmApplication"] != null)
-        {
-            var fsmApplication = JsonConvert.DeserializeObject<FsmApplication>(TempData["FsmApplication"].ToString());
-            // Re-save the application data to TempData for the next request
-            TempData["FsmApplication"] = JsonConvert.SerializeObject(fsmApplication);
-            return View("Check_Answers", fsmApplication);
-        }
-
-        // Fallback - empty model
-        return View("Check_Answers");
-    }
-
-    [HttpPost]
-    [ActionName("Check_Answers")]
-    public async Task<IActionResult> Check_Answers_Post(FsmApplication request)
-    {
-        if (TempData["FsmApplication"] != null)
-        {
-            var savedApplication = JsonConvert.DeserializeObject<FsmApplication>(TempData["FsmApplication"].ToString());
-            if (savedApplication.Evidence?.EvidenceList?.Count > 0)
-            {
-                request.Evidence = savedApplication.Evidence;
-            }
-        }
-
-        _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
-        var userId = await _createUserUseCase.Execute(HttpContext.User.Claims);
-
-        var responses = await _submitApplicationUseCase.Execute(
-            request,
-            userId,
-            _Claims.Organisation.Urn);
-
-        TempData["FsmApplicationResponse"] = JsonConvert.SerializeObject(responses);
-
-        return RedirectToAction(
-            responses.FirstOrDefault()?.Data.Status == "Entitled"
-                ? "ApplicationsRegistered"
-                : "AppealsRegistered");
-    }
-
-    [HttpPost]
-    public IActionResult RemoveEvidenceItem(string fileName, string redirectAction)
-    {
-        if (TempData["FsmApplication"] != null)
-        {
-            var fsmApplication = JsonConvert.DeserializeObject<FsmApplication>(TempData["FsmApplication"].ToString());
-            var evidenceItem = fsmApplication.Evidence.EvidenceList.FirstOrDefault(e => e.FileName == fileName);
-            if (evidenceItem != null)
-            {
-                fsmApplication.Evidence.EvidenceList.Remove(evidenceItem);
-                TempData["FsmApplication"] = JsonConvert.SerializeObject(fsmApplication);
-            }
-
-            // Delete the file from blob storage
-            if (evidenceItem != null && !string.IsNullOrEmpty(evidenceItem.StorageAccountReference))
-            {
-                _deleteEvidenceFileUseCase.Execute(evidenceItem.StorageAccountReference, _config["AzureStorageEvidence:EvidenceFilesContainerName"]);
-            }
-        }
-
-        return RedirectToAction(redirectAction);
-    }
-
-    public IActionResult ChangeChildDetails(int child)
-    {
-        TempData["IsRedirect"] = true;
-        var model = new Children { ChildList = new List<Child>() };
-        var fsmApplication = new FsmApplication();
-
-        try
-        {
-            if (TempData["FsmApplication"] != null)
-            {
-                fsmApplication = JsonConvert.DeserializeObject<FsmApplication>(TempData["FsmApplication"].ToString());
-
-                // Save the evidence
-                TempData["FsmEvidence"] = JsonConvert.SerializeObject(fsmApplication.Evidence);
-            }
-
-            model = _changeChildDetailsUseCase.Execute(
-                TempData["FsmApplication"] as string);
-        }
-        catch (JSONException e)
-        {
-            ;
-        }
-        catch (NoChildException)
-        {
-            ;
-        }
-
-        return View("Enter_Child_Details", model);
-    }
-
-
-    [HttpGet]
-    public IActionResult ApplicationsRegistered()
-    {
-        var vm = JsonConvert.DeserializeObject<List<ApplicationSaveItemResponse>>(TempData["FsmApplicationResponse"]
-            .ToString());
-        return View("ApplicationsRegistered", vm);
-    }
-
-
-    [HttpGet]
-    public IActionResult AppealsRegistered()
-    {
-        var vm = JsonConvert.DeserializeObject<List<ApplicationSaveItemResponse>>(TempData["FsmApplicationResponse"]
-            .ToString());
-        return View("AppealsRegistered", vm);
-    }
-
-    [HttpGet]
-    public IActionResult UploadEvidence()
-    {
-        if (TempData["FsmApplication"] != null)
-        {
-            var fsmApplication = JsonConvert.DeserializeObject<FsmApplication>(TempData["FsmApplication"].ToString());
-            TempData["FsmApplication"] = JsonConvert.SerializeObject(fsmApplication);
-            return View(fsmApplication);
-        }
-        return View();
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> UploadEvidence(FsmApplication request)
-    {
-        ModelState.Clear();
-
-        var updatedRequest = new FsmApplication
-        {
-            ParentFirstName = request.ParentFirstName,
-            ParentLastName = request.ParentLastName,
-            ParentNino = request.ParentNino,
-            ParentNass = request.ParentNass ?? string.Empty, // Ensure not null
-            ParentDateOfBirth = request.ParentDateOfBirth,
-            ParentEmail = request.ParentEmail,
-            Children = request.Children,
-            Evidence = new Evidence { EvidenceList = new List<EvidenceFile>() }
-        };
-
-        // Retrieve existing application with evidence from TempData
-        if (TempData["FsmApplication"] != null)
-        {
-            var existingApplication = JsonConvert.DeserializeObject<FsmApplication>(TempData["FsmApplication"].ToString());
-
-            // Add existing evidence files if they exist
-            if (existingApplication?.Evidence?.EvidenceList != null && existingApplication.Evidence.EvidenceList.Any())
-            {
-                updatedRequest.Evidence.EvidenceList.AddRange(existingApplication.Evidence.EvidenceList);
-            }
-        }
-
-        // Process new files from the form if any were uploaded
-        if (request.EvidenceFiles != null && request.EvidenceFiles.Count > 0)
-        {
-            foreach (var file in request.EvidenceFiles)
-            {
-                try
-                {
-                    if (file.Length > 0)
-                    {
-                        string blobUrl = await _uploadEvidenceFileUseCase.Execute(file, _config["AzureStorageEvidence:EvidenceFilesContainerName"]);
-
-                        updatedRequest.Evidence.EvidenceList.Add(new EvidenceFile
-                        {
-                            FileName = file.FileName,
-                            FileType = file.ContentType,
-                            StorageAccountReference = blobUrl
-                        });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to upload evidence file {FileName}", file.FileName);
-                    ModelState.AddModelError("EvidenceFiles", $"Failed to upload file {file.FileName}");
-                }
-            }
-        }
-
-        // preserve any evidence files that came from the form submission
-        if (request.Evidence?.EvidenceList != null && request.Evidence.EvidenceList.Any())
-        {
-            var existingFiles = updatedRequest.Evidence.EvidenceList
-                .Select(f => f.StorageAccountReference)
-                .ToHashSet();
-
-            foreach (var file in request.Evidence.EvidenceList)
-            {
-                // Only add files that aren't already in our list
-                if (!string.IsNullOrEmpty(file.StorageAccountReference) &&
-                    !existingFiles.Contains(file.StorageAccountReference))
-                {
-                    updatedRequest.Evidence.EvidenceList.Add(file);
-                    existingFiles.Add(file.StorageAccountReference);
-                }
-            }
-        }
-
-        TempData["FsmApplication"] = JsonConvert.SerializeObject(updatedRequest);
-
-        if (!ModelState.IsValid)
-        {
-            return View("UploadEvidence", updatedRequest);
-        }
-
-        return RedirectToAction("Check_Answers");
-    }
-
-    [HttpPost]
-    public IActionResult ContinueWithoutMoreFiles(FsmApplication request)
-    {
-        var application = new FsmApplication
-        {
-            ParentFirstName = request.ParentFirstName,
-            ParentLastName = request.ParentLastName,
-            ParentNino = request.ParentNino,
-            ParentNass = request.ParentNass,
-            ParentDateOfBirth = request.ParentDateOfBirth,
-            ParentEmail = request.ParentEmail,
-            Children = request.Children,
-            Evidence = request.Evidence
-        };
-
-        TempData["FsmApplication"] = JsonConvert.SerializeObject(application);
-
-        return RedirectToAction("Check_Answers");
-    }
 }

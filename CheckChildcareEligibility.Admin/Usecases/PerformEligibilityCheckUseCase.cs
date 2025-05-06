@@ -1,6 +1,7 @@
 using System.Text;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
 
@@ -10,7 +11,8 @@ public interface IPerformEligibilityCheckUseCase
 {
     Task<CheckEligibilityResponse> Execute(
         ParentGuardian parentRequest,
-        ISession session
+        ISession session,
+        CheckEligibilityType eligibilityType
     );
 }
 
@@ -25,7 +27,8 @@ public class PerformEligibilityCheckUseCase : IPerformEligibilityCheckUseCase
 
     public async Task<CheckEligibilityResponse> Execute(
         ParentGuardian parentRequest,
-        ISession session)
+        ISession session,
+        CheckEligibilityType eligibilityType)
     {
         session.Set("ParentLastName", Encoding.UTF8.GetBytes(parentRequest.LastName ?? string.Empty));
 
@@ -43,7 +46,7 @@ public class PerformEligibilityCheckUseCase : IPerformEligibilityCheckUseCase
         // Build ECS request
         var checkEligibilityRequest = new CheckEligibilityRequest_Fsm
         {
-            Data = new CheckEligibilityRequestData_Fsm
+            Data = new CheckEligibilityRequestData_Fsm(eligibilityType)
             {
                 LastName = parentRequest.LastName,
                 NationalInsuranceNumber = parentRequest.NationalInsuranceNumber?.ToUpper(),
@@ -52,8 +55,6 @@ public class PerformEligibilityCheckUseCase : IPerformEligibilityCheckUseCase
         };
 
         // Call ECS check
-
-
         var response = await _checkGateway.PostCheck(checkEligibilityRequest);
 
         return response;
