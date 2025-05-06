@@ -1,5 +1,7 @@
+using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace CheckChildcareEligibility.Admin.Controllers;
 
@@ -11,6 +13,23 @@ public class HomeController : BaseController
         return View(_Claims);
     }
 
+    public IActionResult SingleCheckMenu()
+    {
+        return View("SingleCheckMenu");
+    }
+
+    [HttpPost]
+    public IActionResult SingleCheckMenu([FromForm] string eligibilityType)
+    {
+        if (string.IsNullOrEmpty(eligibilityType))
+        {
+            return BadRequest("Eligibility type is required.");
+        }
+
+        TempData["eligibilityType"] = eligibilityType;
+
+        return RedirectToAction("Enter_Details", "Check");
+    }
 
     public IActionResult Privacy()
     {

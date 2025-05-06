@@ -30,7 +30,6 @@ public class DobAttribute : ValidationAttribute
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
         var model = validationContext.ObjectInstance;
-        
 
         var dayString = GetPropertyStringValue(model, _dayPropertyName);
         var monthString = GetPropertyStringValue(model, _monthPropertyName);
@@ -120,6 +119,17 @@ public class DobAttribute : ValidationAttribute
                 var missingField = errorFields[1]; // [0] is DateOfBirth
                 message = $"Date of birth must include a {missingField.ToLower()}";
             }
+            else if (errorFields.Count == 4) // All fields missing
+            {
+                if (yearString != null && yearString.Length < 4)
+                {
+                    message = "Year must include 4 numbers";
+                }
+                else
+                {
+                    message = $"Enter a {_fieldName}";
+                }
+            }
             else // Multiple but not all fields missing
             {
                 message = "Enter a complete date of birth";
@@ -127,7 +137,14 @@ public class DobAttribute : ValidationAttribute
         }
         else if (errorFields.Any())
         {
-            message = "Date of birth must be a real date";
+            if (yearString.Length < 4)
+            {
+                message = "Year must include 4 numbers";
+            }
+            else
+            {
+                message = "Date of birth must be a real date";
+            }
         }
         else
         {
@@ -138,6 +155,10 @@ public class DobAttribute : ValidationAttribute
                 var dayInt = int.Parse(dayString);
 
                 var dob = new DateTime(yearInt, monthInt, dayInt);
+
+                if (dob > DateTime.Now)
+                    return new ValidationResult("Date of birth must be in the past",
+                        new[] { "DateOfBirth", "Day", "Month", "Year" });
 
                 return ValidationResult.Success;
             }

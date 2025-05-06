@@ -89,6 +89,100 @@
 
 /*END - Header account links */
 
+/*BEGIN - dashboard card overrides */
+
+.dfe-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border: 1px solid #b1b4b6;
+    max-width: 400px;
+}
+
+@media (max-width: 40.0525em) {
+    .dfe-card {
+        max-width: 100%;
+    }
+}
+
+.dfe-card > picture,
+.dfe-card > picture > img {
+    max-width: 100%;
+}
+
+.dfe-card-container {
+    padding: 24px !important;
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+}
+
+    .dfe-card-container :last-child {
+        margin-top: auto;
+    }
+
+    .dfe-card-container h2 + p:last-child,
+    .dfe-card-container h3 + p:last-child {
+        margin-top: 0px;
+    }
+
+.dfe-card:hover,
+.dfe-card:focus-within {
+    background-color: #003a69;
+}
+
+    .dfe-card:hover a,
+    .dfe-card:focus-within a,
+    .dfe-card:hover p,
+    .dfe-card:focus-within p,
+    .dfe-card:hover .govuk-heading-m,
+    .dfe-card:focus-within .govuk-heading-m {
+        color: #ffffff;
+    }
+
+.dfe-card:focus-within {
+    outline: 3px solid #ffdd00;
+}
+
+.dfe-card-container .dfe-card-link--retake:focus,
+.dfe-card-container .dfe-card-link--header:focus {
+    color: #0b0c0c;
+}
+
+.dfe-card-link--retake {
+    position: relative;
+    z-index: 2;
+}
+
+.dfe-card-link--header {
+    text-decoration: none;
+    color: #347ca9;
+}
+
+    .dfe-card-link--header:after {
+        position: absolute;
+        content: "";
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+.button-as-link-dfe-card-style {
+    padding: 0;
+    background: none;
+    border: none;
+    color: #1d70b8;
+    font-weight: 700;
+    text-align: left;
+}
+
+    .button-as-link-dfe-card-style:hover {
+        color: #ffffff;
+    }
+
+/*END - dashboard card overrides */
 
 /*BEGIN - Accessible dashboard card links */
 

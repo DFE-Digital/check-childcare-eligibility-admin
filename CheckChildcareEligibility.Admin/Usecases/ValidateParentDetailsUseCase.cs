@@ -25,33 +25,12 @@ public class ValidateParentDetailsUseCase : IValidateParentDetailsUseCase
 
     public ValidationResult Execute(ParentGuardian request, ModelStateDictionary modelState)
     {
-        if (request.NinAsrSelection == ParentGuardian.NinAsrSelect.None)
-        {
-            if (!modelState.IsValid)
-            {
-                var errors = ProcessModelStateErrors(modelState);
-                return new ValidationResult { IsValid = false, Errors = errors };
-            }
-        }
-        else if (request.NinAsrSelection == ParentGuardian.NinAsrSelect.AsrnSelected)
-        {
-            modelState.Remove("NationalInsuranceNumber");
-            if (!modelState.IsValid)
-            {
-                var errors = ProcessModelStateErrors(modelState);
-                return new ValidationResult { IsValid = false, Errors = errors };
-            }
-        }
-        else
-        {
-            modelState.Remove("NationalAsylumSeekerServiceNumber");
-            if (!modelState.IsValid)
-            {
-                var errors = ProcessModelStateErrors(modelState);
-                return new ValidationResult { IsValid = false, Errors = errors };
-            }
-        }
 
+        if (!modelState.IsValid)
+        {
+            var errors = ProcessModelStateErrors(modelState);
+            return new ValidationResult { IsValid = false, Errors = errors };
+        }
         return new ValidationResult { IsValid = true };
     }
 
@@ -63,18 +42,6 @@ public class ValidateParentDetailsUseCase : IValidateParentDetailsUseCase
                 k => k.Key,
                 v => v.Value.Errors.Select(e => e.ErrorMessage).ToList()
             );
-
-        const string targetValue = "Please select one option";
-
-        if (errors.ContainsKey("NationalInsuranceNumber") &&
-            errors.ContainsKey("NationalAsylumSeekerServiceNumber"))
-            if (errors["NationalInsuranceNumber"].Contains(targetValue) &&
-                errors["NationalAsylumSeekerServiceNumber"].Contains(targetValue))
-            {
-                errors.Remove("NationalInsuranceNumber");
-                errors.Remove("NationalAsylumSeekerServiceNumber");
-                errors["NINAS"] = new List<string> { targetValue };
-            }
 
         return errors;
     }

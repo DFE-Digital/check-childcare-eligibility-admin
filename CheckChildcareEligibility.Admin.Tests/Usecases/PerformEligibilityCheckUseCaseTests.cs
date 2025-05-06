@@ -36,13 +36,11 @@ public class PerformEligibilityCheckUseCaseTests
 
         _parent = new ParentGuardian
         {
-            FirstName = "John",
             LastName = "Doe",
             Day = "01",
             Month = "01",
             Year = "1980",
             NationalInsuranceNumber = "AB123456C",
-            EmailAddress = "a@b.c"
         };
 
         _eligibilityResponse = new CheckEligibilityResponse
@@ -72,7 +70,6 @@ public class PerformEligibilityCheckUseCaseTests
         // Assert
         response.Should().BeEquivalentTo(_eligibilityResponse);
 
-        Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentFirstName")).Should().Be("John");
         Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentLastName")).Should().Be("Doe");
         Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentDOB")).Should().Be("1980-01-01");
         Encoding.UTF8.GetString(_sessionMock.Object.Get("ParentNINO")).Should().Be("AB123456C");
