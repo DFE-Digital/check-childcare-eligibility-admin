@@ -225,7 +225,7 @@ public class CheckController : BaseController
 
     private string GetEligibilityTypeLabel(string eligibilityType)
     {
-        return "2 years old early learning";
+        return Domain.Constants.EligibilityTypeLabels.EligibilityTypeLabels.Labels[eligibilityType].ToLower();        
     }
 
     [HttpGet]
