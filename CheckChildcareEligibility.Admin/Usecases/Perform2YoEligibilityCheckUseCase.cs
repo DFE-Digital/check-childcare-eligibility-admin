@@ -1,34 +1,31 @@
 using System.Text;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
-using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
 
 namespace CheckChildcareEligibility.Admin.UseCases;
 
-public interface IPerformEligibilityCheckUseCase
+public interface IPerform2YoEligibilityCheckUseCase
 {
     Task<CheckEligibilityResponse> Execute(
         ParentGuardian parentRequest,
-        ISession session,
-        CheckEligibilityType eligibilityType
+        ISession session
     );
 }
 
-public class PerformEligibilityCheckUseCase : IPerformEligibilityCheckUseCase
+public class Perform2YoEligibilityCheckUseCase : IPerform2YoEligibilityCheckUseCase
 {
     private readonly ICheckGateway _checkGateway;
 
-    public PerformEligibilityCheckUseCase(ICheckGateway checkGateway)
+    public Perform2YoEligibilityCheckUseCase(ICheckGateway checkGateway)
     {
         _checkGateway = checkGateway ?? throw new ArgumentNullException(nameof(checkGateway));
     }
 
     public async Task<CheckEligibilityResponse> Execute(
         ParentGuardian parentRequest,
-        ISession session,
-        CheckEligibilityType eligibilityType)
+        ISession session)
     {
         session.Set("ParentLastName", Encoding.UTF8.GetBytes(parentRequest.LastName ?? string.Empty));
 
@@ -44,9 +41,9 @@ public class PerformEligibilityCheckUseCase : IPerformEligibilityCheckUseCase
         session.Set("ParentNINO", Encoding.UTF8.GetBytes(parentRequest.NationalInsuranceNumber ?? ""));
 
         // Build ECS request
-        var checkEligibilityRequest = new CheckEligibilityRequest_Fsm
+        var checkEligibilityRequest = new CheckEligibilityRequest
         {
-            Data = new CheckEligibilityRequestData_Fsm(eligibilityType)
+            Data = new CheckEligibilityRequestData(Domain.Enums.CheckEligibilityType.TwoYearOffer)
             {
                 LastName = parentRequest.LastName,
                 NationalInsuranceNumber = parentRequest.NationalInsuranceNumber?.ToUpper(),

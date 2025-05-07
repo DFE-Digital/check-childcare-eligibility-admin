@@ -1,3 +1,4 @@
+@model CheckChildcareEligibility.Admin.ViewModels.EligibilityOutcomeViewModel
 @{
     ViewData["Title"] = "May not be eligible";
 }
@@ -5,8 +6,6 @@
 @inject IConfiguration Configuration
 
 <div class="govuk-grid-column-full">
-    <a class="govuk-back-link" @Html.ActionLink("Back", "Enter_Details", "Check")</a>
-    @* <a class="govuk-back-link-nolink"></a> *@
 
     <div id="content" data-type="Not_Eligible" class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
@@ -14,36 +13,57 @@
                  data-module="govuk-notification-banner">
                 <div class="govuk-notification-banner__header">
                     <h2 class="govuk-notification-banner__title"
-                        id="govuk-notification-banner-title">@ViewData["Title"]</h2>
+                        id="govuk-notification-banner-title">
+                        @ViewData["Title"]
+                    </h2>
                 </div>
                 <div class="govuk-notification-banner__content">
                     <p class="govuk-notification-banner__heading">
-                        The children of this parent or guardian may not be eligible for free school meals.
+                        The children of this parent or guardian may not be eligible for @Model.EligibilityTypeLabel.
                     </p>
-                    <p class="govuk-body">The parent or guardian can appeal, but you’ll need to ask them for supporting
-                        evidence.</p>
-                    <p class="govuk-body"><a class="govuk-link" rel="noreferrer noopener" target="_blank"
-                                             href="~/Home/Guidance">See a complete list of acceptable evidence (opens in
-                            new tab)</a>.</p>
+                    <p class="govuk-body">They'll need to provide supporting evidence if they think they are eligible.</p>
                 </div>
             </div>
 
-            <h1 class="govuk-heading-l">Make an appeal</h1>
+            <h1 class="govuk-heading-l">Parent or guardian details</h1>
 
-            <p class="govuk-body">You'll be told how to send the local authority supporting evidence after you've made
-                an appeal.</p>
+            <div class="govuk-body">
+                <dl class="govuk-summary-list">
 
-            @Html.ActionLink("Appeal now", "Enter_Child_Details", "Check", null, new { @class = "govuk-button" })
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Last Name
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @Model.ParentLastName
+                        </dd>
+                    </div>
 
-            <p class="govuk-body">
-                Alternatively, you can
-                <a href="@Configuration["ContactUsUrl"]" class="govuk-link">
-                    contact the Department for Education support desk
-                </a>
-                to request a separate check
-            </p>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Date of birth
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @DateTime.Parse(Model.ParentDateOfBirth).ToString("d MMMM yyyy")
+                        </dd>
+                    </div>
 
-            <p>@Html.ActionLink("Return to dashboard", "Index", "Home")</p>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            National Insurance number
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @Model.ParentNino
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+
+            <h1 class="govuk-heading-l">What to do next</h1>
+            <p class="govuk-body">You can <a href="#" onclick="window.print(); return false;">print this page</a> for the parent or guardian to keep.</p>
+            <p class="govuk-body">If the parent or guardian provides supporting evidence, you'll need to review it and decide if they are eligible.</p>
+            @Html.ActionLink("Run another check", "Enter_Details", "Check", null, new { @class = "govuk-button" })
         </div>
+
     </div>
 </div>

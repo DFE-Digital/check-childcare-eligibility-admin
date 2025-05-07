@@ -12,13 +12,13 @@ using Moq;
 namespace CheckChildcareEligibility.Admin.Tests.UseCases;
 
 [TestFixture]
-public class PerformEligibilityCheckUseCaseTests
+public class Perform2YoEligibilityCheckUseCaseTests
 {
     [SetUp]
     public void SetUp()
     {
         _checkGatewayMock = new Mock<ICheckGateway>();
-        _sut = new PerformEligibilityCheckUseCase(_checkGatewayMock.Object);
+        _sut = new Perform2YoEligibilityCheckUseCase(_checkGatewayMock.Object);
 
         _sessionMock = new Mock<ISession>();
         var sessionStorage = new Dictionary<string, byte[]>();
@@ -50,7 +50,7 @@ public class PerformEligibilityCheckUseCaseTests
         };
     }
 
-    private PerformEligibilityCheckUseCase _sut;
+    private Perform2YoEligibilityCheckUseCase _sut;
     private Mock<ICheckGateway> _checkGatewayMock;
     private Mock<ISession> _sessionMock;
 
@@ -61,11 +61,11 @@ public class PerformEligibilityCheckUseCaseTests
     public async Task Execute_WithValidParent_ShouldReturnValidResponse()
     {
         // Arrange
-        _checkGatewayMock.Setup(s => s.PostCheck(It.IsAny<CheckEligibilityRequest_Fsm>()))
+        _checkGatewayMock.Setup(s => s.PostCheck(It.IsAny<CheckEligibilityRequest>()))
             .ReturnsAsync(_eligibilityResponse);
 
         // Act
-        var response = await _sut.Execute(_parent, _sessionMock.Object, CheckEligibilityType.FreeSchoolMeals);
+        var response = await _sut.Execute(_parent, _sessionMock.Object);
 
         // Assert
         response.Should().BeEquivalentTo(_eligibilityResponse);
@@ -79,11 +79,12 @@ public class PerformEligibilityCheckUseCaseTests
     public async Task Execute_WithNassParent_ShouldSetNassSessionData()
     {
         // Arrange
-        _checkGatewayMock.Setup(s => s.PostCheck(It.IsAny<CheckEligibilityRequest_Fsm>()))
+        
+        _checkGatewayMock.Setup(s => s.PostCheck(It.IsAny<CheckEligibilityRequest>()))
             .ReturnsAsync(_eligibilityResponse);
 
         // Act
-        var response = await _sut.Execute(_parent, _sessionMock.Object, CheckEligibilityType.FreeSchoolMeals);
+        var response = await _sut.Execute(_parent, _sessionMock.Object);
 
         // Assert
         response.Should().BeEquivalentTo(_eligibilityResponse);
@@ -98,11 +99,11 @@ public class PerformEligibilityCheckUseCaseTests
     public async Task Execute_WhenApiThrowsException_ShouldThrow()
     {
         // Arrange
-        _checkGatewayMock.Setup(s => s.PostCheck(It.IsAny<CheckEligibilityRequest_Fsm>()))
+        _checkGatewayMock.Setup(s => s.PostCheck(It.IsAny<CheckEligibilityRequest>()))
             .ThrowsAsync(new Exception("API Error"));
 
         // Act
-        Func<Task> act = async () => await _sut.Execute(_parent, _sessionMock.Object, CheckEligibilityType.FreeSchoolMeals);
+        Func<Task> act = async () => await _sut.Execute(_parent, _sessionMock.Object);
 
         // Assert
         await act.Should().ThrowAsync<Exception>().WithMessage("API Error");

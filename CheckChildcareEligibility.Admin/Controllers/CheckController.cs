@@ -6,6 +6,7 @@ using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
+using CheckChildcareEligibility.Admin.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -18,7 +19,8 @@ public class CheckController : BaseController
     private readonly IGetCheckStatusUseCase _getCheckStatusUseCase;
     private readonly ILoadParentDetailsUseCase _loadParentDetailsUseCase;
     private readonly ILogger<CheckController> _logger;
-    private readonly IPerformEligibilityCheckUseCase _performEligibilityCheckUseCase;
+    private readonly IPerform2YoEligibilityCheckUseCase _perform2YoEligibilityCheckUseCase;
+    private readonly IPerformEyppEligibilityCheckUseCase _performEyppEligibilityCheckUseCase;
     private readonly IValidateParentDetailsUseCase _validateParentDetailsUseCase;
     
 
@@ -27,7 +29,8 @@ public class CheckController : BaseController
         ICheckGateway checkGateway,
         IConfiguration configuration,
         ILoadParentDetailsUseCase loadParentDetailsUseCase,
-        IPerformEligibilityCheckUseCase performEligibilityCheckUseCase,
+        IPerform2YoEligibilityCheckUseCase perform2YoEligibilityCheckUseCase,
+        IPerformEyppEligibilityCheckUseCase performEyppEligibilityCheckUseCase,
         IGetCheckStatusUseCase getCheckStatusUseCase,
         IValidateParentDetailsUseCase validateParentDetailsUseCase)
     {
@@ -35,7 +38,8 @@ public class CheckController : BaseController
         _logger = logger;
         _checkGateway = checkGateway;
         _loadParentDetailsUseCase = loadParentDetailsUseCase;
-        _performEligibilityCheckUseCase = performEligibilityCheckUseCase;
+        _perform2YoEligibilityCheckUseCase = perform2YoEligibilityCheckUseCase;
+        _performEyppEligibilityCheckUseCase = performEyppEligibilityCheckUseCase;
         _getCheckStatusUseCase = getCheckStatusUseCase;
         _validateParentDetailsUseCase = validateParentDetailsUseCase;
     }
@@ -57,6 +61,8 @@ public class CheckController : BaseController
     [HttpGet]
     public async Task<IActionResult> Enter_Details()
     {
+        TempData.Remove("ParentDetails");
+      
         var eligibilityType = TempData["eligibilityType"].ToString();
         TempData["eligibilityType"] = eligibilityType;
         var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
@@ -71,6 +77,8 @@ public class CheckController : BaseController
             foreach (var (key, errorList) in validationErrors)
                 foreach (var error in errorList)
                     ModelState.AddModelError(key, error);
+        
+        TempData["ParentDetails"] = parent;
 
         return View(parent);
     }
@@ -78,8 +86,8 @@ public class CheckController : BaseController
     [HttpPost]
     public async Task<IActionResult> Enter_Details(ParentGuardian request)
     {
-        var eligibilityType = TempData["eligibilityType"] as string;
         var validationResult = _validateParentDetailsUseCase.Execute(request, ModelState);
+
 
         if (!validationResult.IsValid)
         {
@@ -92,25 +100,24 @@ public class CheckController : BaseController
         TempData.Remove("FsmApplication");
         TempData.Remove("FsmEvidence");
 
-        // Map the string values "2YO" and "EYPP" to corresponding CheckEligibilityType enum values
-        CheckEligibilityType parsedEligibilityType;
-        if (eligibilityType == "2YO")
-        {
-            parsedEligibilityType = CheckEligibilityType.TwoYearOffer;
-        }
-        else if (eligibilityType == "EYPP")
-        {
-            parsedEligibilityType = CheckEligibilityType.EarlyYearPupilPremium;
-        }
-        else
-        {
-            // Handle unexpected values
-            _logger.LogError($"Failed to map eligibility type: {eligibilityType}");
+        TempData["ParentDetails"] = JsonConvert.SerializeObject(request);
+
+        var eligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty;
+
+        if (string.IsNullOrEmpty(eligibilityType))
             return View("Outcome/Technical_Error");
+
+        if (string.Equals(eligibilityType, "2YO", StringComparison.OrdinalIgnoreCase))
+        {
+            var response = await _perform2YoEligibilityCheckUseCase.Execute(request, HttpContext.Session);
+            TempData["Response"] = JsonConvert.SerializeObject(response);
         }
 
-        var response = await _performEligibilityCheckUseCase.Execute(request, HttpContext.Session, parsedEligibilityType);
-        TempData["Response"] = JsonConvert.SerializeObject(response);
+        if (string.Equals(eligibilityType, "EYPP", StringComparison.OrdinalIgnoreCase))
+        {
+            var response = await _performEyppEligibilityCheckUseCase.Execute(request, HttpContext.Session);
+            TempData["Response"] = JsonConvert.SerializeObject(response);
+        }
 
         return RedirectToAction("Loader");
     }
@@ -130,34 +137,99 @@ public class CheckController : BaseController
 
             _logger.LogError(outcome);
 
+            var eligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty;
+
+            var parentDetailsJson = TempData["ParentDetails"]?.ToString();
+
+            if (parentDetailsJson != null)
+            {
+                TempData["ParentDetails"] = parentDetailsJson;
+            }
+
+            var (parent, validationErrors) = await _loadParentDetailsUseCase.Execute(
+                parentDetailsJson,
+                TempData["Errors"]?.ToString()
+            );
+
+            var eligbilityOutcomeVm = new EligibilityOutcomeViewModel
+            {
+                EligibilityType = eligibilityType,
+                EligibilityTypeLabel = GetEligibilityTypeLabel(eligibilityType),
+                ParentLastName = parent?.LastName ?? string.Empty,
+                ParentDateOfBirth = GetDateOfBirth(parent?.Day, parent?.Month, parent?.Year).ToString(),
+                ParentNino = parent?.NationalInsuranceNumber ?? string.Empty
+            };
+
             var isLA = _Claims?.Organisation?.Category?.Name == Constants.CategoryTypeLA; //false=school
             switch (outcome)
             {
                 case "eligible":
-                    return View(isLA ? "Outcome/Eligible_LA" : "Outcome/Eligible");
-                    break;
+                    return View(isLA ? "Outcome/Eligible_LA" : "Outcome/Eligible", eligbilityOutcomeVm);
 
                 case "notEligible":
-                    return View(isLA ? "Outcome/Not_Eligible_LA" : "Outcome/Not_Eligible");
-                    break;
+                    return View(isLA ? "Outcome/Not_Eligible_LA" : "Outcome/Not_Eligible", eligbilityOutcomeVm);
 
                 case "parentNotFound":
-                    return View("Outcome/Not_Found");
-                    break;
+                    return View("Outcome/Not_Found", eligbilityOutcomeVm);
 
                 case "queuedForProcessing":
-                    return View("Loader");
-                    break;
+                    return View("Loader", eligbilityOutcomeVm);
 
                 default:
-                    return View("Outcome/Technical_Error");
+                    return View("Outcome/Technical_Error", eligbilityOutcomeVm);
             }
         }
         catch (Exception ex)
         {
-            return View("Outcome/Technical_Error");
+            // Create a minimal view model for the error case
+            var eligbilityOutcomeVm = new EligibilityOutcomeViewModel
+            {
+                EligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty,
+                EligibilityTypeLabel = GetEligibilityTypeLabel(TempData.Peek("EligibilityType")?.ToString() ?? string.Empty)
+            };
+
+            // Try to get parent details again
+            if (TempData["ParentDetails"] != null)
+            {
+                var (parent, _) = await _loadParentDetailsUseCase.Execute(
+                    TempData["ParentDetails"]?.ToString(),
+                    null
+                );
+
+                if (parent != null)
+                {
+                    eligbilityOutcomeVm.ParentLastName = parent.LastName ?? string.Empty;
+                    eligbilityOutcomeVm.ParentDateOfBirth = GetDateOfBirth(parent.Day, parent.Month, parent.Year).ToString();
+                    eligbilityOutcomeVm.ParentNino = parent.NationalInsuranceNumber ?? string.Empty;
+                }
+            }
+
+            return View("Outcome/Technical_Error", eligbilityOutcomeVm);
         }
     }
 
+    public DateTime GetDateOfBirth(string? dayStr, string? monthStr, string? yearStr)
+{
+    if (int.TryParse(dayStr, out int day) &&
+        int.TryParse(monthStr, out int month) &&
+        int.TryParse(yearStr, out int year))
+    {
+        try
+        {
+            return new DateTime(year, month, day);
+        }
+        catch
+        {
+            return DateTime.MinValue;
+        }
+    }
+
+    return DateTime.MinValue;
+}
+
+    private string GetEligibilityTypeLabel(string eligibilityType)
+    {
+        return Domain.Constants.EligibilityTypeLabels.EligibilityTypeLabels.Labels[eligibilityType].ToLower();        
+    }
 
 }

@@ -150,7 +150,7 @@ public class BulkUploadTests : TestBase
                 Links = new CheckEligibilityResponseBulkLinks
                     { Get_BulkCheck_Results = "someUrl", Get_Progress_Check = "someUrl" }
             };
-        _checkGatewayMock.Setup(s => s.PostBulkCheck(It.IsAny<CheckEligibilityRequestBulk_Fsm>()))
+        _checkGatewayMock.Setup(s => s.PostBulkCheck(It.IsAny<CheckEligibilityRequestBulk>()))
             .ReturnsAsync(response);
 
         var content = Resources.bulkchecktemplate_small_Valid;
@@ -260,7 +260,7 @@ public class BulkUploadTests : TestBase
         };
 
         _checkGatewayMock.Setup(
-                s => s.PostBulkCheck(It.IsAny<CheckEligibilityRequestBulk_Fsm>()))
+                s => s.PostBulkCheck(It.IsAny<CheckEligibilityRequestBulk>()))
             .ReturnsAsync(response);
 
         _sut.TempData["ErrorMessage"] = "No more than 10 batch check requests can be made per hour";
@@ -305,7 +305,7 @@ public class BulkUploadTests : TestBase
         };
 
         _checkGatewayMock.Setup(
-                s => s.PostBulkCheck(It.IsAny<CheckEligibilityRequestBulk_Fsm>()))
+                s => s.PostBulkCheck(It.IsAny<CheckEligibilityRequestBulk>()))
             .ReturnsAsync(response);
 
         var content = Resources.bulkchecktemplate_small_Valid;

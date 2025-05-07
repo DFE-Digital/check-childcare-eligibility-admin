@@ -50,7 +50,7 @@ public class BulkCheckController : BaseController
         TempData["Response"] = "data_issue";
         List<CheckRow> DataLoad;
         var errorCount = 0;
-        var requestItems = new List<CheckEligibilityRequestData_Fsm>();
+        var requestItems = new List<CheckEligibilityRequestData>();
         var validationResultsItems = new StringBuilder();
         if (fileUpload == null || fileUpload.ContentType.ToLower() != "text/csv")
         {
@@ -115,20 +115,19 @@ public class BulkCheckController : BaseController
                 if (DataLoad == null || !DataLoad.Any()) throw new InvalidDataException("Invalid file content.");
             }
 
-            var validator = new CheckEligibilityRequestDataValidator_Fsm();
+            var validator = new CheckEligibilityRequestDataValidator();
             var sequence = 1;
 
 
             foreach (var item in DataLoad)
             {
-                var requestItem = new CheckEligibilityRequestData_Fsm(Domain.Enums.CheckEligibilityType.FreeSchoolMeals)
+                var requestItem = new CheckEligibilityRequestData(Domain.Enums.CheckEligibilityType.FreeSchoolMeals)
                 {
                     LastName = item.LastName,
                     DateOfBirth = DateTime.TryParse(item.DOB, out var dtval)
                         ? dtval.ToString("yyyy-MM-dd")
                         : string.Empty,
                     NationalInsuranceNumber = item.Ni.ToUpper(),
-                    NationalAsylumSeekerServiceNumber = item.Nass.ToUpper(),
                     Sequence = sequence
                 };
                 var validationResults = validator.Validate(requestItem);
@@ -154,7 +153,7 @@ public class BulkCheckController : BaseController
             return View("BulkOutcome/Error_Data_Issue");
         }
 
-        var result = await _checkGateway.PostBulkCheck(new CheckEligibilityRequestBulk_Fsm { Data = requestItems });
+        var result = await _checkGateway.PostBulkCheck(new CheckEligibilityRequestBulk { Data = requestItems });
         HttpContext.Session.SetString("Get_Progress_Check", result.Links.Get_Progress_Check);
         HttpContext.Session.SetString("Get_BulkCheck_Results", result.Links.Get_BulkCheck_Results);
         return RedirectToAction("Bulk_Loader");
