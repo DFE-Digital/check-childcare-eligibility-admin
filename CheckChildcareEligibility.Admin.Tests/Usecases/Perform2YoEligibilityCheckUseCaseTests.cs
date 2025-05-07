@@ -65,7 +65,7 @@ public class Perform2YoEligibilityCheckUseCaseTests
             .ReturnsAsync(_eligibilityResponse);
 
         // Act
-        var response = await _sut.Execute(_parent, _sessionMock.Object, CheckEligibilityType.FreeSchoolMeals);
+        var response = await _sut.Execute(_parent, _sessionMock.Object);
 
         // Assert
         response.Should().BeEquivalentTo(_eligibilityResponse);
@@ -84,7 +84,7 @@ public class Perform2YoEligibilityCheckUseCaseTests
             .ReturnsAsync(_eligibilityResponse);
 
         // Act
-        var response = await _sut.Execute(_parent, _sessionMock.Object, CheckEligibilityType.FreeSchoolMeals);
+        var response = await _sut.Execute(_parent, _sessionMock.Object);
 
         // Assert
         response.Should().BeEquivalentTo(_eligibilityResponse);
@@ -103,7 +103,7 @@ public class Perform2YoEligibilityCheckUseCaseTests
             .ThrowsAsync(new Exception("API Error"));
 
         // Act
-        Func<Task> act = async () => await _sut.Execute(_parent, _sessionMock.Object, CheckEligibilityType.FreeSchoolMeals);
+        Func<Task> act = async () => await _sut.Execute(_parent, _sessionMock.Object);
 
         // Assert
         await act.Should().ThrowAsync<Exception>().WithMessage("API Error");

@@ -1,7 +1,6 @@
 using System.Text;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
-using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
 
@@ -11,8 +10,7 @@ public interface IPerform2YoEligibilityCheckUseCase
 {
     Task<CheckEligibilityResponse> Execute(
         ParentGuardian parentRequest,
-        ISession session,
-        CheckEligibilityType eligibilityType
+        ISession session
     );
 }
 
@@ -27,8 +25,7 @@ public class Perform2YoEligibilityCheckUseCase : IPerform2YoEligibilityCheckUseC
 
     public async Task<CheckEligibilityResponse> Execute(
         ParentGuardian parentRequest,
-        ISession session,
-        CheckEligibilityType eligibilityType)
+        ISession session)
     {
         session.Set("ParentLastName", Encoding.UTF8.GetBytes(parentRequest.LastName ?? string.Empty));
 

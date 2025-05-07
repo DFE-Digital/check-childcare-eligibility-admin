@@ -35,13 +35,11 @@ public class PerformEyppEligibilityCheckUseCaseTests
 
         _parent = new ParentGuardian
         {
-            FirstName = "John",
             LastName = "Doe",
             Day = "01",
             Month = "01",
             Year = "1980",
-            NationalInsuranceNumber = "AB123456C",
-            EmailAddress = "a@b.c"
+            NationalInsuranceNumber = "AB123456C"
         };
 
         _eligibilityResponse = new CheckEligibilityResponse
@@ -81,8 +79,6 @@ public class PerformEyppEligibilityCheckUseCaseTests
     public async Task Execute_WithNassParent_ShouldSetNassSessionData()
     {
         // Arrange
-        _parent.NationalAsylumSeekerServiceNumber = "NASS123456";
-        _parent.NinAsrSelection = ParentGuardian.NinAsrSelect.AsrnSelected;
         _checkGatewayMock.Setup(s => s.PostCheck(It.IsAny<CheckEligibilityRequest>()))
             .ReturnsAsync(_eligibilityResponse);
 

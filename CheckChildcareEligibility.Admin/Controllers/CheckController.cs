@@ -19,12 +19,8 @@ public class CheckController : BaseController
     private readonly IGetCheckStatusUseCase _getCheckStatusUseCase;
     private readonly ILoadParentDetailsUseCase _loadParentDetailsUseCase;
     private readonly ILogger<CheckController> _logger;
-    private readonly IParentGateway _parentGateway;
     private readonly IPerform2YoEligibilityCheckUseCase _perform2YoEligibilityCheckUseCase;
     private readonly IPerformEyppEligibilityCheckUseCase _performEyppEligibilityCheckUseCase;
-    private readonly IProcessChildDetailsUseCase _processChildDetailsUseCase;
-    private readonly IRemoveChildUseCase _removeChildUseCase;
-    private readonly ISubmitApplicationUseCase _submitApplicationUseCase;
     private readonly IValidateParentDetailsUseCase _validateParentDetailsUseCase;
     
 
@@ -35,8 +31,6 @@ public class CheckController : BaseController
         ILoadParentDetailsUseCase loadParentDetailsUseCase,
         IPerform2YoEligibilityCheckUseCase perform2YoEligibilityCheckUseCase,
         IPerformEyppEligibilityCheckUseCase performEyppEligibilityCheckUseCase,
-        IEnterChildDetailsUseCase enterChildDetailsUseCase,
-        IProcessChildDetailsUseCase processChildDetailsUseCase,
         IGetCheckStatusUseCase getCheckStatusUseCase,
         IValidateParentDetailsUseCase validateParentDetailsUseCase)
     {
@@ -46,8 +40,6 @@ public class CheckController : BaseController
         _loadParentDetailsUseCase = loadParentDetailsUseCase;
         _perform2YoEligibilityCheckUseCase = perform2YoEligibilityCheckUseCase;
         _performEyppEligibilityCheckUseCase = performEyppEligibilityCheckUseCase;
-        _enterChildDetailsUseCase = enterChildDetailsUseCase;
-        _processChildDetailsUseCase = processChildDetailsUseCase;
         _getCheckStatusUseCase = getCheckStatusUseCase;
         _validateParentDetailsUseCase = validateParentDetailsUseCase;
     }
@@ -71,7 +63,6 @@ public class CheckController : BaseController
     {
         TempData.Remove("ParentDetails");
       
-
         var eligibilityType = TempData["eligibilityType"].ToString();
         TempData["eligibilityType"] = eligibilityType;
         var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
@@ -95,7 +86,6 @@ public class CheckController : BaseController
     [HttpPost]
     public async Task<IActionResult> Enter_Details(ParentGuardian request)
     {
-        var eligibilityType = TempData["eligibilityType"] as string;
         var validationResult = _validateParentDetailsUseCase.Execute(request, ModelState);
 
 
@@ -149,11 +139,17 @@ public class CheckController : BaseController
 
             var eligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty;
 
+            var parentDetailsJson = TempData["ParentDetails"]?.ToString();
+
+            if (parentDetailsJson != null)
+            {
+                TempData["ParentDetails"] = parentDetailsJson;
+            }
+
             var (parent, validationErrors) = await _loadParentDetailsUseCase.Execute(
-                TempData["ParentDetails"]?.ToString(),
+                parentDetailsJson,
                 TempData["Errors"]?.ToString()
             );
-
 
             var eligbilityOutcomeVm = new EligibilityOutcomeViewModel
             {
@@ -185,7 +181,30 @@ public class CheckController : BaseController
         }
         catch (Exception ex)
         {
-            return View("Outcome/Technical_Error");
+            // Create a minimal view model for the error case
+            var eligbilityOutcomeVm = new EligibilityOutcomeViewModel
+            {
+                EligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty,
+                EligibilityTypeLabel = GetEligibilityTypeLabel(TempData.Peek("EligibilityType")?.ToString() ?? string.Empty)
+            };
+
+            // Try to get parent details again
+            if (TempData["ParentDetails"] != null)
+            {
+                var (parent, _) = await _loadParentDetailsUseCase.Execute(
+                    TempData["ParentDetails"]?.ToString(),
+                    null
+                );
+
+                if (parent != null)
+                {
+                    eligbilityOutcomeVm.ParentLastName = parent.LastName ?? string.Empty;
+                    eligbilityOutcomeVm.ParentDateOfBirth = GetDateOfBirth(parent.Day, parent.Month, parent.Year).ToString();
+                    eligbilityOutcomeVm.ParentNino = parent.NationalInsuranceNumber ?? string.Empty;
+                }
+            }
+
+            return View("Outcome/Technical_Error", eligbilityOutcomeVm);
         }
     }
 

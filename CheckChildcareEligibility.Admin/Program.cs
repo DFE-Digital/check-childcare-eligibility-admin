@@ -31,7 +31,6 @@ builder.Services.AddServices(builder.Configuration);
 builder.Services.AddSession();
 
 builder.Services.AddScoped<ILoadParentDetailsUseCase, LoadParentDetailsUseCase>();
-builder.Services.AddScoped<IProcessChildDetailsUseCase, ProcessChildDetailsUseCase>();
 builder.Services.AddScoped<IPerform2YoEligibilityCheckUseCase, Perform2YoEligibilityCheckUseCase>();
 builder.Services.AddScoped<IPerformEyppEligibilityCheckUseCase, PerformEyppEligibilityCheckUseCase>();
 builder.Services.AddScoped<IGetCheckStatusUseCase, GetCheckStatusUseCase>();

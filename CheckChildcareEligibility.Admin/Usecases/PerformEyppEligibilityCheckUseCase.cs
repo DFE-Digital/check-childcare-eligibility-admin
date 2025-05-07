@@ -27,7 +27,6 @@ public class PerformEyppEligibilityCheckUseCase : IPerformEyppEligibilityCheckUs
         ParentGuardian parentRequest,
         ISession session)
     {
-        session.Set("ParentFirstName", Encoding.UTF8.GetBytes(parentRequest.FirstName ?? string.Empty));
         session.Set("ParentLastName", Encoding.UTF8.GetBytes(parentRequest.LastName ?? string.Empty));
 
         // Build DOB string
@@ -38,20 +37,8 @@ public class PerformEyppEligibilityCheckUseCase : IPerformEyppEligibilityCheckUs
         ).ToString("yyyy-MM-dd");
 
         session.Set("ParentDOB", Encoding.UTF8.GetBytes(dobString));
-        session.SetString("ParentEmail", parentRequest.EmailAddress);
-
-        // If we're finishing a NASS flow, store "ParentNASS"; 
-        // otherwise store "ParentNINO".
-        if (parentRequest.NinAsrSelection == ParentGuardian.NinAsrSelect.AsrnSelected)
-        {
-            session.Set("ParentNASS", Encoding.UTF8.GetBytes(parentRequest.NationalAsylumSeekerServiceNumber ?? ""));
-            session.Remove("ParentNINO");
-        }
-        else
-        {
-            session.Set("ParentNINO", Encoding.UTF8.GetBytes(parentRequest.NationalInsuranceNumber ?? ""));
-            session.Remove("ParentNASS");
-        }
+        
+        session.Set("ParentNINO", Encoding.UTF8.GetBytes(parentRequest.NationalInsuranceNumber ?? ""));
 
         // Build ECS request
         var checkEligibilityRequest = new CheckEligibilityRequest

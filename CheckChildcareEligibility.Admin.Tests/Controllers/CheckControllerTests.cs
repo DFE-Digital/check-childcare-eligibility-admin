@@ -43,8 +43,6 @@ public class CheckControllerTests : TestBase
             _loadParentDetailsUseCaseMock.Object,
             _perform2YoEligibilityCheckUseCaseMock.Object,
             _performEyppEligibilityCheckUseCaseMock.Object,
-            _enterChildDetailsUseCaseMock.Object,
-            _processChildDetailsUseCaseMock.Object,
             _getCheckStatusUseCaseMock.Object,
             _validateParentDetailsUseCaseMock.Object
         );
