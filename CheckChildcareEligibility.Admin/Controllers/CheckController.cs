@@ -195,7 +195,7 @@ public class CheckController : BaseController
                     return View("Loader", eligbilityOutcomeVm);
 
                 default:
-                    return View("Outcome/Technical_Error");
+                    return View("Outcome/Technical_Error", eligbilityOutcomeVm);
             }
         }
         catch (Exception ex)
