@@ -20,45 +20,40 @@
                 </div>
             </div>
 
-            <div class="govuk-summary-card">
-                <div class="govuk-summary-card__title-wrapper">
-                    <h2 class="govuk-summary-card__title">
-                        Parent or guardian details
-                    </h2>
-                </div>
+            <h1 class="govuk-heading-l">Parent or guardian details</h1>
 
-                <div class="govuk-summary-card__content">
-                    <dl class="govuk-summary-list">
+            <div class="govuk-body">
+                <dl class="govuk-summary-list">
 
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                Last Name
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                @Model.ParentLastName
-                            </dd>
-                        </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Last Name
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @Model.ParentLastName
+                        </dd>
+                    </div>
 
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                Date of birth
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                @DateTime.Parse(Model.ParentDateOfBirth).ToString("d MMMM yyyy")
-                            </dd>
-                        </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Date of birth
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @DateTime.Parse(Model.ParentDateOfBirth).ToString("d MMMM yyyy")
+                        </dd>
+                    </div>
 
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                National Insurance number
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                @Model.ParentNino
-                            </dd>
-                        </div>
-                    </dl>
-                </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            National Insurance number
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @Model.ParentNino
+                        </dd>
+                    </div>
+                </dl>
             </div>
+
             <h1 class="govuk-heading-l">What to do next</h1>
             <p class="govuk-body">Check that you entered the parent or guardian last name in full and that all other details are correct.</p>
             <p class="govuk-body">If this keeps happening, <a href="#" onclick="window.print(); return false;">print this page</a> for the parent or guardian to check their details.</p>

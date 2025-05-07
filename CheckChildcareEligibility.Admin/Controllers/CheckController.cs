@@ -90,6 +90,9 @@ public class CheckController : BaseController
     [HttpGet]
     public async Task<IActionResult> Enter_Details()
     {
+        TempData.Remove("ParentDetails");
+      
+
         var (parent, validationErrors) = await _loadParentDetailsUseCase.Execute(
             TempData["ParentDetails"]?.ToString(),
             TempData["Errors"]?.ToString()
@@ -110,6 +113,7 @@ public class CheckController : BaseController
     {
         var validationResult = _validateParentDetailsUseCase.Execute(request, ModelState);
 
+
         if (!validationResult.IsValid)
         {
             TempData["ParentDetails"] = JsonConvert.SerializeObject(request);
@@ -120,6 +124,8 @@ public class CheckController : BaseController
         // Clear data when starting a new application
         TempData.Remove("FsmApplication");
         TempData.Remove("FsmEvidence");
+
+        TempData["ParentDetails"] = JsonConvert.SerializeObject(request);
 
         var eligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty;
 
@@ -163,12 +169,13 @@ public class CheckController : BaseController
                 TempData["Errors"]?.ToString()
             );
 
+
             var eligbilityOutcomeVm = new EligibilityOutcomeViewModel
             {
                 EligibilityType = eligibilityType,
                 EligibilityTypeLabel = GetEligibilityTypeLabel(eligibilityType),
                 ParentLastName = parent?.LastName ?? string.Empty,
-                ParentDateOfBirth = parent?.DateOfBirth ?? string.Empty,
+                ParentDateOfBirth = GetDateOfBirth(parent?.Day, parent?.Month, parent?.Year).ToString(),
                 ParentNino = parent?.NationalInsuranceNumber ?? string.Empty
             };
 
@@ -196,6 +203,25 @@ public class CheckController : BaseController
             return View("Outcome/Technical_Error");
         }
     }
+
+    public DateTime GetDateOfBirth(string? dayStr, string? monthStr, string? yearStr)
+{
+    if (int.TryParse(dayStr, out int day) &&
+        int.TryParse(monthStr, out int month) &&
+        int.TryParse(yearStr, out int year))
+    {
+        try
+        {
+            return new DateTime(year, month, day);
+        }
+        catch
+        {
+            return DateTime.MinValue;
+        }
+    }
+
+    return DateTime.MinValue;
+}
 
     private string GetEligibilityTypeLabel(string eligibilityType)
     {
