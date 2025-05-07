@@ -21,7 +21,6 @@
         <Content Remove="Views\Check\Enter_Child_Details.cshtml" />
         <Content Remove="Views\Check\UploadEvidence.cshtml" />
         <Content Remove="Views\Check\Check_Answers.cshtml" />
-        <Content Remove="Views\Shared\_ValidationSummary.cshtml" />
     </ItemGroup>
 
     <ItemGroup>
