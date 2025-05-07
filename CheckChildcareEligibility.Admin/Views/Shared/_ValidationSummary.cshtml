@@ -5,7 +5,7 @@
 
     List<string> propertyOrder;
 
-    if (Model.ContainsKey("FirstName"))
+    if (Model.ContainsKey("LastName"))
     {
         propertyOrder = typeof(ParentGuardian).GetProperties().Select(p => p.Name).ToList();
     }

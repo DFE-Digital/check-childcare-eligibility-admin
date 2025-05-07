@@ -1,6 +1,7 @@
 using System.Text;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
 
@@ -10,7 +11,8 @@ public interface IPerform2YoEligibilityCheckUseCase
 {
     Task<CheckEligibilityResponse> Execute(
         ParentGuardian parentRequest,
-        ISession session
+        ISession session,
+        CheckEligibilityType eligibilityType
     );
 }
 
@@ -25,9 +27,9 @@ public class Perform2YoEligibilityCheckUseCase : IPerform2YoEligibilityCheckUseC
 
     public async Task<CheckEligibilityResponse> Execute(
         ParentGuardian parentRequest,
-        ISession session)
+        ISession session,
+        CheckEligibilityType eligibilityType)
     {
-        session.Set("ParentFirstName", Encoding.UTF8.GetBytes(parentRequest.FirstName ?? string.Empty));
         session.Set("ParentLastName", Encoding.UTF8.GetBytes(parentRequest.LastName ?? string.Empty));
 
         // Build DOB string
@@ -38,20 +40,8 @@ public class Perform2YoEligibilityCheckUseCase : IPerform2YoEligibilityCheckUseC
         ).ToString("yyyy-MM-dd");
 
         session.Set("ParentDOB", Encoding.UTF8.GetBytes(dobString));
-        session.SetString("ParentEmail", parentRequest.EmailAddress);
 
-        // If we're finishing a NASS flow, store "ParentNASS"; 
-        // otherwise store "ParentNINO".
-        if (parentRequest.NinAsrSelection == ParentGuardian.NinAsrSelect.AsrnSelected)
-        {
-            session.Set("ParentNASS", Encoding.UTF8.GetBytes(parentRequest.NationalAsylumSeekerServiceNumber ?? ""));
-            session.Remove("ParentNINO");
-        }
-        else
-        {
-            session.Set("ParentNINO", Encoding.UTF8.GetBytes(parentRequest.NationalInsuranceNumber ?? ""));
-            session.Remove("ParentNASS");
-        }
+        session.Set("ParentNINO", Encoding.UTF8.GetBytes(parentRequest.NationalInsuranceNumber ?? ""));
 
         // Build ECS request
         var checkEligibilityRequest = new CheckEligibilityRequest
@@ -65,8 +55,6 @@ public class Perform2YoEligibilityCheckUseCase : IPerform2YoEligibilityCheckUseC
         };
 
         // Call ECS check
-
-
         var response = await _checkGateway.PostCheck(checkEligibilityRequest);
 
         return response;
