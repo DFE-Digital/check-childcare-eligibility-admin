@@ -58,7 +58,7 @@
             <h1 class="govuk-heading-l">What to do next</h1>
             <p class="govuk-body">Tell the childcare provider that the children of this parent or guardian are eligible for @Model.EligibilityTypeLabel.</p>
             <p class="govuk-body">You can <a href="#" onclick="window.print(); return false;">print this page</a> for the parent or guardian to keep.</p>
-            @Html.ActionLink("Run another check", "Enter_Details", "Check", null, new { @class = "govuk-button" })
+            @Html.ActionLink("Run another check", "Enter_Details", "Check", new { clearData = true }, new { @class = "govuk-button" })
         </div>
     </div>
 </div>

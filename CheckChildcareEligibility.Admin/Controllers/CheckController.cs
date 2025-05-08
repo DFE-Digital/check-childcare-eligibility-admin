@@ -59,9 +59,14 @@ public class CheckController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Enter_Details()
+    public async Task<IActionResult> Enter_Details(bool clearData = false)
     {
-        TempData.Remove("ParentDetails");
+        // If clearData is true, remove the ParentDetails from TempData
+        if (clearData)
+        {
+            TempData.Remove("ParentDetails");
+            TempData.Remove("Errors");
+        }
       
         var eligibilityType = TempData["eligibilityType"].ToString();
         TempData["eligibilityType"] = eligibilityType;
@@ -77,8 +82,6 @@ public class CheckController : BaseController
             foreach (var (key, errorList) in validationErrors)
                 foreach (var error in errorList)
                     ModelState.AddModelError(key, error);
-        
-        TempData["ParentDetails"] = parent;
 
         return View(parent);
     }
