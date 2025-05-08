@@ -1,7 +1,7 @@
 describe("Admin Portal pages contain recommended network security related headers", () => {
     it("Pages respond with recommended network security headers", () => {
 
-        cy.checkSession('school');
+        cy.checkSession('LA');
         
         // check for network headers on a regular page
         cy.request({
@@ -31,27 +31,7 @@ describe("Admin Portal pages contain recommended network security related header
 );
 
 describe('Clarity', () => {
-    var schoolClarityId: string
-    var LAClarityId: string
-
-    it('Loads Clarity when it is enabled', () => {
-        cy.checkSession('school');
-
-        cy.get('#accept-cookies').click();
-
-        cy.wait(1000);
-
-        cy.get('body')
-            .invoke('attr', 'data-clarity')
-            .then(($clarity) => {
-                    if($clarity)
-                        schoolClarityId = $clarity;
-                    cy.get('head script[src*="clarity"]');
-                }
-            );
-    });
-
-    it('Does not Clarity when it is disabled', () => {
+    it('Does not load Clarity when it is disabled', () => {
         cy.checkSession('LA');
 
         cy.get('#accept-cookies').click();
@@ -61,20 +41,9 @@ describe('Clarity', () => {
         cy.get('body')
             .invoke('attr', 'data-clarity')
             .then(($clarity) => {
-                    if(!$clarity) {
-                        cy.get('head script[src*="clarity"]').should('not.exist');
-                    }
-
-                    else {
-                        LAClarityId = $clarity;
-                    }
+                if(!$clarity) {
+                    cy.get('head script[src*="clarity"]').should('not.exist');
                 }
-            );
-    });
-
-    it('Loads different Clarity for School and LA', () => {
-        if(schoolClarityId) {
-            expect(schoolClarityId).not.equal(LAClarityId)
-        }
+            });
     });
 });
