@@ -7,6 +7,7 @@ using CheckChildcareEligibility.Admin.Gateways;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
+using CheckChildcareEligibility.Admin.ViewModels;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -82,6 +83,9 @@ public class CheckControllerTests : TestBase
         var expectedParent = _fixture.Create<ParentGuardian>();
         var expectedErrors = new Dictionary<string, List<string>>();
 
+        // Setup TempData with eligibilityType
+        _tempData["eligibilityType"] = "2YO";
+
         _loadParentDetailsUseCaseMock
             .Setup(x => x.Execute(
                 It.IsAny<string>(),
@@ -89,7 +93,7 @@ public class CheckControllerTests : TestBase
             .ReturnsAsync((expectedParent, expectedErrors));
 
         // Act
-        var result = await _sut.Enter_Details(expectedParent);
+        var result = await _sut.Enter_Details();
 
         // Assert
         result.Should().BeOfType<ViewResult>();
@@ -107,6 +111,11 @@ public class CheckControllerTests : TestBase
             { "TestError", new List<string> { "Error message 1", "Error message 2" } }
         };
 
+        // Setup TempData with eligibilityType
+        _tempData["eligibilityType"] = "2YO";
+        _tempData["ParentDetails"] = JsonConvert.SerializeObject(expectedParent);
+        _tempData["Errors"] = JsonConvert.SerializeObject(expectedErrors);
+
         _loadParentDetailsUseCaseMock
             .Setup(x => x.Execute(
                 It.IsAny<string>(),
@@ -114,7 +123,7 @@ public class CheckControllerTests : TestBase
             .ReturnsAsync((expectedParent, expectedErrors));
 
         // Act
-        var result = await _sut.Enter_Details(expectedParent);
+        var result = await _sut.Enter_Details();
 
         // Assert
         result.Should().BeOfType<ViewResult>();
@@ -271,73 +280,177 @@ public class CheckControllerTests : TestBase
             Times.Once);
     }
     
+    [Test]
+    public async Task Loader_Should_Handle_Exceptions_And_Return_Technical_Error_View()
+    {
+        // Arrange
+        var responseJson = JsonConvert.SerializeObject(_fixture.Create<CheckEligibilityResponse>());
+        _tempData["Response"] = responseJson;
+        _tempData["EligibilityType"] = "2YO";
+        
+        // Setup mock to throw an exception when called
+        _getCheckStatusUseCaseMock
+            .Setup(x => x.Execute(It.IsAny<string>(), _sessionMock.Object))
+            .ThrowsAsync(new Exception("Test exception"));
 
-    // [Test]
-    // public void Check_Answers_Get_Should_Return_View()
-    // {
-    //     // Act
-    //     var result = _sut.Check_Answers();
+        // Act
+        var result = await _sut.Loader();
 
-    //     // Assert
-    //     result.Should().BeOfType<ViewResult>();
-    //     var viewResult = result as ViewResult;
-    //     viewResult.ViewName.Should().Be("Check_Answers");
-    // }
+        // Assert
+        result.Should().BeOfType<ViewResult>();
+        var viewResult = result as ViewResult;
+        viewResult.ViewName.Should().Be("Outcome/Technical_Error");
+        
+        // Verify model has some basic properties set
+        var model = viewResult.Model as EligibilityOutcomeViewModel;
+        model.Should().NotBeNull();
+        model.EligibilityType.Should().Be("2YO");
+    }
 
-    //[Test]
-    //public async Task Check_Answers_Post_Should_Submit_And_RedirectTo_AppealsRegistered()
-    //{
-    //    // Arrange
-    //    var request = _fixture.Create<FsmApplication>();
-    //    var userId = "test-user-id";
-    //    var lastResponse = new ApplicationSaveItemResponse
-    //    {
-    //        Data = new ApplicationResponse { Status = "NotEntitled" }
-    //    };
+    [Test]
+    public async Task Loader_When_School_User_Should_Return_Non_LA_View()
+    {
+        // Arrange
+        var statusValue = _fixture.Build<StatusValue>()
+            .With(x => x.Status, "eligible")
+            .Create();
 
-    //    _createUserUseCaseMock
-    //        .Setup(x => x.Execute(It.IsAny<IEnumerable<Claim>>()))
-    //        .ReturnsAsync(userId);
+        var checkEligibilityResponse = _fixture.Build<CheckEligibilityResponse>()
+            .With(x => x.Data, statusValue)
+            .Create();
 
-    //    _submitApplicationUseCaseMock
-    //        .Setup(x => x.Execute(request, userId, It.IsAny<string>()))
-    //        .ReturnsAsync(new List<ApplicationSaveItemResponse>());
+        _httpContext.Setup(ctx => ctx.Session).Returns(_sessionMock.Object);
+        // Set up a school user (not LA)
+        _sut.ControllerContext.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
+        {
+            new("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", "12345"),
+            new("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", "test@example.com"),
+            new("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname", "John"),
+            new("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", "Doe"),
+            new("OrganisationCategoryName", Constants.CategoryTypeSchool)
+        }));
 
-    //    // Act
-    //    var result = await _sut.Check_Answers_Post(request);
+        var responseJson = JsonConvert.SerializeObject(checkEligibilityResponse);
+        _tempData["Response"] = responseJson;
+        _tempData["EligibilityType"] = "2YO";
+        
+        // Setup parent details
+        var parent = _fixture.Create<ParentGuardian>();
+        _tempData["ParentDetails"] = JsonConvert.SerializeObject(parent);
+        
+        _getCheckStatusUseCaseMock
+            .Setup(x => x.Execute(responseJson, _sessionMock.Object))
+            .ReturnsAsync("eligible");
+            
+        _loadParentDetailsUseCaseMock
+            .Setup(x => x.Execute(
+                It.IsAny<string>(),
+                It.IsAny<string>()))
+            .ReturnsAsync((parent, null));
 
-    //    // Assert
-    //    result.Should().BeOfType<RedirectToActionResult>();
-    //    var redirectResult = result as RedirectToActionResult;
-    //    redirectResult.ActionName.Should().Be("AppealsRegistered");
-    //}
+        // Act
+        var result = await _sut.Loader();
 
+        // Assert
+        result.Should().BeOfType<ViewResult>();
+        var viewResult = result as ViewResult;
+        // Should return the non-LA view for eligible result
+        viewResult.ViewName.Should().Be("Outcome/Eligible");
+    }
 
-    //[Test]
-    //public async Task Check_Answers_Post_Should_Submit_And_RedirectTo_ApplicationsRegistered()
-    //{
-    //    // Arrange
-    //    var request = _fixture.Create<FsmApplication>();
-    //    var userId = "test-user-id";
-    //    var viewModel = _fixture.Create<List<ApplicationSaveItemResponse>>();
-    //    viewModel.First().Data = new ApplicationResponse { Status = "Entitled" };
+    [Test]
+    public async Task Loader_When_DateOfBirth_Is_Invalid_Should_Handle_Gracefully()
+    {
+        // Arrange
+        var statusValue = _fixture.Build<StatusValue>()
+            .With(x => x.Status, "notEligible")
+            .Create();
 
-    //    _createUserUseCaseMock
-    //        .Setup(x => x.Execute(It.IsAny<IEnumerable<Claim>>()))
-    //        .ReturnsAsync(userId);
+        var checkEligibilityResponse = _fixture.Build<CheckEligibilityResponse>()
+            .With(x => x.Data, statusValue)
+            .Create();
 
-    //    _submitApplicationUseCaseMock
-    //        .Setup(x => x.Execute(request, userId, It.IsAny<string>()))
-    //        .ReturnsAsync(viewModel);
+        _httpContext.Setup(ctx => ctx.Session).Returns(_sessionMock.Object);
+        _sut.ControllerContext.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
+        {
+            new("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", "12345"),
+            new("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", "test@example.com"),
+            new("OrganisationCategoryName", Constants.CategoryTypeSchool)
+        }));
 
-    //    // Act
-    //    var result = await _sut.Check_Answers_Post(request);
+        // Create parent with invalid date of birth
+        var parent = _fixture.Create<ParentGuardian>();
+        parent.Day = "99"; // Invalid day
+        parent.Month = "99"; // Invalid month
+        parent.Year = "9999"; // Future year
+        
+        var responseJson = JsonConvert.SerializeObject(checkEligibilityResponse);
+        _tempData["Response"] = responseJson;
+        _tempData["EligibilityType"] = "2YO";
+        _tempData["ParentDetails"] = JsonConvert.SerializeObject(parent);
+        
+        _getCheckStatusUseCaseMock
+            .Setup(x => x.Execute(responseJson, _sessionMock.Object))
+            .ReturnsAsync("notEligible");
+            
+        _loadParentDetailsUseCaseMock
+            .Setup(x => x.Execute(
+                It.IsAny<string>(),
+                It.IsAny<string>()))
+            .ReturnsAsync((parent, null));
 
-    //    // Assert
-    //    result.Should().BeOfType<RedirectToActionResult>();
-    //    var redirectResult = result as RedirectToActionResult;
-    //    redirectResult.ActionName.Should().Be("ApplicationsRegistered");
-    //}
+        // Act
+        var result = await _sut.Loader();
+
+        // Assert
+        result.Should().BeOfType<ViewResult>();
+        var viewResult = result as ViewResult;
+        viewResult.ViewName.Should().Be("Outcome/Not_Eligible");
+        
+        // The view model should have the date conversion handled properly
+        var model = viewResult.Model as EligibilityOutcomeViewModel;
+        model.Should().NotBeNull();
+        // It should default to DateTime.MinValue if invalid
+        model.ParentDateOfBirth.Should().Be(DateTime.MinValue.ToString());
+    }
+    
+    [Test]
+    public async Task Loader_When_ParentDetails_Is_Null_Should_Handle_Gracefully_In_Error_Case()
+    {
+        // Arrange
+        _tempData["Response"] = JsonConvert.SerializeObject(_fixture.Create<CheckEligibilityResponse>());
+        _tempData["EligibilityType"] = "EYPP";
+        _tempData["ParentDetails"] = null;
+        
+        // Setup mock to throw an exception when called
+        _getCheckStatusUseCaseMock
+            .Setup(x => x.Execute(It.IsAny<string>(), _sessionMock.Object))
+            .ThrowsAsync(new Exception("Test exception"));
+            
+        _loadParentDetailsUseCaseMock
+            .Setup(x => x.Execute(
+                It.IsAny<string>(),
+                It.IsAny<string>()))
+            .ReturnsAsync((null, null));
+
+        // Act
+        var result = await _sut.Loader();
+
+        // Assert
+        result.Should().BeOfType<ViewResult>();
+        var viewResult = result as ViewResult;
+        viewResult.ViewName.Should().Be("Outcome/Technical_Error");
+        
+        // The view model should still be created with default values
+        var model = viewResult.Model as EligibilityOutcomeViewModel;
+        model.Should().NotBeNull();
+        model.EligibilityType.Should().Be("EYPP");
+        model.ParentLastName.Should().Be(string.Empty);
+        // In the actual implementation, with null parent details, 
+        // GetDateOfBirth returns DateTime.MinValue.ToString() which ends up empty
+        // in some cultures and with a value in others
+        model.ParentNino.Should().Be(string.Empty);
+    }
 
     [TestCase("eligible", "Outcome/Eligible")]
     [TestCase("notEligible", "Outcome/Not_Eligible")]

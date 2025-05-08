@@ -25,7 +25,6 @@ public class ValidateParentDetailsUseCase : IValidateParentDetailsUseCase
 
     public ValidationResult Execute(ParentGuardian request, ModelStateDictionary modelState)
     {
-
         if (!modelState.IsValid)
         {
             var errors = ProcessModelStateErrors(modelState);

@@ -33,28 +33,21 @@ public class LoadParentDetailsUseCase : ILoadParentDetailsUseCase
             {
                 parent = JsonConvert.DeserializeObject<ParentGuardian>(parentDetailsJson);
             }
-
-            catch (JsonException)
+            catch (JsonException ex)
             {
+                _logger.LogWarning(ex, "Error deserializing parent details JSON");
             }
 
 
         if (!string.IsNullOrEmpty(validationErrorsJson))
         {
-            errors = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(validationErrorsJson);
-            if (errors != null)
+            try
             {
-                const string targetValue = "Please select one option";
-
-                if (errors.ContainsKey("NationalInsuranceNumber") &&
-                    errors.ContainsKey("NationalAsylumSeekerServiceNumber"))
-                    if (errors["NationalInsuranceNumber"].Contains(targetValue) &&
-                        errors["NationalAsylumSeekerServiceNumber"].Contains(targetValue))
-                    {
-                        errors.Remove("NationalInsuranceNumber");
-                        errors.Remove("NationalAsylumSeekerServiceNumber");
-                        errors["NINAS"] = new List<string> { targetValue };
-                    }
+                errors = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(validationErrorsJson);
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogWarning(ex, "Error deserializing validation errors JSON");
             }
         }
 

@@ -186,7 +186,7 @@ public class BulkCheckController : BaseController
             LastName = x.LastName,
             DOB = x.DateOfBirth,
             NI = x.NationalInsuranceNumber,
-            NASS = x.NationalAsylumSeekerServiceNumber,
+            // NASS field removed as it's not being used in the application
             Outcome = x.Status.GetFsmStatusDescription()
         });
 

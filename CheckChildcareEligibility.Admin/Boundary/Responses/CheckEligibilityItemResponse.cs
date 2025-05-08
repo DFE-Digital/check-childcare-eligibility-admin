@@ -8,8 +8,6 @@ public class CheckEligibilityItem
 
     public string DateOfBirth { get; set; }
 
-    public string NationalAsylumSeekerServiceNumber { get; set; }
-
     public string Status { get; set; }
 
     public DateTime Created { get; set; }

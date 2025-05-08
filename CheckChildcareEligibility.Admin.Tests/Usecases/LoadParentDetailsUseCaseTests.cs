@@ -55,4 +55,41 @@ public class LoadParentDetailsUseCaseTests
         resultParent.Should().BeNull();
         resultErrors.Should().BeNull();
     }
+    
+    [Test]
+    public async Task Execute_WithInvalidParentJson_ReturnsNullParent()
+    {
+        // Arrange
+        string invalidJson = "{invalid_json}";
+        var errors = new Dictionary<string, List<string>>
+        {
+            { "TestError", new List<string> { "Error message" } }
+        };
+        var errorsJson = JsonConvert.SerializeObject(errors);
+
+        // Act
+        var result = await _sut.Execute(invalidJson, errorsJson);
+        var (resultParent, resultErrors) = result;
+
+        // Assert
+        resultParent.Should().BeNull();
+        resultErrors.Should().BeEquivalentTo(errors);
+    }
+    
+    [Test]
+    public async Task Execute_WithInvalidErrorsJson_ReturnsNullErrors()
+    {
+        // Arrange
+        var parent = _fixture.Create<ParentGuardian>();
+        var parentJson = JsonConvert.SerializeObject(parent);
+        string invalidErrorsJson = "{invalid_json}";
+        
+        // Act
+        var result = await _sut.Execute(parentJson, invalidErrorsJson);
+        var (resultParent, resultErrors) = result;
+        
+        // Assert
+        resultParent.Should().BeEquivalentTo(parent);
+        resultErrors.Should().BeNull();
+    }
 }
