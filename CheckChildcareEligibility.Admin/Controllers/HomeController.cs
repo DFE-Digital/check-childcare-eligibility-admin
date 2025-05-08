@@ -10,6 +10,14 @@ public class HomeController : BaseController
     public IActionResult Index()
     {
         _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
+        
+        // Check if the organization is a Local Authority
+        if (_Claims?.Organisation?.Category?.Name == null || 
+            !_Claims.Organisation.Category.Name.Equals("Local Authority", StringComparison.OrdinalIgnoreCase))
+        {
+            return View("UnauthorizedOrganization");
+        }
+        
         return View(_Claims);
     }
 
