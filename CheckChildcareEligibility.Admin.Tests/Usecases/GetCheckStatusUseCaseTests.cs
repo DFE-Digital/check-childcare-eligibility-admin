@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 
-namespace CheckChildcareEligibility.Admin.Tests.Usecases;
+namespace CheckChildcareEligibility.Admin.Tests.UseCases;
 
 [TestFixture]
 public class GetCheckStatusUseCaseTests

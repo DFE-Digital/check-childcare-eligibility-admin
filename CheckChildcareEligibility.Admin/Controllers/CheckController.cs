@@ -59,9 +59,14 @@ public class CheckController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Enter_Details()
+    public async Task<IActionResult> Enter_Details(bool clearData = false)
     {
-        TempData.Remove("ParentDetails");
+        // If clearData is true, remove the ParentDetails from TempData
+        if (clearData)
+        {
+            TempData.Remove("ParentDetails");
+            TempData.Remove("Errors");
+        }
       
         var eligibilityType = TempData["eligibilityType"].ToString();
         TempData["eligibilityType"] = eligibilityType;
@@ -77,8 +82,6 @@ public class CheckController : BaseController
             foreach (var (key, errorList) in validationErrors)
                 foreach (var error in errorList)
                     ModelState.AddModelError(key, error);
-        
-        TempData["ParentDetails"] = parent;
 
         return View(parent);
     }
@@ -88,11 +91,11 @@ public class CheckController : BaseController
     {
         var validationResult = _validateParentDetailsUseCase.Execute(request, ModelState);
 
-
-        if (!validationResult.IsValid)
+        // Add null check for validation result
+        if (validationResult == null || !validationResult.IsValid)
         {
             TempData["ParentDetails"] = JsonConvert.SerializeObject(request);
-            TempData["Errors"] = JsonConvert.SerializeObject(validationResult.Errors);
+            TempData["Errors"] = validationResult != null ? JsonConvert.SerializeObject(validationResult.Errors) : null;
             return RedirectToAction("Enter_Details");
         }
 
@@ -229,7 +232,12 @@ public class CheckController : BaseController
 
     private string GetEligibilityTypeLabel(string eligibilityType)
     {
-        return Domain.Constants.EligibilityTypeLabels.EligibilityTypeLabels.Labels[eligibilityType].ToLower();        
+        if (string.IsNullOrEmpty(eligibilityType))
+            return "eligibility";
+
+        return Domain.Constants.EligibilityTypeLabels.EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) 
+            ? Domain.Constants.EligibilityTypeLabels.EligibilityTypeLabels.Labels[eligibilityType].ToLower()
+            : "eligibility";
     }
 
 }

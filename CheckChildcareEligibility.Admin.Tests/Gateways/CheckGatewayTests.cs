@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -196,5 +197,186 @@ internal class CheckGatewayTests
         // Assert
         result.Result.Data.Should().BeNull();
         _sut.apiErrorCount.Should().Be(1);
+    }
+    
+    [Test]
+    public async Task Given_GetBulkCheckProgress_When_CalledWithValidUrl_Should_ReturnBulkStatusResponse()
+    {
+        // Arrange
+        const string bulkCheckUrl = "bulk-check/sample-url";
+        var responseContent = new CheckEligibilityBulkStatusResponse();
+        var responseMessage = new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent(JsonConvert.SerializeObject(responseContent))
+        };
+
+        _httpMessageHandlerMock.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(responseMessage);
+
+        // Act
+        var result = await _sut.GetBulkCheckProgress(bulkCheckUrl);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeEquivalentTo(responseContent);
+    }
+
+    [Test]
+    public async Task Given_GetBulkCheckProgress_When_ApiThrowsException_Should_ReturnNull()
+    {
+        // Arrange
+        const string bulkCheckUrl = "bulk-check/error-url";
+        var responseMessage = new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.InternalServerError,
+            Content = new StringContent("Error")
+        };
+
+        _httpMessageHandlerMock.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ThrowsAsync(new HttpRequestException("Test exception"));
+
+        // Act
+        var result = await _sut.GetBulkCheckProgress(bulkCheckUrl);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [Test]
+    public async Task Given_GetBulkCheckResults_When_CalledWithValidUrl_Should_ReturnBulkResponse()
+    {
+        // Arrange
+        const string resultsUrl = "bulk-check/results-url";
+        var responseContent = new CheckEligibilityBulkResponse();
+        var responseMessage = new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent(JsonConvert.SerializeObject(responseContent))
+        };
+
+        _httpMessageHandlerMock.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(responseMessage);
+
+        // Act
+        var result = await _sut.GetBulkCheckResults(resultsUrl);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeEquivalentTo(responseContent);
+    }
+
+    [Test]
+    public async Task Given_GetBulkCheckResults_When_ApiThrowsException_Should_PropagateException()
+    {
+        // Arrange
+        const string resultsUrl = "bulk-check/error-url";
+        _httpMessageHandlerMock.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ThrowsAsync(new HttpRequestException("Test exception"));
+
+        // Act
+        Func<Task> act = async () => await _sut.GetBulkCheckResults(resultsUrl);
+
+        // Assert
+        await act.Should().ThrowAsync<HttpRequestException>().WithMessage("Test exception");
+    }
+
+    [Test]
+    public async Task Given_PostBulkCheck_When_CalledWithValidRequest_Should_ReturnBulkResponse()
+    {
+        // Arrange
+        var requestBody = new CheckEligibilityRequestBulk
+        {
+            Data = new List<CheckEligibilityRequestData>
+            {
+                new CheckEligibilityRequestData(CheckEligibilityType.FreeSchoolMeals)
+            }
+        };
+        var responseContent = new CheckEligibilityResponseBulk();
+        var responseMessage = new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent(JsonConvert.SerializeObject(responseContent))
+        };
+
+        _httpMessageHandlerMock.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(responseMessage);
+
+        // Act
+        var result = await _sut.PostBulkCheck(requestBody);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeEquivalentTo(responseContent);
+    }
+
+    [Test]
+    public async Task Given_PostBulkCheck_When_ApiReturnsUnauthorized_Should_ThrowUnauthorizedException()
+    {
+        // Arrange
+        var requestBody = new CheckEligibilityRequestBulk
+        {
+            Data = new List<CheckEligibilityRequestData>
+            {
+                new CheckEligibilityRequestData(CheckEligibilityType.FreeSchoolMeals)
+            }
+        };
+        var responseMessage = new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.Unauthorized,
+            Content = new StringContent("")
+        };
+
+        _httpMessageHandlerMock.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(responseMessage);
+
+        // Act
+        Func<Task> act = async () => await _sut.PostBulkCheck(requestBody);
+
+        // Assert
+        await act.Should().ThrowExactlyAsync<UnauthorizedAccessException>();
+    }
+
+    [Test]
+    public async Task Given_PostBulkCheck_When_NullOrEmptyData_Should_HandleErrorUrl()
+    {
+        // Arrange
+        var requestBody = new CheckEligibilityRequestBulk
+        {
+            Data = new List<CheckEligibilityRequestData>() // Empty data
+        };
+        
+        // We expect an exception since BulkCheckUrl returns "error"
+        // when data is null or empty, and there's no handler for this URL
+
+        // Act
+        Func<Task> act = async () => await _sut.PostBulkCheck(requestBody);
+
+        // Assert
+        await act.Should().ThrowAsync<Exception>();
     }
 }

@@ -409,4 +409,5 @@ FodyWeavers.xsd
 
 # Cypress
 /tests/cypress/downloads/
+/tests/cypress/screenshots/
 /tests/cypress/fixtures/*.json

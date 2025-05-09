@@ -15,8 +15,7 @@
                         id="govuk-notification-banner-title">@ViewData["Title"]</h2>
                 </div>
                 <div class="govuk-notification-banner__content">
-                    <p class="govuk-notification-banner__heading">The personal information you entered does not match
-                        departmental records.</p>
+                    <p class="govuk-notification-banner__heading">The personal information you entered does not match departmental records.</p>
                 </div>
             </div>
 
@@ -57,7 +56,7 @@
             <h1 class="govuk-heading-l">What to do next</h1>
             <p class="govuk-body">Check that you entered the parent or guardian last name in full and that all other details are correct.</p>
             <p class="govuk-body">If this keeps happening, <a href="#" onclick="window.print(); return false;">print this page</a> for the parent or guardian to check their details.</p>
-            <p>@Html.ActionLink("Try again", "Enter_Details", "Check")</p>
+            <p>@Html.ActionLink("Try again", "Enter_Details", "Check", new { clearData = true }, null)</p>
         </div>
 
     </div>
