@@ -33,6 +33,7 @@ describe("Admin Portal pages contain recommended network security related header
 describe('Clarity', () => {
     it('Does not load Clarity when it is disabled', () => {
         cy.checkSession('LA');
+        cy.visit(Cypress.config().baseUrl ?? "");
 
         cy.get('#accept-cookies').click();
 
