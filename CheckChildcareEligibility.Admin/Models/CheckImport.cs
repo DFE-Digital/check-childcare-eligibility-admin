@@ -17,9 +17,9 @@ public class CheckRowRowMap : ClassMap<CheckRow>
 {
     public CheckRowRowMap()
     {
-        Map(m => m.Ni).Index(0);
-        Map(m => m.Nass).Index(1);
-        Map(m => m.DOB).Index(2);
-        Map(m => m.LastName).Index(3);
+        Map(m => m.LastName).Index(0);
+        Map(m => m.DOB).Index(1);
+        Map(m => m.Ni).Index(2);
+        Map(m => m.Nass).Index(3);
     }
 }
