@@ -2,7 +2,7 @@ describe('Full journey of checking eligibility in LA portal', () => {
     const parentLastName = 'Jones';
     const parentNinoEligible = "nn123456c";
     const parentNinoNotEligible = 'PN123456C'; // Updated to the specified NI number
-    const parentNinoParentNotFound = 'AB123456C'; // NI number for parent not found scenario
+    const parentNinoParentNotFound = 'RA123456C'; // NI number for parent not found scenario
     const parentLastNameNotFound = 'ttySimpson'; // Last name for parent not found scenario
     const parentNinoTechnicalError = 'AA668767B'; // Using an unusual NI number to potentially trigger errors
     
