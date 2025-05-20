@@ -26,8 +26,8 @@ const visitPrefilledForm = (onlyfill?: boolean) => {
 
 describe('Date of Birth Validation Tests', () => {
     beforeEach(() => {
-        // Start by logging in as LA type
         cy.checkSession('LA');
+        cy.visit(Cypress.config().baseUrl ?? "");
         
         // Navigate from Dashboard to SingleCheckMenu
         cy.visit('/');
