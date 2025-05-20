@@ -235,8 +235,8 @@ public class CheckController : BaseController
         if (string.IsNullOrEmpty(eligibilityType))
             return "eligibility";
 
-        return Domain.Constants.EligibilityTypeLabels.EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) 
-            ? Domain.Constants.EligibilityTypeLabels.EligibilityTypeLabels.Labels[eligibilityType].ToLower()
+        return EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) 
+            ? EligibilityTypeLabels.Labels[eligibilityType]
             : "eligibility";
     }
 
