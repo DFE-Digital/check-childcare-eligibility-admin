@@ -279,4 +279,9 @@ public class BulkCheckController : BaseController
 
         return errorCount;
     }
+
+    public IActionResult Bulk_Check_Explainer()
+    {
+        return View();
+    }
 }
