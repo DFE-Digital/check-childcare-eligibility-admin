@@ -121,7 +121,7 @@ public class BulkCheckController : BaseController
 
             foreach (var item in DataLoad)
             {
-                var requestItem = new CheckEligibilityRequestData(Domain.Enums.CheckEligibilityType.FreeSchoolMeals)
+                var requestItem = new CheckEligibilityRequestData(Domain.Enums.CheckEligibilityType.TwoYearOffer)
                 {
                     LastName = item.LastName,
                     DateOfBirth = DateTime.TryParse(item.DOB, out var dtval)

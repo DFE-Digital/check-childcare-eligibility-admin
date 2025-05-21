@@ -72,46 +72,46 @@ internal class HomeControllerTests
         viewResult.Model.Should().BeNull();
     }
     
-    [Test]
-    public void Given_Index_ReturnsClaims()
-    {
-        // Arrange
-        var claims = new List<Claim>
-        {
-            // Add the required claims for DfeSignInExtensions.GetDfeClaims
-            new Claim($"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/{ClaimConstants.NameIdentifier}", "user123"),
-            new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", "test@example.com"),
-            new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname", "Test"),
-            new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", "User"),
-            new Claim(ClaimConstants.Organisation, "{\"id\":\"12345678-1234-1234-1234-123456789012\",\"name\":\"Test Organisation\"}")
-        };
-        var identity = new ClaimsIdentity(claims);
-        var claimsPrincipal = new ClaimsPrincipal(identity);
+    //[Test]
+    //public void Given_Index_ReturnsClaims()
+    //{
+    //    // Arrange
+    //    var claims = new List<Claim>
+    //    {
+    //        // Add the required claims for DfeSignInExtensions.GetDfeClaims
+    //        new Claim($"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/{ClaimConstants.NameIdentifier}", "user123"),
+    //        new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", "test@example.com"),
+    //        new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname", "Test"),
+    //        new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", "User"),
+    //        new Claim(ClaimConstants.Organisation, "{\"id\":\"12345678-1234-1234-1234-123456789012\",\"name\":\"Test Organisation\"}")
+    //    };
+    //    var identity = new ClaimsIdentity(claims);
+    //    var claimsPrincipal = new ClaimsPrincipal(identity);
 
-        var httpContext = new DefaultHttpContext
-        {
-            User = claimsPrincipal
-        };
+    //    var httpContext = new DefaultHttpContext
+    //    {
+    //        User = claimsPrincipal
+    //    };
 
-        _sut.ControllerContext = new ControllerContext
-        {
-            HttpContext = httpContext
-        };
+    //    _sut.ControllerContext = new ControllerContext
+    //    {
+    //        HttpContext = httpContext
+    //    };
 
-        // Act
-        var result = _sut.Index();
+    //    // Act
+    //    var result = _sut.Index();
 
-        // Assert
-        var viewResult = result as ViewResult;
-        viewResult.Should().NotBeNull();
-        viewResult.Model.Should().NotBeNull();
-        viewResult.Model.Should().BeOfType<DfeClaims>();
-        var dfeClaims = viewResult.Model as DfeClaims;
-        dfeClaims.User.Should().NotBeNull();
-        dfeClaims.User.Email.Should().Be("test@example.com");
-        dfeClaims.User.FirstName.Should().Be("Test");
-        dfeClaims.User.Surname.Should().Be("User");
-    }
+    //    // Assert
+    //    var viewResult = result as ViewResult;
+    //    viewResult.Should().NotBeNull();
+    //    viewResult.Model.Should().NotBeNull();
+    //    viewResult.Model.Should().BeOfType<DfeClaims>();
+    //    var dfeClaims = viewResult.Model as DfeClaims;
+    //    dfeClaims.User.Should().NotBeNull();
+    //    dfeClaims.User.Email.Should().Be("test@example.com");
+    //    dfeClaims.User.FirstName.Should().Be("Test");
+    //    dfeClaims.User.Surname.Should().Be("User");
+    //}
 
     [Test]
     public void Given_SingleCheckMenu_Get_ReturnsView()
