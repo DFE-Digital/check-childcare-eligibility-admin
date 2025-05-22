@@ -19,7 +19,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
     public class BulkCheckCsvResult
     {
         public List<CheckEligibilityRequestData> ValidRequests { get; set; } = new();
-        public List<CsvRowError> Errors { get; set; }
+        public List<CsvRowError> Errors { get; set; } = new();
     }
 
     public class CsvRowError
@@ -44,119 +44,116 @@ namespace CheckChildcareEligibility.Admin.Usecases
             _validator = validator;
         }
 
-        public Task<BulkCheckCsvResult> Execute(Stream csvStream, CheckEligibilityType eligibilityType)
+        public async Task<BulkCheckCsvResult> Execute(Stream csvStream, CheckEligibilityType eligibilityType)
         {
-            return Task.Run(() =>
+            var result = new BulkCheckCsvResult();
+
+            using var reader = new StreamReader(csvStream);
+
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                var result = new BulkCheckCsvResult();
+                HasHeaderRecord = true,
+                BadDataFound = null,
+                MissingFieldFound = null
+            };
 
-                using var reader = new StreamReader(csvStream);
+            using var csv = new CsvReader(reader, config);
 
-                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            csv.Context.RegisterClassMap<CheckRowRowMap>();
+
+            var lineNumber = 2; // headers on line 1
+            var sequence = 1;
+            try
+            {
+                var records = csv.GetRecords<CheckRow>();
+                foreach (var record in records)
                 {
-                    HasHeaderRecord = true,
-                    BadDataFound = null,
-                    MissingFieldFound = null
-                };
-
-                using var csv = new CsvReader(reader, config);
-
-                csv.Context.RegisterClassMap<CheckRowRowMap>();
-
-                var lineNumber = 2; // headers on line 1
-                var sequence = 1;
-                try
-                {
-                    var records = csv.GetRecords<CheckRow>();
-                    foreach (var record in records)
+                    if (record == null)
                     {
-                        if (record == null)
+                        result.Errors.Add(new CsvRowError
                         {
-                            result.Errors.Add(new CsvRowError
-                            {
-                                LineNumber = lineNumber,
-                                Message = "Empty or malformed row."
-                            });
-                            lineNumber++;
-                            continue;
-                        }
-
-                        try
-                        {
-                            var requestItem = new CheckEligibilityRequestData(eligibilityType)
-                            {
-                                LastName = record.LastName,
-                                DateOfBirth = DateTime.TryParse(record.DOB, out var dtval) ? dtval.ToString("yyyy-MM-dd") : string.Empty,
-                                NationalInsuranceNumber = record.Ni.ToUpper(),
-                                Sequence = sequence
-                            };
-
-                            var validationResults = _validator.Validate(requestItem);
-
-                            if (!validationResults.IsValid)
-                            {
-                                foreach (var error in validationResults.Errors)
-                                {
-                                    var errorMessage = ExtractValidationErrorMessage(error);
-
-                                    if (ContainsError(result.Errors, lineNumber, errorMessage))
-                                    {
-                                        lineNumber++;
-                                        continue;
-                                    }
-
-                                    result.Errors.Add(new CsvRowError
-                                    {
-                                        LineNumber = lineNumber,
-                                        Message = errorMessage
-                                    });
-                                }
-                            }
-                            else
-                            {
-                                result.ValidRequests.Add(requestItem);
-                            }
-
-                        }
-                        catch (Exception ex)
-                        {
-                            result.Errors.Add(new CsvRowError
-                            {
-                                LineNumber = lineNumber,
-                                Message = $"Unexpected error in processing: {ex.Message}"
-                            });
-                        }
-
-                        sequence++;
+                            LineNumber = lineNumber,
+                            Message = "Empty or malformed row."
+                        });
                         lineNumber++;
+                        continue;
                     }
-                }
-                catch (HeaderValidationException ex)
-                {
-                    result.Errors.Add(new CsvRowError
+
+                    try
                     {
-                        LineNumber = 1,
-                        Message = $"CSV header error: {ex.Message}"
-                    });
-                }
-                catch (ReaderException ex)
-                {
-                    result.Errors.Add(new CsvRowError
+                        var requestItem = new CheckEligibilityRequestData(eligibilityType)
+                        {
+                            LastName = record.LastName,
+                            DateOfBirth = DateTime.TryParse(record.DOB, out var dtval) ? dtval.ToString("yyyy-MM-dd") : string.Empty,
+                            NationalInsuranceNumber = record.Ni.ToUpper(),
+                            Sequence = sequence
+                        };
+
+                        var validationResults = _validator.Validate(requestItem);
+
+                        if (!validationResults.IsValid)
+                        {
+                            foreach (var error in validationResults.Errors)
+                            {
+                                var errorMessage = ExtractValidationErrorMessage(error);
+
+                                if (ContainsError(result.Errors, lineNumber, errorMessage))
+                                {
+                                    lineNumber++;
+                                    continue;
+                                }
+
+                                result.Errors.Add(new CsvRowError
+                                {
+                                    LineNumber = lineNumber,
+                                    Message = errorMessage
+                                });
+                            }
+                        }
+                        else
+                        {
+                            result.ValidRequests.Add(requestItem);
+                        }
+
+                    }
+                    catch (Exception ex)
                     {
-                        LineNumber = lineNumber,
-                        Message = $"CSV read error: {ex.Message}"
-                    });
+                        result.Errors.Add(new CsvRowError
+                        {
+                            LineNumber = lineNumber,
+                            Message = $"Unexpected error in processing: {ex.Message}"
+                        });
+                    }
+
+                    sequence++;
+                    lineNumber++;
                 }
-                catch (Exception ex)
+            }
+            catch (HeaderValidationException ex)
+            {
+                result.Errors.Add(new CsvRowError
                 {
-                    result.Errors.Add(new CsvRowError
-                    {
-                        LineNumber = 0,
-                        Message = $"Unexpected CSV error: {ex.Message}"
-                    });
-                }
-                return result;
-            });
+                    LineNumber = 1,
+                    Message = $"CSV header error: {ex.Message}"
+                });
+            }
+            catch (ReaderException ex)
+            {
+                result.Errors.Add(new CsvRowError
+                {
+                    LineNumber = lineNumber,
+                    Message = $"CSV read error: {ex.Message}"
+                });
+            }
+            catch (Exception ex)
+            {
+                result.Errors.Add(new CsvRowError
+                {
+                    LineNumber = 0,
+                    Message = $"Unexpected CSV error: {ex.Message}"
+                });
+            }
+            return result;
 
         }
 

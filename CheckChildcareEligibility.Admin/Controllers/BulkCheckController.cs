@@ -43,7 +43,7 @@ public class BulkCheckController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Bulk_Check(IFormFile fileUpload, string checkType)
+    public async Task<IActionResult> Bulk_Check(IFormFile fileUpload, string eligibilityType)
     {
         var timeNow = DateTime.UtcNow;
 
@@ -103,7 +103,7 @@ public class BulkCheckController : BaseController
 
             using (var fileStream = fileUpload.OpenReadStream())
             {
-                var parsedItems = await _parseBulkCheckFileUseCase.Execute(fileStream, checkType == "EYPP" ? Domain.Enums.CheckEligibilityType.EarlyYearPupilPremium : Domain.Enums.CheckEligibilityType.FreeSchoolMeals);
+                var parsedItems = await _parseBulkCheckFileUseCase.Execute(fileStream, eligibilityType == "EYPP" ? Domain.Enums.CheckEligibilityType.EarlyYearPupilPremium : Domain.Enums.CheckEligibilityType.FreeSchoolMeals);
 
                 if (parsedItems.ValidRequests == null || !parsedItems.ValidRequests.Any()) 
                     throw new InvalidDataException("Invalid file content.");
