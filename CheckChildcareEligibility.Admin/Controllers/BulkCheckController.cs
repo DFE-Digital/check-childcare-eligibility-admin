@@ -5,6 +5,8 @@ using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
 using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
+using CheckChildcareEligibility.Admin.Usecases;
+using CheckChildcareEligibility.Admin.ViewModels;
 using CsvHelper;
 using CsvHelper.Configuration;
 using FluentValidation.Results;
@@ -18,15 +20,21 @@ public class BulkCheckController : BaseController
     private readonly ICheckGateway _checkGateway;
     private readonly IConfiguration _config;
 
+    private readonly IParseBulkCheckFileUseCase _parseBulkCheckFileUseCase;
+
     private readonly ILogger<BulkCheckController> _logger;
     private ILogger<BulkCheckController> _loggerMock;
 
-    public BulkCheckController(ILogger<BulkCheckController> logger, ICheckGateway checkGateway,
-        IConfiguration configuration)
+    public BulkCheckController(
+        ILogger<BulkCheckController> logger, 
+        ICheckGateway checkGateway,
+        IConfiguration configuration,
+        IParseBulkCheckFileUseCase parseBulkCheckFileUseCase)
     {
         _config = configuration;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _checkGateway = checkGateway ?? throw new ArgumentNullException(nameof(checkGateway));
+        _parseBulkCheckFileUseCase = parseBulkCheckFileUseCase;
     }
 
     public IActionResult Bulk_Check()
@@ -35,9 +43,10 @@ public class BulkCheckController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Bulk_Check(IFormFile fileUpload)
+    public async Task<IActionResult> Bulk_Check(IFormFile fileUpload, string checkType)
     {
         var timeNow = DateTime.UtcNow;
+
         if (!string.IsNullOrEmpty(HttpContext.Session.GetString("FirstSubmissionTimeStamp")))
         {
             var firstSubmissionTimeStampString = HttpContext.Session.GetString("FirstSubmissionTimeStamp");
@@ -48,10 +57,9 @@ public class BulkCheckController : BaseController
         }
 
         TempData["Response"] = "data_issue";
-        List<CheckRow> DataLoad;
-        var errorCount = 0;
+        
         var requestItems = new List<CheckEligibilityRequestData>();
-        var validationResultsItems = new StringBuilder();
+        
         if (fileUpload == null || fileUpload.ContentType.ToLower() != "text/csv")
         {
             TempData["ErrorMessage"] = "Select a CSV File";
@@ -87,70 +95,46 @@ public class BulkCheckController : BaseController
 
         // check not more than 10, if it is return Bulk_Check() with ErrorMessage == too many requests made, wait a bit longer
 
+        var errorsViewModel = new BulkCheckErrorsViewModel();
 
         try
         {
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                HasHeaderRecord = true,
-                BadDataFound = null,
-                MissingFieldFound = null
-            };
+            var checkRowLimit = int.Parse(_config["BulkEligibilityCheckLimit"]);
+
             using (var fileStream = fileUpload.OpenReadStream())
-
-            using (var csv = new CsvReader(new StreamReader(fileStream), config))
             {
-                csv.Context.RegisterClassMap<CheckRowRowMap>();
-                DataLoad = csv.GetRecords<CheckRow>().ToList();
+                var parsedItems = await _parseBulkCheckFileUseCase.Execute(fileStream, checkType == "EYPP" ? Domain.Enums.CheckEligibilityType.EarlyYearPupilPremium : Domain.Enums.CheckEligibilityType.FreeSchoolMeals);
 
-                // if it has a header record add one to the limit
-                var checkRowLimit = int.Parse(_config["BulkEligibilityCheckLimit"]);
+                if (parsedItems.ValidRequests == null || !parsedItems.ValidRequests.Any()) 
+                    throw new InvalidDataException("Invalid file content.");
 
-                if (DataLoad.Count > checkRowLimit)
+                if (parsedItems.ValidRequests.Count > checkRowLimit)
                 {
                     TempData["ErrorMessage"] = $"CSV File cannot contain more than {checkRowLimit} records";
                     return RedirectToAction("Bulk_Check");
                 }
 
-                if (DataLoad == null || !DataLoad.Any()) throw new InvalidDataException("Invalid file content.");
-            }
-
-            var validator = new CheckEligibilityRequestDataValidator();
-            var sequence = 1;
-
-
-            foreach (var item in DataLoad)
-            {
-                var requestItem = new CheckEligibilityRequestData(Domain.Enums.CheckEligibilityType.FreeSchoolMeals)
+                if (parsedItems.Errors.Any())
                 {
-                    LastName = item.LastName,
-                    DateOfBirth = DateTime.TryParse(item.DOB, out var dtval)
-                        ? dtval.ToString("yyyy-MM-dd")
-                        : string.Empty,
-                    NationalInsuranceNumber = item.Ni.ToUpper(),
-                    Sequence = sequence
-                };
-                var validationResults = validator.Validate(requestItem);
-                if (!validationResults.IsValid)
-                    errorCount = checkIfExists(sequence, validationResultsItems, validationResults, errorCount);
-                else
-                    requestItems.Add(requestItem);
-                sequence++;
+                    errorsViewModel.TotalErrorCount = parsedItems.Errors.Count();
+                    
+                    var csvRowErrors = parsedItems.Errors.Take(TotalErrorsToDisplay);
+
+                    errorsViewModel.Errors = parsedItems.Errors
+                        .Select(error =>
+                            new CheckRowError() { LineNumber = error.LineNumber, Message = error.Message });
+
+                    return View("BulkOutcome/Error_Data_Issue", errorsViewModel);
+                }
             }
+
         }
         catch (Exception ex)
         {
             _logger.LogError("ImportEstablishmentData", ex);
-            validationResultsItems.AppendLine(ex.Message);
-        }
 
-        if (validationResultsItems.Length > 0)
-        {
-            if (errorCount - TotalErrorsToDisplay > 0)
-                TempData["BulkParentCheckItemsLineMoreErrors"] = errorCount - TotalErrorsToDisplay;
-
-            TempData["BulkParentCheckItemsErrors"] = validationResultsItems.ToString();
-            return View("BulkOutcome/Error_Data_Issue");
+            errorsViewModel.ErrorMessage = ex.Message;
+            return View("BulkOutcome/Error_Data_Issue", errorsViewModel);
         }
 
         var result = await _checkGateway.PostBulkCheck(new CheckEligibilityRequestBulk { Data = requestItems });
@@ -158,7 +142,7 @@ public class BulkCheckController : BaseController
         HttpContext.Session.SetString("Get_BulkCheck_Results", result.Links.Get_BulkCheck_Results);
         return RedirectToAction("Bulk_Loader");
     }
-
+    
     public async Task<IActionResult> Bulk_Loader()
     {
         var result = await _checkGateway.GetBulkCheckProgress(HttpContext.Session.GetString("Get_Progress_Check"));
@@ -207,76 +191,5 @@ public class BulkCheckController : BaseController
             streamWriter.Flush();
             return memoryStream.ToArray();
         }
-    }
-
-    private int checkIfExists(int sequence, StringBuilder validationResultsItems, ValidationResult validationResults,
-        int errorCount)
-    {
-        var message = "";
-        if (errorCount >= TotalErrorsToDisplay)
-        {
-            errorCount++;
-            return errorCount;
-        }
-
-        foreach (var item in validationResults.Errors)
-            switch (item.ErrorMessage)
-            {
-                case ValidationMessages.LastName:
-                case "'LastName' must not be empty.":
-                {
-                    message = $"<li>Line {sequence}: Issue with Surname</li>";
-                    errorCount = AddLineIfNotExist(validationResultsItems, errorCount, message);
-                }
-                    break;
-                case ValidationMessages.DOB
-                    :
-                case "'Date Of Birth' must not be empty.":
-                {
-                    message = $"<li>Line {sequence}: Issue with date of birth</li>";
-                    errorCount = AddLineIfNotExist(validationResultsItems, errorCount, message);
-                }
-                    break;
-                case ValidationMessages.NI:
-                {
-                    message = $"<li>Line {sequence}: Issue with National Insurance number</li>";
-                    errorCount = AddLineIfNotExist(validationResultsItems, errorCount, message);
-                }
-                    break;
-                case ValidationMessages.NI_and_NASS:
-                {
-                    message = $"<li>Line {sequence}: Issue {ValidationMessages.NI_and_NASS}</li>";
-                    errorCount = AddLineIfNotExist(validationResultsItems, errorCount, message);
-                }
-                    break;
-                case ValidationMessages.NI_or_NASS:
-                {
-                    message = $"<li>Line {sequence}: Issue {ValidationMessages.NI_or_NASS}</li>";
-                    errorCount = AddLineIfNotExist(validationResultsItems, errorCount, message);
-                }
-                    break;
-                default:
-                    message = $"<li>Line {sequence}: Issue {item.ErrorMessage}</li>";
-                    if (!validationResultsItems.ToString().Contains(message))
-                    {
-                        validationResultsItems.AppendLine(message);
-                        errorCount++;
-                    }
-
-                    break;
-            }
-
-        return errorCount;
-    }
-
-    private static int AddLineIfNotExist(StringBuilder validationResultsItems, int errorCount, string message)
-    {
-        if (!validationResultsItems.ToString().Contains(message))
-        {
-            validationResultsItems.AppendLine(message);
-            errorCount++;
-        }
-
-        return errorCount;
-    }
+    }    
 }
