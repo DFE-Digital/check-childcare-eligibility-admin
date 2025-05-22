@@ -83,7 +83,7 @@ internal class HomeControllerTests
             new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", "test@example.com"),
             new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname", "Test"),
             new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", "User"),
-            new Claim(ClaimConstants.Organisation, "{\"id\":\"12345678-1234-1234-1234-123456789012\",\"name\":\"Test Organisation\"}")
+            new Claim(ClaimConstants.Organisation, "{\"id\":\"12345678-1234-1234-1234-123456789012\",\"name\":\"Test Organisation\",\"category\":{\"id\": 2,\"name\":\"Local Authority\"}}"),
         };
         var identity = new ClaimsIdentity(claims);
         var claimsPrincipal = new ClaimsPrincipal(identity);
