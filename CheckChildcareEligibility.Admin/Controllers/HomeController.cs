@@ -21,13 +21,13 @@ public class HomeController : BaseController
         return View(_Claims);
     }
 
-    public IActionResult SingleCheckMenu()
+    public IActionResult MenuSingleCheck()
     {
-        return View("SingleCheckMenu");
+        return View("MenuSingleCheck");
     }
 
     [HttpPost]
-    public IActionResult SingleCheckMenu([FromForm] string eligibilityType)
+    public IActionResult MenuSingleCheck([FromForm] string eligibilityType)
     {
         if (string.IsNullOrEmpty(eligibilityType))
         {

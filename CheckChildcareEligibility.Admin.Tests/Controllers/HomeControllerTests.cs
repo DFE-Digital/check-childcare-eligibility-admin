@@ -114,20 +114,20 @@ internal class HomeControllerTests
     }
 
     [Test]
-    public void Given_SingleCheckMenu_Get_ReturnsView()
+    public void Given_MenuSingleCheck_Get_ReturnsView()
     {
         // Arrange
         
         // Act
-        var result = _sut.SingleCheckMenu();
+        var result = _sut.MenuSingleCheck();
 
         // Assert
         var viewResult = result as ViewResult;
-        viewResult.ViewName.Should().Be("SingleCheckMenu");
+        viewResult.ViewName.Should().Be("MenuSingleCheck");
     }
 
     [Test]
-    public void Given_SingleCheckMenu_Post_WithValidEligibilityType_RedirectsToEnterDetails()
+    public void Given_MenuSingleCheck_Post_WithValidEligibilityType_RedirectsToEnterDetails()
     {
         // Arrange
         var eligibilityType = "FSM";
@@ -137,7 +137,7 @@ internal class HomeControllerTests
         _sut.TempData = tempData.Object;
 
         // Act
-        var result = _sut.SingleCheckMenu(eligibilityType);
+        var result = _sut.MenuSingleCheck(eligibilityType);
 
         // Assert
         var redirectResult = result as RedirectToActionResult;
@@ -150,13 +150,13 @@ internal class HomeControllerTests
     }
 
     [Test]
-    public void Given_SingleCheckMenu_Post_WithNullEligibilityType_ReturnsBadRequest()
+    public void Given_MenuSingleCheck_Post_WithNullEligibilityType_ReturnsBadRequest()
     {
         // Arrange
         string eligibilityType = null;
 
         // Act
-        var result = _sut.SingleCheckMenu(eligibilityType);
+        var result = _sut.MenuSingleCheck(eligibilityType);
 
         // Assert
         var badRequestResult = result as BadRequestObjectResult;
