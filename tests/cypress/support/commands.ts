@@ -1,32 +1,44 @@
 import 'cypress-file-upload';
 
 Cypress.Commands.add('checkSession', (userType: string) => {
-  // Check if a session exists via cy.session, not cookie files
-  const sessionName = `user-${userType}`;
-  
-  cy.session(sessionName, () => {
+  // Check if a logged in session exists and re-use that, else log in
+  const filePath = userType === 'school' ? 'cypress/fixtures/SchoolUserCookies.json' : 'cypress/fixtures/LAUserCookies.json';
+  cy.task<Cypress.CookieData | null>('readFileMaybe', filePath).then((data) => {
+    if (data && data.cookies) {
+      if (data.cookies.length > 0) {
+        cy.loadCookies(userType);
+        cy.visit(Cypress.config().baseUrl ?? "");
+        const expectedText = userType === 'school' ? 'The Telford Park School' : 'Telford and Wrekin Council';
+        cy.get('.govuk-caption-l').should('include.text', expectedText);
+      } else {
+        cy.log('No cookies found, forcing new login');
+        if (userType === 'school') {
+          cy.login('school');
+        } else {
+          cy.login('LA');
+        }
+      }
+    } else {
+      cy.log(`File not found or invalid data: ${filePath}`);
+      if (userType === 'school') {
+        cy.login('school');
+      } else {
+        cy.login('LA');
+      }
+    }
+  });
+});
+
+Cypress.Commands.add('login', (userType) => {
+  // Funnel login request to correct function and then store the cookies - Call 'checkSession' rather than use this directly
+  cy.session([userType], () => {
     if (userType === 'school') {
       cy.loginSchoolUser();
     } else {
       cy.loginLocalAuthorityUser();
     }
-  }, {
-    validate: () => {
-      cy.visit(Cypress.config().baseUrl ?? "");
-      const expectedText = userType === 'school' ? 'The Telford Park School' : 'Manage eligibility for childcare support';
-      cy.get('h1', { timeout: 10000 }).should('be.visible').and('include.text', expectedText);
-    },
-    cacheAcrossSpecs: true
+    cy.storeCookies(userType);
   });
-});
-
-Cypress.Commands.add('login', (userType) => {
-  // Now just delegates to the appropriate login function
-  if (userType === 'school') {
-    cy.loginSchoolUser();
-  } else {
-    cy.loginLocalAuthorityUser();
-  }
 });
 
 Cypress.Commands.add('loginSchoolUser', () => {
@@ -62,21 +74,12 @@ Cypress.Commands.add('loginLocalAuthorityUser', () => {
 
 Cypress.Commands.add('storeCookies', (userType: string) => {
   const filePath = userType === 'school' ? 'cypress/fixtures/SchoolUserCookies.json' : 'cypress/fixtures/LAUserCookies.json';
-  // Ensure we're on a known authenticated page before capturing cookies
-  cy.url().then(url => {
-    // If not already on a page showing authentication state, visit the home page
-    if (!url.endsWith('/') && !url.includes('/Home')) {
-      cy.visit(Cypress.config().baseUrl ?? "");
-      cy.wait(1000); // Short wait to ensure all cookies are set
-    }
-    
-    cy.getCookies().then((cookies: Cypress.Cookie[]) => {
-      const data: Cypress.CookieData = {
-        timestamp: Date.now(),
-        cookies: cookies
-      };
-      cy.writeFile(filePath, data);
-    });
+  cy.getCookies().then((cookies: Cypress.Cookie[]) => {
+    const data: Cypress.CookieData = {
+      timestamp: Date.now(),
+      cookies: cookies
+    };
+    cy.writeFile(filePath, data);
   });
 });
 
