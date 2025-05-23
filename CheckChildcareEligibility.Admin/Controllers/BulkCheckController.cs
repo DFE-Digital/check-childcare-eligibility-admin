@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
+using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
 using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
 using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
@@ -39,6 +40,11 @@ public class BulkCheckController : BaseController
 
     public IActionResult Bulk_Check()
     {
+        var eligibilityType = TempData["eligibilityType"].ToString();
+        TempData["eligibilityType"] = eligibilityType;
+        var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
+        TempData["eligibilityTypeLabel"] = label; 
+        
         return View();
     }
 
@@ -191,5 +197,10 @@ public class BulkCheckController : BaseController
             streamWriter.Flush();
             return memoryStream.ToArray();
         }
-    }    
+    }
+
+    public IActionResult Bulk_Check_Status()
+    {
+        return View();
+    }
 }
