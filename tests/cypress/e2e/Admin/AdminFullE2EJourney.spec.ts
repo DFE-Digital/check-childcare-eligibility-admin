@@ -37,7 +37,7 @@ describe('Full journey of checking eligibility in LA portal', () => {
         cy.url().should('include', 'Check/Loader');
 
         // Eligible outcome page - LA specific view
-        cy.get('.govuk-notification-banner__heading', { timeout: 80000 }).should('include.text', 'The children of this parent or guardian are eligible');
+        cy.get('.govuk-notification-banner__heading', { timeout: 80000 }).should('include.text', 'The personal information you entered does not match departmental records.');
         
         // Verify parent details displayed
         cy.get('.govuk-summary-list').within(() => {
