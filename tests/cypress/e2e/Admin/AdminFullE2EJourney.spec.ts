@@ -37,7 +37,7 @@ describe('Full journey of checking eligibility in LA portal', () => {
         cy.url().should('include', 'Check/Loader');
 
         // Eligible outcome page - LA specific view
-        cy.get('.govuk-notification-banner__heading', { timeout: 80000 }).should('include.text', 'The personal information you entered does not match departmental records.');
+        cy.get('.govuk-notification-banner__heading', { timeout: 80000 }).should('include.text', 'The children of this parent or guardian are eligible');
         
         // Verify parent details displayed
         cy.get('.govuk-summary-list').within(() => {
@@ -183,9 +183,9 @@ describe('Full journey of checking eligibility in LA portal', () => {
         // Technical error outcome - this test will be flaky as we can't guarantee a technical error
         // We'll use a timeout and then intentionally allow the test to pass if it doesn't encounter the error
         cy.get('body', { timeout: 80000 }).then($body => {
-            if ($body.find('.govuk-notification-banner__heading:contains("There has been a technical issue")').length > 0) {
+            if ($body.find('.govuk-notification-banner__heading:contains("There has been a technical error")').length > 0) {
                 // Technical error found, continue with verification
-                cy.get('.govuk-notification-banner__heading').should('include.text', 'There has been a technical issue');
+                cy.get('.govuk-notification-banner__heading').should('include.text', 'There has been a technical error');
                 
                 // Verify the try again link exists
                 cy.contains('Try again later').should('exist');
