@@ -51,6 +51,8 @@ public class BulkCheckController : BaseController
     [HttpPost]
     public async Task<IActionResult> Bulk_Check(IFormFile fileUpload, string eligibilityType)
     {
+        TempData["eligibilityType"] = eligibilityType;
+
         var timeNow = DateTime.UtcNow;
 
         if (!string.IsNullOrEmpty(HttpContext.Session.GetString("FirstSubmissionTimeStamp")))

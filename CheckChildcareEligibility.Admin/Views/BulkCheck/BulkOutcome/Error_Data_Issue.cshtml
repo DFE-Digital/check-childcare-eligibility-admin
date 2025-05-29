@@ -21,7 +21,7 @@
                         {
                             <li>Line @error.LineNumber: @error.Message</li>
                         }
-                        @if (Model.ErrorMessage.Length > 0)
+                        @if (Model.ErrorMessage?.Length > 0)
                         {
                             <li>
                                 @Model.ErrorMessage
