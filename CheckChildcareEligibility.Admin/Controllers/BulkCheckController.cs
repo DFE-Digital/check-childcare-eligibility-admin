@@ -132,6 +132,8 @@ public class BulkCheckController : BaseController
 
                     return View("BulkOutcome/Error_Data_Issue", errorsViewModel);
                 }
+
+                requestItems.AddRange(parsedItems.ValidRequests);
             }
 
         }
