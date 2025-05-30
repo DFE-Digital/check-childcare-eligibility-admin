@@ -92,7 +92,7 @@ public class BulkCheckController : BaseController
         {
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                HasHeaderRecord = true,
+                HasHeaderRecord = false,
                 BadDataFound = null,
                 MissingFieldFound = null
             };
@@ -121,21 +121,34 @@ public class BulkCheckController : BaseController
 
             foreach (var item in DataLoad)
             {
-                var requestItem = new CheckEligibilityRequestData(Domain.Enums.CheckEligibilityType.TwoYearOffer)
+                if (sequence == 1)
                 {
-                    LastName = item.LastName,
-                    DateOfBirth = DateTime.TryParse(item.DOB, out var dtval)
+                    if (!ValidateHeaders(item))
+                    {
+                        TempData["ErrorMessage"] = "The column headings in the selected file must exactly match the template";
+                        return RedirectToAction("Bulk_Check");
+                    }
+                    sequence++;
+                }
+                else
+                {
+
+                    var requestItem = new CheckEligibilityRequestData(Domain.Enums.CheckEligibilityType.TwoYearOffer)
+                    {
+                        LastName = item.LastName,
+                        DateOfBirth = DateTime.TryParse(item.DOB, out var dtval)
                         ? dtval.ToString("yyyy-MM-dd")
                         : string.Empty,
-                    NationalInsuranceNumber = item.Ni.ToUpper(),
-                    Sequence = sequence
-                };
-                var validationResults = validator.Validate(requestItem);
-                if (!validationResults.IsValid)
-                    errorCount = checkIfExists(sequence, validationResultsItems, validationResults, errorCount);
-                else
-                    requestItems.Add(requestItem);
-                sequence++;
+                        NationalInsuranceNumber = item.Ni.ToUpper(),
+                        Sequence = sequence
+                    };
+                    var validationResults = validator.Validate(requestItem);
+                    if (!validationResults.IsValid)
+                        errorCount = checkIfExists(sequence, validationResultsItems, validationResults, errorCount);
+                    else
+                        requestItems.Add(requestItem);
+                    sequence++;
+                }
             }
         }
         catch (Exception ex)
@@ -157,6 +170,20 @@ public class BulkCheckController : BaseController
         HttpContext.Session.SetString("Get_Progress_Check", result.Links.Get_Progress_Check);
         HttpContext.Session.SetString("Get_BulkCheck_Results", result.Links.Get_BulkCheck_Results);
         return RedirectToAction("Bulk_Loader");
+    }
+    private bool ValidateHeaders(CheckRow item)
+    {
+        var expectedHeaders = new List<string> { "Parent Last Name", "Parent Date of Birth", "Parent National Insurance Number"};
+        var actualHeaders = new List<string> { item.LastName, item.DOB, item.Ni};
+
+        for (int i = 0; i < expectedHeaders.Count; i++)
+        {
+            if (actualHeaders[i] != expectedHeaders[i])
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     public async Task<IActionResult> Bulk_Loader()
