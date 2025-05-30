@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq.Expressions;
 using System.Net.Security;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using AspNetCoreGeneratedDocument;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
@@ -20,6 +21,8 @@ namespace CheckChildcareEligibility.Admin.Usecases
     {
         public List<CheckEligibilityRequestData> ValidRequests { get; set; } = new();
         public List<CsvRowError> Errors { get; set; } = new();
+        public string ErrorMessage { get; set; } = string.Empty;
+
     }
 
     public class CsvRowError
@@ -46,6 +49,8 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
         public async Task<BulkCheckCsvResult> Execute(Stream csvStream, CheckEligibilityType eligibilityType)
         {
+            var expectedHeaders = new[] { "Parent Last Name", "Parent Date of Birth", "Parent National Insurance Number" };
+
             var result = new BulkCheckCsvResult();
 
             using var reader = new StreamReader(csvStream);
@@ -61,11 +66,43 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
             csv.Context.RegisterClassMap<CheckRowRowMap>();
 
+            //csv.Read();
+            //csv.ReadHeader();
+            //var actualHeaders = csv.HeaderRecord;
+
+            //if (!expectedHeaders.SequenceEqual(actualHeaders))
+            //{
+            //    result.Errors.Add(new CsvRowError()
+            //        {
+            //            LineNumber = -1,
+            //            Message = "The column headings in the selected file must exactly match the template"
+            //        }
+            //    );
+            //    return result;
+            //}
+
+            //// Now safely read records
+            //reader.BaseStream.Seek(0, SeekOrigin.Begin); // Reset reader to beginning
+            //reader.DiscardBufferedData();                // Necessary when reusing StreamReader
+
+
             var lineNumber = 2; // headers on line 1
             var sequence = 1;
             try
             {
+                csv.Read();
+                csv.ReadHeader();
+                
                 var records = csv.GetRecords<CheckRow>();
+                var actualHeaders = csv.HeaderRecord;
+
+                if (!expectedHeaders.SequenceEqual(actualHeaders))
+                {
+                    result.ErrorMessage = "The column headings in the selected file must exactly match the template";
+
+                    return result;
+                }
+
                 foreach (var record in records)
                 {
                     if (record == null)

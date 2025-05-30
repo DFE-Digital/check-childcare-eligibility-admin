@@ -113,13 +113,29 @@ public class BulkCheckController : BaseController
             {
                 var parsedItems = await _parseBulkCheckFileUseCase.Execute(fileStream, eligibilityType == "EYPP" ? Domain.Enums.CheckEligibilityType.EarlyYearPupilPremium : Domain.Enums.CheckEligibilityType.FreeSchoolMeals);
 
-                if (parsedItems.ValidRequests == null || !parsedItems.ValidRequests.Any()) 
-                    throw new InvalidDataException("Invalid file content.");
+                if (parsedItems.ValidRequests == null || !parsedItems.ValidRequests.Any())
+                {
+                    if (!parsedItems.Errors.Any() && string.IsNullOrWhiteSpace(parsedItems.ErrorMessage))
+                    {
+                        errorsViewModel.ErrorMessage = "Invalid file content.";
+                        errorsViewModel.Errors = new List<CheckRowError>();
+
+                        return View("BulkOutcome/Error_Data_Issue", errorsViewModel);
+                    } 
+                }
 
                 if (parsedItems.ValidRequests.Count > checkRowLimit)
                 {
                     TempData["ErrorMessage"] = $"CSV File cannot contain more than {checkRowLimit} records";
                     return RedirectToAction("Bulk_Check");
+                }
+
+                if (!string.IsNullOrWhiteSpace(parsedItems.ErrorMessage))
+                {
+                    errorsViewModel.ErrorMessage = parsedItems.ErrorMessage;
+                    errorsViewModel.Errors = new List<CheckRowError>();
+
+                    return View("BulkOutcome/Error_Data_Issue", errorsViewModel);
                 }
 
                 if (parsedItems.Errors.Any())
