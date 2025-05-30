@@ -1,4 +1,5 @@
-﻿@{
+﻿@model CheckChildcareEligibility.Admin.ViewModels.BulkCheckErrorsViewModel
+@{
     ViewData["Title"] = "Error – Parent data issue";
 }
 
@@ -16,17 +17,28 @@
                         <li>
                             <strong>There are issues with the parent data on the following lines:</strong>
                         </li>
-                        @Html.Raw(TempData["BulkParentCheckItemsErrors"])
-
-                        @if (Convert.ToInt32(TempData["BulkParentCheckItemsLineMoreErrors"]) > 0)
+                        @foreach (var error in Model.Errors)
+                        {
+                            <li>Line @error.LineNumber: @error.Message</li>
+                        }
+                        @if (Model.ErrorMessage?.Length > 0)
                         {
                             <li>
-                                <strong>There are also issues on @TempData["BulkParentCheckItemsLineMoreErrors"] more
-                                    lines</strong>
+                                @Model.ErrorMessage
                             </li>
                         }
-
-
+                        @{
+                            var shownCount = Model.Errors.Count();
+                            var remaining = Model.TotalErrorCount - shownCount;
+                        }
+                        @if (remaining > 0)
+                        {
+                            <li>
+                                <strong>
+                                    There are also issues on @remaining more line@(remaining == 1 ? "" : "s")
+                                </strong>
+                            </li>                     
+                        }
                     </ul>
                 </div>
             </div>

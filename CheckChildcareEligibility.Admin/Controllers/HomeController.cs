@@ -21,13 +21,14 @@ public class HomeController : BaseController
         return View(_Claims);
     }
 
-    public IActionResult SingleCheckMenu()
+    //Single
+    public IActionResult MenuSingleCheck()
     {
-        return View("SingleCheckMenu");
+        return View("MenuSingleCheck");
     }
 
     [HttpPost]
-    public IActionResult SingleCheckMenu([FromForm] string eligibilityType)
+    public IActionResult MenuSingleCheck([FromForm] string eligibilityType)
     {
         if (string.IsNullOrEmpty(eligibilityType))
         {
@@ -37,6 +38,25 @@ public class HomeController : BaseController
         TempData["eligibilityType"] = eligibilityType;
 
         return RedirectToAction("Enter_Details", "Check");
+    }
+
+    //Bulk
+    public IActionResult MenuBulkCheck()
+    {
+        return View("MenuBulkCheck");
+    }
+
+    [HttpPost]
+    public IActionResult MenuBulkCheck([FromForm] string eligibilityType)
+    {
+        if (string.IsNullOrEmpty(eligibilityType))
+        {
+            return BadRequest("Eligibility type is required.");
+        }
+
+        TempData["eligibilityType"] = eligibilityType;
+
+        return RedirectToAction("Bulk_Check", "BulkCheck");
     }
 
     public IActionResult Privacy()

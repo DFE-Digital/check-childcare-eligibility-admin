@@ -2,8 +2,12 @@ using System.Globalization;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using CheckChildcareEligibility.Admin;
+using CheckChildcareEligibility.Admin.Boundary.Requests;
+using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Infrastructure;
+using CheckChildcareEligibility.Admin.Usecases;
 using CheckChildcareEligibility.Admin.UseCases;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,7 +39,11 @@ builder.Services.AddScoped<IPerform2YoEligibilityCheckUseCase, Perform2YoEligibi
 builder.Services.AddScoped<IPerformEyppEligibilityCheckUseCase, PerformEyppEligibilityCheckUseCase>();
 builder.Services.AddScoped<IGetCheckStatusUseCase, GetCheckStatusUseCase>();
 builder.Services.AddScoped<IValidateParentDetailsUseCase, ValidateParentDetailsUseCase>();
+builder.Services.AddScoped<IParseBulkCheckFileUseCase, ParseBulkCheckFileUseCase>();
+builder.Services.AddScoped<IValidator<CheckEligibilityRequestData>, CheckEligibilityRequestDataValidator>();
 builder.Services.AddSession();
+
+
 
 var dfeSignInConfiguration = new DfeSignInConfiguration();
 builder.Configuration.GetSection("DfeSignIn").Bind(dfeSignInConfiguration);
