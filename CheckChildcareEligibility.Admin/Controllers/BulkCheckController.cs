@@ -117,10 +117,10 @@ public class BulkCheckController : BaseController
                 {
                     if (!parsedItems.Errors.Any() && string.IsNullOrWhiteSpace(parsedItems.ErrorMessage))
                     {
-                        errorsViewModel.ErrorMessage = "Invalid file content.";
+                        TempData["ErrorMessage"] = "Invalid file content.";
                         errorsViewModel.Errors = new List<CheckRowError>();
 
-                        return View("BulkOutcome/Error_Data_Issue", errorsViewModel);
+                        return RedirectToAction("Bulk_Check");
                     } 
                 }
 
@@ -132,10 +132,8 @@ public class BulkCheckController : BaseController
 
                 if (!string.IsNullOrWhiteSpace(parsedItems.ErrorMessage))
                 {
-                    errorsViewModel.ErrorMessage = parsedItems.ErrorMessage;
-                    errorsViewModel.Errors = new List<CheckRowError>();
-
-                    return View("BulkOutcome/Error_Data_Issue", errorsViewModel);
+                    TempData["ErrorMessage"] = parsedItems.ErrorMessage;
+                    return RedirectToAction("Bulk_Check");
                 }
 
                 if (parsedItems.Errors.Any())
