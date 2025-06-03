@@ -52,6 +52,10 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
         [Test]
         public async Task Given_Bulk_Check_Should_Load_BulkCheckPage()
         {
+            //Arrange
+            _tempData.Add("eligibilityType", "2YO");
+            _sut.TempData = _tempData;
+
             // Act
             var result = _sut.Bulk_Check();
 

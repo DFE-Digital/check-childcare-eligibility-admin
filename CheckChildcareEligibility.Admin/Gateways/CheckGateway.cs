@@ -55,11 +55,6 @@ public class CheckGateway : BaseGateway, ICheckGateway
     {
         try
         {
-            var apiVersion = _configuration["ApiVersion"] ?? string.Empty;
-
-            if (apiVersion == "1")
-                return await PostCheckV1(ConvertToV1(requestBody));
-
             var checkUrl = CheckUrl(requestBody);
 
             var result = await ApiDataPostAsynch(checkUrl, requestBody, new CheckEligibilityResponse());
@@ -125,11 +120,6 @@ public class CheckGateway : BaseGateway, ICheckGateway
     {
         try
         {
-            var apiVersion = _configuration["ApiVersion"] ?? string.Empty;
-
-            if ( apiVersion == "1" ) 
-                return await PostBulkCheckV1(ConvertBulkToV1(requestBody));
-
             var checkBulkUploadUrl = BulkCheckUrl(requestBody);
 
             var result =
@@ -142,23 +132,6 @@ public class CheckGateway : BaseGateway, ICheckGateway
                 $"Post failed. uri:-{_httpClient.BaseAddress}{BulkCheckUrl(requestBody)} content:-{JsonConvert.SerializeObject(requestBody)}");
             throw;
         }
-    }
-
-    private CheckEligibilityRequestV1 ConvertToV1(CheckEligibilityRequest requestBody)
-    {
-        var checkType = ExtractCheckType(requestBody.Data);
-
-        var requestV1 = new CheckEligibilityRequestV1()
-        {
-            Data = new CheckEligibilityRequestDataV1(checkType)
-            {
-                DateOfBirth = requestBody.Data.DateOfBirth,
-                LastName = requestBody.Data.LastName,
-                NationalInsuranceNumber = requestBody.Data.NationalInsuranceNumber
-            }
-        };
-
-        return requestV1;
     }
 
     private static CheckEligibilityType ExtractCheckType(CheckEligibilityRequestData data)
@@ -179,77 +152,5 @@ public class CheckGateway : BaseGateway, ICheckGateway
         }
 
         return checkType;
-    }
-
-    private CheckEligibilityRequestBulkV1 ConvertBulkToV1(CheckEligibilityRequestBulk requestBody)
-    {
-
-        var dataV1 = requestBody.Data.Select(x =>
-            {
-                var checkType = ExtractCheckType(x);
-
-                return new CheckEligibilityRequestDataV1(checkType)
-                {
-                    DateOfBirth = x.DateOfBirth,
-                    LastName = x.LastName,
-                    NationalInsuranceNumber = x.NationalInsuranceNumber                    
-                };
-            });
-
-
-        return new CheckEligibilityRequestBulkV1()
-        {
-            Data = dataV1
-        };
-    }
-
-    public async Task<CheckEligibilityResponse> PostCheckV1(CheckEligibilityRequestV1 requestBody)
-    {
-        try
-        {
-            var checkUrl = CheckUrl(requestBody);
-
-            var result = await ApiDataPostAsynch(checkUrl, requestBody, new CheckEligibilityResponse());
-            return result;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex,
-                $"Post Check failed. uri:-{_httpClient.BaseAddress}{CheckUrl(requestBody)} content:-{JsonConvert.SerializeObject(requestBody)}");
-            throw;
-        }
-    }
-
-    private string CheckUrl(CheckEligibilityRequestV1 checkEligibilityRequest)
-    {
-        if (checkEligibilityRequest.Data == null)
-            return "error";
-
-        return CheckUrls[checkEligibilityRequest.Data.CheckType];
-    }
-    private string BulkCheckUrl(CheckEligibilityRequestBulkV1 checkEligibilityRequest)
-    {
-        if (checkEligibilityRequest.Data == null || !checkEligibilityRequest.Data.Any())
-            return "error";
-
-        return BulkCheckUrls[checkEligibilityRequest.Data.First().CheckType];
-    }
-
-    public async Task<CheckEligibilityResponseBulk> PostBulkCheckV1(CheckEligibilityRequestBulkV1 requestBody)
-    {
-        try
-        {
-            var checkBulkUploadUrl = BulkCheckUrl(requestBody);
-
-            var result =
-                await ApiDataPostAsynch(checkBulkUploadUrl, requestBody, new CheckEligibilityResponseBulk());
-            return result;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex,
-                $"Post failed. uri:-{_httpClient.BaseAddress}{BulkCheckUrl(requestBody)} content:-{JsonConvert.SerializeObject(requestBody)}");
-            throw;
-        }
     }
 }

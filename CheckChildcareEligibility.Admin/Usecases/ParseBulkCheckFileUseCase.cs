@@ -66,26 +66,6 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
             csv.Context.RegisterClassMap<CheckRowRowMap>();
 
-            //csv.Read();
-            //csv.ReadHeader();
-            //var actualHeaders = csv.HeaderRecord;
-
-            //if (!expectedHeaders.SequenceEqual(actualHeaders))
-            //{
-            //    result.Errors.Add(new CsvRowError()
-            //        {
-            //            LineNumber = -1,
-            //            Message = "The column headings in the selected file must exactly match the template"
-            //        }
-            //    );
-            //    return result;
-            //}
-
-            //// Now safely read records
-            //reader.BaseStream.Seek(0, SeekOrigin.Begin); // Reset reader to beginning
-            //reader.DiscardBufferedData();                // Necessary when reusing StreamReader
-
-
             var lineNumber = 2; // headers on line 1
             var sequence = 1;
             try

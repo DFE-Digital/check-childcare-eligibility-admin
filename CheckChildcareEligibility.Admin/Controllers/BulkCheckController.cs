@@ -40,7 +40,7 @@ public class BulkCheckController : BaseController
 
     public IActionResult Bulk_Check()
     {
-        var eligibilityType = TempData["eligibilityType"].ToString();
+        var eligibilityType = TempData["eligibilityType"]?.ToString();
         TempData["eligibilityType"] = eligibilityType;
         var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
         TempData["eligibilityTypeLabel"] = label; 
