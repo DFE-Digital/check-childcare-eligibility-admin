@@ -14,12 +14,17 @@ namespace CheckChildcareEligibility.Admin.Tests;
 [ExcludeFromCodeCoverage]
 public abstract class TestBase
 {
-    public Mock<IConfiguration> _configMock;
+    // fixture
     public Fixture _fixture = new();
+
+    // mocks
+    public Mock<IConfiguration> _configMock;
     public Mock<HttpContext> _httpContext;
     public Mock<ISession> _sessionMock;
-    public ITempDataDictionary _tempData;
     public Mock<ClaimsPrincipal> _userMock;
+
+    // test data entities
+    public ITempDataDictionary _tempData;
 
     [SetUp]
     public void SetUp()

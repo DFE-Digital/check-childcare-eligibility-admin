@@ -1,4 +1,5 @@
-﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
+﻿using System.Security.Cryptography.Xml;
+using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
@@ -67,6 +68,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
         }
     }
 
+
     public async Task<CheckEligibilityStatusResponse> GetStatus(CheckEligibilityResponse responseBody)
     {
         try
@@ -130,5 +132,25 @@ public class CheckGateway : BaseGateway, ICheckGateway
                 $"Post failed. uri:-{_httpClient.BaseAddress}{BulkCheckUrl(requestBody)} content:-{JsonConvert.SerializeObject(requestBody)}");
             throw;
         }
+    }
+
+    private static CheckEligibilityType ExtractCheckType(CheckEligibilityRequestData data)
+    {
+        CheckEligibilityType checkType = CheckEligibilityType.None;
+
+        switch (data.CheckType)
+        {
+            case "FreeSchoolMeals":
+                checkType = CheckEligibilityType.FreeSchoolMeals;
+                break;
+            case "TwoYearOffer":
+                checkType = CheckEligibilityType.TwoYearOffer;
+                break;
+            case "EarlyYearPupilPremium":
+                checkType = CheckEligibilityType.EarlyYearPupilPremium;
+                break;
+        }
+
+        return checkType;
     }
 }

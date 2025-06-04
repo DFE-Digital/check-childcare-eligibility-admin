@@ -16,6 +16,7 @@ public class CheckEligibilityRequestData : CheckEligibilityRequestDataBase
 
     public string DateOfBirth { get; set; } = string.Empty;
 
+    public string? NationalAsylumSeekerServiceNumber { get; set; }
 }
 
 #endregion
