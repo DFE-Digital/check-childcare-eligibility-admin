@@ -78,9 +78,9 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
                 if (!expectedHeaders.SequenceEqual(actualHeaders))
                 {
-                    result.ErrorMessage = "The column headings in the selected file must exactly match the template";
+                    //result.ErrorMessage = "The column headings in the selected file must exactly match the template";
 
-                    return result;
+                    //return result;
                 }
 
                 foreach (var record in records)
