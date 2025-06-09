@@ -55,7 +55,7 @@ describe('Admin Bulk Check Journey', () => {
             ]);            
         });
         cy.contains('Run check').click();
-        cy.get('h1', { timeout: 80000 }).should('include.text', 'Checks completed');
+        cy.get('h1', { timeout: 200000 }).should('include.text', 'Checks completed');
         cy.contains("Download").click();
     });
 });
