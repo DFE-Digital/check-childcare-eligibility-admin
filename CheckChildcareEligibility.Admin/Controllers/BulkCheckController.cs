@@ -111,7 +111,7 @@ public class BulkCheckController : BaseController
 
             using (var fileStream = fileUpload.OpenReadStream())
             {
-                var parsedItems = await _parseBulkCheckFileUseCase.Execute(fileStream, eligibilityType == "EYPP" ? Domain.Enums.CheckEligibilityType.EarlyYearPupilPremium : Domain.Enums.CheckEligibilityType.FreeSchoolMeals);
+                var parsedItems = await _parseBulkCheckFileUseCase.Execute(fileStream, eligibilityType == "EYPP" ? Domain.Enums.CheckEligibilityType.EarlyYearPupilPremium : Domain.Enums.CheckEligibilityType.TwoYearOffer);
 
                 if (parsedItems.ValidRequests == null || !parsedItems.ValidRequests.Any())
                 {

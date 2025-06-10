@@ -1,8 +1,7 @@
 ﻿using CheckChildcareEligibility.Admin.Domain.Enums;
 
-namespace CheckChildcareEligibility.Admin.Boundary.Requests;
-#region FreeSchoolMeals Type
-
+namespace CheckChildcareEligibility.Admin.Boundary.Requests
+{
 public class CheckEligibilityRequestData : CheckEligibilityRequestDataBase
 {
     public CheckEligibilityRequestData(CheckEligibilityType eligibilityType)
@@ -16,7 +15,5 @@ public class CheckEligibilityRequestData : CheckEligibilityRequestDataBase
 
     public string DateOfBirth { get; set; } = string.Empty;
 
-    public string? NationalAsylumSeekerServiceNumber { get; set; }
+    }
 }
-
-#endregion

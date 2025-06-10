@@ -186,10 +186,6 @@ namespace CheckChildcareEligibility.Admin.Usecases
                     return "Issue with date of birth";
                 case ValidationMessages.NI:
                     return "Issue with National Insurance number";
-                case ValidationMessages.NI_and_NASS:
-                    return $"Issue {ValidationMessages.NI_and_NASS}";
-                case ValidationMessages.NI_or_NASS:
-                    return $"Issue {ValidationMessages.NI_or_NASS}";
                 default:
                     return $"Issue {error.ErrorMessage}";
             }
