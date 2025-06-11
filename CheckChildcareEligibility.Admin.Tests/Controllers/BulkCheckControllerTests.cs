@@ -387,7 +387,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
         {
             // Arrange
             var content = Resources.bulkchecktemplate_too_many_records;
-            _sut.TempData["ErrorMessage"] = "CSV File cannot contain more than 250 records";
+            _sut.TempData["ErrorMessage"] = "The selected file must contain fewer than 250 rows";
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             writer.Write(content);
@@ -419,7 +419,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
             result.Should().BeOfType<RedirectToActionResult>();
             var viewResult = result as RedirectToActionResult;
             viewResult.ActionName.Should().BeEquivalentTo("Bulk_Check");
-            _sut.TempData["ErrorMessage"].Should().BeEquivalentTo("CSV File cannot contain more than 250 records");
+            _sut.TempData["ErrorMessage"].Should().BeEquivalentTo("The selected file must contain fewer than 250 rows");
         }
     }
 }
