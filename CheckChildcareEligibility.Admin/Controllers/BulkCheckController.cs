@@ -117,7 +117,8 @@ public class BulkCheckController : BaseController
                 {
                     if (!parsedItems.Errors.Any() && string.IsNullOrWhiteSpace(parsedItems.ErrorMessage))
                     {
-                        TempData["ErrorMessage"] = "Invalid file content.";
+
+                        TempData["ErrorMessage"] = "The selected file is empty.";
                         errorsViewModel.Errors = new List<CheckRowError>();
 
                         return RedirectToAction("Bulk_Check");
@@ -126,7 +127,7 @@ public class BulkCheckController : BaseController
 
                 if (parsedItems.ValidRequests.Count > checkRowLimit)
                 {
-                    TempData["ErrorMessage"] = $"CSV File cannot contain more than {checkRowLimit} records";
+                    TempData["ErrorMessage"] = $"The selected file must contain fewer than {checkRowLimit} rows";
                     return RedirectToAction("Bulk_Check");
                 }
 
@@ -194,7 +195,6 @@ public class BulkCheckController : BaseController
             LastName = x.LastName,
             DOB = x.DateOfBirth,
             NI = x.NationalInsuranceNumber,
-            // NASS field removed as it's not being used in the application
             Outcome = x.Status.GetFsmStatusDescription()
         });
 

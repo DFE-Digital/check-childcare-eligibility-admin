@@ -72,7 +72,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
             {
                 csv.Read();
                 csv.ReadHeader();
-                
+
                 var records = csv.GetRecords<CheckRow>();
                 var actualHeaders = csv.HeaderRecord;
 
@@ -101,7 +101,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                         var requestItem = new CheckEligibilityRequestData(eligibilityType)
                         {
                             LastName = record.LastName,
-                            DateOfBirth = DateTime.TryParse(record.DOB, out var dtval) ? dtval.ToString("yyyy-MM-dd") : string.Empty,
+                            DateOfBirth = record.DOB,
                             NationalInsuranceNumber = record.Ni.ToUpper(),
                             Sequence = sequence
                         };
@@ -112,7 +112,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                         {
                             foreach (var error in validationResults.Errors)
                             {
-                                var errorMessage = ExtractValidationErrorMessage(error);
+                                var errorMessage = error.ToString();
 
                                 if (ContainsError(result.Errors, lineNumber, errorMessage))
                                 {
@@ -172,23 +172,6 @@ namespace CheckChildcareEligibility.Admin.Usecases
             }
             return result;
 
-        }
-
-        private string ExtractValidationErrorMessage(ValidationFailure error)
-        {
-            switch (error.ErrorMessage)
-            {
-                case ValidationMessages.LastName:
-                case "'LastName' must not be empty.":
-                    return "Issue with Surname";
-                case ValidationMessages.DOB:
-                case "'Date Of Birth' must not be empty.":
-                    return "Issue with date of birth";
-                case ValidationMessages.NI:
-                    return "Issue with National Insurance number";
-                default:
-                    return $"Issue {error.ErrorMessage}";
-            }
         }
 
         private bool ContainsError(IEnumerable<CsvRowError> errors, int lineNumber, string errorMessage)
