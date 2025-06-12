@@ -242,7 +242,7 @@
 }
 
 .dfe-header__navigation-list {
-    border-top: 0px solid rgba(255, 255, 255, 0.2); /*HR Border between DfE logo and home link should not be visible */
+    border-top: 0px solid rgba(255, 255, 255, 0.2); /*HR Border between DfE logo and home link should not be visible*/
     display: flex;
     justify-content: flex-start;
     padding: 0;
