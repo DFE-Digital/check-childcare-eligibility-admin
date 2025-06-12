@@ -37,7 +37,7 @@ Cypress.Commands.add('login', (userType) => {
     } else {
       cy.loginLocalAuthorityUser();
     }
-    cy.storeCookies(userType);
+    // cy.storeCookies(userType);
   });
 });
 
