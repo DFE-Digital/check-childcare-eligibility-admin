@@ -101,7 +101,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                         var requestItem = new CheckEligibilityRequestData(eligibilityType)
                         {
                             LastName = record.LastName,
-                            DateOfBirth = record.DOB,
+                            DateOfBirth = record.DOB, //must remain in original pre-parsed form to go through validator
                             NationalInsuranceNumber = record.Ni.ToUpper(),
                             Sequence = sequence
                         };
@@ -129,6 +129,9 @@ namespace CheckChildcareEligibility.Admin.Usecases
                         }
                         else
                         {
+                            //We know this passed parse earlier but it must be translated to correct format (yyyy-MM-dd) for Database to access
+                            requestItem.DateOfBirth = DateTime.Parse(record.DOB).ToString("yyyy-MM-dd");
+                            
                             result.ValidRequests.Add(requestItem);
                         }
 
