@@ -2,7 +2,7 @@ import 'cypress-file-upload';
 
 Cypress.Commands.add('checkSession', (userType: string) => {
   // Check if a logged in session exists and re-use that, else log in
-  // const filePath = userType === 'school' ? 'cypress/fixtures/SchoolUserCookies.json' : 'cypress/fixtures/LAUserCookies.json';
+  const filePath = userType === 'school' ? 'cypress/fixtures/SchoolUserCookies.json' : 'cypress/fixtures/LAUserCookies.json';
   const filePath = "";
   cy.task<Cypress.CookieData | null>('readFileMaybe', filePath).then((data) => {
     if (data && data.cookies) {
@@ -38,7 +38,7 @@ Cypress.Commands.add('login', (userType) => {
     } else {
       cy.loginLocalAuthorityUser();
     }
-    // cy.storeCookies(userType);
+    cy.storeCookies(userType);
   });
 });
 
