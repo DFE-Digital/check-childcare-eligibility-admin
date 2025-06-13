@@ -154,12 +154,26 @@ namespace CheckChildcareEligibility.Admin.Usecases
                     Message = $"CSV header error: {ex.Message}"
                 });
             }
-            catch (ReaderException ex)
+            catch (ReaderException ex) //Updated to userFriendlyMessage to stop leaking variable names to users
             {
+                string userFriendlyMessage;
+
+                if (ex.Message.Contains("No header record was found"))
+                {
+                    userFriendlyMessage = "The selected file is empty or missing headers.";
+                }
+                else if (ex.Message.Contains("data type"))
+                {
+                    userFriendlyMessage = $"CSV read error: The file contains invalid data at line {lineNumber}.";
+                }
+                else
+                {
+                    userFriendlyMessage = "CSV read error: An error occurred while processing the file.";
+                }
+
                 result.Errors.Add(new CsvRowError
                 {
-                    LineNumber = lineNumber,
-                    Message = $"CSV read error: {ex.Message}"
+                    Message = userFriendlyMessage
                 });
             }
             catch (Exception ex)
