@@ -49,7 +49,7 @@
         @if (Model.Status == "Completed")
         {
             <td class="govuk-table__cell">
-                @Html.ActionLink("Download results", "Bulk_check_download", "BulkCheck", new { Filename = Model.Filename, SubmittedOn = Model.DateSubmitted }) | @Html.ActionLink("Delete", "Bulk_check_download", "BulkCheck", new { Filename = Model.Filename, SubmittedOn = Model.DateSubmitted })
+                @Html.ActionLink("Download results", "Bulk_check_file_download", "BulkCheck", new { groupId = Model.Guid }) | @Html.ActionLink("Delete", "Bulk_check_file_delete", "BulkCheck", new { groupId = Model.Guid })
             </td>
         }
         else

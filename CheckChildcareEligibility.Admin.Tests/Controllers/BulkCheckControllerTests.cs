@@ -24,8 +24,10 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
             _checkGatewayMock = new Mock<ICheckGateway>();
             _loggerMock = Mock.Of<ILogger<BulkCheckController>>();
             _parseBulkCheckFileUseCaseMock = new Mock<IParseBulkCheckFileUseCase>();
+            _getBulkCheckStatusesUseCaseMock = new Mock<IGetBulkCheckStatusesUseCase>();
+            _deleteBulkCheckFileUseCase = new Mock<IDeleteBulkCheckFileUseCase>();
 
-            _sut = new BulkCheckController(_loggerMock, _checkGatewayMock.Object, _configMock.Object, _parseBulkCheckFileUseCaseMock.Object);
+            _sut = new BulkCheckController(_loggerMock, _checkGatewayMock.Object, _configMock.Object, _parseBulkCheckFileUseCaseMock.Object, _getBulkCheckStatusesUseCaseMock.Object, _deleteBulkCheckFileUseCase.Object);
 
             base.SetUp();
 
@@ -43,7 +45,8 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
         private ILogger<BulkCheckController> _loggerMock;
         private Mock<ICheckGateway> _checkGatewayMock;
         private Mock<IParseBulkCheckFileUseCase> _parseBulkCheckFileUseCaseMock;
-
+        private Mock<IGetBulkCheckStatusesUseCase> _getBulkCheckStatusesUseCaseMock;
+        private Mock<IDeleteBulkCheckFileUseCase> _deleteBulkCheckFileUseCase;
         // system under test
         private BulkCheckController _sut;
 

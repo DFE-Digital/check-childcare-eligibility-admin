@@ -38,7 +38,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
             {
                 Guid = response.Guid,
                 Status = response.Status,
-                DateSubmitted = response.DateSubmitted,
+                SubmittedDate = response.SubmittedDate,
                 SubmittedBy = response.SubmittedBy,
                 ClientIdentifier = response.ClientIdentifier,
                 EligibilityType = response.EligibilityType,

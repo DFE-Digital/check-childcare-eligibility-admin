@@ -1,5 +1,6 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CheckChildcareEligibility.Admin.Gateways.Interfaces;
 
@@ -15,4 +16,5 @@ public interface ICheckGateway
     // single
     Task<CheckEligibilityResponse> PostCheck(CheckEligibilityRequest requestBody);
     Task<CheckEligibilityStatusResponse> GetStatus(CheckEligibilityResponse responseBody);
+    Task<CheckEligiblityBulkDeleteResponse> DeleteBulkChecksFor(string bulkCheckDeleteUrl);
 }
