@@ -6,6 +6,8 @@
 <div class="govuk-grid-column-two-thirds">
     <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
     <div class="govuk-warning-text">
+        @Html.ActionLink("Back", "Index", "Home", null, new { @class = "govuk-back-link" })
+        @* <a class="govuk-back-link-nolink"></a> *@
         <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
         <strong class="govuk-warning-text__text">
             <span class="govuk-visually-hidden">Warning</span>
