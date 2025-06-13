@@ -1,18 +1,15 @@
-﻿// Ignore Spelling: FSM
-
-namespace CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
+﻿namespace CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
 
 public static class ValidationMessages
 {
-    public const string NI_and_NASS =
-        "National Insurance Number or National Asylum Seeker Service Number is required is required, not both";
-
-    public const string DOB = "Date of birth is required:- (yyyy-mm-dd)";
+    public const string RequiredLastName = "Enter parent or guardian's last name";
+    public const string RequiredDOB = "Enter parent or guardian's date of birth";
+    public const string RequiredNI = "Enter parent or guardian's National Insurance number";
+    public const string ValidLastName = "Parent or guardian's last name should not contain numbers";
+    public const string ValidDOB = "The date of birth must be in yyyy-mm-d or dd-mm-yyyy format";
+    public const string ValidNI = "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C";
     public const string ChildDOB = "Child Date of birth is required:- (yyyy-mm-dd)";
-    public const string LastName = "LastName is required";
-    public const string FirstName = "FirstName is required";
     public const string ChildLastName = "Child LastName is required";
     public const string ChildFirstName = "Child FirstName is required";
-    public const string NI = "Invalid National Insurance Number";
-    public const string NI_or_NASS = "National Insurance Number or National Asylum Seeker Service Number is required";
+    public const string FirstName = "FirstName is required"; //?? redundant ??
 }

@@ -12,16 +12,19 @@ public class CheckEligibilityRequestDataValidator : AbstractValidator<CheckEligi
     public CheckEligibilityRequestDataValidator()
     {
         RuleFor(x => x.LastName)
-            .NotEmpty().WithMessage(ValidationMessages.LastName);
+            .NotEmpty().WithMessage(ValidationMessages.RequiredLastName)
+            .Must((x, lastName) => string.IsNullOrEmpty(lastName) || DataValidation.BeAValidName(lastName))
+            .WithMessage(ValidationMessages.ValidLastName);
 
         RuleFor(x => x.DateOfBirth)
-            .NotEmpty()
-            .Must(DataValidation.BeAValidDate)
-            .WithMessage(ValidationMessages.DOB);
+            .NotEmpty().WithMessage(ValidationMessages.RequiredDOB)
+            .Must((x, dob) => string.IsNullOrEmpty(dob) || DataValidation.BeAValidDate(dob))
+            .WithMessage(ValidationMessages.ValidDOB);
 
-            RuleFor(x => x.NationalInsuranceNumber)
-                .NotEmpty()
-                .Must(DataValidation.BeAValidNi)
-                .WithMessage(ValidationMessages.NI);
+
+        RuleFor(x => x.NationalInsuranceNumber)
+            .NotEmpty().WithMessage(ValidationMessages.RequiredNI)
+            .Must((x, NINumber) => string.IsNullOrEmpty(NINumber) || DataValidation.BeAValidNi(NINumber))
+            .WithMessage(ValidationMessages.ValidNI);
     }
 }
