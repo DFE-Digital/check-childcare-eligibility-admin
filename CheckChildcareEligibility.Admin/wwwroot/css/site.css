@@ -83,10 +83,6 @@
         text-decoration: underline;
     }
 
-.govuk-pagination {
-    justify-content: center;
-}
-
 /*END - Header account links */
 
 /*BEGIN - dashboard card overrides */
@@ -346,3 +342,18 @@ img, svg {
 }
 
 /*END - Align right and set correct margin for 'Remove' link on Evidence Upload Items */
+
+/*BEGIN - Prevent overridw of caption position */
+
+table {
+    caption-side: top;
+}
+
+caption {
+    padding-top: inherit;
+    padding-bottom: inherit;
+    color: inherit;
+    text-align: inherit;
+}
+
+/*END - Prevent overridw of caption position */

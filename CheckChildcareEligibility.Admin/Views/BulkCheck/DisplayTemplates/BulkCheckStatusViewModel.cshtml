@@ -1,0 +1,60 @@
+﻿@model CheckChildcareEligibility.Admin.ViewModels.BulkCheckStatusViewModel
+@{
+    Dictionary<string, string> statusColor = new()
+    {
+        { "NotStarted", "govuk-tag--grey" },
+        { "InProgress", "govuk-tag--light-blue" },
+        { "Completed", "govuk-tag--green" },
+    };
+
+    Dictionary<string, string> statusName = new()
+    {
+        { "NotStarted", "Not started" },
+        { "InProgress", "In progress" },
+        { "Completed", "Completed" },
+    };
+
+    Dictionary<string, string> eligibilityTypeName = new()
+    {
+        { "2YO", "2 years old early learning" },
+        { "EYPP", "Early years pupil premium" }
+    };
+
+    DateTime parsed;
+    var inputDateSubmitted = Model.DateSubmitted;
+    var dateSubmittedFormatted = DateTime.TryParseExact(
+        inputDateSubmitted,
+        "yyyy-MM-dd HH:mm",
+        System.Globalization.CultureInfo.InvariantCulture,
+        System.Globalization.DateTimeStyles.None,
+        out parsed
+    )
+    ? parsed.ToString("dd MMMM yyyy h:mmtt").ToLower()
+    : inputDateSubmitted;
+}
+
+<tr>
+    @if (Model.EligibilityType == "2YO" || Model.EligibilityType == "EYPP")
+    {
+        <td class="govuk-table__cell">@(Model.Filename)</td>
+        <td class="govuk-table__cell">@(@eligibilityTypeName[Model.EligibilityType])</td>
+        <td class="govuk-table__cell">@(dateSubmittedFormatted)</td>
+        <td class="govuk-table__cell">@(Model.SubmittedBy)</td>
+        <td class="govuk-table__cell">
+            <strong class="govuk-tag @statusColor[Model.Status]">
+                @statusName[Model.Status]
+            </strong>
+        </td>
+
+        @if (Model.Status == "Completed")
+        {
+            <td class="govuk-table__cell">
+                @Html.ActionLink("Download results", "Bulk_check_download", "BulkCheck", new { Filename = Model.Filename, SubmittedOn = Model.DateSubmitted }) | @Html.ActionLink("Delete", "Bulk_check_download", "BulkCheck", new { Filename = Model.Filename, SubmittedOn = Model.DateSubmitted })
+            </td>
+        }
+        else
+        {
+            <td class="govuk-table__cell"></td>
+        }
+    }
+</tr>

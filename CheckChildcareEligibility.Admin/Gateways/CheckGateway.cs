@@ -153,4 +153,43 @@ public class CheckGateway : BaseGateway, ICheckGateway
 
         return checkType;
     }
+
+    public async Task<CheckEligibilityBulkProgressByLAResponse> GetBulkCheckStatuses(string organisationId)
+    {
+
+#if DEBUG
+        return new CheckEligibilityBulkProgressByLAResponse
+        {
+            Results = new List<CheckEligibilityBulkProgressResponse>()
+            {
+                new CheckEligibilityBulkProgressResponse() { Filename = "2yearsFeb25b.csv", EligibilityType = "2YO", SubmittedBy = "Janet Eccles", DateSubmitted = "2025-04-28 12:22:00", Status = "NotStarted" },
+                new CheckEligibilityBulkProgressResponse() { Filename = "2yearold.csv", EligibilityType = "2YO", SubmittedBy = "Janet Eccles", DateSubmitted = "2025-04-28 09:03:00", Status = "InProgress" },
+                new CheckEligibilityBulkProgressResponse() { Filename = "2yo-24-Mar-MCC.csv", EligibilityType = "2YO", SubmittedBy = "Matty Smith", DateSubmitted = "2025-04-25 14:17:00", Status = "InProgress" },
+                new CheckEligibilityBulkProgressResponse() { Filename = "batch-eypp-jan-25.csv", EligibilityType = "EYPP", SubmittedBy = "Taylor Johnson", DateSubmitted = "2025-04-25 09:44:00", Status = "Completed" },
+                new CheckEligibilityBulkProgressResponse() { Filename = "upload-final-final.csv", EligibilityType = "EYPP", SubmittedBy = "Matty Smith", DateSubmitted = "2025-04-24 11:39:00", Status = "Completed" },
+                new CheckEligibilityBulkProgressResponse() { Filename = "mcc-eypp-headcount.csv", EligibilityType = "EYPP", SubmittedBy = "Francis Gallagher", DateSubmitted = "2025-04-23 16:32:00", Status = "Completed" },
+                new CheckEligibilityBulkProgressResponse() { Filename = "2yo-feb.csv", EligibilityType = "2YO", SubmittedBy = "Taylor Johnson", DateSubmitted = "2025-04-22 18:12:00", Status = "Completed" },
+                new CheckEligibilityBulkProgressResponse() { Filename = "mcc-provider.csv", EligibilityType = "EYPP", SubmittedBy = "Matty Smith", DateSubmitted = "2025-04-22 07:56:00", Status = "Completed" },
+                new CheckEligibilityBulkProgressResponse() { Filename = "recheck-spring-term.csv", EligibilityType = "EYPP", SubmittedBy = "Karen Wallace", DateSubmitted = "2025-04-21 15:01:00", Status = "Completed" },
+                new CheckEligibilityBulkProgressResponse() { Filename = "2yo-Feb2.csv", EligibilityType = "2YO", SubmittedBy = "Taylor Johnson", DateSubmitted = "2025-04-21 12:24:00", Status = "Completed" },
+                new CheckEligibilityBulkProgressResponse() { Filename = "2yearsFeb25bx.csv", EligibilityType = "2YO", SubmittedBy = "Taylor Johnson", DateSubmitted = "2025-04-21 06:12:00", Status = "Completed" },
+            }
+        };
+        
+#endif
+
+        try
+        {
+            var response = await ApiDataGetAsynch($"bulk-check/statuses",
+                new CheckEligibilityBulkProgressByLAResponse());
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                $"Get Status failed. uri:-{_httpClient.BaseAddress}bulk-check/statuses");
+        }
+
+        return null;
+    }
 }

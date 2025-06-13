@@ -8,6 +8,7 @@ public interface ICheckGateway
     // bulk
     Task<CheckEligibilityBulkStatusResponse> GetBulkCheckProgress(string bulkCheckUrl);
     Task<CheckEligibilityBulkResponse> GetBulkCheckResults(string resultsUrl);
+    Task<CheckEligibilityBulkProgressByLAResponse> GetBulkCheckStatuses(string organisationId);
 
     Task<CheckEligibilityResponseBulk> PostBulkCheck(CheckEligibilityRequestBulk requestBody);
 
