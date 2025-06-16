@@ -9,9 +9,8 @@ function loadStatuses() {
             var newContent = doc.getElementById("content");
 
             // Only update the content if the data-type has changed
-            if (newContent.getAttribute("data-type") !== document.getElementById("content").getAttribute("data-type")) {
+            if (newContent.innerHTML !== document.getElementById("content").innerHTML) {
                 document.getElementById("content").innerHTML = newContent.innerHTML;
-                document.getElementById("content").setAttribute("data-type", newContent.getAttribute("data-type"));
                 if (!newContent.getAttribute("data-url")) clearInterval(loaderTimer);
             }
         })

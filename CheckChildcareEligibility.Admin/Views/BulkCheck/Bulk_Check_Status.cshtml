@@ -22,7 +22,7 @@
     </div>
     </div>
     
-    <div class="govuk-grid-row">
+    <div class="govuk-grid-row" id="content" data-type="Refresh" data-url="@Url.Action("Bulk_Check_Status", "BulkCheck", new { pageNumber = ViewBag.CurrentPage } )">
 
         <div class="govuk-grid-column-full">
 
@@ -66,3 +66,5 @@
     </div>
 
 </div>
+
+<script src="/js/bulk-check-status-refresh.js"></script>

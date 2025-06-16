@@ -258,16 +258,10 @@ public class BulkCheckController : BaseController
 
     public async Task<CheckEligiblityBulkDeleteResponse> Bulk_check_file_delete(string groupId)
     {
-
         var result =
             await  _deleteBulkCheckFileUseCase.Execute(groupId, HttpContext.Session);
 
-        //if (result.Data.Complete = true)
-        //{
-        //    return 
-        //}
-
-        return null;
+        return result;
     }
 
     private byte[] WriteCsvToMemory(IEnumerable<BulkFSMExport> records)

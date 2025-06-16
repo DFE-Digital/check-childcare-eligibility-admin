@@ -163,17 +163,17 @@ public class CheckGateway : BaseGateway, ICheckGateway
         {
             Results = new List<CheckEligibilityBulkProgressResponse>()
             {
-                new CheckEligibilityBulkProgressResponse() { Guid = new Guid().ToString(), Filename = "2yearsFeb25b.csv", EligibilityType = "2YO", SubmittedBy = "Janet Eccles", SubmittedDate = "2025-04-28 12:22:00", Status = "NotStarted" },
-                new CheckEligibilityBulkProgressResponse() { Guid = new Guid().ToString(), Filename = "2yearold.csv", EligibilityType = "2YO", SubmittedBy = "Janet Eccles", SubmittedDate = "2025-04-28 09:03:00", Status = "InProgress" },
-                new CheckEligibilityBulkProgressResponse() { Guid = new Guid().ToString(), Filename = "2yo-24-Mar-MCC.csv", EligibilityType = "2YO", SubmittedBy = "Matty Smith", SubmittedDate = "2025-04-25 14:17:00", Status = "InProgress" },
-                new CheckEligibilityBulkProgressResponse() { Guid = new Guid().ToString(), Filename = "batch-eypp-jan-25.csv", EligibilityType = "EYPP", SubmittedBy = "Taylor Johnson", SubmittedDate = "2025-04-25 09:44:00", Status = "Completed" },
-                new CheckEligibilityBulkProgressResponse() { Guid = new Guid().ToString(), Filename = "upload-final-final.csv", EligibilityType = "EYPP", SubmittedBy = "Matty Smith", SubmittedDate = "2025-04-24 11:39:00", Status = "Completed" },
-                new CheckEligibilityBulkProgressResponse() { Guid = new Guid().ToString(), Filename = "mcc-eypp-headcount.csv", EligibilityType = "EYPP", SubmittedBy = "Francis Gallagher", SubmittedDate = "2025-04-23 16:32:00", Status = "Completed" },
-                new CheckEligibilityBulkProgressResponse() { Guid = new Guid().ToString(), Filename = "2yo-feb.csv", EligibilityType = "2YO", SubmittedBy = "Taylor Johnson", SubmittedDate = "2025-04-22 18:12:00", Status = "Completed" },
-                new CheckEligibilityBulkProgressResponse() { Guid = new Guid().ToString(), Filename = "mcc-provider.csv", EligibilityType = "EYPP", SubmittedBy = "Matty Smith", SubmittedDate = "2025-04-22 07:56:00", Status = "Completed" },
-                new CheckEligibilityBulkProgressResponse() { Guid = new Guid().ToString(), Filename = "recheck-spring-term.csv", EligibilityType = "EYPP", SubmittedBy = "Karen Wallace", SubmittedDate = "2025-04-21 15:01:00", Status = "Completed" },
-                new CheckEligibilityBulkProgressResponse() { Guid = new Guid().ToString(), Filename = "2yo-Feb2.csv", EligibilityType = "2YO", SubmittedBy = "Taylor Johnson", SubmittedDate = "2025-04-21 12:24:00", Status = "Completed" },
-                new CheckEligibilityBulkProgressResponse() { Guid = new Guid().ToString(), Filename = "2yearsFeb25bx.csv", EligibilityType = "2YO", SubmittedBy = "Taylor Johnson", SubmittedDate = "2025-04-21 06:12:00", Status = "Completed" },
+                new CheckEligibilityBulkProgressResponse() { Guid = Guid.NewGuid().ToString(), Filename = "2yearsFeb25b.csv", EligibilityType = "2YO", SubmittedBy = "Janet Eccles", SubmittedDate = "2025-04-28 12:22:00", Status = "NotStarted" },
+                new CheckEligibilityBulkProgressResponse() { Guid = Guid.NewGuid().ToString(), Filename = "2yearold.csv", EligibilityType = "2YO", SubmittedBy = "Janet Eccles", SubmittedDate = "2025-04-28 09:03:00", Status = "InProgress" },
+                new CheckEligibilityBulkProgressResponse() { Guid = Guid.NewGuid().ToString(), Filename = "2yo-24-Mar-MCC.csv", EligibilityType = "2YO", SubmittedBy = "Matty Smith", SubmittedDate = "2025-04-25 14:17:00", Status = "InProgress" },
+                new CheckEligibilityBulkProgressResponse() { Guid = Guid.NewGuid().ToString(), Filename = "batch-eypp-jan-25.csv", EligibilityType = "EYPP", SubmittedBy = "Taylor Johnson", SubmittedDate = "2025-04-25 09:44:00", Status = "Completed" },
+                new CheckEligibilityBulkProgressResponse() { Guid = Guid.NewGuid().ToString(), Filename = "upload-final-final.csv", EligibilityType = "EYPP", SubmittedBy = "Matty Smith", SubmittedDate = "2025-04-24 11:39:00", Status = "Completed" },
+                new CheckEligibilityBulkProgressResponse() { Guid = Guid.NewGuid().ToString(), Filename = "mcc-eypp-headcount.csv", EligibilityType = "EYPP", SubmittedBy = "Francis Gallagher", SubmittedDate = "2025-04-23 16:32:00", Status = "Completed" },
+                new CheckEligibilityBulkProgressResponse() { Guid = Guid.NewGuid().ToString(), Filename = "2yo-feb.csv", EligibilityType = "2YO", SubmittedBy = "Taylor Johnson", SubmittedDate = "2025-04-22 18:12:00", Status = "Completed" },
+                new CheckEligibilityBulkProgressResponse() { Guid = Guid.NewGuid().ToString(), Filename = "mcc-provider.csv", EligibilityType = "EYPP", SubmittedBy = "Matty Smith", SubmittedDate = "2025-04-22 07:56:00", Status = "Completed" },
+                new CheckEligibilityBulkProgressResponse() { Guid = Guid.NewGuid().ToString(), Filename = "recheck-spring-term.csv", EligibilityType = "EYPP", SubmittedBy = "Karen Wallace", SubmittedDate = "2025-04-21 15:01:00", Status = "Completed" },
+                new CheckEligibilityBulkProgressResponse() { Guid = Guid.NewGuid().ToString(), Filename = "2yo-Feb2.csv", EligibilityType = "2YO", SubmittedBy = "Taylor Johnson", SubmittedDate = "2025-04-21 12:24:00", Status = "Completed" },
+                new CheckEligibilityBulkProgressResponse() { Guid = Guid.NewGuid().ToString(), Filename = "2yearsFeb25bx.csv", EligibilityType = "2YO", SubmittedBy = "Taylor Johnson", SubmittedDate = "2025-04-21 06:12:00", Status = "Completed" },
             }
         };
         

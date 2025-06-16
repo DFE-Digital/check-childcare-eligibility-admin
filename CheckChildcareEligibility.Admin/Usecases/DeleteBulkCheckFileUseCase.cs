@@ -35,11 +35,6 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
                 var response = new CheckEligiblityBulkDeleteResponse();
 
-                if (result == null)
-                {
-
-                }
-
                 return response;
             }
             catch (Exception ex)
