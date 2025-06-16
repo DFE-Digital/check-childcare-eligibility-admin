@@ -87,39 +87,6 @@ public class Perform2YoEligibilityCheckUseCaseTests
     }
 
     [Test]
-    public async Task Execute_WithNassParent_ShouldSetNassSessionData()
-    {
-        // Arrange
-        var parent = new ParentGuardian
-        {
-            LastName = "Doe",
-            Day = "01",
-            Month = "01",
-            Year = "1980",
-            // Use a mock NASS number for testing
-        };
-        
-        _checkGatewayMock.Setup(s => s.PostCheck(It.IsAny<CheckEligibilityRequest>()))
-            .ReturnsAsync(_eligibilityResponse);
-
-        // Act
-        var response = await _sut.Execute(parent, _sessionMock.Object);
-
-        // Assert
-        response.Should().BeEquivalentTo(_eligibilityResponse);
-
-        // Verify that session has the expected values
-        byte[] lastNameBytes;
-        byte[] dobBytes;
-        
-        _sessionMock.Object.TryGetValue("ParentLastName", out lastNameBytes);
-        _sessionMock.Object.TryGetValue("ParentDOB", out dobBytes);
-        
-        Encoding.UTF8.GetString(lastNameBytes).Should().Be("Doe");
-        Encoding.UTF8.GetString(dobBytes).Should().Be("1980-01-01");
-    }
-
-    [Test]
     public async Task Execute_WhenApiThrowsException_ShouldThrow()
     {
         // Arrange

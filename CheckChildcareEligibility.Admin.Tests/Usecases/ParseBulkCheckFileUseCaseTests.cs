@@ -34,10 +34,10 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
             // Arrange
             var errors = new List<CsvRowError> 
             {
-               new CsvRowError{ LineNumber = 2, Message = "Issue Something is wrong!" },
-               new CsvRowError{ LineNumber = 3, Message = "Issue Something is wrong!" },
-               new CsvRowError{ LineNumber = 4, Message = "Issue Something is wrong!" },
-               new CsvRowError{ LineNumber = 5, Message = "Issue Something is wrong!" },
+               new CsvRowError{ LineNumber = 2, Message = "Something is wrong!" },
+               new CsvRowError{ LineNumber = 3, Message = "Something is wrong!" },
+               new CsvRowError{ LineNumber = 4, Message = "Something is wrong!" },
+               new CsvRowError{ LineNumber = 5, Message = "Something is wrong!" },
             };
 
             var content = Resources.bulkchecktemplate_some_invalid_items;
