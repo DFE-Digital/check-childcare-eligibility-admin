@@ -181,7 +181,8 @@ public class BulkCheckController : BaseController
         var result = await _checkGateway.PostBulkCheck(new CheckEligibilityRequestBulk { Filename = fileName, SubmittedBy = submittedBy, Data = requestItems });
         HttpContext.Session.SetString("Get_Progress_Check", result.Links.Get_Progress_Check);
         HttpContext.Session.SetString("Get_BulkCheck_Results", result.Links.Get_BulkCheck_Results);
-        return RedirectToAction("Bulk_Loader");
+        TempData["JustUploaded"] = "true";
+        return RedirectToAction("Bulk_Check_Status");
     }
     
     public async Task<IActionResult> Bulk_Loader()
@@ -231,9 +232,11 @@ public class BulkCheckController : BaseController
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = fileName };
     }
 
-    public async Task<IActionResult> Bulk_check_file_download(string groupId)
+    public async Task<IActionResult> Bulk_check_file_download(string groupId, string eligibilityType = "")
     {
-        var eligibilityType = TempData["eligibilityType"]?.ToString();
+        if (string.IsNullOrWhiteSpace(eligibilityType))
+            eligibilityType = TempData["eligibilityType"]?.ToString();
+
         var filePrefix = GetFileNamePrefix(eligibilityType);
         TempData["filePrefix"] = filePrefix;
 
@@ -281,8 +284,10 @@ public class BulkCheckController : BaseController
         switch (eligibilityType) 
         {
             case "2YO":
+            case "TwoYearOffer":
                 return "two-year-offer";
             case "EYPP":
+            case "EarlyYearsPupilPremium":
                 return "early-year-pupil-premium";
             default:
                 return "free-school-meal";
@@ -307,7 +312,8 @@ public class BulkCheckController : BaseController
                 Guid = x.Guid,
                 Status = x.Status,
                 SubmittedBy = x.SubmittedBy          
-            });
+            })
+            .OrderByDescending(x=> x.DateSubmitted);
 
         ViewBag.CurrentPage = pageNumber;
         ViewBag.TotalPages =  (int)Math.Ceiling(response.Count() / (float)pageSize);

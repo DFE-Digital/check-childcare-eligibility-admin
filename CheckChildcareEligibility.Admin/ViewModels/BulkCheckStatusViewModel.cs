@@ -6,7 +6,7 @@
         public string ClientIdentifier { get; set; } = string.Empty;
         public string Filename { get; set; } = string.Empty;
         public string EligibilityType { get; set; } = string.Empty;
-        public string DateSubmitted { get; set; } = string.Empty;
+        public DateTime DateSubmitted { get; set; }
         public string SubmittedBy { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
     }

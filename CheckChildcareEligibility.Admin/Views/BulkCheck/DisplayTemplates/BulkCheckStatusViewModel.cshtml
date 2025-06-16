@@ -4,37 +4,27 @@
     {
         { "NotStarted", "govuk-tag--grey" },
         { "InProgress", "govuk-tag--light-blue" },
-        { "Completed", "govuk-tag--green" },
+        { "Complete", "govuk-tag--green" },
     };
 
     Dictionary<string, string> statusName = new()
     {
-        { "NotStarted", "Not started" },
-        { "InProgress", "In progress" },
-        { "Completed", "Completed" },
+        { "NotStarted", "Not Started" },
+        { "InProgress", "In Progress" },
+        { "Complete", "Complete" },
     };
 
     Dictionary<string, string> eligibilityTypeName = new()
     {
-        { "2YO", "2 years old early learning" },
-        { "EYPP", "Early years pupil premium" }
+        { "TwoYearOffer", "2 years old early learning" },
+        { "EarlyYearPupilPremium", "Early years pupil premium" }
     };
 
-    DateTime parsed;
-    var inputDateSubmitted = Model.DateSubmitted;
-    var dateSubmittedFormatted = DateTime.TryParseExact(
-        inputDateSubmitted,
-        "yyyy-MM-dd HH:mm",
-        System.Globalization.CultureInfo.InvariantCulture,
-        System.Globalization.DateTimeStyles.None,
-        out parsed
-    )
-    ? parsed.ToString("dd MMMM yyyy h:mmtt").ToLower()
-    : inputDateSubmitted;
+    var dateSubmittedFormatted = $"{Model.DateSubmitted.ToString("dd MMMM yyyy")} {Model.DateSubmitted.ToString("h:mmtt").ToLower()}";
 }
 
 <tr>
-    @if (Model.EligibilityType == "2YO" || Model.EligibilityType == "EYPP")
+    @if (Model.EligibilityType == "TwoYearOffer" || Model.EligibilityType == "EarlyYearPupilPremium")
     {
         <td class="govuk-table__cell">@(Model.Filename)</td>
         <td class="govuk-table__cell">@(@eligibilityTypeName[Model.EligibilityType])</td>
@@ -46,10 +36,10 @@
             </strong>
         </td>
 
-        @if (Model.Status == "Completed")
+        @if (Model.Status == "Complete")
         {
             <td class="govuk-table__cell">
-                @Html.ActionLink("Download results", "Bulk_check_file_download", "BulkCheck", new { groupId = Model.Guid }) | @Html.ActionLink("Delete", "Bulk_check_file_delete", "BulkCheck", new { groupId = Model.Guid })
+                @Html.ActionLink("Download results", "Bulk_check_file_download", "BulkCheck", new { groupId = Model.Guid, eligibilityType = Model.EligibilityType }) | @Html.ActionLink("Delete", "Bulk_check_file_delete", "BulkCheck", new { groupId = Model.Guid })
             </td>
         }
         else

@@ -29,7 +29,12 @@ namespace CheckChildcareEligibility.Admin.Usecases
         {
             var response = await _checkGateway.GetBulkCheckStatuses(organisationId);
 
-            return response.Results.Select(x => MapToBulkCheck(x));
+            if (response.Checks == null)
+            {
+                return new List<BulkCheck>();
+            }
+
+            return response.Checks.Select(x => MapToBulkCheck(x));
         }
 
         private BulkCheck MapToBulkCheck(CheckEligibilityBulkProgressResponse response)

@@ -21,17 +21,17 @@ public class CheckEligibilityResponseBulkLinks
 public class CheckEligibilityBulkProgressResponse
 {
     public string Guid { get; set; }
-    public string ClientIdentifier { get; set; } = string.Empty;
-    public string Filename { get; set; } = string.Empty;
+    public string? ClientIdentifier { get; set; } = string.Empty;
+    public string? Filename { get; set; } = string.Empty;
     public string EligibilityType { get; set; } = string.Empty;
-    public string SubmittedDate { get; set; } = string.Empty;
-    public string SubmittedBy { get; set; } = string.Empty;
+    public DateTime SubmittedDate { get; set; }
+    public string? SubmittedBy { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
 
 }
 
 public class CheckEligibilityBulkProgressByLAResponse
 {
-    public IEnumerable<CheckEligibilityBulkProgressResponse> Results { get; set; }
+    public IEnumerable<CheckEligibilityBulkProgressResponse> Checks { get; set; }
     
 }
