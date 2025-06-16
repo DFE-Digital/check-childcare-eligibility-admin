@@ -61,6 +61,8 @@ public class BulkCheckController : BaseController
     {
         _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
 
+        var establishmentNumber = _Claims.Organisation.EstablishmentNumber;
+
         var fileName = fileUpload.FileName;
         var submittedBy = $"{_Claims?.User.FirstName} {_Claims?.User.Surname}"; 
 
@@ -178,7 +180,7 @@ public class BulkCheckController : BaseController
             return View("BulkOutcome/Error_Data_Issue", errorsViewModel);
         }
 
-        var result = await _checkGateway.PostBulkCheck(new CheckEligibilityRequestBulk { Filename = fileName, SubmittedBy = submittedBy, Data = requestItems });
+        var result = await _checkGateway.PostBulkCheck(new CheckEligibilityRequestBulk { ClientIdentifier = establishmentNumber, Filename = fileName, SubmittedBy = submittedBy, Data = requestItems });
         HttpContext.Session.SetString("Get_Progress_Check", result.Links.Get_Progress_Check);
         HttpContext.Session.SetString("Get_BulkCheck_Results", result.Links.Get_BulkCheck_Results);
         TempData["JustUploaded"] = "true";
@@ -298,7 +300,7 @@ public class BulkCheckController : BaseController
     {
         _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
 
-        var response = await _getBulkCheckStatusesUseCase.Execute(_Claims.Organisation.Name, HttpContext.Session);
+        var response = await _getBulkCheckStatusesUseCase.Execute(_Claims.Organisation.EstablishmentNumber, HttpContext.Session);
         var pageSize = 10;
         var checks = response
             .Skip((pageNumber - 1) * pageSize)

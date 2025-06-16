@@ -181,7 +181,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
 
         try
         {
-            var response = await ApiDataGetAsynch($"bulk-check/status",
+            var response = await ApiDataGetAsynch($"bulk-check/status/{organisationId}",
                 new CheckEligibilityBulkProgressByLAResponse());
             return response;
         }
