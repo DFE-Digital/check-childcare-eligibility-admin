@@ -39,7 +39,7 @@
         @if (Model.Status == "Complete")
         {
             <td class="govuk-table__cell">
-                @Html.ActionLink("Download results", "Bulk_check_file_download", "BulkCheck", new { groupId = Model.Guid, eligibilityType = Model.EligibilityType }) | @Html.ActionLink("Delete", "Bulk_check_file_delete", "BulkCheck", new { groupId = Model.Guid })
+                @Html.ActionLink("Download results", "Bulk_check_file_download", "BulkCheck", new { groupId = Model.Guid, eligibilityType = Model.EligibilityType }) | <a href="#" class="delete-link" data-group-id="@Model.Guid">Delete</a>
             </td>
         }
         else

@@ -289,7 +289,7 @@ public class BulkCheckController : BaseController
             case "TwoYearOffer":
                 return "two-year-offer";
             case "EYPP":
-            case "EarlyYearsPupilPremium":
+            case "EarlyYearPupilPremium":
                 return "early-year-pupil-premium";
             default:
                 return "free-school-meal";

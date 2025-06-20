@@ -23,3 +23,28 @@ function loadStatuses() {
 var refreshTimer = setInterval(function () {
     loadStatuses();
 }, 5000);
+
+
+document.querySelectorAll('.delete-link').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+        e.preventDefault();
+        const groupId = this.getAttribute('data-group-id');
+        deleteItem(groupId);
+    });
+});
+
+window.deleteItem = function (groupId) {
+    fetch(`/BulkCheck/Bulk_check_file_delete?groupId=${groupId}`, {
+        method: 'POST',
+        headers: {
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+        }
+    })
+        .then(response => {
+            if (response.ok) {
+//                alert("OK");
+            } else {
+//                alert("Failed to delete.");
+            }
+        });
+};
