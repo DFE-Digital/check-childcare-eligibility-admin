@@ -208,7 +208,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
             // Assert
             result.Should().BeOfType<RedirectToActionResult>();
             var viewResult = result as RedirectToActionResult;
-            viewResult.ActionName.Should().BeEquivalentTo("Bulk_Loader");
+            viewResult.ActionName.Should().BeEquivalentTo("Bulk_Check_Status");
         }
 
 
@@ -329,7 +329,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
                 var result = await _sut.Bulk_Check(file, "2YO");
                 result.Should().BeOfType<RedirectToActionResult>();
                 var viewResult = result as RedirectToActionResult;
-                viewResult.ActionName.Should().BeEquivalentTo("Bulk_Loader");
+                viewResult.ActionName.Should().BeEquivalentTo("Bulk_Check_Status");
 
                 if (i == 10)
                     // assert
@@ -382,7 +382,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
             // Assert
             result.Should().BeOfType<RedirectToActionResult>();
             var viewResult = result as RedirectToActionResult;
-            viewResult.ActionName.Should().BeEquivalentTo("Bulk_Loader");
+            viewResult.ActionName.Should().BeEquivalentTo("Bulk_Check_Status");
         }
 
         [Test]
