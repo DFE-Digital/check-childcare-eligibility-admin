@@ -5,7 +5,7 @@ namespace CheckChildcareEligibility.Admin.Attributes;
 
 public class NameAttribute : ValidationAttribute
 {
-    public static readonly string UnicodeOnlyPattern = @"^[a-zA-Z ,.'-]+$";
+    private static readonly string UnicodeOnlyPattern = @"^[a-zA-Z ,.'-]+$";
 
     private static readonly Regex regex = new(UnicodeOnlyPattern);
 
