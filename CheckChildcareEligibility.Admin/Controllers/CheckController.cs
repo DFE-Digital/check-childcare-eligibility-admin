@@ -59,8 +59,15 @@ public class CheckController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Enter_Details()
+    public async Task<IActionResult> Enter_Details(bool clearData = false)
     {
+        // If clearData is true, remove the ParentDetails from TempData
+        if (clearData)
+        {
+            TempData.Remove("ParentDetails");
+            TempData.Remove("Errors");
+        }
+
         var eligibilityType = TempData["eligibilityType"].ToString();
         TempData["eligibilityType"] = eligibilityType;
         var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
