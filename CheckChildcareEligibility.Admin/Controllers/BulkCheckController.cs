@@ -111,7 +111,11 @@ public class BulkCheckController : BaseController
 
             using (var fileStream = fileUpload.OpenReadStream())
             {
-                var parsedItems = await _parseBulkCheckFileUseCase.Execute(fileStream, eligibilityType == "EYPP" ? Domain.Enums.CheckEligibilityType.EarlyYearPupilPremium : Domain.Enums.CheckEligibilityType.TwoYearOffer);
+                var parsedItems = await _parseBulkCheckFileUseCase.Execute(fileStream,
+                    eligibilityType == "EYPP" ?
+                    Domain.Enums.CheckEligibilityType.EarlyYearPupilPremium :
+                    eligibilityType == "2YO" ? Domain.Enums.CheckEligibilityType.TwoYearOffer :
+                    Domain.Enums.CheckEligibilityType.FreeSchoolMeals);
 
                 if (parsedItems.ValidRequests == null || !parsedItems.ValidRequests.Any())
                 {
@@ -183,11 +187,19 @@ public class BulkCheckController : BaseController
 
     public async Task<IActionResult> Bulk_check_success()
     {
+        var eligibilityType = TempData["eligibilityType"]?.ToString();
+        TempData["eligibilityType"] = eligibilityType;
+        TempData["filePrefix"] = GetFileNamePrefix(eligibilityType);
+
         return View("BulkOutcome/Success");
     }
 
     public async Task<IActionResult> Bulk_check_download()
     {
+        var eligibilityType = TempData["eligibilityType"]?.ToString();
+        var filePrefix = GetFileNamePrefix(eligibilityType);
+        TempData["filePrefix"] = filePrefix;
+
         var resultData =
             await _checkGateway.GetBulkCheckResults(HttpContext.Session.GetString("Get_BulkCheck_Results"));
         var exportData = resultData.Data.Select(x => new BulkFSMExport
@@ -198,11 +210,24 @@ public class BulkCheckController : BaseController
             Outcome = x.Status.GetFsmStatusDescription()
         });
 
-        var fileName = $"free-school-meal-outcomes-{DateTime.Now.ToString("yyyyMMdd")}.csv";
+        var fileName = $"{filePrefix}-outcomes-{DateTime.Now.ToString("yyyyMMdd")}.csv";
 
         var result = WriteCsvToMemory(exportData);
         var memoryStream = new MemoryStream(result);
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = fileName };
+    }
+
+    private string GetFileNamePrefix(string? eligibilityType)
+    {
+        switch (eligibilityType)
+        {
+            case "2YO":
+                return "two-year-offer";
+            case "EYPP":
+                return "early-year-pupil-premium";
+            default:
+                return "free-school-meal";
+        }
     }
 
     private byte[] WriteCsvToMemory(IEnumerable<BulkFSMExport> records)
