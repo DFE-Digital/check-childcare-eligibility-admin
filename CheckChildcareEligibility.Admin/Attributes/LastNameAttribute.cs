@@ -6,8 +6,7 @@ namespace CheckChildcareEligibility.Admin.Attributes;
 
 public class LastNameAttribute : ValidationAttribute
 {
-    // Updated the pattern to ensure proper handling of hyphens and apostrophes
-    private static readonly string UnicodeOnlyPattern = @"^[\p{L}\-' ]+$";
+    private static readonly string UnicodeOnlyPattern = NameAttribute.UnicodeOnlyPattern;
 
     private static readonly Regex regex = new(UnicodeOnlyPattern);
     private readonly string _childIndexPropertyName;
