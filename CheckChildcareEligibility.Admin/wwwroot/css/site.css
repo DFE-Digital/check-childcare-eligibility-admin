@@ -112,6 +112,7 @@
     display: flex;
     flex-grow: 1;
     flex-direction: column;
+    border-bottom: 0 solid #003a69;
 }
 
     .dfe-card-container :last-child {
@@ -238,7 +239,7 @@
 }
 
 .dfe-header__navigation-list {
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 0px solid rgba(255, 255, 255, 0.2); /*HR Border between DfE logo and home link should not be visible*/
     display: flex;
     justify-content: flex-start;
     padding: 0;
@@ -357,3 +358,16 @@ caption {
 }
 
 /*END - Prevent overridw of caption position */
+
+
+/*BEGIN - set dfe card width to match prototype */
+
+@media (min-width: 40.0625em) {
+    .dfe-grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 30px;
+    }
+}
+
+/*END - set dfe card width to match prototype */

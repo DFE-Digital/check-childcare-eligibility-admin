@@ -72,7 +72,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
             {
                 csv.Read();
                 csv.ReadHeader();
-                
+
                 var records = csv.GetRecords<CheckRow>();
                 var actualHeaders = csv.HeaderRecord;
 
@@ -101,7 +101,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                         var requestItem = new CheckEligibilityRequestData(eligibilityType)
                         {
                             LastName = record.LastName,
-                            DateOfBirth = DateTime.TryParse(record.DOB, out var dtval) ? dtval.ToString("yyyy-MM-dd") : string.Empty,
+                            DateOfBirth = record.DOB, //must remain in original pre-parsed form to go through validator
                             NationalInsuranceNumber = record.Ni.ToUpper(),
                             Sequence = sequence
                         };
@@ -112,7 +112,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                         {
                             foreach (var error in validationResults.Errors)
                             {
-                                var errorMessage = ExtractValidationErrorMessage(error);
+                                var errorMessage = error.ToString();
 
                                 if (ContainsError(result.Errors, lineNumber, errorMessage))
                                 {
@@ -129,6 +129,9 @@ namespace CheckChildcareEligibility.Admin.Usecases
                         }
                         else
                         {
+                            //We know this passed parse earlier but it must be translated to correct format (yyyy-MM-dd) for Database to access
+                            requestItem.DateOfBirth = DateTime.Parse(record.DOB).ToString("yyyy-MM-dd");
+                            
                             result.ValidRequests.Add(requestItem);
                         }
 
@@ -154,12 +157,26 @@ namespace CheckChildcareEligibility.Admin.Usecases
                     Message = $"CSV header error: {ex.Message}"
                 });
             }
-            catch (ReaderException ex)
+            catch (ReaderException ex) //Updated to userFriendlyMessage to stop leaking variable names to users
             {
+                string userFriendlyMessage;
+
+                if (ex.Message.Contains("No header record was found"))
+                {
+                    userFriendlyMessage = "The selected file is empty or missing headers.";
+                }
+                else if (ex.Message.Contains("data type"))
+                {
+                    userFriendlyMessage = $"CSV read error: The file contains invalid data at line {lineNumber}.";
+                }
+                else
+                {
+                    userFriendlyMessage = "CSV read error: An error occurred while processing the file.";
+                }
+
                 result.Errors.Add(new CsvRowError
                 {
-                    LineNumber = lineNumber,
-                    Message = $"CSV read error: {ex.Message}"
+                    Message = userFriendlyMessage
                 });
             }
             catch (Exception ex)
@@ -172,27 +189,6 @@ namespace CheckChildcareEligibility.Admin.Usecases
             }
             return result;
 
-        }
-
-        private string ExtractValidationErrorMessage(ValidationFailure error)
-        {
-            switch (error.ErrorMessage)
-            {
-                case ValidationMessages.LastName:
-                case "'LastName' must not be empty.":
-                    return "Issue with Surname";
-                case ValidationMessages.DOB:
-                case "'Date Of Birth' must not be empty.":
-                    return "Issue with date of birth";
-                case ValidationMessages.NI:
-                    return "Issue with National Insurance number";
-                case ValidationMessages.NI_and_NASS:
-                    return $"Issue {ValidationMessages.NI_and_NASS}";
-                case ValidationMessages.NI_or_NASS:
-                    return $"Issue {ValidationMessages.NI_or_NASS}";
-                default:
-                    return $"Issue {error.ErrorMessage}";
-            }
         }
 
         private bool ContainsError(IEnumerable<CsvRowError> errors, int lineNumber, string errorMessage)

@@ -21,7 +21,7 @@ describe('Admin Bulk Check Journey', () => {
         cy.contains('Run check').click();
         cy.get('#file-upload-1-error').as('errorMessage');
         cy.get('@errorMessage').should(($p) => {
-            expect($p.first()).to.contain('CSV File cannot contain more than 250 records');
+            expect($p.first()).to.contain('The selected file must contain fewer than 250 rows');
         });
     });
 
