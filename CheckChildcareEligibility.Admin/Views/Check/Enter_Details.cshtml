@@ -10,7 +10,7 @@
 
     @if (!ViewData.ModelState.IsValid)
     {
-        ViewData["Title"] = "Error: Check Details";
+        @*         ViewData["Title"] = "Error: Check Details";*@
         <partial name="_ValidationSummary" model="ViewData.ModelState" />
     }
 
