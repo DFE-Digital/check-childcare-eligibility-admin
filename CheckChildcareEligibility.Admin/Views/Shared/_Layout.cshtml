@@ -179,7 +179,8 @@
     <script type="module" src="~/js/govuk-frontend.min.js"></script>
     <script src="~/js/dfefrontend.js"></script>
 
-    <script type="module" src="~/js/site.js"></script>
+    <script type="module" src="~/js/cookieFunctions.js"></script>
+    <script type="module" src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", false)
 </body>
