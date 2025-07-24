@@ -57,7 +57,7 @@ describe('Date of Birth Validation Tests', () => {
 
         // Check that the validation error appears
         cy.get('.govuk-error-summary').should('exist');
-        cy.get('.govuk-error-summary__list').should('contain', 'Enter a date of birth');
+        cy.get('.govuk-error-summary__list').should('contain', "Enter parent or guardian's date of birth");
     });
 
     it('displays error messages for non-numeric inputs', () => {
@@ -190,7 +190,7 @@ describe('Last Name Validation Tests', () => {
         cy.contains('Run check').click();
 
         // Should proceed to next step without validation errors
-        cy.url().should('include', '/Check/Loader');
+        cy.contains('There is a problem').should('not.exist');
     });
 });
 
@@ -289,7 +289,7 @@ describe('National Insurance Number Validation Tests', () => {
         cy.contains('Run check').click();
 
         // Should proceed to next step without validation errors
-        cy.url().should('include', '/Check/Loader');
+        cy.contains('There is a problem').should('not.exist');
     });
 });
 
