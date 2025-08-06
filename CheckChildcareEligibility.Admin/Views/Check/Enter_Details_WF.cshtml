@@ -23,10 +23,13 @@
                 <label class="govuk-label govuk-label--m" for="EligibilityCode">
                     Eligibility Code
                 </label>
+                <div id="EligibilityCode-hint" class="govuk-hint">
+                    Eligibility code must be 11 digits long
+                </div>
                 <p class="govuk-error-message">
                     <span asp-validation-for="EligibilityCode"></span>
                 </p>
-                <input class="govuk-input govuk-input--width-11 @(ViewData.ModelState["EligibilityCode"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                <input class="govuk-input govuk-input--width-10 @(ViewData.ModelState["EligibilityCode"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
                        asp-for="EligibilityCode" type="text" aria-label="Eligibility Code">
             </div>
 
@@ -35,7 +38,7 @@
                     National Insurance number
                 </label>
                 <div id="ni-number-entered-hint" class="govuk-hint">
-                    For example, ‘QQ 12 34 56 C’
+                    Can be for a parent, guardian or partner. For example, ‘QQ 12 34 56 C’
                 </div>
                 <p class="govuk-error-message">
                     <span asp-validation-for="NationalInsuranceNumber"></span>
