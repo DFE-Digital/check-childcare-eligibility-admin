@@ -35,10 +35,13 @@ builder.Services.AddServices(builder.Configuration);
 builder.Services.AddSession();
 
 builder.Services.AddScoped<ILoadParentDetailsUseCase, LoadParentDetailsUseCase>();
+builder.Services.AddScoped<ILoadParentAndChildDetailsUseCase, LoadParentAndChildDetailsUseCase>();
+builder.Services.AddScoped<IPerformWFEligibilityCheckUseCase, PerformWFEligibilityCheckUseCase>();
 builder.Services.AddScoped<IPerform2YoEligibilityCheckUseCase, Perform2YoEligibilityCheckUseCase>();
 builder.Services.AddScoped<IPerformEyppEligibilityCheckUseCase, PerformEyppEligibilityCheckUseCase>();
 builder.Services.AddScoped<IGetCheckStatusUseCase, GetCheckStatusUseCase>();
 builder.Services.AddScoped<IValidateParentDetailsUseCase, ValidateParentDetailsUseCase>();
+builder.Services.AddScoped<IValidateParentAndChildDetailsUseCase, ValidateParentAndChildDetailsUseCase>();
 builder.Services.AddScoped<IParseBulkCheckFileUseCase, ParseBulkCheckFileUseCase>();
 builder.Services.AddScoped<IValidator<CheckEligibilityRequestData>, CheckEligibilityRequestDataValidator>();
 builder.Services.AddSession();

@@ -19,6 +19,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
         ["FreeSchoolMeals"] = "check/free-school-meals",
         ["TwoYearOffer"] = "check/two-year-offer",
         ["EarlyYearPupilPremium"] = "check/early-year-pupil-premium",
+        ["WorkingFamilies"] = "check/working-families",
     };
 
     private static readonly Dictionary<string, string> BulkCheckUrls = new()
@@ -26,6 +27,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
         ["FreeSchoolMeals"] = "bulk-check/free-school-meals",
         ["TwoYearOffer"] = "bulk-check/two-year-offer",
         ["EarlyYearPupilPremium"] = "bulk-check/early-year-pupil-premium",
+        ["WorkingFamilies"] = "check/working-families",
     };
 
     public CheckGateway(ILoggerFactory logger, HttpClient httpClient, IConfiguration configuration) : base("EcsService",

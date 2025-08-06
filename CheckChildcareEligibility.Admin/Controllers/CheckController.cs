@@ -18,10 +18,13 @@ public class CheckController : BaseController
     private readonly IConfiguration _config;
     private readonly IGetCheckStatusUseCase _getCheckStatusUseCase;
     private readonly ILoadParentDetailsUseCase _loadParentDetailsUseCase;
+    private readonly ILoadParentAndChildDetailsUseCase _loadParentAndChildDetailsUseCase;
     private readonly ILogger<CheckController> _logger;
+    private readonly IPerformWFEligibilityCheckUseCase _performWFEligibilityCheckUseCase;
     private readonly IPerform2YoEligibilityCheckUseCase _perform2YoEligibilityCheckUseCase;
     private readonly IPerformEyppEligibilityCheckUseCase _performEyppEligibilityCheckUseCase;
     private readonly IValidateParentDetailsUseCase _validateParentDetailsUseCase;
+    private readonly IValidateParentAndChildDetailsUseCase _validateParentAndChildDetailsUseCase;
 
 
     public CheckController(
@@ -29,19 +32,25 @@ public class CheckController : BaseController
         ICheckGateway checkGateway,
         IConfiguration configuration,
         ILoadParentDetailsUseCase loadParentDetailsUseCase,
+        ILoadParentAndChildDetailsUseCase loadParentAndChildDetailsUseCase,
+        IPerformWFEligibilityCheckUseCase performWFEligibilityCheckUseCase,
         IPerform2YoEligibilityCheckUseCase perform2YoEligibilityCheckUseCase,
         IPerformEyppEligibilityCheckUseCase performEyppEligibilityCheckUseCase,
         IGetCheckStatusUseCase getCheckStatusUseCase,
-        IValidateParentDetailsUseCase validateParentDetailsUseCase)
+        IValidateParentDetailsUseCase validateParentDetailsUseCase,
+        IValidateParentAndChildDetailsUseCase validateParentAndChildDetailsUseCase)
     {
         _config = configuration;
         _logger = logger;
         _checkGateway = checkGateway;
         _loadParentDetailsUseCase = loadParentDetailsUseCase;
+        _loadParentAndChildDetailsUseCase = loadParentAndChildDetailsUseCase;
+        _performWFEligibilityCheckUseCase = performWFEligibilityCheckUseCase;
         _perform2YoEligibilityCheckUseCase = perform2YoEligibilityCheckUseCase;
         _performEyppEligibilityCheckUseCase = performEyppEligibilityCheckUseCase;
         _getCheckStatusUseCase = getCheckStatusUseCase;
         _validateParentDetailsUseCase = validateParentDetailsUseCase;
+        _validateParentAndChildDetailsUseCase = validateParentAndChildDetailsUseCase;
     }
 
     [HttpGet]
@@ -119,6 +128,68 @@ public class CheckController : BaseController
         if (string.Equals(eligibilityType, "EYPP", StringComparison.OrdinalIgnoreCase))
         {
             var response = await _performEyppEligibilityCheckUseCase.Execute(request, HttpContext.Session);
+            TempData["Response"] = JsonConvert.SerializeObject(response);
+        }
+
+        return RedirectToAction("Loader");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Enter_Details_WF(bool clearData = false)
+    {
+        // If clearData is true, remove the ParentDetails from TempData
+        if (clearData)
+        {
+            TempData.Remove("ParentDetails");
+            TempData.Remove("ParentAndChildDetails");
+            TempData.Remove("Errors");
+        }
+
+        var eligibilityType = TempData["eligibilityType"].ToString();
+        TempData["eligibilityType"] = eligibilityType;
+        var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
+        TempData["eligibilityTypeLabel"] = label;
+
+        var (parentAndChild, validationErrors) = await _loadParentAndChildDetailsUseCase.Execute(
+            TempData["ParentAndChildDetails"]?.ToString(),
+            TempData["Errors"]?.ToString()
+        );
+
+        if (validationErrors != null)
+            foreach (var (key, errorList) in validationErrors)
+                foreach (var error in errorList)
+                    ModelState.AddModelError(key, error);
+
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Enter_Details_WF(ParentAndChildViewModel request)
+    {
+        var validationResult = _validateParentAndChildDetailsUseCase.Execute(request, ModelState);
+
+        // Add null check for validation result
+        if (validationResult == null || !validationResult.IsValid)
+        {
+            TempData["ParentAndChildDetails"] = JsonConvert.SerializeObject(request);
+            TempData["Errors"] = validationResult != null ? JsonConvert.SerializeObject(validationResult.Errors) : null;
+            return RedirectToAction("Enter_Details_WF");
+        }
+
+        // Clear data when starting a new application
+        TempData.Remove("FsmApplication");
+        TempData.Remove("FsmEvidence");
+
+        TempData["ParentAndChildDetails"] = JsonConvert.SerializeObject(request);
+
+        var eligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty;
+
+        if (string.IsNullOrEmpty(eligibilityType))
+            return View("Outcome/Technical_Error");
+
+        if (string.Equals(eligibilityType, "WF", StringComparison.OrdinalIgnoreCase))
+        {
+            var response = await _performWFEligibilityCheckUseCase.Execute(request, HttpContext.Session);
             TempData["Response"] = JsonConvert.SerializeObject(response);
         }
 
