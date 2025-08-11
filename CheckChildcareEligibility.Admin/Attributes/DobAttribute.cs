@@ -128,7 +128,9 @@ public class DobAttribute : ValidationAttribute
                 }
                 else
                 {
-                    message = "Enter parent or guardian's date of birth";
+                    message = "Enter " +
+                        (model is CheckChildcareEligibility.Admin.Models.Child ? "child's" : "parent or guardian's") +
+                        " date of birth";
                 }
             }
             else // Multiple but not all fields missing
