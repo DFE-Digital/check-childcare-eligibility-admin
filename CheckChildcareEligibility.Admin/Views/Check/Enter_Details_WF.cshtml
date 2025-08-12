@@ -44,7 +44,7 @@
                     <span asp-validation-for="NationalInsuranceNumber"></span>
                 </p>
                 <input class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["NationalInsuranceNumber"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                       asp-controller="Check" asp-for="NationalInsuranceNumber" type="text"
+                       asp-controller="Check" asp-for="ParentGuardian.NationalInsuranceNumber" type="text"
                        spellcheck="false" autocomplete="text"
                        aria-label="Parent or guardian National Insurance number">
             </div>
