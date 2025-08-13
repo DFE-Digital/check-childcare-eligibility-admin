@@ -27,7 +27,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
         ["FreeSchoolMeals"] = "bulk-check/free-school-meals",
         ["TwoYearOffer"] = "bulk-check/two-year-offer",
         ["EarlyYearPupilPremium"] = "bulk-check/early-year-pupil-premium",
-        ["WorkingFamilies"] = "check/working-families",
+        ["WorkingFamilies"] = "bulk-check/working-families",
     };
 
     public CheckGateway(ILoggerFactory logger, HttpClient httpClient, IConfiguration configuration) : base("EcsService",
