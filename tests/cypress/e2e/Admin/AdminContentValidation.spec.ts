@@ -1,4 +1,4 @@
-const parentLastName = Cypress.env('lastName') || 'Jones';
+const parentLastName = Cypress.env('lastName') || 'Tester';
 const NIN = 'PN668767B';
 const validNIN = 'NN123456C';
 const invalidNIN = 'INVALID123';
