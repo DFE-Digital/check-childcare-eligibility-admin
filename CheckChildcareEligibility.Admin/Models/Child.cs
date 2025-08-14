@@ -5,14 +5,6 @@ namespace CheckChildcareEligibility.Admin.Models;
 
 public class Child
 {
-    //[NotMapped] public int ChildIndex { get; set; }
-
-    //[ChildName("first name")] public string? FirstName { get; set; }
-
-    //[ChildName("last name")]
-    //[LastName("last name", "child", "ChildIndex")]
-    //public string? LastName { get; set; }
-
     public string? EligibilityCode { get; set; }
 
     [NotMapped]
@@ -24,6 +16,4 @@ public class Child
     public string? Month { get; set; }
 
     public string? Year { get; set; }
-
-    //public School? School { get; set; }
 }
