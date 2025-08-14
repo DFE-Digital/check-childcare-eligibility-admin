@@ -4720,7 +4720,18 @@ and (min-width: 40.0625em) {
     color: #ffffff;
     background: #00703c;
 }
-
+.govuk-panel--yellow {
+    color: #ffffff;
+    background: #ffdd00;
+}
+.govuk-panel--blue {
+    color: #ffffff;
+    background: #1d70b8;
+}
+.govuk-panel--orange {
+    color: #ffffff;
+    background: #f47738;
+}
 @media print {
     .govuk-panel--confirmation {
         border-color: currentcolor;
