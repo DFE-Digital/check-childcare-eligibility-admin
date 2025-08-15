@@ -1,0 +1,60 @@
+using System.Text;
+using CheckChildcareEligibility.Admin.Boundary.Requests;
+using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Gateways.Interfaces;
+using CheckChildcareEligibility.Admin.Models;
+using CheckChildcareEligibility.Admin.ViewModels;
+
+namespace CheckChildcareEligibility.Admin.UseCases;
+
+public interface IPerformWFEligibilityCheckUseCase
+{
+    Task<CheckEligibilityResponse> Execute(
+        ParentAndChildViewModel parentAndChildRequest,
+        ISession session
+    );
+}
+
+public class PerformWFEligibilityCheckUseCase : IPerformWFEligibilityCheckUseCase
+{
+    private readonly ICheckGateway _checkGateway;
+
+    public PerformWFEligibilityCheckUseCase(ICheckGateway checkGateway)
+    {
+        _checkGateway = checkGateway ?? throw new ArgumentNullException(nameof(checkGateway));
+    }
+
+    public async Task<CheckEligibilityResponse> Execute(
+        ParentAndChildViewModel parentAndChildRequest,
+        ISession session)
+    {
+        session.Set("EligibilityCode", Encoding.UTF8.GetBytes(parentAndChildRequest.EligibilityCode ?? string.Empty));
+
+        // Build DOB string
+        var dobString = new DateOnly(
+            int.Parse(parentAndChildRequest.Year),
+            int.Parse(parentAndChildRequest.Month),
+            int.Parse(parentAndChildRequest.Day)
+        ).ToString("yyyy-MM-dd");
+
+        session.Set("ChildDOB", Encoding.UTF8.GetBytes(dobString));
+
+        session.Set("ParentNINO", Encoding.UTF8.GetBytes(parentAndChildRequest.NationalInsuranceNumber ?? ""));
+
+        // Build ECS request
+        var checkEligibilityRequest = new CheckEligibilityRequest
+        {
+            Data = new CheckEligibilityRequestData(Domain.Enums.CheckEligibilityType.WorkingFamilies)
+            {
+                EligibilityCode = parentAndChildRequest.EligibilityCode,
+                NationalInsuranceNumber = parentAndChildRequest.NationalInsuranceNumber?.ToUpper(),
+                ChildDateOfBirth = dobString
+            }
+        };
+
+        // Call ECS check
+        var response = await _checkGateway.PostCheck(checkEligibilityRequest);
+
+        return response;
+    }
+}

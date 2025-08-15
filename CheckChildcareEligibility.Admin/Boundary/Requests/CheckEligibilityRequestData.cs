@@ -14,6 +14,8 @@ namespace CheckChildcareEligibility.Admin.Boundary.Requests
         public string LastName { get; set; } = string.Empty;
 
         public string DateOfBirth { get; set; } = string.Empty;
+        public string ChildDateOfBirth { get; set; } = string.Empty;
+        public string EligibilityCode { get; set; } = string.Empty;
 
         public string NationalInsuranceNumber { get; set; } = string.Empty;
 
