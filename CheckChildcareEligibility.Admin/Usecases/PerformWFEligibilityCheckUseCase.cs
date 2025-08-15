@@ -48,7 +48,7 @@ public class PerformWFEligibilityCheckUseCase : IPerformWFEligibilityCheckUseCas
             {
                 EligibilityCode = parentAndChildRequest.Child.EligibilityCode,
                 NationalInsuranceNumber = parentAndChildRequest.NationalInsuranceNumber?.ToUpper(),
-                ChildDateOfBirth = dobString
+                DateOfBirth = dobString
             }
         };
 

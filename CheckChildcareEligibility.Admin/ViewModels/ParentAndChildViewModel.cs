@@ -9,7 +9,6 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         [Nino]
         [MaxLength(13)]
         public string? NationalInsuranceNumber { get; set; }
-        public string? ChildDateOfBirth { get; set; }
         public Child Child { get; set; } = new Child();
     }
 }
