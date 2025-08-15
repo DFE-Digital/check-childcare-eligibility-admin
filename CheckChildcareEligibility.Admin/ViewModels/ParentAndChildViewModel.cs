@@ -9,9 +9,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         [MaxLength(11)]
         public string EligibilityCode { get; set; } = string.Empty;
 
-        public ParentGuardian? ParentGuardian { get; set; }
-
-        public string? NationalInsuranceNumber => ParentGuardian?.NationalInsuranceNumber;
+        public string? NationalInsuranceNumber { get; set; }
 
         public string? ChildDateOfBirth { get; set; }
 
