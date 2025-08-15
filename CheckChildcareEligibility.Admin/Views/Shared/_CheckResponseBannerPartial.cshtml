@@ -1,141 +1,61 @@
 ﻿@using CheckChildcareEligibility.Admin.Domain.Constants.ResponseBanner
-@*
-   Partial banner for working family responses
-*@
+@model CheckChildcareEligibility.Admin.ViewModels.WFResponseViewModel
+
 @{
-    // pass response model from API
-    // this value will be taken from the passed model
-    string eligiblityCode = "";
-    /* Code Type */
+    int currentYear = DateTime.UtcNow.Year;
+    // defaults
     string codeType = ResponseBanner.CodePermanent;
-    if (eligiblityCode.StartsWith("1"))
+    string codeStatus = ResponseBanner.CodeValid;
+    string bannerColour = ResponseBanner.ColourGreen;
+    string termValidityDetails = ResponseBanner.TermValidFor;
+    string reconfirmationDetails = ResponseBanner.ReconfirmationBefore + Model.ValidityEndDate.ToLongDateString();
+
+    if (Model.EligibilityCode.StartsWith("1"))
     {
         codeType = ResponseBanner.CodeTemporary;
+
+        if (Model.IsEligible)
+        {
+            termValidityDetails = "Only" + termValidityDetails;
+        }
     }
-    else if (eligiblityCode.StartsWith("4"))
+    else if (Model.EligibilityCode.StartsWith("4"))
     {
         codeType = ResponseBanner.CodeFosterFamily;
     }
-    /* Code status */
-    // get it from model
-    bool childIsTooYoung = false;
-    bool childIsTooOld = false;
-    bool isEligible = false;
-    DateTime validityStartDate = DateTime.Parse("");
-    DateTime validityEndDate = DateTime.Parse("");
-    DateTime gracePeriodEndDate = DateTime.Parse("");
-    DateTime today = DateTime.UtcNow;
-    string definition = ResponseBanner.Valid;
-    string bannerColour = ResponseBanner.colourGreen; //green
-                                                      // Child too young
-    if (isEligible && childIsTooYoung)
+    // Child too young
+    if (Model.IsEligible && Model.ChildIsTooYoung)
     {
-        definition = ResponseBanner.ChildTooYoung;
-        bannerColour = ResponseBanner.colourBlue;
+        codeStatus = ResponseBanner.CodeChildTooYoung;
+        bannerColour = ResponseBanner.ColourBlue;
+        termValidityDetails = ResponseBanner.TermValidFrom;
         codeType = string.Empty;
     }
     // Validity start date in future
-    else if (validityStartDate.Month > DateTime.UtcNow.Month)
+    else if (Model.IsVSDinFuture)
     {
-        definition = ResponseBanner.VEDinFuture;
-        bannerColour = ResponseBanner.colourBlue;
+        codeStatus = ResponseBanner.CodeVEDinFuture;
+        bannerColour = ResponseBanner.ColourBlue;
     }
     // Code is in grace period
-    else if (today > validityEndDate && today < gracePeriodEndDate)
+    else if (Model.IsInGracePeriod)
     {
-        definition = ResponseBanner.InGracePeriod;
-        bannerColour = ResponseBanner.colourYellow;
+        codeStatus = ResponseBanner.CodeInGracePeriod;
+        bannerColour = ResponseBanner.ColourYellow;
     }
     // Expired
-    else if (today > gracePeriodEndDate)
+    else if (Model.IsExpired)
     {
-        definition = ResponseBanner.Expired;
-        bannerColour = ResponseBanner.colourOrange;
+        codeStatus = ResponseBanner.Expired;
+        bannerColour = ResponseBanner.ColourOrange;
     }
-
 }
-<div class="govuk-width-container">
-    <main class="govuk-main-wrapper" id="main-content">
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds">
-                <div class="govuk-panel govuk-panel--@bannerColour govuk-!-margin-bottom-7">
-
-                    <h1 class="govuk-panel__title">
-                       @codeType @definition
-                    </h1>
-                    <div class="govuk-panel__body">
-                        Valid for summer term 2025
-                    </div>
-                </div>
-
-                <h2 class="govuk-heading-m">Details checked</h2>
-                <dl class="govuk-summary-list">
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            Eligibility code
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            50879487381
-                        </dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            National Insurance number
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            PB123456C
-                        </dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            Child date of birth
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            26 May 2024
-                        </dd>
-                    </div>
-
-
-                </dl>
-
-                <h2 class="govuk-heading-m govuk-!-margin-top-8">Code details</h2>
-
-                <dl class="govuk-summary-list">
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            Eligibility last confirmed on
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            21 March 2025
-                        </dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            Reconfirm between
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            22 May 2025 and 22 June 2025
-                        </dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            Grace period ends
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            31 December 2025
-                        </dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            Reconfirmation status
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            <strong class="govuk-tag govuk-tag--green" style="max-width:100%;">
-                                Not due yet
-                            </strong>
-                        </dd>
-                    </div>
-                </dl>
-                <p>You can <a href="" class="govuk-link" onclick="printPage()">print this page</a> for the parent or guardian to keep.</p>
-            </div>
-        </div>
+<div class="govuk-panel govuk-panel--@bannerColour govuk-!-margin-bottom-7">
+    <h1 class="govuk-panel__title">
+        @codeType @codeStatus
+    </h1>
+    <div class="govuk-panel__body govuk-!-margin-bottom-5">
+       @termValidityDetails @Model.Term @currentYear
+    </div>
+    <p class="govuk-body-l govuk-!-margin-bottom-0" style="color:white;">@reconfirmationDetails</p>
+</div></div>
