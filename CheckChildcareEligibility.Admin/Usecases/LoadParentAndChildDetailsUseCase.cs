@@ -1,4 +1,3 @@
-using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.ViewModels;
 using Newtonsoft.Json;
 
@@ -27,7 +26,6 @@ public class LoadParentAndChildDetailsUseCase : ILoadParentAndChildDetailsUseCas
     {
         ParentAndChildViewModel parentAndChild = null;
         Dictionary<string, List<string>> errors = null;
-
 
         if (!string.IsNullOrEmpty(parentAndChildDetailsJson))
             try

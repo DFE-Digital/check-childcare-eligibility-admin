@@ -166,6 +166,12 @@ public class CheckController : BaseController
     public async Task<IActionResult> Enter_Details_WF(ParentAndChildViewModel request)
     {
         var CombinedValidationResult = _validateParentAndChildDetailsUseCase.Execute(request, ModelState);
+        //Hardcoded path to check new page is working properly
+        request.ChildDateOfBirth = GetDateOfBirth(request.Child.Day, request.Child.Month, request.Child.Year).ToString();
+        if (!string.IsNullOrEmpty(request.Child.EligibilityCode) && request.Child.EligibilityCode.Equals("12345678911"))
+        {
+            return View("Outcome/Not_Found_WF", request);
+        }
 
         if (CombinedValidationResult == null || !CombinedValidationResult.IsValid)
         {
