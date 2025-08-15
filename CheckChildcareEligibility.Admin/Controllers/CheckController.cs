@@ -137,7 +137,6 @@ public class CheckController : BaseController
     [HttpGet]
     public async Task<IActionResult> Enter_Details_WF(bool clearData = false)
     {
-        // If clearData is true, remove the ParentDetails from TempData
         if (clearData)
         {
             TempData.Remove("ParentDetails");
@@ -160,25 +159,24 @@ public class CheckController : BaseController
                 foreach (var error in errorList)
                     ModelState.AddModelError(key, error);
 
-        return View();
+        return View(parentAndChild);
     }
 
     [HttpPost]
     public async Task<IActionResult> Enter_Details_WF(ParentAndChildViewModel request)
     {
-        var validationResult = _validateParentAndChildDetailsUseCase.Execute(request, ModelState);
+        var CombinedValidationResult = _validateParentAndChildDetailsUseCase.Execute(request, ModelState);
         //Hardcoded path to check new page is working properly
-        request.ChildDateOfBirth = GetDateOfBirth(request.Day, request.Month, request.Year).ToString();
-        if (request.EligibilityCode.Equals("12345678911"))
+        request.ChildDateOfBirth = GetDateOfBirth(request.Child.Day, request.Child.Month, request.Child.Year).ToString();
+        if (!string.IsNullOrEmpty(request.Child.EligibilityCode) && request.Child.EligibilityCode.Equals("12345678911"))
         {
             return View("Outcome/Not_Found_WF", request);
         }
 
-        // Add null check for validation result
-        if (validationResult == null || !validationResult.IsValid)
+        if (CombinedValidationResult == null || !CombinedValidationResult.IsValid)
         {
             TempData["ParentAndChildDetails"] = JsonConvert.SerializeObject(request);
-            TempData["Errors"] = validationResult != null ? JsonConvert.SerializeObject(validationResult.Errors) : null;
+            TempData["Errors"] = CombinedValidationResult != null ? JsonConvert.SerializeObject(CombinedValidationResult.Errors) : null;
             return RedirectToAction("Enter_Details_WF");
         }
 

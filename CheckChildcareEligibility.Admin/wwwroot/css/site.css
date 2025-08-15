@@ -42,7 +42,7 @@
 .govuk-back-link {
     font-size: 0.875rem;
     line-height: 1.14286;
-/*    font-family: "GDS Transport", arial, sans-serif;*/
+    font-family: "GDS Transport", arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-underline-offset: 0.1578em;
     display: inline-block;
@@ -56,7 +56,7 @@
 .govuk-back-link-nolink {
     font-size: 0.875rem;
     line-height: 1.14286;
-/*    font-family: "GDS Transport", arial, sans-serif;*/
+    font-family: "GDS Transport", arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-underline-offset: 0.1578em;
     display: inline-block;
@@ -360,12 +360,3 @@ img, svg {
 }
 
 /*END - set dfe card width to match prototype */
-
-
-/*BEGIN - 224933 WF/2YO/EYPP - Update default fonts on childcare pages */
-
-* {
-    font-family: 'Inter', sans-serif !important;
-}
-
-/*END - 224933 WF/2YO/EYPP - Update default fonts on childcare pages */

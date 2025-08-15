@@ -3,7 +3,7 @@ describe('Full journey of checking eligibility in LA portal', () => {
     const parentNinoEligible = "nn123456c";
     const parentNinoNotEligible = 'PN123456C'; // Updated to the specified NI number
     const parentNinoParentNotFound = 'RA123456C'; // NI number for parent not found scenario
-    //const parentLastNameNotFound = 'ttySimpson'; // Last name for parent not found scenario
+    const parentLastNameNotFound = 'ttySimpson'; // Last name for parent not found scenario
     const parentNinoTechnicalError = 'AA668767B'; // Using an unusual NI number to potentially trigger errors
     
     beforeEach(() => {
@@ -133,7 +133,7 @@ describe('Full journey of checking eligibility in LA portal', () => {
         cy.url().should('include', '/Check/Enter_Details');
         
         // Add parent details
-        cy.get('#LastName').type(parentLastName);
+        cy.get('#LastName').type(parentLastNameNotFound);
         cy.get('#Day').type('01');
         cy.get('#Month').type('01');
         cy.get('#Year').type('1990');
@@ -150,7 +150,7 @@ describe('Full journey of checking eligibility in LA portal', () => {
         cy.get('.govuk-summary-list').within(() => {
             cy.contains('.govuk-summary-list__key', 'Last Name')
               .siblings('.govuk-summary-list__value')
-              .should('contain.text', parentLastName);
+              .should('contain.text', parentLastNameNotFound);
             
             cy.contains('.govuk-summary-list__key', 'National Insurance number')
               .siblings('.govuk-summary-list__value')

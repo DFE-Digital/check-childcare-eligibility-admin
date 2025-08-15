@@ -1,10 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using CheckChildcareEligibility.Admin.Attributes;
+﻿using CheckChildcareEligibility.Admin.Attributes;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CheckChildcareEligibility.Admin.Models;
 
 public class Child
 {
+    [EligibilityCode]
+    [MaxLength(11)]
     public string? EligibilityCode { get; set; }
 
     [NotMapped]
