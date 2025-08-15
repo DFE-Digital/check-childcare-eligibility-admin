@@ -6,17 +6,10 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 {
     public class ParentAndChildViewModel
     {
-        [MaxLength(11)]
-        public string EligibilityCode { get; set; } = string.Empty;
-
+        [Nino]
+        [MaxLength(13)]
         public string? NationalInsuranceNumber { get; set; }
-
         public string? ChildDateOfBirth { get; set; }
-
-        public string? Day { get; set; }
-
-        public string? Month { get; set; }
-
-        public string? Year { get; set; }
+        public Child Child { get; set; } = new Child();
     }
 }
