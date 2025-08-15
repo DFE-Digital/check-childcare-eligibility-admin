@@ -31,10 +31,13 @@ public class CheckControllerTests : TestBase
 
         // Initialize use case mocks
         _loadParentDetailsUseCaseMock = new Mock<ILoadParentDetailsUseCase>();
+        _loadParentAndChildDetailsUseCaseMock = new Mock<ILoadParentAndChildDetailsUseCase>();
         _perform2YoEligibilityCheckUseCaseMock = new Mock<IPerform2YoEligibilityCheckUseCase>();
         _performEyppEligibilityCheckUseCaseMock = new Mock<IPerformEyppEligibilityCheckUseCase>();
+        _performWFEligibilityCheckUseCaseMock = new Mock<IPerformWFEligibilityCheckUseCase>();
         _getCheckStatusUseCaseMock = new Mock<IGetCheckStatusUseCase>();
         _validateParentDetailsUseCaseMock = new Mock<IValidateParentDetailsUseCase>();
+        _validateParentAndChildDetailsUseCaseMock = new Mock<IValidateParentAndChildDetailsUseCase>();
 
         // Initialize controller with all dependencies
         _sut = new CheckController(
@@ -42,10 +45,13 @@ public class CheckControllerTests : TestBase
             _checkGatewayMock.Object,
             _configMock.Object,
             _loadParentDetailsUseCaseMock.Object,
+            _loadParentAndChildDetailsUseCaseMock.Object,
+            _performWFEligibilityCheckUseCaseMock.Object,
             _perform2YoEligibilityCheckUseCaseMock.Object,
             _performEyppEligibilityCheckUseCaseMock.Object,
             _getCheckStatusUseCaseMock.Object,
-            _validateParentDetailsUseCaseMock.Object
+            _validateParentDetailsUseCaseMock.Object,
+            _validateParentAndChildDetailsUseCaseMock.Object
         );
 
         SetUpSessionData();
@@ -65,10 +71,13 @@ public class CheckControllerTests : TestBase
     // Mocks for use cases
     private ILogger<CheckController> _loggerMock;
     private Mock<ILoadParentDetailsUseCase> _loadParentDetailsUseCaseMock;
+    private Mock<ILoadParentAndChildDetailsUseCase> _loadParentAndChildDetailsUseCaseMock;
     private Mock<IPerform2YoEligibilityCheckUseCase> _perform2YoEligibilityCheckUseCaseMock;
     private Mock<IPerformEyppEligibilityCheckUseCase> _performEyppEligibilityCheckUseCaseMock;
+    private Mock<IPerformWFEligibilityCheckUseCase> _performWFEligibilityCheckUseCaseMock;
     private Mock<IGetCheckStatusUseCase> _getCheckStatusUseCaseMock;
     private Mock<IValidateParentDetailsUseCase> _validateParentDetailsUseCaseMock;
+    private Mock<IValidateParentAndChildDetailsUseCase> _validateParentAndChildDetailsUseCaseMock;
 
     // Legacy service mocks
     private Mock<ICheckGateway> _checkGatewayMock;
