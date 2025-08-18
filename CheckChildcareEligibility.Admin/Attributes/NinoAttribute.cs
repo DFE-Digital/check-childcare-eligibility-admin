@@ -27,7 +27,7 @@ public class NinoAttribute : ValidationAttribute
 
         if (property == null)
         {
-            return new ValidationResult("Model does not contain a NationalInsuranceNumber property.");
+            return new ValidationResult("Model does not contain a NationalInsuranceNumber property");
         }
 
         // NINO not provided
