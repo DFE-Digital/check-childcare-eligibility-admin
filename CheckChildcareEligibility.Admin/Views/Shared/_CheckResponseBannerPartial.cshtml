@@ -1,4 +1,4 @@
-﻿@using CheckChildcareEligibility.Admin.Domain.Constants.ResponseBanner
+﻿@    using CheckChildcareEligibility.Admin.Domain.Constants.ResponseBanner
 @model CheckChildcareEligibility.Admin.ViewModels.WFResponseViewModel
 
 @{
@@ -10,7 +10,7 @@
     string termValidityDetails = ResponseBanner.TermValidFor;
     string reconfirmationDetails = ResponseBanner.ReconfirmationBefore + Model.ValidityEndDate.ToLongDateString();
 
-    if (Model.EligibilityCode.StartsWith("1"))
+    if (Model.Response.EligibilityCode.StartsWith("1"))
     {
         codeType = ResponseBanner.CodeTemporary;
 
@@ -19,7 +19,7 @@
             termValidityDetails = "Only" + termValidityDetails;
         }
     }
-    else if (Model.EligibilityCode.StartsWith("4"))
+    else if (Model.Response.EligibilityCode.StartsWith("4"))
     {
         codeType = ResponseBanner.CodeFosterFamily;
     }

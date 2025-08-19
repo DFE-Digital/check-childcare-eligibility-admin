@@ -1,6 +1,6 @@
-﻿namespace CheckChildcareEligibility.Admin.Domain.Constants.ResponseBanner
+﻿namespace CheckChildcareEligibility.Admin.Domain.Constants.Generic
 {
-    public static class ResponseBanner
+    public static class WorkingFamiliesResponseBanner
     {
         public const string ColourYellow = "yellow";
         public const string ColourGreen = "confirmation";
