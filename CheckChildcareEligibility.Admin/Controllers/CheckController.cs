@@ -170,7 +170,7 @@ public class CheckController : BaseController
         request.Child.ChildDateOfBirth = GetDateOfBirth(request.Child.Day, request.Child.Month, request.Child.Year).ToString();
         if (!string.IsNullOrEmpty(request.Child.EligibilityCode) && request.Child.EligibilityCode.Equals("12345678911"))
         {
-            return View("Outcome/Not_Found_WF", request);
+            return View("Outcome/WorkingFamilies/Not_Found_WF", request);
         }
         if (CombinedValidationResult == null || !CombinedValidationResult.IsValid)
         {
