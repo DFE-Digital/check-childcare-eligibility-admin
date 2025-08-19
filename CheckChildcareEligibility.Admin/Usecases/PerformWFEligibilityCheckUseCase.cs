@@ -28,13 +28,13 @@ public class PerformWFEligibilityCheckUseCase : IPerformWFEligibilityCheckUseCas
         ParentAndChildViewModel parentAndChildRequest,
         ISession session)
     {
-        session.Set("EligibilityCode", Encoding.UTF8.GetBytes(parentAndChildRequest.EligibilityCode ?? string.Empty));
+        session.Set("EligibilityCode", Encoding.UTF8.GetBytes(parentAndChildRequest.Child.EligibilityCode ?? string.Empty));
 
         // Build DOB string
         var dobString = new DateOnly(
-            int.Parse(parentAndChildRequest.Year),
-            int.Parse(parentAndChildRequest.Month),
-            int.Parse(parentAndChildRequest.Day)
+            int.Parse(parentAndChildRequest.Child.Year),
+            int.Parse(parentAndChildRequest.Child.Month),
+            int.Parse(parentAndChildRequest.Child.Day)
         ).ToString("yyyy-MM-dd");
 
         session.Set("ChildDOB", Encoding.UTF8.GetBytes(dobString));
@@ -46,9 +46,9 @@ public class PerformWFEligibilityCheckUseCase : IPerformWFEligibilityCheckUseCas
         {
             Data = new CheckEligibilityRequestData(Domain.Enums.CheckEligibilityType.WorkingFamilies)
             {
-                EligibilityCode = parentAndChildRequest.EligibilityCode,
+                EligibilityCode = parentAndChildRequest.Child.EligibilityCode,
                 NationalInsuranceNumber = parentAndChildRequest.NationalInsuranceNumber?.ToUpper(),
-                ChildDateOfBirth = dobString
+                DateOfBirth = dobString
             }
         };
 

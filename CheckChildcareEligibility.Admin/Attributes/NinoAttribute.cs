@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
-using CheckChildcareEligibility.Admin.Models;
-using static CheckChildcareEligibility.Admin.Models.ParentGuardian;
+using System.Reflection;
 
 namespace CheckChildcareEligibility.Admin.Attributes;
 
@@ -20,27 +19,39 @@ public class NinoAttribute : ValidationAttribute
 
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
-        var model = (ParentGuardian)validationContext.ObjectInstance;
+        var model = validationContext.ObjectInstance;
+        var modelType = model.GetType();
 
-        //Nin not provided
-        if (value == null)
-            return new ValidationResult("Enter a National Insurance number");
+        // Try to get the NationalInsuranceNumber property
+        var property = modelType.GetProperty("NationalInsuranceNumber", BindingFlags.Public | BindingFlags.Instance);
 
-        //Nin selected and completed - validate against regex
-        if (value != null)
+        if (property == null)
         {
-            var nino = value.ToString().ToUpper();
-            nino = string.Concat(nino
-                .Where(ch => char.IsLetterOrDigit(ch)));
-
-            if (nino.Length > 9)
-                return new ValidationResult(
-                    "National Insurance number should contain no more than 9 alphanumeric characters");
-
-            if (!regex.IsMatch(nino)) return new ValidationResult("Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
-
-            model.NationalInsuranceNumber = nino;
+            return new ValidationResult("Model does not contain a NationalInsuranceNumber property");
         }
+
+        // NINO not provided
+        if (value == null)
+        {
+            return new ValidationResult("Enter a National Insurance number");
+        }
+
+        // Clean and validate the NINO
+        var nino = value.ToString().ToUpper();
+        nino = string.Concat(nino.Where(char.IsLetterOrDigit));
+
+        if (nino.Length > 9)
+        {
+            return new ValidationResult("National Insurance number should contain no more than 9 alphanumeric characters");
+        }
+
+        if (!regex.IsMatch(nino))
+        {
+            return new ValidationResult("Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
+        }
+
+        // Set the cleaned NINO back into the model
+        property.SetValue(model, nino);
 
         return ValidationResult.Success;
     }

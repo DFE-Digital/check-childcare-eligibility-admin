@@ -1,0 +1,61 @@
+﻿@using CheckChildcareEligibility.Admin.Domain.Constants.ResponseBanner
+@model CheckChildcareEligibility.Admin.ViewModels.WFResponseViewModel
+
+@{
+    int currentYear = DateTime.UtcNow.Year;
+    // defaults
+    string codeType = ResponseBanner.CodePermanent;
+    string codeStatus = ResponseBanner.CodeValid;
+    string bannerColour = ResponseBanner.ColourGreen;
+    string termValidityDetails = ResponseBanner.TermValidFor;
+    string reconfirmationDetails = ResponseBanner.ReconfirmationBefore + Model.ValidityEndDate.ToLongDateString();
+
+    if (Model.EligibilityCode.StartsWith("1"))
+    {
+        codeType = ResponseBanner.CodeTemporary;
+
+        if (Model.IsEligible)
+        {
+            termValidityDetails = "Only" + termValidityDetails;
+        }
+    }
+    else if (Model.EligibilityCode.StartsWith("4"))
+    {
+        codeType = ResponseBanner.CodeFosterFamily;
+    }
+    // Child too young
+    if (Model.IsEligible && Model.ChildIsTooYoung)
+    {
+        codeStatus = ResponseBanner.CodeChildTooYoung;
+        bannerColour = ResponseBanner.ColourBlue;
+        termValidityDetails = ResponseBanner.TermValidFrom;
+        codeType = string.Empty;
+    }
+    // Validity start date in future
+    else if (Model.IsVSDinFuture)
+    {
+        codeStatus = ResponseBanner.CodeVEDinFuture;
+        bannerColour = ResponseBanner.ColourBlue;
+    }
+    // Code is in grace period
+    else if (Model.IsInGracePeriod)
+    {
+        codeStatus = ResponseBanner.CodeInGracePeriod;
+        bannerColour = ResponseBanner.ColourYellow;
+    }
+    // Expired
+    else if (Model.IsExpired)
+    {
+        codeStatus = ResponseBanner.Expired;
+        bannerColour = ResponseBanner.ColourOrange;
+    }
+}
+<div class="govuk-panel govuk-panel--@bannerColour govuk-!-margin-bottom-7">
+    <h1 class="govuk-panel__title">
+        @codeType @codeStatus
+    </h1>
+    <div class="govuk-panel__body govuk-!-margin-bottom-5">
+       @termValidityDetails @Model.Term @currentYear
+    </div>
+    <p class="govuk-body-l govuk-!-margin-bottom-0" style="color:white;">@reconfirmationDetails</p>
+</div></div>

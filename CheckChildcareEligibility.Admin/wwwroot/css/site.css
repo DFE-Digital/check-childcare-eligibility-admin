@@ -362,6 +362,26 @@ img, svg {
 /*END - set dfe card width to match prototype */
 
 
+/*BEGIN - different colours for WF outcomes banner */
+
+.govuk-panel--yellow {
+    color: #ffffff;
+    background: #ffdd00;
+}
+
+.govuk-panel--blue {
+    color: #ffffff;
+    background: #1d70b8;
+}
+
+.govuk-panel--orange {
+    color: #ffffff;
+    background: #f47738;
+}
+
+/*END - different colours for WF outcomes banner */
+
+
 /*BEGIN - 224933 WF/2YO/EYPP - Update default fonts on childcare pages */
 
 * {

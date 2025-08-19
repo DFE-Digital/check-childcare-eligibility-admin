@@ -2,7 +2,6 @@ using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace CheckChildcareEligibility.Admin.Controllers;
 
