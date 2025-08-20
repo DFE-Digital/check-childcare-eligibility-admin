@@ -1,9 +1,6 @@
-﻿using System.Security.Claims;
-using AutoFixture;
+﻿using AutoFixture;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Controllers;
-using CheckChildcareEligibility.Admin.Domain.Enums;
-using CheckChildcareEligibility.Admin.Gateways;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
@@ -16,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
+using System.Security.Claims;
 
 namespace CheckChildcareEligibility.Admin.Tests.Controllers;
 
@@ -45,14 +43,10 @@ public class CheckControllerTests : TestBase
             _checkGatewayMock.Object,
             _configMock.Object,
             _loadParentDetailsUseCaseMock.Object,
-            _loadParentAndChildDetailsUseCaseMock.Object,
-            _performWFEligibilityCheckUseCaseMock.Object,
             _perform2YoEligibilityCheckUseCaseMock.Object,
             _performEyppEligibilityCheckUseCaseMock.Object,
             _getCheckStatusUseCaseMock.Object,
-            _validateParentDetailsUseCaseMock.Object,
-            _validateParentAndChildDetailsUseCaseMock.Object
-        );
+            _validateParentDetailsUseCaseMock.Object);
 
         SetUpSessionData();
 
