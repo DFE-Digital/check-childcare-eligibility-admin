@@ -68,7 +68,6 @@ public class WorkingFamiliesCheckController : BaseController
     public async Task<IActionResult> Enter_Details_WF(ParentAndChildViewModel request)
     {
         var CombinedValidationResult = _validateParentAndChildDetailsUseCase.Execute(request, ModelState);
-        //Hardcoded path to check new page is working properly
         request.Child.ChildDateOfBirth = GetDateOfBirth(request.Child.Day, request.Child.Month, request.Child.Year).ToString();
         if (CombinedValidationResult == null || !CombinedValidationResult.IsValid)
         {
@@ -104,18 +103,18 @@ public class WorkingFamiliesCheckController : BaseController
             var outcome = await _getCheckStatusUseCase.Execute(responseJson, HttpContext.Session);
             CheckEligibilityStatus outcomeStatus = (CheckEligibilityStatus)Enum.Parse(typeof(CheckEligibilityStatus), outcome);
 
+            if (outcome == "queuedForProcessing") {
+                TempData["Response"] = responseJson;
+            }
+            
             _logger.LogError(outcome);
-
-            var eligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty;
-            var isLA = _Claims?.Organisation?.Category?.Name == Constants.CategoryTypeLA; //false=school
-
-            TempData["Response"] = responseJson;
-
+    
             var parentAndChildDetailsJson = TempData["ParentAndChildDetails"]?.ToString();
+            TempData["ParentAndChildDetails"] = parentAndChildDetailsJson;
+            
             var (parentAndChild, validationErrors) = await _loadParentAndChildDetailsUseCase.Execute(
             parentAndChildDetailsJson,
             TempData["Errors"]?.ToString());
-
 
             switch (outcomeStatus)
             {
