@@ -70,6 +70,7 @@ public class HomeController : BaseController
         }
 
         TempData["eligibilityType"] = eligibilityType;
+        TempData["JustUploaded"] = "";
 
         return RedirectToAction("Bulk_Check", "BulkCheck");
     }
