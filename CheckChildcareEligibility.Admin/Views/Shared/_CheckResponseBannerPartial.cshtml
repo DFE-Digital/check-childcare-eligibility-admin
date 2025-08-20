@@ -1,5 +1,5 @@
 ﻿@using CheckChildcareEligibility.Admin.Domain.Constants.Generic
-@model CheckChildcareEligibility.Admin.ViewModels.WFResponseViewModel
+@model CheckChildcareEligibility.Admin.ViewModels.WorkingFamiliesResponseViewModel
 
 @{
     int currentYear = DateTime.UtcNow.Year;
@@ -10,7 +10,7 @@
     string termValidityDetails = WorkingFamiliesResponseBanner.TermValidFor;
     string reconfirmationDetails = WorkingFamiliesResponseBanner.ReconfirmationBefore + Model.ValidityEndDate.ToLongDateString();
 
-    if (Model.Response.EligibilityCode.StartsWith("1"))
+    if (Model.isTemporaryCode)
     {
         codeType = WorkingFamiliesResponseBanner.CodeTemporary;
 
@@ -19,7 +19,7 @@
             termValidityDetails = "Only" + termValidityDetails;
         }
     }
-    else if (Model.Response.EligibilityCode.StartsWith("4"))
+    else if (Model.isFosterCode)
     {
         codeType = WorkingFamiliesResponseBanner.CodeFosterFamily;
     }
@@ -58,4 +58,4 @@
        @termValidityDetails @Model.Term @currentYear
     </div>
     <p class="govuk-body-l govuk-!-margin-bottom-0" style="color:white;">@reconfirmationDetails</p>
-</div></div>
+</div>

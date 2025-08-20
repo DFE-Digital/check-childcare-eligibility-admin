@@ -1,9 +1,8 @@
-using System.Text;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
-using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.ViewModels;
+using System.Text;
 
 namespace CheckChildcareEligibility.Admin.UseCases;
 
@@ -13,6 +12,7 @@ public interface IPerformWFEligibilityCheckUseCase
         ParentAndChildViewModel parentAndChildRequest,
         ISession session
     );
+    Task<CheckEligibilityItemWorkingFamiliesResponse> GetItemAsync(string getEligibilityCheck);
 }
 
 public class PerformWFEligibilityCheckUseCase : IPerformWFEligibilityCheckUseCase
@@ -56,5 +56,10 @@ public class PerformWFEligibilityCheckUseCase : IPerformWFEligibilityCheckUseCas
         var response = await _checkGateway.PostCheck(checkEligibilityRequest);
 
         return response;
+    }
+    public async Task<CheckEligibilityItemWorkingFamiliesResponse> GetItemAsync(string getEligibilityCheck) {
+        var response = await _checkGateway.GetWFResult(getEligibilityCheck);
+        return response;
+
     }
 }

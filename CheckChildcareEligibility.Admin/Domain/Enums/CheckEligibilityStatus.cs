@@ -4,6 +4,7 @@ public enum CheckEligibilityStatus
 {
     queuedForProcessing,
     parentNotFound,
+    notFound,
     eligible,
     notEligible,
     error

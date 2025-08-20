@@ -4,7 +4,7 @@ using CheckChildcareEligibility.Admin.Domain.Constants.Generic;
 
 namespace CheckChildcareEligibility.Admin.ViewModels
 {
-    public class WFResponseViewModel
+    public class WorkingFamiliesResponseViewModel
     {
         public CheckEligibilityItemWorkingFamilies Response { get; set; }
         public bool ChildIsTooYoung { get; set; }
@@ -13,10 +13,11 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public bool IsVSDinFuture => ValidityStartDate.Month > DateTime.UtcNow.Month;
         public bool IsInGracePeriod => DateTime.UtcNow > ValidityEndDate && DateTime.UtcNow < GracePeriodEndDate;
         public bool IsExpired => DateTime.UtcNow > GracePeriodEndDate;
-        public bool isTemporaryCode => Response.EligibilityCode.StartsWith("4");
-        public DateTime ValidityStartDate { get; set; }
-        public DateTime ValidityEndDate { get; set;}
-        public DateTime GracePeriodEndDate { get; set; }
+        public bool isTemporaryCode => Response.EligibilityCode.StartsWith("1");
+        public bool isFosterCode => Response.EligibilityCode.StartsWith("4");
+        public DateTime ValidityStartDate => DateTime.Parse(Response.ValidityStartDate);
+        public DateTime ValidityEndDate => DateTime.Parse(Response.ValidityEndDate);
+        public DateTime GracePeriodEndDate => DateTime.Parse(Response.GracePeriodEndDate);
 
         public string Term {
             get {
