@@ -8,9 +8,9 @@
     string codeStatus = WorkingFamiliesResponseBanner.CodeValid;
     string bannerColour = WorkingFamiliesResponseBanner.ColourGreen;
     string termValidityDetails = WorkingFamiliesResponseBanner.TermValidFor;
-    string reconfirmationDetails = WorkingFamiliesResponseBanner.ReconfirmationBefore + Model.ValidityEndDate.ToLongDateString();
+    string reconfirmationDetails = $"{WorkingFamiliesResponseBanner.ReconfirmationBefore} {Model.ValidityEndDate.ToString("d MMMM yyyy")}";
 
-    if (Model.isTemporaryCode)
+    if (Model.IsTemporaryCode)
     {
         codeType = WorkingFamiliesResponseBanner.CodeTemporary;
 
@@ -19,7 +19,7 @@
             termValidityDetails = "Only" + termValidityDetails;
         }
     }
-    else if (Model.isFosterCode)
+    else if (Model.IsFosterCode)
     {
         codeType = WorkingFamiliesResponseBanner.CodeFosterFamily;
     }
@@ -57,5 +57,7 @@
     <div class="govuk-panel__body govuk-!-margin-bottom-5">
        @termValidityDetails @Model.Term @currentYear
     </div>
-    <p class="govuk-body-l govuk-!-margin-bottom-0" style="color:white;">@reconfirmationDetails</p>
+    <div class="govuk-body-l govuk-!-margin-bottom-0">
+        @reconfirmationDetails
+    </div>
 </div>

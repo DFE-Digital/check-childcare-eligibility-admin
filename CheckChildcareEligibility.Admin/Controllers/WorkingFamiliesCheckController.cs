@@ -109,12 +109,13 @@ public class WorkingFamiliesCheckController : BaseController
             var eligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty;
             var isLA = _Claims?.Organisation?.Category?.Name == Constants.CategoryTypeLA; //false=school
 
-            // Deserialise form to pass to pages
             TempData["Response"] = responseJson;
+
             var parentAndChildDetailsJson = TempData["ParentAndChildDetails"]?.ToString();
             var (parentAndChild, validationErrors) = await _loadParentAndChildDetailsUseCase.Execute(
             parentAndChildDetailsJson,
             TempData["Errors"]?.ToString());
+
 
             switch (outcomeStatus)
             {
@@ -122,15 +123,16 @@ public class WorkingFamiliesCheckController : BaseController
                   
                     return View("Loader_WF", parentAndChild);
                 case CheckEligibilityStatus.notFound:
-                    return View("Outcome/WorkingFamilies/Not_Found_WF", parentAndChild);
+                    return View("Outcome/Not_Found_WF", parentAndChild);
                 default:
                     var responseItem = JsonConvert.DeserializeObject<CheckEligibilityResponse>(responseJson);
 
                     var result = await _performWFEligibilityCheckUseCase.GetItemAsync(responseItem.Links.Get_EligibilityCheck);
+                   
                     WorkingFamiliesResponseViewModel viewModel = new WorkingFamiliesResponseViewModel() {
                         Response = result.Data
                     };
-                    return View("Outcome/WorkingFamilies/Response_WF", viewModel );
+                    return View("Outcome/Response_WF", viewModel );
             }      
         }
         catch (Exception ex)

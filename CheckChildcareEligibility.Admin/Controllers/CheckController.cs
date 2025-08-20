@@ -18,13 +18,10 @@ public class CheckController : BaseController
     private readonly IConfiguration _config;
     private readonly IGetCheckStatusUseCase _getCheckStatusUseCase;
     private readonly ILoadParentDetailsUseCase _loadParentDetailsUseCase;
-    private readonly ILoadParentAndChildDetailsUseCase _loadParentAndChildDetailsUseCase;
     private readonly ILogger<CheckController> _logger;
-    private readonly IPerformWFEligibilityCheckUseCase _performWFEligibilityCheckUseCase;
     private readonly IPerform2YoEligibilityCheckUseCase _perform2YoEligibilityCheckUseCase;
     private readonly IPerformEyppEligibilityCheckUseCase _performEyppEligibilityCheckUseCase;
     private readonly IValidateParentDetailsUseCase _validateParentDetailsUseCase;
-    private readonly IValidateParentAndChildDetailsUseCase _validateParentAndChildDetailsUseCase;
 
 
     public CheckController(
@@ -32,25 +29,19 @@ public class CheckController : BaseController
         ICheckGateway checkGateway,
         IConfiguration configuration,
         ILoadParentDetailsUseCase loadParentDetailsUseCase,
-        ILoadParentAndChildDetailsUseCase loadParentAndChildDetailsUseCase,
-        IPerformWFEligibilityCheckUseCase performWFEligibilityCheckUseCase,
         IPerform2YoEligibilityCheckUseCase perform2YoEligibilityCheckUseCase,
         IPerformEyppEligibilityCheckUseCase performEyppEligibilityCheckUseCase,
         IGetCheckStatusUseCase getCheckStatusUseCase,
-        IValidateParentDetailsUseCase validateParentDetailsUseCase,
-        IValidateParentAndChildDetailsUseCase validateParentAndChildDetailsUseCase)
+        IValidateParentDetailsUseCase validateParentDetailsUseCase)
     {
         _config = configuration;
         _logger = logger;
         _checkGateway = checkGateway;
         _loadParentDetailsUseCase = loadParentDetailsUseCase;
-        _loadParentAndChildDetailsUseCase = loadParentAndChildDetailsUseCase;
-        _performWFEligibilityCheckUseCase = performWFEligibilityCheckUseCase;
         _perform2YoEligibilityCheckUseCase = perform2YoEligibilityCheckUseCase;
         _performEyppEligibilityCheckUseCase = performEyppEligibilityCheckUseCase;
         _getCheckStatusUseCase = getCheckStatusUseCase;
         _validateParentDetailsUseCase = validateParentDetailsUseCase;
-        _validateParentAndChildDetailsUseCase = validateParentAndChildDetailsUseCase;
     }
 
     [HttpGet]

@@ -16,7 +16,7 @@
     <span class="govuk-caption-l">@TempData["eligibilityTypeLabel"]</span>
     <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
 
-    <form asp-controller="Check" asp-action="Enter_Details_WF" method="post">
+    <form asp-controller="WorkingFamiliesCheck" asp-action="Enter_Details_WF" method="post">
         <input type="hidden" name="eligibilityType" value="@TempData["eligibiltyType"]" />
         <fieldset class="govuk-fieldset">
             <div class="govuk-form-group">

@@ -13,11 +13,12 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public bool IsVSDinFuture => ValidityStartDate.Month > DateTime.UtcNow.Month;
         public bool IsInGracePeriod => DateTime.UtcNow > ValidityEndDate && DateTime.UtcNow < GracePeriodEndDate;
         public bool IsExpired => DateTime.UtcNow > GracePeriodEndDate;
-        public bool isTemporaryCode => Response.EligibilityCode.StartsWith("1");
-        public bool isFosterCode => Response.EligibilityCode.StartsWith("4");
+        public bool IsTemporaryCode => Response.EligibilityCode.StartsWith("1");
+        public bool IsFosterCode => Response.EligibilityCode.StartsWith("4");
         public DateTime ValidityStartDate => DateTime.Parse(Response.ValidityStartDate);
         public DateTime ValidityEndDate => DateTime.Parse(Response.ValidityEndDate);
         public DateTime GracePeriodEndDate => DateTime.Parse(Response.GracePeriodEndDate);
+        public DateTime ChildDateOfBirth => DateTime.Parse(Response.DateOfBirth);
 
         public string Term {
             get {

@@ -25,7 +25,7 @@
         public const string AutumnTerm = "autumn term";
         public const string SpringTerm = "spring term";
 
-        public const string ReconfirmationBefore = "Needs reconfirming";
+        public const string ReconfirmationBefore = "Needs reconfirming before";
         public const string ReconfirmationNow = "Needs reconfirming now";
         public const string ReconfirmationChildTooOld = "Child has reached compulsory school age";
         public const string ReconfirmationTempCode = "Apply for a new code before";
