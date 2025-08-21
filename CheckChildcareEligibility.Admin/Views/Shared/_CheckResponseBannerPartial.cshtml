@@ -1,53 +1,53 @@
-﻿@using CheckChildcareEligibility.Admin.Domain.Constants.ResponseBanner
-@model CheckChildcareEligibility.Admin.ViewModels.WFResponseViewModel
+﻿@using CheckChildcareEligibility.Admin.Domain.Constants.Generic
+@model CheckChildcareEligibility.Admin.ViewModels.WorkingFamiliesResponseViewModel
 
 @{
     int currentYear = DateTime.UtcNow.Year;
     // defaults
-    string codeType = ResponseBanner.CodePermanent;
-    string codeStatus = ResponseBanner.CodeValid;
-    string bannerColour = ResponseBanner.ColourGreen;
-    string termValidityDetails = ResponseBanner.TermValidFor;
-    string reconfirmationDetails = ResponseBanner.ReconfirmationBefore + Model.ValidityEndDate.ToLongDateString();
+    string codeType = WorkingFamiliesResponseBanner.CodePermanent;
+    string codeStatus = WorkingFamiliesResponseBanner.CodeValid;
+    string bannerColour = WorkingFamiliesResponseBanner.ColourGreen;
+    string termValidityDetails = WorkingFamiliesResponseBanner.TermValidFor;
+    string reconfirmationDetails = $"{WorkingFamiliesResponseBanner.ReconfirmationBefore} {Model.ValidityEndDate.ToString("d MMMM yyyy")}";
 
-    if (Model.EligibilityCode.StartsWith("1"))
+    if (Model.IsTemporaryCode)
     {
-        codeType = ResponseBanner.CodeTemporary;
+        codeType = WorkingFamiliesResponseBanner.CodeTemporary;
 
         if (Model.IsEligible)
         {
             termValidityDetails = "Only" + termValidityDetails;
         }
     }
-    else if (Model.EligibilityCode.StartsWith("4"))
+    else if (Model.IsFosterCode)
     {
-        codeType = ResponseBanner.CodeFosterFamily;
+        codeType = WorkingFamiliesResponseBanner.CodeFosterFamily;
     }
     // Child too young
     if (Model.IsEligible && Model.ChildIsTooYoung)
     {
-        codeStatus = ResponseBanner.CodeChildTooYoung;
-        bannerColour = ResponseBanner.ColourBlue;
-        termValidityDetails = ResponseBanner.TermValidFrom;
+        codeStatus = WorkingFamiliesResponseBanner.CodeChildTooYoung;
+        bannerColour = WorkingFamiliesResponseBanner.ColourBlue;
+        termValidityDetails = WorkingFamiliesResponseBanner.TermValidFrom;
         codeType = string.Empty;
     }
     // Validity start date in future
     else if (Model.IsVSDinFuture)
     {
-        codeStatus = ResponseBanner.CodeVEDinFuture;
-        bannerColour = ResponseBanner.ColourBlue;
+        codeStatus = WorkingFamiliesResponseBanner.CodeVEDinFuture;
+        bannerColour = WorkingFamiliesResponseBanner.ColourBlue;
     }
     // Code is in grace period
     else if (Model.IsInGracePeriod)
     {
-        codeStatus = ResponseBanner.CodeInGracePeriod;
-        bannerColour = ResponseBanner.ColourYellow;
+        codeStatus = WorkingFamiliesResponseBanner.CodeInGracePeriod;
+        bannerColour = WorkingFamiliesResponseBanner.ColourYellow;
     }
     // Expired
     else if (Model.IsExpired)
     {
-        codeStatus = ResponseBanner.Expired;
-        bannerColour = ResponseBanner.ColourOrange;
+        codeStatus = WorkingFamiliesResponseBanner.Expired;
+        bannerColour = WorkingFamiliesResponseBanner.ColourOrange;
     }
 }
 <div class="govuk-panel govuk-panel--@bannerColour govuk-!-margin-bottom-7">
@@ -57,5 +57,7 @@
     <div class="govuk-panel__body govuk-!-margin-bottom-5">
        @termValidityDetails @Model.Term @currentYear
     </div>
-    <p class="govuk-body-l govuk-!-margin-bottom-0" style="color:white;">@reconfirmationDetails</p>
-</div></div>
+    <div class="govuk-body-l govuk-!-margin-bottom-0">
+        @reconfirmationDetails
+    </div>
+</div>

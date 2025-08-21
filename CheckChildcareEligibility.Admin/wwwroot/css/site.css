@@ -378,12 +378,11 @@ img, svg {
     color: #ffffff;
     background: #f47738;
 }
-
+.govuk-panel--confirmation > div {
+    color: #ffffff !important;
+}
 /*END - different colours for WF outcomes banner */
-
-
 /*BEGIN - 224933 WF/2YO/EYPP - Update default fonts on childcare pages */
-
 * {
     font-family: 'Inter', sans-serif !important;
 }

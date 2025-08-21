@@ -1,0 +1,78 @@
+﻿@model CheckChildcareEligibility.Admin.ViewModels.WorkingFamiliesResponseViewModel
+@using CheckChildcareEligibility.Admin.Domain.Constants.Generic
+
+@{
+    DateTime startReconfirmDate = Model.ValidityEndDate.AddDays(-28);
+    string reconfirmBetween = $"{startReconfirmDate.ToString("d MMMM yyyy")} and {Model.ValidityEndDate.ToString("d MMMM yyyy")}";
+    string[] reconfirmationStatus = WorkingFamiliesResponseDetails.ReconfirmationStatusNotDueYet; 
+
+    if (Model.IsTemporaryCode || Model.ChildIsTooYoung)
+    {
+        reconfirmBetween = WorkingFamiliesResponseDetails.StatusNotApplicable;
+    } 
+   
+}
+<h2 class="govuk-heading-m">Details checked</h2>
+<dl class="govuk-summary-list">
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Eligibility code
+        </dt>
+        <dd class="govuk-summary-list__value">
+            @Model.Response.EligibilityCode
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            National Insurance number
+        </dt>
+        <dd class="govuk-summary-list__value">
+            @Model.Response.NationalInsuranceNumber
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Child date of birth
+        </dt>
+        <dd class="govuk-summary-list__value">
+            @Model.ChildDateOfBirth.ToLongDateString()
+        </dd>
+    </div>
+</dl>
+<h2 class="govuk-heading-m govuk-!-margin-top-8">Code details</h2>
+<dl class="govuk-summary-list">
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Eligibility confirmed on
+        </dt>
+        <dd class="govuk-summary-list__value">
+            @Model.ValidityStartDate.ToString("d MMMM yyyy")
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Reconfirm between
+        </dt>
+        <dd class="govuk-summary-list__value">
+            @reconfirmBetween
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Grace period ends
+        </dt>
+        <dd class="govuk-summary-list__value">
+            @Model.GracePeriodEndDate.ToString("d MMMM yyyy")
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Reconfirmation status
+        </dt>
+        <dd class="govuk-summary-list__value">
+            <strong class="govuk-tag govuk-tag--@reconfirmationStatus[1]" style="max-width:100%;">
+                @reconfirmationStatus[0]
+            </strong>
+        </dd>
+    </div>
+</dl>

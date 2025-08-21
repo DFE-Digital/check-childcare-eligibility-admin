@@ -1,6 +1,4 @@
-﻿// Ignore Spelling: Fsm
-
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace CheckChildcareEligibility.Admin.Domain.Enums;
 

@@ -1,5 +1,3 @@
-using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
-using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
@@ -49,7 +47,7 @@ public class HomeController : BaseController
 
         if(eligibilityType.Equals("WF"))
         {
-            return RedirectToAction("Enter_Details_WF", "Check");
+            return RedirectToAction("Enter_Details_WF", "WorkingFamiliesCheck");
         }
 
         return RedirectToAction("Enter_Details", "Check");
