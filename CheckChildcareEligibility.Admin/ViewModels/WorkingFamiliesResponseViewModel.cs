@@ -20,17 +20,29 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public DateTime GracePeriodEndDate => DateTime.Parse(Response.GracePeriodEndDate);
         public DateTime ChildDateOfBirth => DateTime.Parse(Response.DateOfBirth);
 
-        public string Term {
-            get {
-                int month = 
-                    ValidityEndDate.Month;
+        public string Term
+        {
+            get
+            {
+                DateTime vsd = ValidityStartDate;
+                DateTime nineMonthsDate = ChildDateOfBirth.AddMonths(9);
+                if (ChildIsTooYoung && vsd < nineMonthsDate)
+                {
+                    vsd = nineMonthsDate;
+                }
+                if (DateTime.UtcNow > ValidityEndDate)
+                {
+                    return $"{GracePeriodEndDate: dd MMMM}";
+                }
+                int month = vsd.Month;
+
                 if (month >= 1 && month <= 3)
                     return WorkingFamiliesResponseBanner.SpringTerm;
                 else if (month >= 4 && month <= 8)
                     return WorkingFamiliesResponseBanner.SummerTerm;
-                else return WorkingFamiliesResponseBanner.AutumnTerm;
+                else
+                    return WorkingFamiliesResponseBanner.AutumnTerm;
             }
         }
-        
     }
 }
