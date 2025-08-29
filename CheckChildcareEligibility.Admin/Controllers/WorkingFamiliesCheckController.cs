@@ -116,7 +116,7 @@ public class WorkingFamiliesCheckController : BaseController
             parentAndChildDetailsJson,
             TempData["Errors"]?.ToString());
 
-            switch (outcomeStatus)
+                switch (outcomeStatus)
             {
                 case CheckEligibilityStatus.queuedForProcessing:
                   

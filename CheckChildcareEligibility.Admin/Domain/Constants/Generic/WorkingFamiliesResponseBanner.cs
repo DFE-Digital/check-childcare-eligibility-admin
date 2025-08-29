@@ -20,6 +20,7 @@
         public const string TermValidFrom = "Valid from";
         public const string TermValidFor = "Valid for";
         public const string TermExpiresOn = "Expires on";
+        public const string TermExpiredOn = "Expired on";
 
         public const string SummerTerm = "summer term";
         public const string AutumnTerm = "autumn term";

@@ -365,7 +365,6 @@ img, svg {
 /*BEGIN - different colours for WF outcomes banner */
 
 .govuk-panel--yellow {
-    color: #ffffff;
     background: #ffdd00;
 }
 

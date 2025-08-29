@@ -42,12 +42,14 @@
     {
         codeStatus = WorkingFamiliesResponseBanner.CodeInGracePeriod;
         bannerColour = WorkingFamiliesResponseBanner.ColourYellow;
+        termValidityDetails = WorkingFamiliesResponseBanner.TermExpiresOn;
     }
     // Expired
     else if (Model.IsExpired)
     {
         codeStatus = WorkingFamiliesResponseBanner.Expired;
         bannerColour = WorkingFamiliesResponseBanner.ColourOrange;
+        termValidityDetails = WorkingFamiliesResponseBanner.TermExpiredOn;
     }
 }
 <div class="govuk-panel govuk-panel--@bannerColour govuk-!-margin-bottom-7">
