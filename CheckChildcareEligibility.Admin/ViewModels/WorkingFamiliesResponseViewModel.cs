@@ -7,8 +7,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
     public class WorkingFamiliesResponseViewModel
     {
         public CheckEligibilityItemWorkingFamilies Response { get; set; }
-        public bool ChildIsTooYoung { get; set; }
-        public bool ChildIsTooOld { get; set; }
+        public bool ChildIsTooYoung => ValidityStartDate < ChildDateOfBirth.AddMonths(9); public bool ChildIsTooOld { get; set; }
         public bool IsEligible => Response.Status == CheckEligibilityStatus.eligible.ToString();
         public bool IsVSDinFuture => ValidityStartDate.Month > DateTime.UtcNow.Month;
         public bool IsInGracePeriod => DateTime.UtcNow > ValidityEndDate && DateTime.UtcNow < GracePeriodEndDate;
