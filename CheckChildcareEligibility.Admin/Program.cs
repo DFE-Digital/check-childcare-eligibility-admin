@@ -71,7 +71,21 @@ app.Use(async (ctx, next) =>
         ctx.Request.Path = "/Error/NotFound";
         await next();
     }
-});
+    await next();
+    if (ctx.Response.StatusCode == 500 && !ctx.Response.HasStarted)
+    {
+        //Re-execute the request so the user gets the error page
+        ctx.Request.Path = "/Error/ServiceProblem";
+        await next();
+    }
+    await next();
+    if (ctx.Response.StatusCode == 503 && !ctx.Response.HasStarted)
+    {
+        //Re-execute the request so the user gets the error page
+        ctx.Request.Path = "/Error/ServiceNotAvailable";
+        await next();
+    }
+}); 
 
 app.MapHealthChecks("/healthcheck");
 
