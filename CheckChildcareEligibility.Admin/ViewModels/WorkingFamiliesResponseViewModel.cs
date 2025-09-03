@@ -136,9 +136,9 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
         public string GetBannerReconfirmationMessage()
         {
-            if ((IsTemporaryCode && codeStatus == "valid")
-                || (IsTemporaryCode && codeStatus == "in grace period")
-                || (IsTemporaryCode && codeStatus == "expired"))
+            if ((IsTemporaryCode && codeStatus == WorkingFamiliesResponseBanner.CodeValid)
+                || (IsTemporaryCode && codeStatus == WorkingFamiliesResponseBanner.CodeInGracePeriod)
+                || (IsTemporaryCode && codeStatus == WorkingFamiliesResponseBanner.CodeExpired))
             {
                 return string.Empty;
             }
