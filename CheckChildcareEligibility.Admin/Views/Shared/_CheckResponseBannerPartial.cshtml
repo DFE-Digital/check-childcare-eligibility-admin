@@ -2,64 +2,17 @@
 @model CheckChildcareEligibility.Admin.ViewModels.WorkingFamiliesResponseViewModel
 
 @{
-    int currentYear = DateTime.UtcNow.Year;
-    // defaults
-    string codeType = WorkingFamiliesResponseBanner.CodePermanent;
-    string codeStatus = WorkingFamiliesResponseBanner.CodeValid;
-    string bannerColour = WorkingFamiliesResponseBanner.ColourGreen;
-    string termValidityDetails = WorkingFamiliesResponseBanner.TermValidFor;
-    string reconfirmationDetails = $"{WorkingFamiliesResponseBanner.ReconfirmationBefore} {Model.ValidityEndDate.ToString("d MMMM yyyy")}";
-
-    if (Model.IsTemporaryCode)
-    {
-        codeType = WorkingFamiliesResponseBanner.CodeTemporary;
-
-        if (Model.IsEligible)
-        {
-            termValidityDetails = "Only" + termValidityDetails;
-        }
-    }
-    else if (Model.IsFosterCode)
-    {
-        codeType = WorkingFamiliesResponseBanner.CodeFosterFamily;
-    }
-    // Child too young
-    if (Model.IsEligible && Model.ChildIsTooYoung)
-    {
-        codeStatus = WorkingFamiliesResponseBanner.CodeChildTooYoung;
-        bannerColour = WorkingFamiliesResponseBanner.ColourBlue;
-        termValidityDetails = WorkingFamiliesResponseBanner.TermValidFrom;
-        codeType = string.Empty;
-    }
-    // Validity start date in future
-    else if (Model.IsVSDinFuture)
-    {
-        codeStatus = WorkingFamiliesResponseBanner.CodeVEDinFuture;
-        bannerColour = WorkingFamiliesResponseBanner.ColourBlue;
-    }
-    // Code is in grace period
-    else if (Model.IsInGracePeriod)
-    {
-        codeStatus = WorkingFamiliesResponseBanner.CodeInGracePeriod;
-        bannerColour = WorkingFamiliesResponseBanner.ColourYellow;
-        termValidityDetails = WorkingFamiliesResponseBanner.TermExpiresOn;
-    }
-    // Expired
-    else if (Model.IsExpired)
-    {
-        codeStatus = WorkingFamiliesResponseBanner.Expired;
-        bannerColour = WorkingFamiliesResponseBanner.ColourOrange;
-        termValidityDetails = WorkingFamiliesResponseBanner.TermExpiredOn;
-    }
+    string bannerReconfirmationMessage = Model.GetBannerReconfirmationMessage();
 }
-<div class="govuk-panel govuk-panel--@bannerColour govuk-!-margin-bottom-7">
+
+<div class="govuk-panel govuk-panel--@Model.BannerColour govuk-!-margin-bottom-7">
     <h1 class="govuk-panel__title">
-        @codeType @codeStatus
+        @Model.CodeType @Model.CodeStatus
     </h1>
     <div class="govuk-panel__body govuk-!-margin-bottom-5">
-       @termValidityDetails @Model.Term
+       @Model.TermValidityDetails @Model.Term
     </div>
     <div class="govuk-body-l govuk-!-margin-bottom-0">
-        @reconfirmationDetails
+        @bannerReconfirmationMessage
     </div>
 </div>

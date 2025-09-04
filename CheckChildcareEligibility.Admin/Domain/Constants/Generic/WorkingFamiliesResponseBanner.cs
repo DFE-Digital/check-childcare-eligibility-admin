@@ -15,7 +15,7 @@
         public const string CodeChildTooYoung = "Child is too young";
         public const string CodeVEDinFuture = "cannot be used yet";
         public const string CodeInGracePeriod = "in grace period";
-        public const string Expired = "Expired";
+        public const string CodeExpired = "Expired";
 
         public const string TermValidFrom = "Valid from";
         public const string TermValidFor = "Valid for";
@@ -27,7 +27,7 @@
         public const string SpringTerm = "spring term";
 
         public const string ReconfirmationBefore = "Needs reconfirming before";
-        public const string ReconfirmationNow = "Needs reconfirming now";
+        public const string ReconfirmationOverdue = "Needs reconfirming now";
         public const string ReconfirmationChildTooOld = "Child has reached compulsory school age";
         public const string ReconfirmationTempCode = "Apply for a new code before";
         public const string ReconfirmationTempCodeInGPED = "TBC";

@@ -1,6 +1,10 @@
-﻿using CheckChildcareEligibility.Admin.Boundary.Responses;
-using CheckChildcareEligibility.Admin.Domain.Enums;
+﻿using Azure.Storage.Blobs.Models;
+using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Constants.Generic;
+using CheckChildcareEligibility.Admin.Domain.Enums;
+using CsvHelper;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace CheckChildcareEligibility.Admin.ViewModels
 {
@@ -18,6 +22,13 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public DateTime ValidityEndDate => DateTime.Parse(Response.ValidityEndDate);
         public DateTime GracePeriodEndDate => DateTime.Parse(Response.GracePeriodEndDate);
         public DateTime ChildDateOfBirth => DateTime.Parse(Response.DateOfBirth);
+        private DateTime StartReconfirmDate => ValidityEndDate.AddDays(-28);
+        public int CurrentYear => DateTime.UtcNow.Year;
+        public string CodeType = WorkingFamiliesResponseBanner.CodePermanent;
+        public string CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
+        public string BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
+        public string TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor;
+
 
         public string Term
         {
@@ -46,6 +57,145 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
                 return $"{termName} {vsd.Year}";
             }
+            
         }
+
+        public static DateTime GetTermStart(DateTime date)
+        {
+            int year = date.Year;
+
+            if (date >= new DateTime(year, 9, 1))
+                return new DateTime(year, 9, 1);
+            else if (date >= new DateTime(year, 4, 1))
+                return new DateTime(year, 4, 1);
+            else
+                return new DateTime(year, 1, 1);
+        }
+
+        public static DateTime GetNextTerm(DateTime termStart)
+        {
+            if (termStart.Month == 1)
+                return new DateTime(termStart.Year, 4, 1);
+            else if (termStart.Month == 4)
+                return new DateTime(termStart.Year, 9, 1);
+            else // September
+                return new DateTime(termStart.Year + 1, 1, 1);
+        }
+
+        public bool HasReachedCompulsorySchoolAge(DateTime dateOfBirth, DateTime currentCheckDate)
+        {
+            DateTime fifthBirthday = dateOfBirth.AddYears(5);
+            DateTime termChildTurnsFive = GetTermStart(fifthBirthday);
+            DateTime termAfterFive = GetNextTerm(termChildTurnsFive);
+
+            return currentCheckDate >= termAfterFive;
+        }
+
+        public string GetBannerCodeType()
+        {
+
+            if (HasReachedCompulsorySchoolAge(ChildDateOfBirth, DateTime.Now))//child too old - Child has reached compulsory school age
+            {
+                return WorkingFamiliesResponseBanner.ReconfirmationChildTooOld;
+            }
+            else if (DateTime.Now >= StartReconfirmDate && DateTime.Now <= ValidityEndDate) //due now
+            {
+                return $"{WorkingFamiliesResponseBanner.ReconfirmationBefore} {ValidityEndDate.ToString("d MMMM yyyy")}";
+            }
+            else if (DateTime.Now > ValidityEndDate) //overdue - Needs reconfirming now
+            {
+                return WorkingFamiliesResponseBanner.ReconfirmationOverdue;
+            }
+            return string.Empty;
+        }
+
+        public void SetBannerValues()
+        {
+            if (IsTemporaryCode)
+            {
+                CodeType = WorkingFamiliesResponseBanner.CodeTemporary;
+
+                if (IsEligible)
+                {
+                    TermValidityDetails = "Only" + TermValidityDetails;
+                }
+            }
+            else if (IsFosterCode)
+            {
+                CodeType = WorkingFamiliesResponseBanner.CodeFosterFamily;
+            }
+
+            if (IsEligible && ChildIsTooYoung) // Child too young
+            {
+                CodeStatus = WorkingFamiliesResponseBanner.CodeChildTooYoung;
+                BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
+                TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFrom;
+                CodeType = string.Empty;
+            }
+            else if (IsVSDinFuture) // Validity start date in future
+            {
+                CodeStatus = WorkingFamiliesResponseBanner.CodeVEDinFuture;
+                BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
+            }
+            else if (IsInGracePeriod) // Code is in grace period
+            {
+                CodeStatus = WorkingFamiliesResponseBanner.CodeInGracePeriod;
+                BannerColour = WorkingFamiliesResponseBanner.ColourYellow;
+            }
+            else if (IsExpired) // Expired
+            {
+                CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
+                BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
+            }
+        }
+
+        public string GetBannerReconfirmationMessage()
+        {
+            if ((IsTemporaryCode && CodeStatus == WorkingFamiliesResponseBanner.CodeValid)
+                || (IsTemporaryCode && CodeStatus == WorkingFamiliesResponseBanner.CodeInGracePeriod)
+                || (IsTemporaryCode && CodeStatus == WorkingFamiliesResponseBanner.CodeExpired))
+            {
+                return string.Empty;
+            }
+            else if (HasReachedCompulsorySchoolAge(ChildDateOfBirth, DateTime.Now))//child too old - Child has reached compulsory school age
+            {
+                return WorkingFamiliesResponseBanner.ReconfirmationChildTooOld;
+            }
+            else if (DateTime.Now >= StartReconfirmDate && DateTime.Now <= ValidityEndDate) //due now
+            {
+                return $"{WorkingFamiliesResponseBanner.ReconfirmationBefore} {ValidityEndDate.ToString("d MMMM yyyy")}";
+            }
+            else if (DateTime.Now > ValidityEndDate) //overdue - Needs reconfirming now
+            {
+                return WorkingFamiliesResponseBanner.ReconfirmationOverdue;
+            }
+            return string.Empty;
+        }
+
+        public string[] GetReconfirmationStatus()
+        {
+            if (IsTemporaryCode) //Temp code
+            {
+                return WorkingFamiliesResponseDetails.ReconfirmationStatusNotApplicable;
+            }
+            else if (HasReachedCompulsorySchoolAge(ChildDateOfBirth, DateTime.Now))//child too old
+            {
+                return WorkingFamiliesResponseDetails.ReconfirmationStatusChildTooOld;
+            }
+            else if (DateTime.Now < StartReconfirmDate)
+            {
+                return WorkingFamiliesResponseDetails.ReconfirmationStatusNotDueYet;
+            }
+            else if (DateTime.Now >= StartReconfirmDate && DateTime.Now <= ValidityEndDate) //due now
+            {
+                return WorkingFamiliesResponseDetails.ReconfirmationStatusDueNow;
+            }
+            else if (DateTime.Now > ValidityEndDate) //overdue - Needs reconfirming now
+            {
+                return WorkingFamiliesResponseDetails.ReconfirmationStatusOverdue;
+            }
+            return ["Not set", "purple"]; // Should not reach this
+        }
+
     }
 }

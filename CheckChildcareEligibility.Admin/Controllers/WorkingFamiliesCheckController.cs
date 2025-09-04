@@ -81,7 +81,7 @@ public class WorkingFamiliesCheckController : BaseController
         var eligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty;
 
         if (string.IsNullOrEmpty(eligibilityType))
-            return View("Outcome/Technical_Error");
+            return View("Outcome/Technical_Error_WF");
 
         if (string.Equals(eligibilityType, "WF", StringComparison.OrdinalIgnoreCase))
         {
@@ -136,7 +136,7 @@ public class WorkingFamiliesCheckController : BaseController
         }
         catch (Exception ex)
         {
-            return View("Outcome/Technical_Error");
+            return View("Outcome/Technical_Error_WF");
         }
     }
 

@@ -4,14 +4,14 @@
 @{
     DateTime startReconfirmDate = Model.ValidityEndDate.AddDays(-28);
     string reconfirmBetween = $"{startReconfirmDate.ToString("d MMMM yyyy")} and {Model.ValidityEndDate.ToString("d MMMM yyyy")}";
-    string[] reconfirmationStatus = WorkingFamiliesResponseDetails.ReconfirmationStatusNotDueYet; 
+    string[] reconfirmationStatus = Model.GetReconfirmationStatus();
 
     if (Model.IsTemporaryCode || Model.ChildIsTooYoung)
     {
         reconfirmBetween = WorkingFamiliesResponseDetails.StatusNotApplicable;
-    } 
-   
+    }
 }
+
 <h2 class="govuk-heading-m">Details checked</h2>
 <dl class="govuk-summary-list">
     <div class="govuk-summary-list__row">
