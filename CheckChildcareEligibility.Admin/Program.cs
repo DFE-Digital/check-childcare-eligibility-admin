@@ -57,33 +57,31 @@ builder.Services.AddHealthChecks();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment()) app.UseExceptionHandler("/Error");
-
-app.Use(async (ctx, next) =>
+if (!app.Environment.IsDevelopment())
 {
-    await next();
-    if (ctx.Response.StatusCode == 404 && !ctx.Response.HasStarted)
-    {
-        //Re-execute the request so the user gets the error page
-        ctx.Request.Path = "/Error/NotFound";
-        await next();
-    }
-    await next();
-    if (ctx.Response.StatusCode == 500 && !ctx.Response.HasStarted)
-    {
-        //Re-execute the request so the user gets the error page
-        ctx.Request.Path = "/Error/ServiceProblem";
-        await next();
-    }
-    await next();
-    if (ctx.Response.StatusCode == 503 && !ctx.Response.HasStarted)
-    {
-        //Re-execute the request so the user gets the error page
-        ctx.Request.Path = "/Error/ServiceNotAvailable";
-        await next();
-    }
-}); 
+    app.UseExceptionHandler("/Error");
+    app.UseStatusCodePagesWithReExecute("/Error/{0}");
+}
 
+// Remove the problematic middleware and replace with:
+app.UseStatusCodePages(async context =>
+{
+    var response = context.HttpContext.Response;
+    if (response.StatusCode == 404)
+    {
+        response.Redirect("/Error/NotFound");
+    }
+    else if (response.StatusCode == 500)
+    {
+        response.Redirect("/Error/ServiceProblem");
+    }
+    else if (response.StatusCode == 503)
+    {
+        response.Redirect("/Error/ServiceNotAvailable");
+    }
+});
+
+app.MapHealthChecks("/healthcheck");
 app.MapHealthChecks("/healthcheck");
 
 app.UseHttpsRedirection();
