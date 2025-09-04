@@ -5,12 +5,12 @@
     string bannerReconfirmationMessage = Model.GetBannerReconfirmationMessage();
 }
 
-<div class="govuk-panel govuk-panel--@Model.bannerColour govuk-!-margin-bottom-7">
+<div class="govuk-panel govuk-panel--@Model.BannerColour govuk-!-margin-bottom-7">
     <h1 class="govuk-panel__title">
-        @Model.codeType @Model.codeStatus
+        @Model.CodeType @Model.CodeStatus
     </h1>
     <div class="govuk-panel__body govuk-!-margin-bottom-5">
-       @Model.termValidityDetails @Model.Term
+       @Model.TermValidityDetails @Model.Term
     </div>
     <div class="govuk-body-l govuk-!-margin-bottom-0">
         @bannerReconfirmationMessage

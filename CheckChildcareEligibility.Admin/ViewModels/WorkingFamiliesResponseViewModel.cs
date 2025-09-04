@@ -22,12 +22,12 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public DateTime ValidityEndDate => DateTime.Parse(Response.ValidityEndDate);
         public DateTime GracePeriodEndDate => DateTime.Parse(Response.GracePeriodEndDate);
         public DateTime ChildDateOfBirth => DateTime.Parse(Response.DateOfBirth);
-        private DateTime startReconfirmDate => ValidityEndDate.AddDays(-28);
-        public int currentYear => DateTime.UtcNow.Year;
-        public string codeType = WorkingFamiliesResponseBanner.CodePermanent;
-        public string codeStatus = WorkingFamiliesResponseBanner.CodeValid;
-        public string bannerColour = WorkingFamiliesResponseBanner.ColourGreen;
-        public string termValidityDetails = WorkingFamiliesResponseBanner.TermValidFor;
+        private DateTime StartReconfirmDate => ValidityEndDate.AddDays(-28);
+        public int CurrentYear => DateTime.UtcNow.Year;
+        public string CodeType = WorkingFamiliesResponseBanner.CodePermanent;
+        public string CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
+        public string BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
+        public string TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor;
 
 
         public string Term
@@ -98,7 +98,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             {
                 return WorkingFamiliesResponseBanner.ReconfirmationChildTooOld;
             }
-            else if (DateTime.Now >= startReconfirmDate && DateTime.Now <= ValidityEndDate) //due now
+            else if (DateTime.Now >= StartReconfirmDate && DateTime.Now <= ValidityEndDate) //due now
             {
                 return $"{WorkingFamiliesResponseBanner.ReconfirmationBefore} {ValidityEndDate.ToString("d MMMM yyyy")}";
             }
@@ -113,47 +113,47 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         {
             if (IsTemporaryCode)
             {
-                codeType = WorkingFamiliesResponseBanner.CodeTemporary;
+                CodeType = WorkingFamiliesResponseBanner.CodeTemporary;
 
                 if (IsEligible)
                 {
-                    termValidityDetails = "Only" + termValidityDetails;
+                    TermValidityDetails = "Only" + TermValidityDetails;
                 }
             }
             else if (IsFosterCode)
             {
-                codeType = WorkingFamiliesResponseBanner.CodeFosterFamily;
+                CodeType = WorkingFamiliesResponseBanner.CodeFosterFamily;
             }
 
             if (IsEligible && ChildIsTooYoung) // Child too young
             {
-                codeStatus = WorkingFamiliesResponseBanner.CodeChildTooYoung;
-                bannerColour = WorkingFamiliesResponseBanner.ColourBlue;
-                termValidityDetails = WorkingFamiliesResponseBanner.TermValidFrom;
-                codeType = string.Empty;
+                CodeStatus = WorkingFamiliesResponseBanner.CodeChildTooYoung;
+                BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
+                TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFrom;
+                CodeType = string.Empty;
             }
             else if (IsVSDinFuture) // Validity start date in future
             {
-                codeStatus = WorkingFamiliesResponseBanner.CodeVEDinFuture;
-                bannerColour = WorkingFamiliesResponseBanner.ColourBlue;
+                CodeStatus = WorkingFamiliesResponseBanner.CodeVEDinFuture;
+                BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
             }
             else if (IsInGracePeriod) // Code is in grace period
             {
-                codeStatus = WorkingFamiliesResponseBanner.CodeInGracePeriod;
-                bannerColour = WorkingFamiliesResponseBanner.ColourYellow;
+                CodeStatus = WorkingFamiliesResponseBanner.CodeInGracePeriod;
+                BannerColour = WorkingFamiliesResponseBanner.ColourYellow;
             }
             else if (IsExpired) // Expired
             {
-                codeStatus = WorkingFamiliesResponseBanner.CodeExpired;
-                bannerColour = WorkingFamiliesResponseBanner.ColourOrange;
+                CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
+                BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
             }
         }
 
         public string GetBannerReconfirmationMessage()
         {
-            if ((IsTemporaryCode && codeStatus == WorkingFamiliesResponseBanner.CodeValid)
-                || (IsTemporaryCode && codeStatus == WorkingFamiliesResponseBanner.CodeInGracePeriod)
-                || (IsTemporaryCode && codeStatus == WorkingFamiliesResponseBanner.CodeExpired))
+            if ((IsTemporaryCode && CodeStatus == WorkingFamiliesResponseBanner.CodeValid)
+                || (IsTemporaryCode && CodeStatus == WorkingFamiliesResponseBanner.CodeInGracePeriod)
+                || (IsTemporaryCode && CodeStatus == WorkingFamiliesResponseBanner.CodeExpired))
             {
                 return string.Empty;
             }
@@ -161,7 +161,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             {
                 return WorkingFamiliesResponseBanner.ReconfirmationChildTooOld;
             }
-            else if (DateTime.Now >= startReconfirmDate && DateTime.Now <= ValidityEndDate) //due now
+            else if (DateTime.Now >= StartReconfirmDate && DateTime.Now <= ValidityEndDate) //due now
             {
                 return $"{WorkingFamiliesResponseBanner.ReconfirmationBefore} {ValidityEndDate.ToString("d MMMM yyyy")}";
             }
@@ -182,11 +182,11 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             {
                 return WorkingFamiliesResponseDetails.ReconfirmationStatusChildTooOld;
             }
-            else if (DateTime.Now < startReconfirmDate)
+            else if (DateTime.Now < StartReconfirmDate)
             {
                 return WorkingFamiliesResponseDetails.ReconfirmationStatusNotDueYet;
             }
-            else if (DateTime.Now >= startReconfirmDate && DateTime.Now <= ValidityEndDate) //due now
+            else if (DateTime.Now >= StartReconfirmDate && DateTime.Now <= ValidityEndDate) //due now
             {
                 return WorkingFamiliesResponseDetails.ReconfirmationStatusDueNow;
             }
