@@ -189,6 +189,8 @@ public class BulkCheckController : BaseController
     {
         var eligibilityType = TempData["eligibilityType"]?.ToString();
         TempData["eligibilityType"] = eligibilityType;
+        var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
+        TempData["eligibilityTypeLabel"] = label;
         TempData["filePrefix"] = GetFileNamePrefix(eligibilityType);
 
         return View("BulkOutcome/Success");
