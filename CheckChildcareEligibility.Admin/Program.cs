@@ -85,7 +85,6 @@ app.UseStatusCodePages(async context =>
 });
 
 app.MapHealthChecks("/healthcheck");
-app.MapHealthChecks("/healthcheck");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
