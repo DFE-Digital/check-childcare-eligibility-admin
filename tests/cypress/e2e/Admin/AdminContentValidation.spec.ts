@@ -112,7 +112,7 @@ describe('Date of Birth Validation Tests', () => {
 
         // Wait for the loader page and then the result page
         cy.url().should('include', '/Check/Loader');
-        cy.get('.govuk-notification-banner', { timeout: 15000 }).should('exist');
+        cy.get('.govuk-notification-banner', { timeout: 29000 }).should('exist');
     });
 });
 

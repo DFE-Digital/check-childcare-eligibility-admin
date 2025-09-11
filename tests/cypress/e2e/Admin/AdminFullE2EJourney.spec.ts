@@ -1,5 +1,5 @@
 describe('Full journey of checking eligibility in LA portal', () => {
-    const parentLastName = 'Jones';
+    const parentLastName = 'Tester';
     const parentNinoEligible = "nn123456c";
     const parentNinoNotEligible = 'PN123456C'; // Updated to the specified NI number
     const parentNinoParentNotFound = 'RA123456C'; // NI number for parent not found scenario
