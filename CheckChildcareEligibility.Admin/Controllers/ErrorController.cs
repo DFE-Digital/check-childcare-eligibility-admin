@@ -27,4 +27,13 @@ public class ErrorController : Controller
     {
         return View();
     }
+
+    public IActionResult ServiceNotAvailable()
+    {
+        return View();
+    }
+    public IActionResult ServiceProblem()
+    {
+        return View();
+    }
 }
