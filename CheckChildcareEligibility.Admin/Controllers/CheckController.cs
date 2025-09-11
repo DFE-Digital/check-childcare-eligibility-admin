@@ -171,6 +171,9 @@ public class CheckController : BaseController
 
                 case "parentNotFound":
                     return View("Outcome/Not_Found", eligbilityOutcomeVm);
+                
+                case "error":
+                    return View("Outcome/Technical_Error", eligbilityOutcomeVm);
 
                 case "queuedForProcessing":
                     return View("Loader", eligbilityOutcomeVm);
