@@ -35,10 +35,13 @@ builder.Services.AddServices(builder.Configuration);
 builder.Services.AddSession();
 
 builder.Services.AddScoped<ILoadParentDetailsUseCase, LoadParentDetailsUseCase>();
+builder.Services.AddScoped<ILoadParentAndChildDetailsUseCase, LoadParentAndChildDetailsUseCase>();
+builder.Services.AddScoped<IPerformWFEligibilityCheckUseCase, PerformWFEligibilityCheckUseCase>();
 builder.Services.AddScoped<IPerform2YoEligibilityCheckUseCase, Perform2YoEligibilityCheckUseCase>();
 builder.Services.AddScoped<IPerformEyppEligibilityCheckUseCase, PerformEyppEligibilityCheckUseCase>();
 builder.Services.AddScoped<IGetCheckStatusUseCase, GetCheckStatusUseCase>();
 builder.Services.AddScoped<IValidateParentDetailsUseCase, ValidateParentDetailsUseCase>();
+builder.Services.AddScoped<IValidateParentAndChildDetailsUseCase, ValidateParentAndChildDetailsUseCase>();
 builder.Services.AddScoped<IParseBulkCheckFileUseCase, ParseBulkCheckFileUseCase>();
 builder.Services.AddScoped<IValidator<CheckEligibilityRequestData>, CheckEligibilityRequestDataValidator>();
 builder.Services.AddSession();
@@ -57,16 +60,27 @@ builder.Services.AddHealthChecks();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment()) app.UseExceptionHandler("/Error");
-
-app.Use(async (ctx, next) =>
+if (!app.Environment.IsDevelopment())
 {
-    await next();
-    if (ctx.Response.StatusCode == 404 && !ctx.Response.HasStarted)
+    app.UseExceptionHandler("/Error");
+    app.UseStatusCodePagesWithReExecute("/Error/{0}");
+}
+
+// Remove the problematic middleware and replace with:
+app.UseStatusCodePages(async context =>
+{
+    var response = context.HttpContext.Response;
+    if (response.StatusCode == 404)
     {
-        //Re-execute the request so the user gets the error page
-        ctx.Request.Path = "/Error/NotFound";
-        await next();
+        response.Redirect("/Error/NotFound");
+    }
+    else if (response.StatusCode == 500)
+    {
+        response.Redirect("/Error/ServiceProblem");
+    }
+    else if (response.StatusCode == 503)
+    {
+        response.Redirect("/Error/ServiceNotAvailable");
     }
 });
 

@@ -1,35 +1,41 @@
-﻿@model Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary
+﻿@@using CheckChildcareEligibility.Admin.ViewModels
+@model Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary
 
 @{
     ViewData["Title"] = "There is a problem";
 
-    List<string> propertyOrder;
+    List<string> propertyOrder = new List<string>();
 
     if (Model.ContainsKey("LastName"))
     {
-        propertyOrder = typeof(ParentGuardian).GetProperties().Select(p => p.Name).ToList();
+        propertyOrder = typeof(ParentGuardian).GetProperties()
+            .Select(p => p.Name.Replace(".", "_")) // Ensure consistency
+            .ToList();
     }
-
-    var dobMappings = new Dictionary<string, string>
+    else if (Model.ContainsKey("EligibilityCode") || Model.ContainsKey("Child.EligibilityCode"))
     {
-        { "DateOfBirth.Day", "Day" },
-        { "DateOfBirth.Month", "Month" },
-        { "DateOfBirth.Year", "Year" }
-    };
+        propertyOrder = new List<string>
+        {
+            "Child_EligibilityCode",
+            "NationalInsuranceNumber",
+            "Child_ChildDateOfBirth_Day",
+            "Child_ChildDateOfBirth_Month",
+            "Child_ChildDateOfBirth_Year",
+            "Child_ChildDateOfBirth_DateOfBirth"
+        };
+    }
 
     var flattenedErrors = Model
         .SelectMany(m => m.Value.Errors
-            .Select(e =>
-                new
-                {
-                    Field = m.Key,
-                    Error = e.ErrorMessage
-                }
-            ))
+            .Select(e => new
+            {
+                Field = m.Key.Replace(".", "_"),
+                Error = e.ErrorMessage
+            }))
         .DistinctBy(e => e.Error)
+        .OrderBy(e => propertyOrder.IndexOf(e.Field))
         .ToList();
 }
-
 
 <div id="error-summary" class="govuk-error-summary" data-module="govuk-error-summary">
     <div role="alert">

@@ -3,29 +3,7 @@
 }
 
 <div class="govuk-grid-column-two-thirds">
-    <div class="govuk-error-summary" data-module="govuk-error-summary">
-        <div role="alert">
-            <h2 class="govuk-error-summary__title">
-                Unauthorized Organization
-            </h2>
-            <div class="govuk-error-summary__body">
-                <p>
-                    Access to this service is currently only available to Local Authority organizations.
-                </p>
-                <p>
-                    Your organization type is not authorized to use this service. If you believe this is an error,
-                    please contact your administrator or the Department for Education support team.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <h2 class="govuk-heading-m">Organization Details</h2>
-    <p>
-        Your signed-in organization type does not match the required type for this service.
-    </p>
-
-    <p>
-        @Html.ActionLink("Sign Out", "SignOut", "Account", null, new { @class = "govuk-button" })
-    </p>
+    <h1 class="govuk-heading-l">You do not have access to this service</h1>
+    <p>This service is for users at local authorities.</p>
+    <p>Contact the <a href="https://forms.office.com.mcas.ms/pages/responsepage.aspx?id=yXfS-grGoU2187O4s0qC-URYbNo1-R1EubHA0gNJis5UNjFaUzRMTEVPTVlaMFNFOVg1Q05PODg3Vi4u&amp;route=shorturl" class="gov-link"> Department for Education support desk</a> for more help.</p>
 </div>

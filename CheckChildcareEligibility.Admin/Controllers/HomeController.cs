@@ -1,7 +1,5 @@
-using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace CheckChildcareEligibility.Admin.Controllers;
 
@@ -10,24 +8,34 @@ public class HomeController : BaseController
     public IActionResult Index()
     {
         _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
-        
+
         // Check if the organization is a Local Authority
-        if (_Claims?.Organisation?.Category?.Name == null || 
+        if (_Claims?.Organisation?.Category?.Name == null ||
             !_Claims.Organisation.Category.Name.Equals("Local Authority", StringComparison.OrdinalIgnoreCase))
         {
             return View("UnauthorizedOrganization");
         }
-        
+
         return View(_Claims);
     }
 
     //Single
-    public IActionResult MenuSingleCheck()
+
+    [HttpGet("MenuSingleCheck")]
+    public IActionResult MenuSingleCheck(bool clearData = false)
     {
+        // If clearData is true, remove the ParentDetails from TempData
+        if (clearData)
+        {
+            TempData.Remove("ParentDetails");
+            TempData.Remove("ParentAndChildDetails");
+            TempData.Remove("Errors");
+        }
         return View("MenuSingleCheck");
     }
 
-    [HttpPost]
+
+    [HttpPost("MenuSingleCheck")]
     public IActionResult MenuSingleCheck([FromForm] string eligibilityType)
     {
         if (string.IsNullOrEmpty(eligibilityType))
@@ -36,6 +44,11 @@ public class HomeController : BaseController
         }
 
         TempData["eligibilityType"] = eligibilityType;
+
+        if(eligibilityType.Equals("WF"))
+        {
+            return RedirectToAction("Enter_Details_WF", "WorkingFamiliesCheck");
+        }
 
         return RedirectToAction("Enter_Details", "Check");
     }

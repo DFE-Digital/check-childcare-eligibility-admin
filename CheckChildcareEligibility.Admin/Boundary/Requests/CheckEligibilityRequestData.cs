@@ -1,22 +1,22 @@
 ﻿using CheckChildcareEligibility.Admin.Domain.Enums;
+using System;
+using System.Linq;
 
-namespace CheckChildcareEligibility.Admin.Boundary.Requests;
-#region FreeSchoolMeals Type
-
-public class CheckEligibilityRequestData : CheckEligibilityRequestDataBase
+namespace CheckChildcareEligibility.Admin.Boundary.Requests
 {
-    public CheckEligibilityRequestData(CheckEligibilityType eligibilityType)
+    public class CheckEligibilityRequestData : CheckEligibilityRequestDataBase
     {
-        baseType = eligibilityType;
+        public CheckEligibilityRequestData(CheckEligibilityType eligibilityType)
+        {
+            baseType = eligibilityType;
+        }
+
+        public string LastName { get; set; } = string.Empty;
+
+        public string DateOfBirth { get; set; } = string.Empty;
+        public string EligibilityCode { get; set; } = string.Empty;
+
+        public string NationalInsuranceNumber { get; set; } = string.Empty;
+
     }
-
-    public string? NationalInsuranceNumber { get; set; }
-
-    public string LastName { get; set; } = string.Empty;
-
-    public string DateOfBirth { get; set; } = string.Empty;
-
-    public string? NationalAsylumSeekerServiceNumber { get; set; }
 }
-
-#endregion

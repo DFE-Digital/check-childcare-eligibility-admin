@@ -118,7 +118,7 @@ describe('Full journey of checking eligibility in LA portal', () => {
         
         // Run another check
         cy.contains('Run another check').click();
-        cy.url().should('include', '/Home/MenuSingleCheck');
+        cy.url().should('include', '/MenuSingleCheck');
     });
     
     it('Shows Parent Not Found outcome when parent cannot be found', () => {

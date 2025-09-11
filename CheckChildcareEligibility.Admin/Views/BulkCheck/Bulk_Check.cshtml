@@ -10,10 +10,21 @@
     <a class="govuk-back-link" href="@Url.Action("MenuBulkCheck", "Home")" onclick="history.back(); return false;">Back</a>
     @* <a class="govuk-back-link-nolink"></a> *@
 
-    @if (!ViewData.ModelState.IsValid)
+    @if (!string.IsNullOrEmpty(errorMessage))
     {
         ViewData["Title"] = "Error: Check Details";
-        <partial name="_ValidationSummary" model="ViewData.ModelState" />
+        <div id="error-summary" class="govuk-error-summary" data-module="govuk-error-summary">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">There is a problem</h2>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        <li>
+                            <a class="govuk-error-message" href="#fileUploadField">@errorMessage</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     }
 
     <span class="govuk-caption-l">@TempData["eligibilityTypeLabel"]</span>
@@ -47,7 +58,7 @@
     <form asp-controller="BulkCheck" asp-action="Bulk_Check" method="post" enctype="multipart/form-data">
         <input type="hidden" name="eligibilityType" value="@eligibilityType" />
 
-        <div class="govuk-form-group @(string.IsNullOrEmpty(errorMessage) ? "" : "govuk-form-group--error")">
+        <div id="fileUploadField" class="govuk-form-group @(string.IsNullOrEmpty(errorMessage) ? "" : "govuk-form-group--error")">
             @if (!string.IsNullOrEmpty(errorMessage))
             {
                 <p id="file-upload-1-error" class="govuk-error-message">
@@ -64,8 +75,6 @@
                            aria-describedby="file-upload-1-error" />
                 </div>
             </div>
-
-
         </div>
 
         <button class="govuk-button" data-module="govuk-button">

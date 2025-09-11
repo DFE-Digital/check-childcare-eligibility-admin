@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography.Xml;
-using CheckChildcareEligibility.Admin.Boundary.Requests;
+﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
@@ -9,8 +8,6 @@ namespace CheckChildcareEligibility.Admin.Gateways;
 
 public class CheckGateway : BaseGateway, ICheckGateway
 {
-    private readonly string _checkBulkUploadUrl;
-    private readonly string _checkUrl;
     private readonly HttpClient _httpClient;
     private readonly ILogger _logger;
 
@@ -19,6 +16,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
         ["FreeSchoolMeals"] = "check/free-school-meals",
         ["TwoYearOffer"] = "check/two-year-offer",
         ["EarlyYearPupilPremium"] = "check/early-year-pupil-premium",
+        ["WorkingFamilies"] = "check/working-families",
     };
 
     private static readonly Dictionary<string, string> BulkCheckUrls = new()
@@ -26,6 +24,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
         ["FreeSchoolMeals"] = "bulk-check/free-school-meals",
         ["TwoYearOffer"] = "bulk-check/two-year-offer",
         ["EarlyYearPupilPremium"] = "bulk-check/early-year-pupil-premium",
+        ["WorkingFamilies"] = "bulk-check/working-families",
     };
 
     public CheckGateway(ILoggerFactory logger, HttpClient httpClient, IConfiguration configuration) : base("EcsService",
@@ -68,6 +67,21 @@ public class CheckGateway : BaseGateway, ICheckGateway
         }
     }
 
+    public async Task<CheckEligibilityItemWorkingFamiliesResponse> GetWFResult(string getEligibilityCheck)
+    {
+        try
+        {
+            var response = await ApiDataGetAsynch(getEligibilityCheck,
+                new CheckEligibilityItemWorkingFamiliesResponse());
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                $"Get Status failed. uri:-{_httpClient.BaseAddress}{getEligibilityCheck}");
+        }
+        return null;
+    }
 
     public async Task<CheckEligibilityStatusResponse> GetStatus(CheckEligibilityResponse responseBody)
     {

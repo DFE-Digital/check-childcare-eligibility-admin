@@ -1,7 +1,4 @@
-﻿using Azure.Core;
-using CheckChildcareEligibility.Admin.Boundary.Responses;
-using CheckChildcareEligibility.Admin.Domain.Enums;
-using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
+﻿using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
@@ -22,7 +19,7 @@ public class CheckController : BaseController
     private readonly IPerform2YoEligibilityCheckUseCase _perform2YoEligibilityCheckUseCase;
     private readonly IPerformEyppEligibilityCheckUseCase _performEyppEligibilityCheckUseCase;
     private readonly IValidateParentDetailsUseCase _validateParentDetailsUseCase;
-    
+
 
     public CheckController(
         ILogger<CheckController> logger,
@@ -67,7 +64,7 @@ public class CheckController : BaseController
             TempData.Remove("ParentDetails");
             TempData.Remove("Errors");
         }
-      
+
         var eligibilityType = TempData["eligibilityType"].ToString();
         TempData["eligibilityType"] = eligibilityType;
         var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
@@ -212,30 +209,30 @@ public class CheckController : BaseController
     }
 
     public DateTime GetDateOfBirth(string? dayStr, string? monthStr, string? yearStr)
-{
-    if (int.TryParse(dayStr, out int day) &&
-        int.TryParse(monthStr, out int month) &&
-        int.TryParse(yearStr, out int year))
     {
-        try
+        if (int.TryParse(dayStr, out int day) &&
+            int.TryParse(monthStr, out int month) &&
+            int.TryParse(yearStr, out int year))
         {
-            return new DateTime(year, month, day);
+            try
+            {
+                return new DateTime(year, month, day);
+            }
+            catch
+            {
+                return DateTime.MinValue;
+            }
         }
-        catch
-        {
-            return DateTime.MinValue;
-        }
-    }
 
-    return DateTime.MinValue;
-}
+        return DateTime.MinValue;
+    }
 
     private string GetEligibilityTypeLabel(string eligibilityType)
     {
         if (string.IsNullOrEmpty(eligibilityType))
             return "eligibility";
 
-        return EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) 
+        return EligibilityTypeLabels.Labels.ContainsKey(eligibilityType)
             ? EligibilityTypeLabels.Labels[eligibilityType]
             : "eligibility";
     }

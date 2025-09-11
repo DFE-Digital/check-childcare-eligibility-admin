@@ -10,8 +10,13 @@
         for (let i = 0; i < links?.length || 0; i++) {
             href = links[i].getAttribute("href");
             hrefs[i] = href;
+
+            // Escape dots in class names to prevent CSS selector misinterpretation
+            let className = href;
+            let escaped = className.replace(/\./g, "\\.");
+
             try {
-                element = document.querySelector(href);
+                element = document.querySelector(escaped);
             } catch {
                 if (!element) {
                     var hrefwithoutHash = href.replace("#", "");

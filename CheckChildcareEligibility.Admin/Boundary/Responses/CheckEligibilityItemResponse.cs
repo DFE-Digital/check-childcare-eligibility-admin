@@ -1,5 +1,11 @@
 ﻿namespace CheckChildcareEligibility.Admin.Boundary.Responses;
 
+
+public class CheckEligibilityItemResponseBase
+{
+    public CheckEligibilityResponseLinks Links { get; set; }
+}
+#region 2YO EYPP
 public class CheckEligibilityItem
 {
     public string NationalInsuranceNumber { get; set; }
@@ -13,8 +19,23 @@ public class CheckEligibilityItem
     public DateTime Created { get; set; }
 }
 
-public class CheckEligibilityItemResponse
+public class CheckEligibilityItemResponse : CheckEligibilityItemResponseBase
 {
     public CheckEligibilityItem Data { get; set; }
-    public CheckEligibilityResponseLinks Links { get; set; }
 }
+#endregion
+
+#region Working Families
+public class CheckEligibilityItemWorkingFamilies : CheckEligibilityItem
+{
+
+    public string EligibilityCode { get; set; }
+    public string ValidityStartDate { get; set; }
+    public string ValidityEndDate { get; set; }
+    public string GracePeriodEndDate { get; set; }
+}
+public class CheckEligibilityItemWorkingFamiliesResponse : CheckEligibilityItemResponseBase
+{
+    public CheckEligibilityItemWorkingFamilies Data { get; set; }
+}
+#endregion
