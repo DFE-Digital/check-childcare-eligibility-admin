@@ -5,6 +5,7 @@ using CheckChildcareEligibility.Admin;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Infrastructure;
+using CheckChildcareEligibility.Admin.Middleware;
 using CheckChildcareEligibility.Admin.Usecases;
 using CheckChildcareEligibility.Admin.UseCases;
 using FluentValidation;
@@ -60,29 +61,13 @@ builder.Services.AddHealthChecks();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+var useCustomErrorPages = app.Configuration.GetValue<bool>("UseCustomErrorPages");
+
+if (!app.Environment.IsDevelopment() || useCustomErrorPages)
 {
-    app.UseExceptionHandler("/Error");
+    app.UseMiddleware<CustomExceptionHandlerMiddleware>();
     app.UseStatusCodePagesWithReExecute("/Error/{0}");
 }
-
-// Remove the problematic middleware and replace with:
-app.UseStatusCodePages(async context =>
-{
-    var response = context.HttpContext.Response;
-    if (response.StatusCode == 404)
-    {
-        response.Redirect("/Error/NotFound");
-    }
-    else if (response.StatusCode == 500)
-    {
-        response.Redirect("/Error/ServiceProblem");
-    }
-    else if (response.StatusCode == 503)
-    {
-        response.Redirect("/Error/ServiceNotAvailable");
-    }
-});
 
 app.MapHealthChecks("/healthcheck");
 
