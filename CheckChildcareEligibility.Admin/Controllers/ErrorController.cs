@@ -23,7 +23,12 @@ public class ErrorController : Controller
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 
-    public IActionResult NotFound()
+    public new IActionResult NotFound()
+    {
+        return View();
+    }
+
+    public IActionResult ServiceProblem()
     {
         return View();
     }
@@ -32,8 +37,20 @@ public class ErrorController : Controller
     {
         return View();
     }
-    public IActionResult ServiceProblem()
+
+    // Status code routing - these match the pattern /Error/{statusCode}
+    public IActionResult Error404()
     {
-        return View();
+        return View("NotFound");
+    }
+
+    public IActionResult Error500()
+    {
+        return View("ServiceProblem");
+    }
+
+    public IActionResult Error503()
+    {
+        return View("ServiceNotAvailable");
     }
 }
