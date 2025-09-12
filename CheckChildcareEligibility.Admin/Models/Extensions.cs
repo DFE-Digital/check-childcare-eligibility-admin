@@ -11,13 +11,13 @@ public static class Extensions
         switch (statusEnum)
         {
             case CheckEligibilityStatus.parentNotFound:
-                return "May not be entitled";
+                return "Information does not match records";
             case CheckEligibilityStatus.eligible:
-                return "Entitled";
+                return "Eligible";
             case CheckEligibilityStatus.notEligible:
-                return "Not Entitled";
+                return "May not be eligible";
             case CheckEligibilityStatus.error:
-                return "Error";
+                return "Try again";
             default:
                 return status;
         }
