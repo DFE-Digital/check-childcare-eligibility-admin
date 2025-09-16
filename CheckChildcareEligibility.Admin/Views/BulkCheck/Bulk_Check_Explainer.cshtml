@@ -1,4 +1,6 @@
-﻿@{
+﻿@using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels
+
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Batch check result explainer";
 }
@@ -15,7 +17,7 @@
             <div class="govuk-accordion__section-header">
                 <h2 class="govuk-accordion__section-heading">
                     <span class="govuk-accordion__section-button" id="accordion-default-heading-1">
-                        Early learning for 2-year-olds
+                        @EligibilityTypeLabels.Labels["2YO"]
                     </span>
                 </h2>
             </div>
@@ -33,7 +35,7 @@
             <div class="govuk-accordion__section-header">
                 <h2 class="govuk-accordion__section-heading">
                     <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
-                        Early years pupil premium
+                        @EligibilityTypeLabels.Labels["EYPP"]
                     </span>
                 </h2>
             </div>
