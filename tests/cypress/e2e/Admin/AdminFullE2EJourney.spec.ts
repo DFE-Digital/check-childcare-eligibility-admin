@@ -27,9 +27,9 @@ describe('Full journey of checking eligibility in LA portal', () => {
         
         // Add parent details
         cy.get('#LastName').type(parentLastName);
-        cy.get('#Day').type('01');
-        cy.get('#Month').type('01');
-        cy.get('#Year').type('1990');
+        cy.get('#DateOfBirth_Day').type('01');
+        cy.get('#DateOfBirth_Month').type('01');
+        cy.get('#DateOfBirth_Year').type('1990');
         cy.get('#NationalInsuranceNumber').type(parentNinoEligible);
         cy.contains('button', 'Run check').click();
 
@@ -80,9 +80,9 @@ describe('Full journey of checking eligibility in LA portal', () => {
         
         // Add parent details
         cy.get('#LastName').type(parentLastName);
-        cy.get('#Day').type('01');
-        cy.get('#Month').type('01');
-        cy.get('#Year').type('1990');
+        cy.get('#DateOfBirth_Day').type('01');
+        cy.get('#DateOfBirth_Month').type('01');
+        cy.get('#DateOfBirth_Year').type('1990');
         cy.get('#NationalInsuranceNumber').type(parentNinoNotEligible);
         cy.contains('button', 'Run check').click();
 
@@ -134,9 +134,9 @@ describe('Full journey of checking eligibility in LA portal', () => {
         
         // Add parent details
         cy.get('#LastName').type(parentLastNameNotFound);
-        cy.get('#Day').type('01');
-        cy.get('#Month').type('01');
-        cy.get('#Year').type('1990');
+        cy.get('#DateOfBirth_Day').type('01');
+        cy.get('#DateOfBirth_Month').type('01');
+        cy.get('#DateOfBirth_Year').type('1990');
         cy.get('#NationalInsuranceNumber').type(parentNinoParentNotFound);
         cy.contains('button', 'Run check').click();
 
@@ -171,9 +171,9 @@ describe('Full journey of checking eligibility in LA portal', () => {
         
         // Add parent details with values that might trigger technical error
         cy.get('#LastName').type('TechnicalError');
-        cy.get('#Day').type('01');
-        cy.get('#Month').type('01');
-        cy.get('#Year').type('1990');
+        cy.get('#DateOfBirth_Day').type('01');
+        cy.get('#DateOfBirth_Month').type('01');
+        cy.get('#DateOfBirth_Year').type('1990');
         cy.get('#NationalInsuranceNumber').type(parentNinoTechnicalError);
         cy.contains('button', 'Run check').click();
 
