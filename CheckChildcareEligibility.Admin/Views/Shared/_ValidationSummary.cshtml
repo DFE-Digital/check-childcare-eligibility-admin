@@ -1,48 +1,86 @@
-﻿@@using CheckChildcareEligibility.Admin.ViewModels
+﻿@using CheckChildcareEligibility.Admin.ViewModels
 @model Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary
 
 @{
     ViewData["Title"] = "There is a problem";
 
+    var errors = Model
+        .SelectMany(m => m.Value.Errors.Select(e => new
+        {
+            Field = m.Key.Replace(".", "_"), //for JavaScript
+            OriginalField = m.Key,
+            Error = e.ErrorMessage
+        }))
+    .ToList();
+
+    var dobErrors = errors
+    .Where(e =>
+        e.OriginalField.EndsWith("Day") ||
+        e.OriginalField.EndsWith("Month") ||
+        e.OriginalField.EndsWith("Year") ||
+        e.OriginalField.EndsWith("DateOfBirth"))
+    .ToList();
+
+    var nonDobErrors = errors
+        .Where(e => !dobErrors.Contains(e))
+        .ToList();
+
+    string[] dobPriority = { "Day", "Month", "Year", "DateOfBirth" };
+
+    var selectedDobError = dobPriority
+        .Select(priority => dobErrors.FirstOrDefault(e => e.OriginalField.EndsWith(priority)))
+        .FirstOrDefault(e => e != null);
+
+    var finalErrors = nonDobErrors.ToList();
+    if (selectedDobError != null)
+    {
+        finalErrors.Add(selectedDobError);
+    }
+
     List<string> propertyOrder = new List<string>();
 
-    if (Model.ContainsKey("LastName"))
+    if (Model.ContainsKey("LastName")) //Parent
     {
-        propertyOrder = typeof(ParentGuardian).GetProperties()
-            .Select(p => p.Name.Replace(".", "_")) // Ensure consistency
-            .ToList();
+        propertyOrder = new List<string>
+        {
+            "LastName",
+            "DateOfBirth",
+            "DateOfBirth_Day",
+            "DateOfBirth_Month",
+            "DateOfBirth_Year",
+            "NationalInsuranceNumber"
+        };
     }
-    else if (Model.ContainsKey("EligibilityCode") || Model.ContainsKey("Child.EligibilityCode"))
+    else if (Model.ContainsKey("EligibilityCode") || Model.ContainsKey("Child.EligibilityCode")) //ParentAndChild
     {
         propertyOrder = new List<string>
         {
             "Child_EligibilityCode",
             "NationalInsuranceNumber",
-            "Child_ChildDateOfBirth_Day",
-            "Child_ChildDateOfBirth_Month",
-            "Child_ChildDateOfBirth_Year",
-            "Child_ChildDateOfBirth_DateOfBirth"
+            "Child_ChildDateOfBirth_DateOfBirth",
+            "Child_Day",
+            "Child_Month",
+            "Child_Year"
         };
     }
 
-    var flattenedErrors = Model
-        .SelectMany(m => m.Value.Errors
-            .Select(e => new
-            {
-                Field = m.Key.Replace(".", "_"),
-                Error = e.ErrorMessage
-            }))
-        .DistinctBy(e => e.Error)
-        .OrderBy(e => propertyOrder.IndexOf(e.Field))
+    string[] fieldOrder = propertyOrder.ToArray();
+    errors = finalErrors
+        .OrderBy(e =>
+        {
+            int index = Array.IndexOf(fieldOrder, e.Field);
+            return index == -1 ? int.MaxValue : index; // Put unknown fields at the end
+        })
         .ToList();
 }
+
 
 <div id="error-summary" class="govuk-error-summary" data-module="govuk-error-summary">
     <div role="alert">
         <h2 class="govuk-error-summary__title">There is a problem</h2>
         <div class="govuk-error-summary__body">
             <ul class="govuk-list govuk-error-summary__list">
-                @foreach (var modelError in flattenedErrors)
+                @foreach (var modelError in errors)
                 {
                     <li>
                         @if (string.IsNullOrEmpty(modelError.Field))

@@ -51,7 +51,7 @@
                                     Day
                                 </label>
                                 <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["DateOfBirth.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                       asp-for="Day" id="Day" type="text" inputmode="numeric" maxlength="2"
+                                       asp-for="Day" id="DateOfBirth_Day" type="text" inputmode="numeric" maxlength="2"
                                        aria-label="Day" />
                             </div>
                         </div>
@@ -62,7 +62,7 @@
                                     Month
                                 </label>
                                 <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["DateOfBirth.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                       asp-for="Month" id="Month" type="text" inputmode="numeric" maxlength="2"
+                                       asp-for="Month" id="DateOfBirth_Month" type="text" inputmode="numeric" maxlength="2"
                                        aria-label="Month" />
                             </div>
                         </div>
@@ -73,7 +73,7 @@
                                     Year
                                 </label>
                                 <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["DateOfBirth.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                       asp-for="Year" id="Year" type="text" inputmode="numeric" maxlength="4"
+                                       asp-for="Year" id="DateOfBirth_Year" type="text" inputmode="numeric" maxlength="4"
                                        aria-label="Year" />
                             </div>
                         </div>
