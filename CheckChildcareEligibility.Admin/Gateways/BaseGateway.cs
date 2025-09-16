@@ -79,7 +79,18 @@ public class BaseGateway
             var method = "POST";
 
             if (task.StatusCode == HttpStatusCode.Unauthorized) throw new UnauthorizedAccessException();
-            await LogApiError(task, method, uri, json);
+            
+            // Handle specific status codes differently
+            switch (task.StatusCode)
+            {
+                case HttpStatusCode.ServiceUnavailable:
+                    throw new HttpRequestException("Service temporarily unavailable", null, HttpStatusCode.ServiceUnavailable);
+                case HttpStatusCode.NotFound:
+                    throw new HttpRequestException("Resource not found", null, HttpStatusCode.NotFound);
+                default:
+                    await LogApiError(task, method, uri, json);
+                    break;
+            }
         }
 
         return result;
