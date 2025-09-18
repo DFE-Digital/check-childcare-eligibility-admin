@@ -13,7 +13,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public CheckEligibilityItemWorkingFamilies Response { get; set; }
         public bool ChildIsTooYoung => ValidityStartDate < ChildDateOfBirth.AddMonths(9); public bool ChildIsTooOld { get; set; }
         public bool IsEligible => Response.Status == CheckEligibilityStatus.eligible.ToString();
-        public bool IsVSDinFuture => ValidityStartDate.Month > DateTime.UtcNow.Month;
+        public bool IsVSDinFuture => ValidityStartDate > DateTime.UtcNow;
         public bool IsInGracePeriod => DateTime.UtcNow > ValidityEndDate && DateTime.UtcNow < GracePeriodEndDate;
         public bool IsExpired => DateTime.UtcNow > GracePeriodEndDate;
         public bool IsTemporaryCode => Response.EligibilityCode.StartsWith("1");
