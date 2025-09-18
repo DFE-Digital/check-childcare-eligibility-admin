@@ -33,7 +33,7 @@ describe('Date of Birth Validation Tests', () => {
         cy.visit('/');
         cy.contains('a', 'Run a check').click();
         
-        // From SingleCheckMenu, select an option (e.g. 2 years old early learning)
+        // From SingleCheckMenu, select an option (e.g. Early learning for 2-year-olds)
         cy.contains('button', 'Childcare for working families').click();
         
         // We should now be on the Enter_Details page
@@ -125,7 +125,7 @@ describe('Eligibility Code Validation Tests', () => {
         cy.visit('/');
         cy.contains('a', 'Run a check').click();
         
-        // From SingleCheckMenu, select an option (e.g. 2 years old early learning)
+        // From SingleCheckMenu, select an option (e.g. Early learning for 2-year-olds)
         cy.contains('button', 'Childcare for working families').click();
         
         // We should now be on the Enter_Details page
@@ -224,7 +224,7 @@ describe('National Insurance Number Validation Tests', () => {
         cy.visit('/');
         cy.contains('a', 'Run a check').click();
         
-        // From SingleCheckMenu, select an option (e.g. 2 years old early learning)
+        // From SingleCheckMenu, select an option (e.g. Early learning for 2-year-olds)
         cy.contains('button', 'Childcare for working families').click();
         
         // We should now be on the Enter_Details page

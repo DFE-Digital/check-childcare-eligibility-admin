@@ -5,7 +5,7 @@ describe('Admin Bulk Check Journey', () => {
         cy.checkSession('LA');
         cy.visit(Cypress.config().baseUrl ?? "");
         cy.contains('Run a batch check').click();
-        cy.contains('button', '2 years old early learning').click();
+        cy.contains('button', 'Early learning for 2-year-olds').click();
     });
 
     it("will return an error message if the bulk file contains more than 250 rows of data", () => {
