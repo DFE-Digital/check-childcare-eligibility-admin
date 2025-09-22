@@ -117,7 +117,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
                 if (IsEligible)
                 {
-                    TermValidityDetails = "Only" + TermValidityDetails;
+                    TermValidityDetails = "Only "  + TermValidityDetails;
                 }
             }
             else if (IsFosterCode)
