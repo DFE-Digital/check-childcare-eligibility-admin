@@ -1,8 +1,9 @@
-﻿@{
+﻿@model CheckChildcareEligibility.Admin.Domain.DfeSignIn.DfeClaims;
+@using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels
+
+@{
     ViewData["Title"] = "Dashboard";
 }
-
-@model CheckChildcareEligibility.Admin.Domain.DfeSignIn.DfeClaims;
 
 <div class="govuk-grid-column-full">
     @* <a class="govuk-back-link" href="#" onclick="history.back(); return false;">Back</a>*@
@@ -28,7 +29,7 @@
                                 <input type="hidden" name="eligibilityType" value="2YO" />
                                 <button class="button-as-link-dfe-card-style govuk-link govuk-link--no-visited-state dfe-card-link--header"
                                         type="submit">
-                                    2 years old early learning
+                                    @EligibilityTypeLabels.Labels["2YO"]
                                 </button>
                             </form>
                         </h2>
@@ -43,7 +44,7 @@
                                 <input type="hidden" name="eligibilityType" value="EYPP" />
                                 <button class="button-as-link-dfe-card-style govuk-link govuk-link--no-visited-state dfe-card-link--header"
                                         type="submit">
-                                    Early years pupil premium
+                                    @EligibilityTypeLabels.Labels["EYPP"]
                                 </button>
                             </form>
                         </h2>

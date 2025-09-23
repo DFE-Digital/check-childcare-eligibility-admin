@@ -33,8 +33,8 @@ describe('Date of Birth Validation Tests', () => {
         cy.visit('/');
         cy.contains('a', 'Run a check').click();
         
-        // From SingleCheckMenu, select an option (e.g. 2 years old early learning)
-        cy.contains('button', '2 years old early learning').click();
+        // From SingleCheckMenu, select an option (e.g. Early learning for 2-year-olds)
+        cy.contains('button', 'Early learning for 2-year-olds').click();
         
         // We should now be on the Enter_Details page
         cy.url().should('include', '/Check/Enter_Details');
@@ -125,8 +125,8 @@ describe('Last Name Validation Tests', () => {
         cy.visit('/');
         cy.contains('a', 'Run a check').click();
         
-        // From SingleCheckMenu, select an option (e.g. 2 years old early learning)
-        cy.contains('button', '2 years old early learning').click();
+        // From SingleCheckMenu, select an option (e.g. Early learning for 2-year-olds)
+        cy.contains('button', 'Early learning for 2-year-olds').click();
         
         // We should now be on the Enter_Details page
         cy.url().should('include', '/Check/Enter_Details');
@@ -203,8 +203,8 @@ describe('National Insurance Number Validation Tests', () => {
         cy.visit('/');
         cy.contains('a', 'Run a check').click();
         
-        // From SingleCheckMenu, select an option (e.g. 2 years old early learning)
-        cy.contains('button', '2 years old early learning').click();
+        // From SingleCheckMenu, select an option (e.g. Early learning for 2-year-olds)
+        cy.contains('button', 'Early learning for 2-year-olds').click();
         
         // We should now be on the Enter_Details page
         cy.url().should('include', '/Check/Enter_Details');
