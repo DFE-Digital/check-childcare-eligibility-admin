@@ -141,11 +141,13 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeInGracePeriod;
                 BannerColour = WorkingFamiliesResponseBanner.ColourYellow;
+                TermValidityDetails = WorkingFamiliesResponseBanner.TermExpiresOn;
             }
             else if (IsExpired) // Expired
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
                 BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
+                TermValidityDetails = WorkingFamiliesResponseBanner.TermExpiredOn;
             }
         }
 
