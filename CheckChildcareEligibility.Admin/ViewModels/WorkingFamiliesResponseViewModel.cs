@@ -117,7 +117,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
                 if (IsEligible)
                 {
-                    TermValidityDetails = "Only" + TermValidityDetails;
+                    TermValidityDetails = "Only "  + TermValidityDetails;
                 }
             }
             else if (IsFosterCode)
@@ -141,11 +141,13 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeInGracePeriod;
                 BannerColour = WorkingFamiliesResponseBanner.ColourYellow;
+                TermValidityDetails = WorkingFamiliesResponseBanner.TermExpiresOn;
             }
             else if (IsExpired) // Expired
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
                 BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
+                TermValidityDetails = WorkingFamiliesResponseBanner.TermExpiredOn;
             }
         }
 

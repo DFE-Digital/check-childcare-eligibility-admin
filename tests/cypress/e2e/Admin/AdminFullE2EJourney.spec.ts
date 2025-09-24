@@ -20,7 +20,7 @@ describe('Full journey of checking eligibility in LA portal', () => {
         
         // Select 2YO eligibility type
         cy.get('h1').should('include.text', 'Run a check for one parent or guardian');
-        cy.contains('button', '2 years old early learning').click();
+        cy.contains('button', 'Early learning for 2-year-olds').click();
         
         // Consent declaration (if exists in the flow)
         cy.url().should('include', '/Check/Enter_Details');
@@ -164,7 +164,7 @@ describe('Full journey of checking eligibility in LA portal', () => {
         
         // Select 2YO eligibility type
         cy.get('h1').should('include.text', 'Run a check for one parent or guardian');
-        cy.contains('button', '2 years old early learning').click();
+        cy.contains('button', 'Early learning for 2-year-olds').click();
         
         // Enter Details page
         cy.url().should('include', '/Check/Enter_Details');
