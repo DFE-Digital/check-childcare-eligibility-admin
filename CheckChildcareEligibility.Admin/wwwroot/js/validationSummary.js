@@ -9,8 +9,8 @@
             let element = document.getElementById(targetId);
 
             // if it's a DOB subfield - style whole DOB block
-            if (targetId.startsWith("Child_ChildDateOfBirth")) {
-                element = document.getElementById("Child_ChildDateOfBirth");
+            if (targetId.startsWith("Child.ChildDateOfBirth")) {
+                element = document.getElementById("Child.ChildDateOfBirth");
             } else if (targetId.startsWith("DateOfBirth")) {
                 element = document.getElementById("DateOfBirth");
             }

@@ -4,76 +4,140 @@
 @{
     ViewData["Title"] = "There is a problem";
 
-    var errors = Model
-        .SelectMany(m => m.Value.Errors.Select(e => new
-        {
-            Field = m.Key.Replace(".", "_"), //for JavaScript
-            OriginalField = m.Key,
-            Error = e.ErrorMessage
-        }))
-    .ToList();
-
-    var dobErrors = errors
-    .Where(e =>
-        e.OriginalField.EndsWith("Day") ||
-        e.OriginalField.EndsWith("Month") ||
-        e.OriginalField.EndsWith("Year") ||
-        e.OriginalField.EndsWith("DateOfBirth"))
-    .ToList();
-
-    var nonDobErrors = errors
-        .Where(e => !dobErrors.Contains(e))
-        .ToList();
-
-    string[] dobPriority = { "Day", "Month", "Year", "DateOfBirth" };
-
-    var selectedDobError = dobPriority
-        .Select(priority => dobErrors.FirstOrDefault(e => e.OriginalField.EndsWith(priority)))
-        .FirstOrDefault(e => e != null);
-
-    var finalErrors = nonDobErrors.ToList();
-    if (selectedDobError != null)
+@functions {
+    public class ValidationError
     {
-        finalErrors.Add(selectedDobError);
+        public string Field { get; set; }
+        public string OriginalField { get; set; }
+        public string Error { get; set; }
     }
-
-    List<string> propertyOrder = new List<string>();
-
-    if (Model.ContainsKey("LastName")) //Parent
-    {
-        propertyOrder = new List<string>
-        {
-            "LastName",
-            "DateOfBirth",
-            "DateOfBirth_Day",
-            "DateOfBirth_Month",
-            "DateOfBirth_Year",
-            "NationalInsuranceNumber"
-        };
-    }
-    else if (Model.ContainsKey("EligibilityCode") || Model.ContainsKey("Child.EligibilityCode")) //ParentAndChild
-    {
-        propertyOrder = new List<string>
-        {
-            "Child_EligibilityCode",
-            "NationalInsuranceNumber",
-            "Child_ChildDateOfBirth_DateOfBirth",
-            "Child_Day",
-            "Child_Month",
-            "Child_Year"
-        };
-    }
-
-    string[] fieldOrder = propertyOrder.ToArray();
-    errors = finalErrors
-        .OrderBy(e =>
-        {
-            int index = Array.IndexOf(fieldOrder, e.Field);
-            return index == -1 ? int.MaxValue : index; // Put unknown fields at the end
-        })
-        .ToList();
 }
 
+// Get all the errors
+var errors = new List<ValidationError>();
+foreach (var m in Model)
+{
+    foreach (var e in m.Value.Errors)
+    {
+        var originalField = m.Key;
+        var field = originalField;
+
+        // Remap School.URN to School so the error summary links correctly
+        if (originalField.EndsWith("School.URN"))
+        {
+            field = originalField.Replace("School.URN", "School");
+        }
+
+        errors.Add(new ValidationError
+        {
+            Field = field,
+            OriginalField = originalField,
+            Error = e.ErrorMessage
+        });
+    }
+}
+
+// Get DOB errors - need to handle separately as multi-field input -> single field output
+var dobErrors = new List<ValidationError>();
+foreach (var error in errors)
+{
+    if (error.OriginalField.EndsWith("Day") ||
+        error.OriginalField.EndsWith("Month") ||
+        error.OriginalField.EndsWith("Year") ||
+        error.OriginalField.EndsWith("DateOfBirth"))
+    {
+        dobErrors.Add(error);
+    }
+}
+
+// Only keep the highest-priority DOB error (the one we will report)
+string[] dobPriority = { "Day", "Month", "Year", "DateOfBirth" };
+ValidationError selectedDobError = null;
+foreach (var priority in dobPriority)
+{
+    foreach (var e in dobErrors)
+    {
+        if (e.OriginalField.EndsWith(priority))
+        {
+            selectedDobError = e;
+            break;
+        }
+    }
+    if (selectedDobError != null)
+        break;
+}
+
+// Get non-DOB errors
+var nonDobErrors = new List<ValidationError>();
+foreach (var error in errors)
+{
+    if (!dobErrors.Contains(error))
+    {
+        nonDobErrors.Add(error);
+    }
+}
+
+var finalErrors = nonDobErrors.ToList();
+if (selectedDobError != null)
+{
+    finalErrors.Add(selectedDobError);
+}
+
+// Order the errors
+List<string> propertyOrder = new List<string>();
+
+if (Model.ContainsKey("LastName")) //Parent
+{
+    foreach (var prop in typeof(ParentGuardian).GetProperties())
+    {
+        propertyOrder.Add(prop.Name);
+    }
+    UpdateDobFields(propertyOrder);
+}
+else if (Model.ContainsKey("EligibilityCode") || Model.ContainsKey("Child.EligibilityCode")) //ParentAndChild
+{
+    propertyOrder = new List<string>
+        {
+            "Child.EligibilityCode",
+            "NationalInsuranceNumber",
+            "Child.ChildDateOfBirth",
+            "Child.ChildDateOfBirth.Day",
+            "Child.ChildDateOfBirth.Month",
+            "Child.ChildDateOfBirth.Year"
+        };
+    // UpdateDobFields(propertyOrder);
+}
+
+void UpdateDobFields(List<string> propertyOrder)
+{
+    int index;
+
+    index = propertyOrder.IndexOf("Day");
+    if (index != -1) propertyOrder[index] = "DateOfBirth.Day";
+
+    index = propertyOrder.IndexOf("Month");
+    if (index != -1) propertyOrder[index] = "DateOfBirth.Month";
+
+    index = propertyOrder.IndexOf("Year");
+    if (index != -1) propertyOrder[index] = "DateOfBirth.Year";
+}
+
+string[] fieldOrder = propertyOrder.ToArray();
+errors = finalErrors
+    .OrderBy(e =>
+    {
+        int index = Array.IndexOf(fieldOrder, e.Field);
+        return index == -1 ? int.MaxValue : index; // Put unknown fields at the end
+    })
+    .ToList();
+
+//Only way I can get Viewmodel error for DOB to show inline
+TempData["DobError"] = string.Empty;
+if (selectedDobError != null && selectedDobError.OriginalField.StartsWith("Child.ChildDateOfBirth"))
+{
+    TempData["DobError"] = selectedDobError.Error;
+}
+}
 
 <div id="error-summary" class="govuk-error-summary" data-module="govuk-error-summary">
     <div role="alert">
@@ -89,6 +153,7 @@
                         }
                         else
                         {
+
                             <a class="govuk-error-message" href="#@modelError.Field">@modelError.Error</a>
                         }
                     </li>

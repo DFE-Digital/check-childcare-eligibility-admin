@@ -51,25 +51,31 @@
                        aria-label="Parent or guardian National Insurance number">
             </div>
 
-            <div class="govuk-form-group" id="Child_ChildDateOfBirth">
+            <div class="govuk-form-group" data-type="dob-form-group">
                 <fieldset class="govuk-fieldset" role="group" aria-describedby="dob-hint">
-                    <label class="govuk-label govuk-label--m" for="ni-number-entered">
+
+                    <legend class="govuk-label govuk-label--m">
                         Child date of birth
-                    </label>
+                    </legend>
+
                     <div id="dob-hint" class="govuk-hint">
                         For example, 27 3 1980
                     </div>
-                    <p class="govuk-error-message">
-                        <span asp-validation-for="Child.ChildDateOfBirth"></span>
-                    </p>
-                    <div class="govuk-date-input">
+
+                    @if (!string.IsNullOrEmpty(TempData["DobError"]?.ToString())) //Hide whitespace if no error
+                    {
+                        <p class="govuk-error-message">
+                            <span asp-validation-for="Child.Day">@Html.Raw(TempData["DobError"])</span>
+                        </p>
+                    }
+                    <div class="govuk-date-input" id="Child.ChildDateOfBirth">
                         <div class="govuk-date-input__item">
                             <div class="govuk-form-group">
                                 <label class="govuk-label govuk-date-input__label" for="Day">
                                     Day
                                 </label>
                                 <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["Child.ChildDateOfBirth.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                       asp-for="Child.Day" id="Child_ChildDateOfBirth_Day" type="text" inputmode="numeric" maxlength="2"
+                                       asp-for="Child.Day" id="Child.ChildDateOfBirth.Day" type="text" inputmode="numeric" maxlength="2"
                                        aria-label="Day" />
                             </div>
                         </div>
@@ -80,7 +86,7 @@
                                     Month
                                 </label>
                                 <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["Child.ChildDateOfBirth.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                       asp-for="Child.Month" id="Child_ChildDateOfBirth_Month" type="text" inputmode="numeric" maxlength="2"
+                                       asp-for="Child.Month" id="Child.ChildDateOfBirth.Month" type="text" inputmode="numeric" maxlength="2"
                                        aria-label="Month" />
                             </div>
                         </div>
@@ -91,7 +97,7 @@
                                     Year
                                 </label>
                                 <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["Child.ChildDateOfBirth.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                       asp-for="Child.Year" id="Child_ChildDateOfBirth_Year" type="text" inputmode="numeric" maxlength="4"
+                                       asp-for="Child.Year" id="Child.ChildDateOfBirth.Year" type="text" inputmode="numeric" maxlength="4"
                                        aria-label="Year" />
                             </div>
                         </div>
