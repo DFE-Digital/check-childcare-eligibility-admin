@@ -9,8 +9,8 @@ public static class ProgramExtensions
     {
         services.AddControllersWithViews();
 
-        
 
+        services.AddHttpContextAccessor();
         services.AddHttpClient<ICheckGateway, CheckGateway>(client =>
         {
             client.BaseAddress = new Uri(configuration["Api:Host"]);

@@ -3,6 +3,7 @@ using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -14,6 +15,7 @@ namespace CheckChildcareEligibility.Admin.Gateways.Tests.Check;
 internal class CheckGatewayTests
 {
     private Mock<IConfiguration> _configMock;
+    private IHttpContextAccessor _httpContextAccessor;
     private HttpClient _httpClient;
     private Mock<HttpMessageHandler> _httpMessageHandlerMock;
     private Mock<ILoggerFactory> _loggerFactoryMock;
@@ -39,7 +41,7 @@ internal class CheckGatewayTests
             BaseAddress = new Uri("https://localhost:7000")
         };
 
-        _sut = new DerivedCheckGateway(_loggerFactoryMock.Object, _httpClient, _configMock.Object);
+        _sut = new DerivedCheckGateway(_loggerFactoryMock.Object, _httpClient, _configMock.Object, _httpContextAccessor);
     }
 
     [TearDown]
