@@ -58,8 +58,7 @@ public class BaseGateway
                 // now build the scope according to the body the user has logged in as
                 var localAuthorityId = (DfeSignInExtensions.GetDfeClaims(_httpContextAccessor.HttpContext.User.Claims)).Organisation.EstablishmentNumber;// claims.Organisation.EstablishmentNumber = Local Authority ID
                 string baseScope = _configuration["Api:AuthorisationScope"];
-                string laScopeName = "local_authority";
-                string userScope = Regex.Replace(baseScope, $@"\b{laScopeName}\b", match => match.Value + $":{localAuthorityId}");
+                string userScope = baseScope + $" local_authority:{localAuthorityId}";
                 var formData = new SystemUser
                 {
                     client_id = _configuration["Api:AuthorisationUsername"],
