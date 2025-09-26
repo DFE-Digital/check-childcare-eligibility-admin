@@ -1,12 +1,14 @@
 ﻿// using CheckChildcareEligibility.Admin.Domain;
 
+using CheckChildcareEligibility.Admin.Boundary.Requests;
+using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Infrastructure;
+using Microsoft.ApplicationInsights;
+using Newtonsoft.Json;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
-using CheckChildcareEligibility.Admin.Boundary.Requests;
-using CheckChildcareEligibility.Admin.Boundary.Responses;
-using Microsoft.ApplicationInsights;
-using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
 namespace CheckChildcareEligibility.Admin.Gateways;
 
@@ -18,13 +20,18 @@ public class BaseGateway
     private readonly ILogger _logger;
     private readonly TelemetryClient _telemetry;
     private DateTime _expiry;
+    private IHttpContextAccessor _httpContextAccessor;
 
-    public BaseGateway(string serviceName, ILoggerFactory logger, HttpClient httpClient, IConfiguration configuration)
+    public BaseGateway(string serviceName, ILoggerFactory logger, HttpClient httpClient, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
     {
         _logger = logger.CreateLogger(serviceName);
         _httpClient = httpClient;
         _telemetry = new TelemetryClient();
         _configuration = configuration;
+        _httpContextAccessor = httpContextAccessor;
+
+
+
 
         Task.Run(Authorise).Wait();
     }
@@ -34,22 +41,40 @@ public class BaseGateway
     public async Task Authorise()
     {
         var url = $"{_httpClient.BaseAddress}oauth2/token";
-
         try
         {
-            if (_expiry == null || _expiry < DateTime.UtcNow)
+            var session = _httpContextAccessor.HttpContext.Session;
+            // Try to get token and expiry from session
+            var token = session.GetString("JwtToken");
+            DateTime.TryParse(session.GetString("JwtTokenExpiry"), out var sessionExpiry);
+            // If token exists and not expired, use it
+            if (!string.IsNullOrEmpty(token) && sessionExpiry > DateTime.UtcNow)
             {
+                _jwtAuthResponse = new JwtAuthResponse { access_token = token, expires_in = (int)(sessionExpiry - DateTime.UtcNow).TotalSeconds };
+                _expiry = sessionExpiry;
+            }
+            else
+            {
+                // now build the scope according to the body the user has logged in as
+                var localAuthorityId = (DfeSignInExtensions.GetDfeClaims(_httpContextAccessor.HttpContext.User.Claims)).Organisation.EstablishmentNumber;// claims.Organisation.EstablishmentNumber = Local Authority ID
+                string baseScope = _configuration["Api:AuthorisationScope"];
+                string laScopeName = "local_authority";
+                string userScope = Regex.Replace(baseScope, $@"\b{laScopeName}\b", match => match.Value + $":{localAuthorityId}");
                 var formData = new SystemUser
                 {
                     client_id = _configuration["Api:AuthorisationUsername"],
                     client_secret = _configuration["Api:AuthorisationPassword"],
-                    scope = _configuration["Api:AuthorisationScope"]
+                    scope = userScope
                 };
 
                 _jwtAuthResponse = await ApiDataPostFormDataAsynch(url, formData, new JwtAuthResponse());
                 _expiry = DateTime.UtcNow.AddSeconds(_jwtAuthResponse.expires_in);
-            }
 
+                // Store token and expiry for the session
+                session.SetString("JwtToken", _jwtAuthResponse.access_token);
+                session.SetString("JwtTokenExpiry", _expiry.ToString("o"));
+            }
+           
             // Ensure we don't add duplicate headers
             if (_httpClient.DefaultRequestHeaders.Contains("Authorization"))
                 _httpClient.DefaultRequestHeaders.Remove("Authorization");
@@ -79,7 +104,7 @@ public class BaseGateway
             var method = "POST";
 
             if (task.StatusCode == HttpStatusCode.Unauthorized) throw new UnauthorizedAccessException();
-            
+
             // Handle specific status codes differently
             switch (task.StatusCode)
             {
