@@ -2,6 +2,7 @@
 
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.DfeSignIn;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using Microsoft.ApplicationInsights;
 using Newtonsoft.Json;
@@ -56,9 +57,19 @@ public class BaseGateway
             else
             {
                 // now build the scope according to the body the user has logged in as
-                var localAuthorityId = (DfeSignInExtensions.GetDfeClaims(_httpContextAccessor.HttpContext.User.Claims)).Organisation.EstablishmentNumber;// claims.Organisation.EstablishmentNumber = Local Authority ID
+                var establishment = (DfeSignInExtensions.GetDfeClaims(_httpContextAccessor.HttpContext.User.Claims)).Organisation;// claims.Organisation.EstablishmentNumber = Local Authority ID
                 string baseScope = _configuration["Api:AuthorisationScope"];
-                string userScope = baseScope + $" local_authority:{localAuthorityId}";
+                string userScope = string.Empty;
+                switch (establishment.Category.Id)
+                {
+                    case OrganisationCategory.LocalAuthority:
+                        userScope = baseScope + $" local_authority:{establishment.EstablishmentNumber}";
+                        break;
+                    default:
+                        userScope = baseScope;
+                        break;
+
+                }
                 var formData = new SystemUser
                 {
                     client_id = _configuration["Api:AuthorisationUsername"],
