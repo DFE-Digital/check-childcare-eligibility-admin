@@ -48,9 +48,9 @@ describe('Date of Birth Validation Tests', () => {
         cy.get('#NationalInsuranceNumber').type(NIN);
         
         // Clear the date fields
-        cy.get('#DateOfBirth_Day').clear();
-        cy.get('#DateOfBirth_Month').clear();
-        cy.get('#DateOfBirth_Year').clear();
+        cy.get('[id="DateOfBirth.Day"]').clear();
+        cy.get('[id="DateOfBirth.Month"]').clear();
+        cy.get('[id="DateOfBirth.Year"]').clear();
         
         // Submit the form
         cy.contains('Run check').click();
@@ -61,42 +61,42 @@ describe('Date of Birth Validation Tests', () => {
     });
 
     it('displays error messages for non-numeric inputs', () => {
-        cy.get('#DateOfBirth_Day').clear().type('abc');
-        cy.get('#DateOfBirth_Month').clear().type('xyz');
-        cy.get('#DateOfBirth_Year').clear().type('abcd');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('abc');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('xyz');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('abcd');
         cy.contains('Run check').click();
 
         cy.get('.govuk-error-message').should('contain', 'Date of birth must be a real date');
-        cy.get('#DateOfBirth_Day').should('have.class', 'govuk-input--error');
-        cy.get('#DateOfBirth_Month').should('have.class', 'govuk-input--error');
-        cy.get('#DateOfBirth_Year').should('have.class', 'govuk-input--error');
+        cy.get('[id="DateOfBirth.Day"]').should('have.class', 'govuk-input--error');
+        cy.get('[id="DateOfBirth.Month"]').should('have.class', 'govuk-input--error');
+        cy.get('[id="DateOfBirth.Year"]').should('have.class', 'govuk-input--error');
     });
 
     it('displays error messages for out-of-range inputs', () => {
-        cy.get('#DateOfBirth_Day').clear().type('50');
-        cy.get('#DateOfBirth_Month').clear().type('13');
-        cy.get('#DateOfBirth_Year').clear().type('1800');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('50');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('13');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1800');
         cy.contains('Run check').click();
 
         cy.get('.govuk-error-message').should('contain', 'Date of birth must be a real date');
-        cy.get('#DateOfBirth_Day').should('have.class', 'govuk-input--error');
-        cy.get('#DateOfBirth_Month').should('have.class', 'govuk-input--error');
-        cy.get('#DateOfBirth_Year').should('have.class', 'govuk-input--error');
+        cy.get('[id="DateOfBirth.Day"]').should('have.class', 'govuk-input--error');
+        cy.get('[id="DateOfBirth.Month"]').should('have.class', 'govuk-input--error');
+        cy.get('[id="DateOfBirth.Year"]').should('have.class', 'govuk-input--error');
     });
 
     it('displays error messages for future dates', () => {
-        cy.get('#DateOfBirth_Day').clear().type('01');
-        cy.get('#DateOfBirth_Month').clear().type('01');
-        cy.get('#DateOfBirth_Year').clear().type((new Date().getFullYear() + 1).toString());
+        cy.get('[id="DateOfBirth.Day"]').clear().type('01');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('01');
+        cy.get('[id="DateOfBirth.Year"]').clear().type((new Date().getFullYear() + 1).toString());
         cy.contains('Run check').click();
 
         cy.get('.govuk-error-message').should('contain', 'Date of birth must be in the past');
     });
 
     it('displays error messages for invalid combinations', () => {
-        cy.get('#DateOfBirth_Day').clear().type('31');
-        cy.get('#DateOfBirth_Month').clear().type('02');
-        cy.get('#DateOfBirth_Year').clear().type('2020');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('31');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('02');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('2020');
         cy.contains('Run check').click();
 
         cy.get('.govuk-error-message').should('contain', 'Date of birth must be a real date');
@@ -104,9 +104,9 @@ describe('Date of Birth Validation Tests', () => {
 
     it('allows valid date of birth submission', () => {
         cy.get('#LastName').clear().type(parentLastName);
-        cy.get('#DateOfBirth_Day').clear().type('15');
-        cy.get('#DateOfBirth_Month').clear().type('06');
-        cy.get('#DateOfBirth_Year').clear().type('2005');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('2005');
         cy.get('#NationalInsuranceNumber').clear().type(NIN);
         cy.contains('Run check').click();
 
@@ -134,9 +134,9 @@ describe('Last Name Validation Tests', () => {
 
     it('displays error messages for missing last name', () => {
         // Fill in valid date of birth
-        cy.get('#DateOfBirth_Day').clear().type('15');
-        cy.get('#DateOfBirth_Month').clear().type('06');
-        cy.get('#DateOfBirth_Year').clear().type('1990');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
         
         // Fill in valid NI number
         cy.get('#NationalInsuranceNumber').clear().type(validNIN);
@@ -155,9 +155,9 @@ describe('Last Name Validation Tests', () => {
 
     it('displays error messages for invalid last name characters', () => {
         // Fill in valid date of birth
-        cy.get('#DateOfBirth_Day').clear().type('15');
-        cy.get('#DateOfBirth_Month').clear().type('06');
-        cy.get('#DateOfBirth_Year').clear().type('1990');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
         
         // Fill in valid NI number
         cy.get('#NationalInsuranceNumber').clear().type(validNIN);
@@ -176,9 +176,9 @@ describe('Last Name Validation Tests', () => {
 
     it('allows valid last name submission', () => {
         // Fill in valid date of birth
-        cy.get('#DateOfBirth_Day').clear().type('15');
-        cy.get('#DateOfBirth_Month').clear().type('06');
-        cy.get('#DateOfBirth_Year').clear().type('1990');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
         
         // Fill in valid NI number
         cy.get('#NationalInsuranceNumber').clear().type(validNIN);
@@ -212,9 +212,9 @@ describe('National Insurance Number Validation Tests', () => {
 
     it('displays error messages for missing NI number', () => {
         // Fill in valid date of birth
-        cy.get('#DateOfBirth_Day').clear().type('15');
-        cy.get('#DateOfBirth_Month').clear().type('06');
-        cy.get('#DateOfBirth_Year').clear().type('1990');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
         
         // Fill in valid last name
         cy.get('#LastName').clear().type('Smith');
@@ -233,9 +233,9 @@ describe('National Insurance Number Validation Tests', () => {
 
     it('displays error messages for invalid NI number format', () => {
         // Fill in valid date of birth
-        cy.get('#DateOfBirth_Day').clear().type('15');
-        cy.get('#DateOfBirth_Month').clear().type('06');
-        cy.get('#DateOfBirth_Year').clear().type('1990');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
         
         // Fill in valid last name
         cy.get('#LastName').clear().type('Smith');
@@ -254,9 +254,9 @@ describe('National Insurance Number Validation Tests', () => {
 
     it('displays error messages for disallowed NI number prefixes', () => {
         // Fill in valid date of birth
-        cy.get('#DateOfBirth_Day').clear().type('15');
-        cy.get('#DateOfBirth_Month').clear().type('06');
-        cy.get('#DateOfBirth_Year').clear().type('1990');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
         
         // Fill in valid last name
         cy.get('#LastName').clear().type('Smith');
@@ -275,9 +275,9 @@ describe('National Insurance Number Validation Tests', () => {
 
     it('allows valid NI number submission', () => {
         // Fill in valid date of birth
-        cy.get('#DateOfBirth_Day').clear().type('15');
-        cy.get('#DateOfBirth_Month').clear().type('06');
-        cy.get('#DateOfBirth_Year').clear().type('1990');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
         
         // Fill in valid last name
         cy.get('#LastName').clear().type('Smith');
