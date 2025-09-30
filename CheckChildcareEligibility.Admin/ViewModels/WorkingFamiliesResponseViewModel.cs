@@ -11,7 +11,8 @@ namespace CheckChildcareEligibility.Admin.ViewModels
     public class WorkingFamiliesResponseViewModel
     {
         public CheckEligibilityItemWorkingFamilies Response { get; set; }
-        public bool ChildIsTooYoung => ValidityStartDate < ChildDateOfBirth.AddMonths(9); public bool ChildIsTooOld { get; set; }
+        public bool ChildIsTooYoung => ValidityStartDate < ChildDateOfBirth.AddMonths(9);
+        public bool ChildIsTooOld => HasReachedCompulsorySchoolAge(ChildDateOfBirth, DateTime.UtcNow);
         public bool IsEligible => Response.Status == CheckEligibilityStatus.eligible.ToString();
         public bool IsVSDinFuture => ValidityStartDate > DateTime.UtcNow;
         public bool IsInGracePeriod => DateTime.UtcNow > ValidityEndDate && DateTime.UtcNow < GracePeriodEndDate;
@@ -82,19 +83,19 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 return new DateTime(termStart.Year + 1, 1, 1);
         }
 
-        public bool HasReachedCompulsorySchoolAge(DateTime dateOfBirth, DateTime currentCheckDate)
+        private bool HasReachedCompulsorySchoolAge(DateTime dateOfBirth, DateTime currentCheckDate)
         {
             DateTime fifthBirthday = dateOfBirth.AddYears(5);
             DateTime termChildTurnsFive = GetTermStart(fifthBirthday);
             DateTime termAfterFive = GetNextTerm(termChildTurnsFive);
-
+        
             return currentCheckDate >= termAfterFive;
         }
 
         public string GetBannerCodeType()
         {
 
-            if (HasReachedCompulsorySchoolAge(ChildDateOfBirth, DateTime.Now))//child too old - Child has reached compulsory school age
+            if (ChildIsTooOld)//child too old - Child has reached compulsory school age
             {
                 return WorkingFamiliesResponseBanner.ReconfirmationChildTooOld;
             }
@@ -180,7 +181,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             {
                 return WorkingFamiliesResponseDetails.ReconfirmationStatusNotApplicable;
             }
-            else if (HasReachedCompulsorySchoolAge(ChildDateOfBirth, DateTime.Now))//child too old
+            else if (ChildIsTooOld)//child too old
             {
                 return WorkingFamiliesResponseDetails.ReconfirmationStatusChildTooOld;
             }
