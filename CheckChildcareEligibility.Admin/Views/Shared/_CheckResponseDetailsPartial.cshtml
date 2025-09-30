@@ -6,7 +6,7 @@
     string reconfirmBetween = $"{startReconfirmDate.ToString("d MMMM yyyy")} and {Model.ValidityEndDate.ToString("d MMMM yyyy")}";
     string[] reconfirmationStatus = Model.GetReconfirmationStatus();
 
-    if (Model.IsTemporaryCode || Model.ChildIsTooYoung)
+    if (Model.IsTemporaryCode || Model.ChildIsTooYoung || Model.ChildIsTooOld)
     {
         reconfirmBetween = WorkingFamiliesResponseDetails.StatusNotApplicable;
     }
