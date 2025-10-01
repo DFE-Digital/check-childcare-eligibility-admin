@@ -16,5 +16,6 @@ public interface ICheckGateway
     // single
     Task<CheckEligibilityResponse> PostCheck(CheckEligibilityRequest requestBody);
     Task<CheckEligibilityStatusResponse> GetStatus(CheckEligibilityResponse responseBody);
+    Task<CheckEligibilityItemWorkingFamiliesResponse> GetWFResult(string getEligibilityCheck);
     Task<CheckEligiblityBulkDeleteResponse> DeleteBulkChecksFor(string bulkCheckDeleteUrl);
 }

@@ -1,7 +1,5 @@
-using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace CheckChildcareEligibility.Admin.Controllers;
 
@@ -30,6 +28,7 @@ public class HomeController : BaseController
         if (clearData)
         {
             TempData.Remove("ParentDetails");
+            TempData.Remove("ParentAndChildDetails");
             TempData.Remove("Errors");
         }
         return View("MenuSingleCheck");
@@ -45,6 +44,11 @@ public class HomeController : BaseController
         }
 
         TempData["eligibilityType"] = eligibilityType;
+
+        if(eligibilityType.Equals("WF"))
+        {
+            return RedirectToAction("Enter_Details_WF", "WorkingFamiliesCheck");
+        }
 
         return RedirectToAction("Enter_Details", "Check");
     }

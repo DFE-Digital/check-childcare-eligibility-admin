@@ -1,7 +1,4 @@
-﻿using Azure.Core;
-using CheckChildcareEligibility.Admin.Boundary.Responses;
-using CheckChildcareEligibility.Admin.Domain.Enums;
-using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
+﻿using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
@@ -174,6 +171,9 @@ public class CheckController : BaseController
 
                 case "parentNotFound":
                     return View("Outcome/Not_Found", eligbilityOutcomeVm);
+                
+                case "error":
+                    return View("Outcome/Technical_Error", eligbilityOutcomeVm);
 
                 case "queuedForProcessing":
                     return View("Loader", eligbilityOutcomeVm);

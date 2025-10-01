@@ -8,13 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Remove="Views\NewFolder\**" />
-        <Content Remove="Views\NewFolder\**" />
-        <EmbeddedResource Remove="Views\NewFolder\**" />
-        <None Remove="Views\NewFolder\**" />
-    </ItemGroup>
-
-    <ItemGroup>
         <!-- Exclude problematic views from compilation -->
         <Content Remove="Views\Check\ApplicationsRegistered.cshtml" />
         <Content Remove="Views\Check\AppealsRegistered.cshtml" />

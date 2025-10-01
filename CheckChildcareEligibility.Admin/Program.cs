@@ -5,6 +5,7 @@ using CheckChildcareEligibility.Admin;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Infrastructure;
+using CheckChildcareEligibility.Admin.Middleware;
 using CheckChildcareEligibility.Admin.Usecases;
 using CheckChildcareEligibility.Admin.UseCases;
 using FluentValidation;
@@ -35,11 +36,14 @@ builder.Services.AddServices(builder.Configuration);
 builder.Services.AddSession();
 
 builder.Services.AddScoped<ILoadParentDetailsUseCase, LoadParentDetailsUseCase>();
+builder.Services.AddScoped<ILoadParentAndChildDetailsUseCase, LoadParentAndChildDetailsUseCase>();
+builder.Services.AddScoped<IPerformWFEligibilityCheckUseCase, PerformWFEligibilityCheckUseCase>();
 builder.Services.AddScoped<IPerform2YoEligibilityCheckUseCase, Perform2YoEligibilityCheckUseCase>();
 builder.Services.AddScoped<IPerformEyppEligibilityCheckUseCase, PerformEyppEligibilityCheckUseCase>();
 builder.Services.AddScoped<IGetCheckStatusUseCase, GetCheckStatusUseCase>();
 builder.Services.AddScoped<IGetBulkCheckStatusesUseCase, GetBulkCheckStatusesUseCase>();
 builder.Services.AddScoped<IValidateParentDetailsUseCase, ValidateParentDetailsUseCase>();
+builder.Services.AddScoped<IValidateParentAndChildDetailsUseCase, ValidateParentAndChildDetailsUseCase>();
 builder.Services.AddScoped<IParseBulkCheckFileUseCase, ParseBulkCheckFileUseCase>();
 builder.Services.AddScoped<IDeleteBulkCheckFileUseCase, DeleteBulkCheckFileUseCase>();
 builder.Services.AddScoped<IValidator<CheckEligibilityRequestData>, CheckEligibilityRequestDataValidator>();
@@ -59,18 +63,13 @@ builder.Services.AddHealthChecks();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment()) app.UseExceptionHandler("/Error");
+var useCustomErrorPages = app.Configuration.GetValue<bool>("UseCustomErrorPages");
 
-app.Use(async (ctx, next) =>
+if (!app.Environment.IsDevelopment() || useCustomErrorPages)
 {
-    await next();
-    if (ctx.Response.StatusCode == 404 && !ctx.Response.HasStarted)
-    {
-        //Re-execute the request so the user gets the error page
-        ctx.Request.Path = "/Error/NotFound";
-        await next();
-    }
-});
+    app.UseMiddleware<CustomExceptionHandlerMiddleware>();
+    app.UseStatusCodePagesWithReExecute("/Error/{0}");
+}
 
 app.MapHealthChecks("/healthcheck");
 

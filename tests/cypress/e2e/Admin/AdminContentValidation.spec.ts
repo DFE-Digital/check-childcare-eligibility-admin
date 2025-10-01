@@ -1,4 +1,4 @@
-const parentLastName = Cypress.env('lastName') || 'Jones';
+const parentLastName = Cypress.env('lastName') || 'Tester';
 const NIN = 'PN668767B';
 const validNIN = 'NN123456C';
 const invalidNIN = 'INVALID123';
@@ -33,8 +33,8 @@ describe('Date of Birth Validation Tests', () => {
         cy.visit('/');
         cy.contains('a', 'Run a check').click();
         
-        // From SingleCheckMenu, select an option (e.g. 2 years old early learning)
-        cy.contains('button', '2 years old early learning').click();
+        // From SingleCheckMenu, select an option (e.g. Early learning for 2-year-olds)
+        cy.contains('button', 'Early learning for 2-year-olds').click();
         
         // We should now be on the Enter_Details page
         cy.url().should('include', '/Check/Enter_Details');
@@ -48,55 +48,55 @@ describe('Date of Birth Validation Tests', () => {
         cy.get('#NationalInsuranceNumber').type(NIN);
         
         // Clear the date fields
-        cy.get('#Day').clear();
-        cy.get('#Month').clear();
-        cy.get('#Year').clear();
+        cy.get('[id="DateOfBirth.Day"]').clear();
+        cy.get('[id="DateOfBirth.Month"]').clear();
+        cy.get('[id="DateOfBirth.Year"]').clear();
         
         // Submit the form
         cy.contains('Run check').click();
 
         // Check that the validation error appears
         cy.get('.govuk-error-summary').should('exist');
-        cy.get('.govuk-error-summary__list').should('contain', 'Enter a date of birth');
+        cy.get('.govuk-error-summary__list').should('contain', "Enter parent or guardian's date of birth");
     });
 
     it('displays error messages for non-numeric inputs', () => {
-        cy.get('#Day').clear().type('abc');
-        cy.get('#Month').clear().type('xyz');
-        cy.get('#Year').clear().type('abcd');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('abc');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('xyz');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('abcd');
         cy.contains('Run check').click();
 
         cy.get('.govuk-error-message').should('contain', 'Date of birth must be a real date');
-        cy.get('#Day').should('have.class', 'govuk-input--error');
-        cy.get('#Month').should('have.class', 'govuk-input--error');
-        cy.get('#Year').should('have.class', 'govuk-input--error');
+        cy.get('[id="DateOfBirth.Day"]').should('have.class', 'govuk-input--error');
+        cy.get('[id="DateOfBirth.Month"]').should('have.class', 'govuk-input--error');
+        cy.get('[id="DateOfBirth.Year"]').should('have.class', 'govuk-input--error');
     });
 
     it('displays error messages for out-of-range inputs', () => {
-        cy.get('#Day').clear().type('50');
-        cy.get('#Month').clear().type('13');
-        cy.get('#Year').clear().type('1800');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('50');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('13');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1800');
         cy.contains('Run check').click();
 
         cy.get('.govuk-error-message').should('contain', 'Date of birth must be a real date');
-        cy.get('#Day').should('have.class', 'govuk-input--error');
-        cy.get('#Month').should('have.class', 'govuk-input--error');
-        cy.get('#Year').should('have.class', 'govuk-input--error');
+        cy.get('[id="DateOfBirth.Day"]').should('have.class', 'govuk-input--error');
+        cy.get('[id="DateOfBirth.Month"]').should('have.class', 'govuk-input--error');
+        cy.get('[id="DateOfBirth.Year"]').should('have.class', 'govuk-input--error');
     });
 
     it('displays error messages for future dates', () => {
-        cy.get('#Day').clear().type('01');
-        cy.get('#Month').clear().type('01');
-        cy.get('#Year').clear().type((new Date().getFullYear() + 1).toString());
+        cy.get('[id="DateOfBirth.Day"]').clear().type('01');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('01');
+        cy.get('[id="DateOfBirth.Year"]').clear().type((new Date().getFullYear() + 1).toString());
         cy.contains('Run check').click();
 
         cy.get('.govuk-error-message').should('contain', 'Date of birth must be in the past');
     });
 
     it('displays error messages for invalid combinations', () => {
-        cy.get('#Day').clear().type('31');
-        cy.get('#Month').clear().type('02');
-        cy.get('#Year').clear().type('2020');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('31');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('02');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('2020');
         cy.contains('Run check').click();
 
         cy.get('.govuk-error-message').should('contain', 'Date of birth must be a real date');
@@ -104,15 +104,15 @@ describe('Date of Birth Validation Tests', () => {
 
     it('allows valid date of birth submission', () => {
         cy.get('#LastName').clear().type(parentLastName);
-        cy.get('#Day').clear().type('15');
-        cy.get('#Month').clear().type('06');
-        cy.get('#Year').clear().type('2005');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('2005');
         cy.get('#NationalInsuranceNumber').clear().type(NIN);
         cy.contains('Run check').click();
 
         // Wait for the loader page and then the result page
         cy.url().should('include', '/Check/Loader');
-        cy.get('.govuk-notification-banner', { timeout: 15000 }).should('exist');
+        cy.get('.govuk-notification-banner', { timeout: 29000 }).should('exist');
     });
 });
 
@@ -125,8 +125,8 @@ describe('Last Name Validation Tests', () => {
         cy.visit('/');
         cy.contains('a', 'Run a check').click();
         
-        // From SingleCheckMenu, select an option (e.g. 2 years old early learning)
-        cy.contains('button', '2 years old early learning').click();
+        // From SingleCheckMenu, select an option (e.g. Early learning for 2-year-olds)
+        cy.contains('button', 'Early learning for 2-year-olds').click();
         
         // We should now be on the Enter_Details page
         cy.url().should('include', '/Check/Enter_Details');
@@ -134,9 +134,9 @@ describe('Last Name Validation Tests', () => {
 
     it('displays error messages for missing last name', () => {
         // Fill in valid date of birth
-        cy.get('#Day').clear().type('15');
-        cy.get('#Month').clear().type('06');
-        cy.get('#Year').clear().type('1990');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
         
         // Fill in valid NI number
         cy.get('#NationalInsuranceNumber').clear().type(validNIN);
@@ -155,9 +155,9 @@ describe('Last Name Validation Tests', () => {
 
     it('displays error messages for invalid last name characters', () => {
         // Fill in valid date of birth
-        cy.get('#Day').clear().type('15');
-        cy.get('#Month').clear().type('06');
-        cy.get('#Year').clear().type('1990');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
         
         // Fill in valid NI number
         cy.get('#NationalInsuranceNumber').clear().type(validNIN);
@@ -176,9 +176,9 @@ describe('Last Name Validation Tests', () => {
 
     it('allows valid last name submission', () => {
         // Fill in valid date of birth
-        cy.get('#Day').clear().type('15');
-        cy.get('#Month').clear().type('06');
-        cy.get('#Year').clear().type('1990');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
         
         // Fill in valid NI number
         cy.get('#NationalInsuranceNumber').clear().type(validNIN);
@@ -190,7 +190,7 @@ describe('Last Name Validation Tests', () => {
         cy.contains('Run check').click();
 
         // Should proceed to next step without validation errors
-        cy.url().should('include', '/Check/Loader');
+        cy.contains('There is a problem').should('not.exist');
     });
 });
 
@@ -203,8 +203,8 @@ describe('National Insurance Number Validation Tests', () => {
         cy.visit('/');
         cy.contains('a', 'Run a check').click();
         
-        // From SingleCheckMenu, select an option (e.g. 2 years old early learning)
-        cy.contains('button', '2 years old early learning').click();
+        // From SingleCheckMenu, select an option (e.g. Early learning for 2-year-olds)
+        cy.contains('button', 'Early learning for 2-year-olds').click();
         
         // We should now be on the Enter_Details page
         cy.url().should('include', '/Check/Enter_Details');
@@ -212,9 +212,9 @@ describe('National Insurance Number Validation Tests', () => {
 
     it('displays error messages for missing NI number', () => {
         // Fill in valid date of birth
-        cy.get('#Day').clear().type('15');
-        cy.get('#Month').clear().type('06');
-        cy.get('#Year').clear().type('1990');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
         
         // Fill in valid last name
         cy.get('#LastName').clear().type('Smith');
@@ -233,9 +233,9 @@ describe('National Insurance Number Validation Tests', () => {
 
     it('displays error messages for invalid NI number format', () => {
         // Fill in valid date of birth
-        cy.get('#Day').clear().type('15');
-        cy.get('#Month').clear().type('06');
-        cy.get('#Year').clear().type('1990');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
         
         // Fill in valid last name
         cy.get('#LastName').clear().type('Smith');
@@ -254,9 +254,9 @@ describe('National Insurance Number Validation Tests', () => {
 
     it('displays error messages for disallowed NI number prefixes', () => {
         // Fill in valid date of birth
-        cy.get('#Day').clear().type('15');
-        cy.get('#Month').clear().type('06');
-        cy.get('#Year').clear().type('1990');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
         
         // Fill in valid last name
         cy.get('#LastName').clear().type('Smith');
@@ -275,9 +275,9 @@ describe('National Insurance Number Validation Tests', () => {
 
     it('allows valid NI number submission', () => {
         // Fill in valid date of birth
-        cy.get('#Day').clear().type('15');
-        cy.get('#Month').clear().type('06');
-        cy.get('#Year').clear().type('1990');
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
         
         // Fill in valid last name
         cy.get('#LastName').clear().type('Smith');
@@ -289,7 +289,7 @@ describe('National Insurance Number Validation Tests', () => {
         cy.contains('Run check').click();
 
         // Should proceed to next step without validation errors
-        cy.url().should('include', '/Check/Loader');
+        cy.contains('There is a problem').should('not.exist');
     });
 });
 

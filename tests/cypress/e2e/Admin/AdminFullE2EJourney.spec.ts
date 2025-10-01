@@ -1,5 +1,5 @@
 describe('Full journey of checking eligibility in LA portal', () => {
-    const parentLastName = 'Jones';
+    const parentLastName = 'Tester';
     const parentNinoEligible = "nn123456c";
     const parentNinoNotEligible = 'PN123456C'; // Updated to the specified NI number
     const parentNinoParentNotFound = 'RA123456C'; // NI number for parent not found scenario
@@ -20,16 +20,16 @@ describe('Full journey of checking eligibility in LA portal', () => {
         
         // Select 2YO eligibility type
         cy.get('h1').should('include.text', 'Run a check for one parent or guardian');
-        cy.contains('button', '2 years old early learning').click();
+        cy.contains('button', 'Early learning for 2-year-olds').click();
         
         // Consent declaration (if exists in the flow)
         cy.url().should('include', '/Check/Enter_Details');
         
         // Add parent details
         cy.get('#LastName').type(parentLastName);
-        cy.get('#Day').type('01');
-        cy.get('#Month').type('01');
-        cy.get('#Year').type('1990');
+        cy.get('[id="DateOfBirth.Day"]').type('01');
+        cy.get('[id="DateOfBirth.Month"]').type('01');
+        cy.get('[id="DateOfBirth.Year"]').type('1990');
         cy.get('#NationalInsuranceNumber').type(parentNinoEligible);
         cy.contains('button', 'Run check').click();
 
@@ -80,9 +80,9 @@ describe('Full journey of checking eligibility in LA portal', () => {
         
         // Add parent details
         cy.get('#LastName').type(parentLastName);
-        cy.get('#Day').type('01');
-        cy.get('#Month').type('01');
-        cy.get('#Year').type('1990');
+        cy.get('[id="DateOfBirth.Day"]').type('01');
+        cy.get('[id="DateOfBirth.Month"]').type('01');
+        cy.get('[id="DateOfBirth.Year"]').type('1990');
         cy.get('#NationalInsuranceNumber').type(parentNinoNotEligible);
         cy.contains('button', 'Run check').click();
 
@@ -134,9 +134,9 @@ describe('Full journey of checking eligibility in LA portal', () => {
         
         // Add parent details
         cy.get('#LastName').type(parentLastNameNotFound);
-        cy.get('#Day').type('01');
-        cy.get('#Month').type('01');
-        cy.get('#Year').type('1990');
+        cy.get('[id="DateOfBirth.Day"]').type('01');
+        cy.get('[id="DateOfBirth.Month"]').type('01');
+        cy.get('[id="DateOfBirth.Year"]').type('1990');
         cy.get('#NationalInsuranceNumber').type(parentNinoParentNotFound);
         cy.contains('button', 'Run check').click();
 
@@ -164,16 +164,16 @@ describe('Full journey of checking eligibility in LA portal', () => {
         
         // Select 2YO eligibility type
         cy.get('h1').should('include.text', 'Run a check for one parent or guardian');
-        cy.contains('button', '2 years old early learning').click();
+        cy.contains('button', 'Early learning for 2-year-olds').click();
         
         // Enter Details page
         cy.url().should('include', '/Check/Enter_Details');
         
         // Add parent details with values that might trigger technical error
         cy.get('#LastName').type('TechnicalError');
-        cy.get('#Day').type('01');
-        cy.get('#Month').type('01');
-        cy.get('#Year').type('1990');
+        cy.get('[id="DateOfBirth.Day"]').type('01');
+        cy.get('[id="DateOfBirth.Month"]').type('01');
+        cy.get('[id="DateOfBirth.Year"]').type('1990');
         cy.get('#NationalInsuranceNumber').type(parentNinoTechnicalError);
         cy.contains('button', 'Run check').click();
 

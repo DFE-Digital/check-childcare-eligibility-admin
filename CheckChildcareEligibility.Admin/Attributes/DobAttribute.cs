@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Metrics;
 using Child = CheckChildcareEligibility.Admin.Models;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
@@ -111,7 +112,7 @@ public class DobAttribute : ValidationAttribute
         if (errorFields.Any() && !errorFields.Contains("DateOfBirth")) errorFields.Insert(0, "DateOfBirth");
 
         // Determine the appropriate error message while maintaining all error fields
-        string message;
+        string message = "";
         if (hasEmptyFields)
         {
             if (errorFields.Count == 2) // One field missing (plus DateOfBirth)
@@ -127,7 +128,9 @@ public class DobAttribute : ValidationAttribute
                 }
                 else
                 {
-                    message = $"Enter a {_fieldName}";
+                    message = "Enter " +
+                        (model is CheckChildcareEligibility.Admin.Models.Child ? "child's" : "parent or guardian's") +
+                        " date of birth";
                 }
             }
             else // Multiple but not all fields missing
