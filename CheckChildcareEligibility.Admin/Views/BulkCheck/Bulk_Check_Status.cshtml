@@ -1,0 +1,91 @@
+﻿@using CheckChildcareEligibility.Admin.ViewModels
+@model CheckChildcareEligibility.Admin.ViewModels.BulkCheckStatusesViewModel;
+@{
+    ViewData["Title"] = "Batch check history";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="govuk-grid-column-full">
+    <a class="govuk-back-link" href="@Url.Action("MenuBulkCheck", "Home")" onclick="history.back(); return false;">Back</a>
+
+    @if (TempData["JustUploaded"]?.ToString() == "true")
+    {
+        <div class="govuk-notification-banner" role="alert"
+        aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title"
+                id="govuk-notification-banner-title">
+                    Batch checks status
+                </h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <h3 class="govuk-notification-banner__heading">
+                    Your file has been submitted but checks have not started
+                </h3>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="moj-page-header-actions">
+            <div class="moj-page-header-actions__title">
+                <h1 class="govuk-heading-l">Batch checks status</h1>
+            </div>
+        </div>
+    }
+
+    <div class="govuk-grid-column-full">
+        <div class="govuk-grid-row">
+        <p class="govuk-body">
+            @Html.ActionLink("Get help with check results", "Bulk_Check_Explainer", "BulkCheck", null, new { @class = "govuk-link" })
+        </p>
+    </div>
+    </div>
+    
+    <div class="govuk-grid-row" id="content" data-type="Refresh" data-url="@Url.Action("Bulk_Check_Status", "BulkCheck", new { pageNumber = ViewBag.CurrentPage } )">
+
+        <div class="govuk-grid-column-full">
+
+            @if (Model.Checks != null && Model.Checks.Any())
+            {
+                <table class="govuk-table govuk-table--small-text-until-tablet" style="caption-side: top;">
+                    <caption class="govuk-table__caption govuk-table__caption--s govuk-!-margin-bottom-4">Showing @ViewBag.TotalRecords batch files uploaded in the last 7 days</caption>
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__header" scope="col">Filename</th>
+                            <th class="govuk-table__header" scope="col">Eligibility type</th>
+                            <th class="govuk-table__header" scope="col">Date submitted</th>
+                            <th class="govuk-table__header" scope="col">Submitted by</th>
+                            <th class="govuk-table__header" scope="col">Status</th>
+                            <th class="govuk-table__header" scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="govuk-table__body">
+                        @Html.DisplayFor(model => model.Checks)
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No results found.</p>
+            }
+
+            @{
+                var paginationModel = new PaginationPartialViewModel
+            {
+                CurrentPage = ViewBag.CurrentPage,
+                TotalPages = ViewBag.TotalPages,
+                RecordsPerPage = ViewBag.RecordsPerPage,
+                TotalRecords = ViewBag.TotalRecords,
+                ControllerName = "BulkCheck"
+            };
+
+                @Html.Partial("PaginationPartial", paginationModel)
+            }
+        </div>
+    </div>
+
+</div>
+
+<script src="/js/bulk-check-status-refresh.js"></script>
