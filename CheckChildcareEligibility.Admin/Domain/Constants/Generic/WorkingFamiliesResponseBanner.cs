@@ -15,7 +15,7 @@
         public const string CodeChildTooYoung = "Child is too young";
         public const string CodeVEDinFuture = "cannot be used yet";
         public const string CodeInGracePeriod = "in grace period";
-        public const string CodeExpired = "Expired";
+        public const string CodeExpired = "expired";
 
         public const string TermValidFrom = "Valid from";
         public const string TermValidFor = "Valid for";
