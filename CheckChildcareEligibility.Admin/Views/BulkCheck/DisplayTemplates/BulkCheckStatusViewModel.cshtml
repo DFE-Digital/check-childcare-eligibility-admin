@@ -4,14 +4,14 @@
     {
         { "NotStarted", "govuk-tag--grey" },
         { "InProgress", "govuk-tag--light-blue" },
-        { "Complete", "govuk-tag--green" },
+        { "Completed", "govuk-tag--green" },
     };
 
     Dictionary<string, string> statusName = new()
     {
         { "NotStarted", "Not Started" },
         { "InProgress", "In Progress" },
-        { "Complete", "Complete" },
+        { "Completed", "Complete" },
     };
 
     Dictionary<string, string> eligibilityTypeName = new()
@@ -36,10 +36,24 @@
             </strong>
         </td>
 
-        @if (Model.Status == "Complete")
+        @if (Model.Status == "Completed")
         {
             <td class="govuk-table__cell">
-                @Html.ActionLink("Download results", "Bulk_check_file_download", "BulkCheck", new { groupId = Model.Guid, eligibilityType = Model.EligibilityType }) | <a href="#" class="delete-link" data-group-id="@Model.Guid">Delete</a>
+                @Html.ActionLink(
+                         "Download Results",
+                         "Bulk_check_file_download",
+                         "BulkCheck",
+                         new { groupId = Model.Guid, eligibilityType = Model.EligibilityType },
+                         new { @class = "govuk-link" }
+                         )
+                |
+                @Html.ActionLink(
+                         "Delete",
+                         "Bulk_check_file_delete",
+                         "BulkCheck",
+                         new { groupId = Model.Guid },
+                         new { @class = "govuk-link" }
+                         )
             </td>
         }
         else

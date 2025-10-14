@@ -264,12 +264,12 @@ public class BulkCheckController : BaseController
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = outputfileName };
     }
 
-    public async Task<CheckEligiblityBulkDeleteResponse> Bulk_check_file_delete(string groupId)
+    public async Task<IActionResult> Bulk_check_file_delete(string groupId)
     {
         var result =
             await  _deleteBulkCheckFileUseCase.Execute(groupId, HttpContext.Session);
 
-        return result;
+        return RedirectToAction("Bulk_Check_Status");
     }
 
     private byte[] WriteCsvToMemory(IEnumerable<BulkFSMExport> records)
@@ -304,6 +304,7 @@ public class BulkCheckController : BaseController
         _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
 
         var response = await _getBulkCheckStatusesUseCase.Execute(_Claims.Organisation.EstablishmentNumber, HttpContext.Session);
+        var filteredResponse = response.Where(x => x.EligibilityType == "TwoYearOffer" || x.EligibilityType == "EarlyYearPupilPremium");
         var pageSize = 10;
         var checks = response
             .Skip((pageNumber - 1) * pageSize)
@@ -321,8 +322,8 @@ public class BulkCheckController : BaseController
             .OrderByDescending(x=> x.DateSubmitted);
 
         ViewBag.CurrentPage = pageNumber;
-        ViewBag.TotalPages =  (int)Math.Ceiling(response.Count() / (float)pageSize);
-        ViewBag.TotalRecords = response.Count();
+        ViewBag.TotalPages =  (int)Math.Ceiling(filteredResponse.Count() / (float)pageSize);
+        ViewBag.TotalRecords = filteredResponse.Count();
         ViewBag.RecordsPerPage = pageSize;
 
         var vm = new BulkCheckStatusesViewModel()

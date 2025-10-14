@@ -42,13 +42,15 @@
         {
             <li class="govuk-pagination__item govuk-pagination__item--ellipses">&ctdot;</li>
         }
-
-        <li class="govuk-pagination__item @(Model.CurrentPage == Model.TotalPages ? "govuk-pagination__item--current" : "")">
-            <a class="govuk-link govuk-pagination__link"
+        @if (Model.CurrentPage != Model.TotalPages || Model.TotalPages < Model.CurrentPage)
+        {
+            <li class="govuk-pagination__item @(Model.CurrentPage == Model.TotalPages ? "govuk-pagination__item--current" : "")">
+                <a class="govuk-link govuk-pagination__link"
                href="@Url.Action("Bulk_Check_Status", Model.ControllerName, new { pageNumber = Model.TotalPages, Model.Keyword, Model.Status })@(Model.DateFrom == null ? "" : $"&DateRange.DateFrom={Model.DateFrom}")"
                aria-label="Page @Model.TotalPages"
             @(Model.CurrentPage == Model.TotalPages ? "aria-current=\"page\"" : "")>@Model.TotalPages</a>
         </li>
+        }
     </ul>
 
     @if (Model.CurrentPage < Model.TotalPages)
