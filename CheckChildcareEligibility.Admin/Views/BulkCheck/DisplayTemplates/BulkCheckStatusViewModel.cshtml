@@ -20,7 +20,8 @@
         { "EarlyYearPupilPremium", "Early years pupil premium" }
     };
 
-    var dateSubmittedFormatted = $"{Model.DateSubmitted.ToString("dd MMMM yyyy")} {Model.DateSubmitted.ToString("h:mmtt").ToLower()}";
+    var dateCultureFormatted = TimeZoneInfo.ConvertTimeFromUtc(Model.DateSubmitted, TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time"));
+    var dateSubmittedFormatted = $"{dateCultureFormatted.ToString("dd MMMM yyyy")} {dateCultureFormatted.ToString("h:mmtt").ToLower()}";
 }
 
 <tr>
