@@ -44,7 +44,7 @@ describe('Admin Bulk Check Journey', () => {
         });
     });
 
-    it("will run a successful batch check", () => {
+    it("will run a successful batch check and redirect to bulk check status page", () => {
         cy.fixture('bulkchecktemplate_complete.csv').then(fileContent1 => {
             cy.get('input[type="file"]').attachFile([
                 {
@@ -55,7 +55,7 @@ describe('Admin Bulk Check Journey', () => {
             ]);            
         });
         cy.contains('Run check').click();
-        cy.get('h1', { timeout: 80000 }).should('include.text', 'Checks completed');
-        cy.contains("Download").click();
-    });
+        cy.get('h2', { timeout: 80000 }).should('include.text', 'Batch checks status');
+        cy.get('td').should('include.text', "bulkchecktemplate_complete.csv")
+    }); 
 });

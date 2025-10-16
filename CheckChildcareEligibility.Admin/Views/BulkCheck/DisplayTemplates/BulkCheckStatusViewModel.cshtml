@@ -1,0 +1,65 @@
+﻿@model CheckChildcareEligibility.Admin.ViewModels.BulkCheckStatusViewModel
+@{
+    Dictionary<string, string> statusColor = new()
+    {
+        { "NotStarted", "govuk-tag--grey" },
+        { "InProgress", "govuk-tag--light-blue" },
+        { "Completed", "govuk-tag--green" },
+    };
+
+    Dictionary<string, string> statusName = new()
+    {
+        { "NotStarted", "Not Started" },
+        { "InProgress", "In Progress" },
+        { "Completed", "Complete" },
+    };
+
+    Dictionary<string, string> eligibilityTypeName = new()
+    {
+        { "TwoYearOffer", "2 years old early learning" },
+        { "EarlyYearPupilPremium", "Early years pupil premium" }
+    };
+
+    var dateCultureFormatted = TimeZoneInfo.ConvertTimeFromUtc(Model.DateSubmitted, TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time"));
+    var dateSubmittedFormatted = $"{dateCultureFormatted.ToString("dd MMMM yyyy")} {dateCultureFormatted.ToString("h:mmtt").ToLower()}";
+}
+
+<tr>
+    @if (Model.EligibilityType == "TwoYearOffer" || Model.EligibilityType == "EarlyYearPupilPremium")
+    {
+        <td class="govuk-table__cell">@(Model.Filename)</td>
+        <td class="govuk-table__cell">@(@eligibilityTypeName[Model.EligibilityType])</td>
+        <td class="govuk-table__cell">@(dateSubmittedFormatted)</td>
+        <td class="govuk-table__cell">@(Model.SubmittedBy)</td>
+        <td class="govuk-table__cell">
+            <strong class="govuk-tag @statusColor[Model.Status]">
+                @statusName[Model.Status]
+            </strong>
+        </td>
+
+        @if (Model.Status == "Completed")
+        {
+            <td class="govuk-table__cell">
+                @Html.ActionLink(
+                         "Download Results",
+                         "Bulk_check_file_download",
+                         "BulkCheck",
+                         new { groupId = Model.Guid, eligibilityType = Model.EligibilityType },
+                         new { @class = "govuk-link" }
+                         )
+                |
+                @Html.ActionLink(
+                         "Delete",
+                         "Bulk_check_file_delete",
+                         "BulkCheck",
+                         new { groupId = Model.Guid },
+                         new { @class = "govuk-link" }
+                         )
+            </td>
+        }
+        else
+        {
+            <td class="govuk-table__cell"></td>
+        }
+    }
+</tr>

@@ -325,6 +325,21 @@ img, svg {
 }
 /*END - Align right and set correct margin for 'Remove' link on Evidence Upload Items */
 
+/*BEGIN - Prevent overridw of caption position */
+
+table {
+    caption-side: top;
+}
+
+caption {
+    padding-top: inherit;
+    padding-bottom: inherit;
+    color: inherit;
+    text-align: inherit;
+}
+
+/*END - Prevent overridw of caption position */
+
 
 /*BEGIN - set dfe card width to match prototype */
 @media (min-width: 40.0625em) {

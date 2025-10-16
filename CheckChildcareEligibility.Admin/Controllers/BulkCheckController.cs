@@ -1,10 +1,13 @@
 ﻿using System.Globalization;
+using System.Linq.Expressions;
 using System.Text;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
+using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
 using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
 using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
+using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.Usecases;
 using CheckChildcareEligibility.Admin.ViewModels;
@@ -22,7 +25,8 @@ public class BulkCheckController : BaseController
     private readonly IConfiguration _config;
 
     private readonly IParseBulkCheckFileUseCase _parseBulkCheckFileUseCase;
-
+    private readonly IGetBulkCheckStatusesUseCase _getBulkCheckStatusesUseCase;
+    private readonly IDeleteBulkCheckFileUseCase _deleteBulkCheckFileUseCase;
     private readonly ILogger<BulkCheckController> _logger;
     private ILogger<BulkCheckController> _loggerMock;
 
@@ -30,12 +34,16 @@ public class BulkCheckController : BaseController
         ILogger<BulkCheckController> logger, 
         ICheckGateway checkGateway,
         IConfiguration configuration,
-        IParseBulkCheckFileUseCase parseBulkCheckFileUseCase)
+        IParseBulkCheckFileUseCase parseBulkCheckFileUseCase,
+        IGetBulkCheckStatusesUseCase getBulkCheckStatusesUseCase,
+        IDeleteBulkCheckFileUseCase deleteBulkCheckFileUseCase)
     {
         _config = configuration;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _checkGateway = checkGateway ?? throw new ArgumentNullException(nameof(checkGateway));
         _parseBulkCheckFileUseCase = parseBulkCheckFileUseCase;
+        _getBulkCheckStatusesUseCase = getBulkCheckStatusesUseCase;
+        _deleteBulkCheckFileUseCase = deleteBulkCheckFileUseCase;
     }
 
     public IActionResult Bulk_Check()
@@ -51,8 +59,15 @@ public class BulkCheckController : BaseController
     [HttpPost]
     public async Task<IActionResult> Bulk_Check(IFormFile fileUpload, string eligibilityType)
     {
-        TempData["eligibilityType"] = eligibilityType;
+        _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
 
+        var establishmentNumber = _Claims.Organisation.EstablishmentNumber;
+
+        var fileName = fileUpload.FileName;
+        var submittedBy = $"{_Claims?.User.FirstName} {_Claims?.User.Surname}"; 
+
+        TempData["eligibilityType"] = eligibilityType;
+        
         var timeNow = DateTime.UtcNow;
 
         if (!string.IsNullOrEmpty(HttpContext.Session.GetString("FirstSubmissionTimeStamp")))
@@ -111,8 +126,8 @@ public class BulkCheckController : BaseController
 
             using (var fileStream = fileUpload.OpenReadStream())
             {
-                var parsedItems = await _parseBulkCheckFileUseCase.Execute(fileStream,
-                    eligibilityType == "EYPP" ?
+                var parsedItems = await _parseBulkCheckFileUseCase.Execute(fileStream, 
+                    eligibilityType == "EYPP" ? 
                     Domain.Enums.CheckEligibilityType.EarlyYearPupilPremium :
                     eligibilityType == "2YO" ? Domain.Enums.CheckEligibilityType.TwoYearOffer :
                     Domain.Enums.CheckEligibilityType.FreeSchoolMeals);
@@ -166,10 +181,11 @@ public class BulkCheckController : BaseController
             return View("BulkOutcome/Error_Data_Issue", errorsViewModel);
         }
 
-        var result = await _checkGateway.PostBulkCheck(new CheckEligibilityRequestBulk { Data = requestItems });
+        var result = await _checkGateway.PostBulkCheck(new CheckEligibilityRequestBulk { ClientIdentifier = establishmentNumber, Filename = fileName, SubmittedBy = submittedBy, Data = requestItems });
         HttpContext.Session.SetString("Get_Progress_Check", result.Links.Get_Progress_Check);
         HttpContext.Session.SetString("Get_BulkCheck_Results", result.Links.Get_BulkCheck_Results);
-        return RedirectToAction("Bulk_Loader");
+        TempData["JustUploaded"] = "true";
+        return RedirectToAction("Bulk_Check_Status");
     }
     
     public async Task<IActionResult> Bulk_Loader()
@@ -179,6 +195,8 @@ public class BulkCheckController : BaseController
         {
             TempData["totalCounter"] = result.Data.Total;
             TempData["currentCounter"] = result.Data.Complete;
+            
+
             if (result.Data.Complete >= result.Data.Total) return RedirectToAction("Bulk_check_success");
         }
 
@@ -219,17 +237,39 @@ public class BulkCheckController : BaseController
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = fileName };
     }
 
-    private string GetFileNamePrefix(string? eligibilityType)
+    public async Task<IActionResult> Bulk_check_file_download(string groupId, string eligibilityType = "")
     {
-        switch (eligibilityType)
+        if (string.IsNullOrWhiteSpace(eligibilityType))
+            eligibilityType = TempData["eligibilityType"]?.ToString();
+
+        var filePrefix = GetFileNamePrefix(eligibilityType);
+        TempData["filePrefix"] = filePrefix;
+
+        var resultData =
+            await _checkGateway.GetBulkCheckResults($"bulk-check/{groupId}/" );
+
+        var exportData = resultData.Data.Select(x => new BulkFSMExport
         {
-            case "2YO":
-                return "two-year-offer";
-            case "EYPP":
-                return "early-year-pupil-premium";
-            default:
-                return "free-school-meal";
-        }
+            LastName = x.LastName,
+            DOB = x.DateOfBirth,
+            NI = x.NationalInsuranceNumber,
+            // NASS field removed as it's not being used in the application
+            Outcome = x.Status.GetFsmStatusDescription()
+        });
+
+        var outputfileName = $"{filePrefix}-outcomes-{DateTime.Now.ToString("yyyyMMdd")}.csv";
+
+        var result = WriteCsvToMemory(exportData);
+        var memoryStream = new MemoryStream(result);
+        return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = outputfileName };
+    }
+
+    public async Task<IActionResult> Bulk_check_file_delete(string groupId)
+    {
+        var result =
+            await  _deleteBulkCheckFileUseCase.Execute(groupId, HttpContext.Session);
+
+        return RedirectToAction("Bulk_Check_Status");
     }
 
     private byte[] WriteCsvToMemory(IEnumerable<BulkFSMExport> records)
@@ -244,8 +284,53 @@ public class BulkCheckController : BaseController
         }
     }
 
-    public IActionResult Bulk_Check_Status()
+    private string GetFileNamePrefix(string? eligibilityType)
     {
-        return View();
+        switch (eligibilityType) 
+        {
+            case "2YO":
+            case "TwoYearOffer":
+                return "two-year-offer";
+            case "EYPP":
+            case "EarlyYearPupilPremium":
+                return "early-year-pupil-premium";
+            default:
+                return "free-school-meal";
+        }
+    }
+
+    public async Task<IActionResult> Bulk_Check_Status(int pageNumber = 1)
+    {
+        _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
+
+        var response = await _getBulkCheckStatusesUseCase.Execute(_Claims.Organisation.EstablishmentNumber, HttpContext.Session);
+        var filteredResponse = response.Where(x => x.EligibilityType == "TwoYearOffer" || x.EligibilityType == "EarlyYearPupilPremium");
+        var pageSize = 10;
+        var checks = response
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(x => new BulkCheckStatusViewModel
+            {
+                ClientIdentifier = x.ClientIdentifier,
+                DateSubmitted = x.SubmittedDate, 
+                EligibilityType = x.EligibilityType,
+                Filename = x.Filename,
+                Guid = x.Guid,
+                Status = x.Status,
+                SubmittedBy = x.SubmittedBy          
+            })
+            .OrderByDescending(x=> x.DateSubmitted);
+
+        ViewBag.CurrentPage = pageNumber;
+        ViewBag.TotalPages =  (int)Math.Ceiling(filteredResponse.Count() / (float)pageSize);
+        ViewBag.TotalRecords = filteredResponse.Count();
+        ViewBag.RecordsPerPage = pageSize;
+
+        var vm = new BulkCheckStatusesViewModel()
+        {
+            Checks = checks.ToList()
+        };
+
+        return View(vm);
     }
 }
