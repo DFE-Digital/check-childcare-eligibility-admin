@@ -333,4 +333,9 @@ public class BulkCheckController : BaseController
 
         return View(vm);
     }
+
+    public IActionResult Bulk_Check_Explainer()
+    {
+        return View("Bulk_Check_Explainer");
+    }
 }
