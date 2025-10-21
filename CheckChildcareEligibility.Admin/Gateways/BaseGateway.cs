@@ -9,7 +9,6 @@ using Newtonsoft.Json;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
-using System.Text.RegularExpressions;
 
 namespace CheckChildcareEligibility.Admin.Gateways;
 
@@ -63,10 +62,12 @@ public class BaseGateway
                 switch (establishment.Category.Id)
                 {
                     case OrganisationCategory.LocalAuthority:
-                        userScope = baseScope + $" local_authority:{establishment.EstablishmentNumber}";
+                        string laScope = "local_authority";
+                        var index = baseScope.IndexOf(laScope, StringComparison.Ordinal);
+                        userScope = baseScope.Insert(index + laScope.Length, $":{establishment.EstablishmentNumber}");
                         break;
-                    default:
-                        userScope = baseScope;
+                    case OrganisationCategory.MultiAcademyTrust:
+                        userScope = baseScope + $" multi_academy_trust:{establishment.Uid}";
                         break;
 
                 }
