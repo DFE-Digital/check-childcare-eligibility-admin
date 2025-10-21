@@ -248,6 +248,10 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
         [Test]
         public async Task Given_Bulk_check_success_When_LoadingPage_Should_return_Bulk_check_success()
         {
+
+            //Arrange
+            _tempData.Add("eligibilityType", "2YO");
+            _sut.TempData = _tempData;
             // Act
             var result = await _sut.Bulk_check_success();
 

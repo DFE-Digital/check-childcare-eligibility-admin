@@ -28,8 +28,8 @@ public class CheckGateway : BaseGateway, ICheckGateway
         ["WorkingFamilies"] = "bulk-check/working-families",
     };
 
-    public CheckGateway(ILoggerFactory logger, HttpClient httpClient, IConfiguration configuration) : base("EcsService",
-        logger, httpClient, configuration)
+    public CheckGateway(ILoggerFactory logger, HttpClient httpClient, IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : base("EcsService",
+        logger, httpClient, configuration, httpContextAccessor )
     {
         _logger = logger.CreateLogger("EcsService");
         _httpClient = httpClient;
