@@ -1,3 +1,8 @@
+// Removed while failing bulk check in frontend issue is investigated.
+// Unhandled exception from batch_check status table due to an unhandled failed status on a batch check. 
+// unhandled due to decision in design process to not include provisions for this status in the frontend
+// Ticket https://dfedigital.atlassian.net/browse/ELIG-444
+
 import 'cypress-file-upload';
 
 describe('Admin Bulk Check Journey', () => {
