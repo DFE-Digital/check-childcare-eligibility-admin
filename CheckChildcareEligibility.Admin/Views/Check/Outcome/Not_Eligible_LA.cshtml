@@ -68,10 +68,10 @@
                 switch (Model.EligibilityType)
                 {
                     case "2YO":
-                        <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="/check/guidance/2yo-evidence">See a complete list of acceptable evidence(opens in new tab)</a>
+                        <p> @Html.ActionLink("See a complete list of acceptable evidence (opens in new tab).", "_2yo_Guidance", "Check", null, new { @class = "govuk-link", target = "_blank" }) </P> 
                         break;
                     case "EYPP":
-                        <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="/check/guidance/eypp-evidence">See a complete list of acceptable evidence(opens in new tab)</a>
+                        <p> @Html.ActionLink("See a complete list of acceptable evidence (opens in new tab).", "Eypp_Guidance", "Check", null, new { @class = "govuk-link", target = "_blank" }) </P> 
                         break;
                 }
             }
