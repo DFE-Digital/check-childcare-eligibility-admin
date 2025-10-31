@@ -63,6 +63,15 @@
             <p class="govuk-body">You can <a href="#" id="print-link">print this page</a> for the parent or guardian to keep.</p>
             <p class="govuk-body">If the parent or guardian provides supporting evidence, you'll need to review it and decide if they are eligible.</p>
             @Html.ActionLink("Run another check", "MenuSingleCheck", "Home", new { clearData = true }, new { @class = "govuk-button" })
+
+            <h2 class="govuk-heading-m">Guidance</h2>
+            @{
+                if (Model.EligibilityType == "TwoYearOffer")
+                {
+                    <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="/childcare/dev/guidance/eypp-evidence">See a complete list of acceptable evidence (opens in new tab)</a>
+                }
+            }
+            
         </div>
 
     </div>

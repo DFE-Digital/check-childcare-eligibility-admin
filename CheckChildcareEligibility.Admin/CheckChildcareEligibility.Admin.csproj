@@ -37,6 +37,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="Views\Check\Guidance\" />
         <Folder Include="wwwroot\documents\" />
     </ItemGroup>
 
