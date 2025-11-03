@@ -240,4 +240,8 @@ public class CheckController : BaseController
             : "eligibility";
     }
 
+    public IActionResult Eypp_Guidance()
+        { return View("Guidance/Eypp_Evidence"); }
+    public IActionResult _2yo_Guidance()
+        { return View("Guidance/2yo_Evidence"); }
 }
