@@ -14,7 +14,6 @@
         ViewData["Title"] = "Error: Check Details";
         <partial name="_ValidationSummary" model="ViewData.ModelState" />
     }
-
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
 
@@ -50,6 +49,22 @@
                         </h2>
                         <p>
                             Extra early years provider funding for eligible children age 9 months to 2 years or eligible 3 and 4-year-olds.
+                        </p>
+                    </div>
+                </div>
+                <div class="dfe-card">
+                    <div class="dfe-card-container">
+                        <h2 class="govuk-heading-m">
+                            <form method="post" action="@Url.Action("MenuBulkCheck", "Home")">
+                                <input type="hidden" name="eligibilityType" value="WF" />
+                                <button class="button-as-link-dfe-card-style govuk-link govuk-link--no-visited-state dfe-card-link--header"
+                                        type="submit">
+                                    @EligibilityTypeLabels.Labels["WF"]
+                                </button>
+                            </form>
+                        </h2>
+                        <p>
+                            30 hours free childcare for children aged 9 months to 4 years.
                         </p>
                     </div>
                 </div>

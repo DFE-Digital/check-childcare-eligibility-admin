@@ -40,7 +40,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
         public async Task<BulkCheckCsvResult> Execute(Stream csvStream, CheckEligibilityType eligibilityType)
         {
-            var expectedHeaders = new[] { "Parent Last Name", "Parent Date of Birth", "Parent National Insurance Number" };
+            string[] expectedHeaders = [];
 
             var result = new BulkCheckCsvResult();
 
@@ -67,6 +67,15 @@ namespace CheckChildcareEligibility.Admin.Usecases
                 var records = csv.GetRecords<CheckRow>();
                 var actualHeaders = csv.HeaderRecord;
 
+                switch (eligibilityType) {
+
+                    case CheckEligibilityType.WorkingFamilies:
+                        expectedHeaders = ["Eligibility code", "National Insurance number", "Child date of birth"];
+                        break;
+                    default:
+                       expectedHeaders = ["Parent Last Name", "Parent Date of Birth", "Parent National Insurance Number"];
+                        break;
+                }
                 if (!expectedHeaders.SequenceEqual(actualHeaders))
                 {
                     result.ErrorMessage = "The column headings in the selected file must exactly match the template";
