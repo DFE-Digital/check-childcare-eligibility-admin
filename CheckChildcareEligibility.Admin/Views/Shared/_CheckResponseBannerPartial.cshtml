@@ -10,7 +10,10 @@
         @Model.CodeType @Model.CodeStatus
     </h1>
     <div class="govuk-panel__body govuk-!-margin-bottom-5">
-       @Model.TermValidityDetails @Model.Term
+        @Model.TermValidityDetails 
+        @{
+           if(!Model.IsReconfirmed) {@Model.Term}
+ }
     </div>
     <div class="govuk-body-l govuk-!-margin-bottom-0">
         @bannerReconfirmationMessage
