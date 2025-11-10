@@ -31,36 +31,51 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public string TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor;
 
 
-        public string Term
+
+        public string Term => GetTerm(ValidityStartDate);
+
+        public string GetTerm(DateTime date)
+        {
+            DateTime vsd = date;
+            DateTime nineMonthsDate = ChildDateOfBirth.AddMonths(9);
+
+            if (ChildIsTooYoung && vsd < nineMonthsDate)
+            {
+                vsd = nineMonthsDate;
+            }
+
+            if (DateTime.UtcNow > ValidityEndDate)
+            {
+                return $"{GracePeriodEndDate:dd MMMM yyyy}";
+            }
+
+            // Normalize to term start
+            DateTime termStart = GetTermStart(vsd);
+
+            string termName;
+            if (termStart.Month == 1)
+                termName = WorkingFamiliesResponseBanner.SpringTerm;
+            else if (termStart.Month == 4)
+                termName = WorkingFamiliesResponseBanner.SummerTerm;
+            else // September
+                termName = WorkingFamiliesResponseBanner.AutumnTerm;
+
+            return $"{termName} {termStart.Year}";
+        }
+        public bool IsReconfirmed
         {
             get
             {
-                DateTime vsd = ValidityStartDate;
-                DateTime nineMonthsDate = ChildDateOfBirth.AddMonths(9);
-
-                if (ChildIsTooYoung && vsd < nineMonthsDate)
+                if (GetTermStart(ValidityStartDate) == GetTermStart(ValidityEndDate))
                 {
-                    vsd = nineMonthsDate;
+                    return false;
                 }
-
-                if (DateTime.UtcNow > ValidityEndDate)
+                else 
                 {
-                    return $"{GracePeriodEndDate:dd MMMM yyyy}";
+                    return true;
                 }
-
-                string termName;
-                if (vsd.Month >= 1 && vsd.Month <= 3)
-                    termName = WorkingFamiliesResponseBanner.SpringTerm;
-                else if (vsd.Month >= 4 && vsd.Month <= 8)
-                    termName = WorkingFamiliesResponseBanner.SummerTerm;
-                else
-                    termName = WorkingFamiliesResponseBanner.AutumnTerm;
-
-                return $"{termName} {vsd.Year}";
             }
-            
         }
-
         public static DateTime GetTermStart(DateTime date)
         {
             int year = date.Year;
@@ -149,6 +164,12 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
                 BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
                 TermValidityDetails = WorkingFamiliesResponseBanner.TermExpiredOn;
+            }
+            else if(IsReconfirmed)
+            {
+                CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
+                BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
+                TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor + " "+ Term + " and " + GetTerm(ValidityEndDate);
             }
         }
 
