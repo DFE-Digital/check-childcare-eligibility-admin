@@ -8,20 +8,19 @@
     {
         case "WF":
             Model.FieldDescriptions = [
-          "the eligibility code",
-           "a National Insurance number (can be for a parent, guardian or partner)",
-           "the child's date of birth (format DD/MM/YYYY or YYYY-MM-DD)"
+                "the eligibility code",
+                "a National Insurance number (can be for a parent, guardian or partner)",
+                "the child's date of birth (format DD/MM/YYYY or YYYY-MM-DD)"
           ];
-            Model.DocumentTemplatePath = "~documents/WFBulkCheckTemplate.csv";
+            Model.DocumentTemplatePath = "/documents/WFBulkCheckTemplate.csv";
             break;
         default:
             Model.FieldDescriptions = [
-               "last name",
-    "date of birth (format DD/MM/YYYY or YYYY-MM-DD)",
-    "National Insurance number"
+                "last name",
+                "date of birth (format DD/MM/YYYY or YYYY-MM-DD)",
+                "National Insurance number"
               ];
-            Model.DocumentTemplatePath = "~/documents/BulkCheckTemplate.csv";
-
+            Model.DocumentTemplatePath = "/documents/BulkCheckTemplate.csv";
             break;
     }
 }
@@ -54,13 +53,14 @@
             (0.13 kb)
         </li>
 
-        @if (eligibilityType == "2YO" || eligibilityType == "EYPP")
+        @if (eligibilityType == "WF")
         {
-            <li>Add the details of the parents or guardians you need to check.</li>
+            <li>Add the details of the eligibility codes you need to check.</li>
+            
         }
         else
         {
-            <li>Add the details of the eligibility codes you need to check.</li>
+            <li>Add the details of the parents or guardians you need to check.</li>
         }
         <li> Save it as a CSV file.</li>
 
