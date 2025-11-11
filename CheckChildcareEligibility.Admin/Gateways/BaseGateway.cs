@@ -57,6 +57,7 @@ public class BaseGateway
             {
                 // now build the scope according to the body the user has logged in as
                 var establishment = (DfeSignInExtensions.GetDfeClaims(_httpContextAccessor.HttpContext.User.Claims)).Organisation;// claims.Organisation.EstablishmentNumber = Local Authority ID
+                var email = (DfeSignInExtensions.GetDfeClaims(_httpContextAccessor.HttpContext.User.Claims)).User.Email;
                 string baseScope = _configuration["Api:AuthorisationScope"];
                 string userScope = string.Empty;
                 switch (establishment.Category.Id)
@@ -73,7 +74,7 @@ public class BaseGateway
                 }
                 var formData = new SystemUser
                 {
-                    client_id = _configuration["Api:AuthorisationUsername"],
+                    client_id = _configuration["Api:AuthorisationUsername"]+":"+email,
                     client_secret = _configuration["Api:AuthorisationPassword"],
                     scope = userScope
                 };
