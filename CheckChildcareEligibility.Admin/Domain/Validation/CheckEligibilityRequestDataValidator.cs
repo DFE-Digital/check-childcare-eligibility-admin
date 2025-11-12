@@ -7,24 +7,45 @@ using FluentValidation;
 
 namespace CheckChildcareEligibility.Admin.Domain.Validation;
 
-public class CheckEligibilityRequestDataValidator : AbstractValidator<CheckEligibilityRequestData>
+public class CheckEligibilityRequestDataValidator : AbstractValidator<IEligibilityServiceType>
 {
     public CheckEligibilityRequestDataValidator()
     {
-        RuleFor(x => x.LastName)
-            .NotEmpty().WithMessage(ValidationMessages.RequiredLastName)
-            .Must((x, lastName) => string.IsNullOrEmpty(lastName) || DataValidation.BeAValidName(lastName))
-            .WithMessage(ValidationMessages.ValidLastName);
+        When(x => x is CheckEligibilityRequestData, () =>
+        {
+            RuleFor(x => ((CheckEligibilityRequestData)x).LastName)
+           .NotEmpty().WithMessage(ValidationMessages.RequiredLastName)
+           .Must((x, lastName) => string.IsNullOrEmpty(lastName) || DataValidation.BeAValidName(lastName))
+           .WithMessage(ValidationMessages.ValidLastName);
 
-        RuleFor(x => x.DateOfBirth)
-            .NotEmpty().WithMessage(ValidationMessages.RequiredDOB)
-            .Must((x, dob) => string.IsNullOrEmpty(dob) || DataValidation.BeAValidDate(dob))
-            .WithMessage(ValidationMessages.ValidDOB);
+            RuleFor(x => ((CheckEligibilityRequestData)x).DateOfBirth)
+                .NotEmpty().WithMessage(ValidationMessages.RequiredDOB)
+                .Must((x, dob) => string.IsNullOrEmpty(dob) || DataValidation.BeAValidDate(dob))
+                .WithMessage(ValidationMessages.ValidDOB);
 
+            RuleFor(x => ((CheckEligibilityRequestData)x).NationalInsuranceNumber)
+                .NotEmpty().WithMessage(ValidationMessages.RequiredNI)
+                .Must((x, NINumber) => string.IsNullOrEmpty(NINumber) || DataValidation.BeAValidNi(NINumber))
+                .WithMessage(ValidationMessages.ValidNI);
+        });
 
-        RuleFor(x => x.NationalInsuranceNumber)
-            .NotEmpty().WithMessage(ValidationMessages.RequiredNI)
-            .Must((x, NINumber) => string.IsNullOrEmpty(NINumber) || DataValidation.BeAValidNi(NINumber))
-            .WithMessage(ValidationMessages.ValidNI);
+        When(x => x is CheckEligibilityRequestWorkingFamiliesData, () =>
+        {
+            RuleFor(x => ((CheckEligibilityRequestData)x).LastName)
+           .NotEmpty().WithMessage(ValidationMessages.RequiredLastName)
+           .Must((x, lastName) => string.IsNullOrEmpty(lastName) || DataValidation.BeAValidName(lastName))
+           .WithMessage(ValidationMessages.ValidLastName);
+
+            RuleFor(x => ((CheckEligibilityRequestData)x).DateOfBirth)
+                .NotEmpty().WithMessage(ValidationMessages.RequiredDOB)
+                .Must((x, dob) => string.IsNullOrEmpty(dob) || DataValidation.BeAValidDate(dob))
+                .WithMessage(ValidationMessages.ValidDOB);
+
+            RuleFor(x => ((CheckEligibilityRequestWorkingFamiliesData)x).EligibilityCode)
+                .NotEmpty().WithMessage(ValidationMessages.EligibilityCodeNullOrEmpty)
+                .Must(x => !long.TryParse(x, out _)).WithMessage(ValidationMessages.EligibilityCodeNumber)
+                .Must(x => x.Length != 11 ).WithMessage(ValidationMessages.EligibilityCodeIncorrectLength);
+        });
+
     }
 }

@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
+using System.ComponentModel.DataAnnotations;
 
 namespace CheckChildcareEligibility.Admin.Attributes;
-
 public class EligibilityCodeAttribute : ValidationAttribute
 {
     protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
@@ -10,17 +10,17 @@ public class EligibilityCodeAttribute : ValidationAttribute
 
         if (string.IsNullOrEmpty(code))
         {
-            return new ValidationResult("Enter an eligibility code that is 11 digits long");
+            return new ValidationResult(ValidationMessages.EligibilityCodeNullOrEmpty);
         }
 
         if (!long.TryParse(code, out _))
         {
-            return new ValidationResult("Eligibility code must only contain numbers");
+            return new ValidationResult(ValidationMessages.EligibilityCodeNumber);
         }
 
         if (code.Length != 11)
         {
-            return new ValidationResult("Eligibility code must be 11 digits long");
+            return new ValidationResult(ValidationMessages.EligibilityCodeIncorrectLength);
         }
 
         return ValidationResult.Success!;

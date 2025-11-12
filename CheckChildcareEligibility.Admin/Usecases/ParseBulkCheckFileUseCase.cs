@@ -37,7 +37,6 @@ namespace CheckChildcareEligibility.Admin.Usecases
         {
             _validator = validator;
         }
-
         public async Task<BulkCheckCsvResult> Execute(Stream csvStream, CheckEligibilityType eligibilityType)
         {
             string[] expectedHeaders = [];
@@ -59,21 +58,24 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
             var lineNumber = 2; // headers on line 1
             var sequence = 1;
+            IEnumerable<CheckRowBase> records = Enumerable.Empty<CheckRowBase>();
+
             try
             {
                 csv.Read();
-                csv.ReadHeader();
-
-                var records = csv.GetRecords<CheckRow>();
+                csv.ReadHeader();     
                 var actualHeaders = csv.HeaderRecord;
 
+                // Validate headers
                 switch (eligibilityType) {
 
                     case CheckEligibilityType.WorkingFamilies:
                         expectedHeaders = ["Eligibility code", "National Insurance number", "Child date of birth"];
+                        records = csv.GetRecords<CheckRowWorkingFamilies>();
                         break;
                     default:
                        expectedHeaders = ["Parent Last Name", "Parent Date of Birth", "Parent National Insurance Number"];
+                        records = csv.GetRecords<CheckRow>();
                         break;
                 }
                 if (!expectedHeaders.SequenceEqual(actualHeaders))
@@ -83,6 +85,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                     return result;
                 }
 
+                // check 
                 foreach (var record in records)
                 {
                     if (record == null)
@@ -98,16 +101,26 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
                     try
                     {
-                        var requestItem = new CheckEligibilityRequestData(eligibilityType)
-                        {
-                            LastName = record.LastName,
-                            DateOfBirth = record.DOB, //must remain in original pre-parsed form to go through validator
-                            NationalInsuranceNumber = record.Ni.ToUpper(),
-                            Sequence = sequence
-                        };
+                        var requestItem = new CheckEligibilityRequestData();
+                        requestItem.Type = eligibilityType;
+                        requestItem.Sequence = sequence;
 
+                        switch (eligibilityType) {
+                            case CheckEligibilityType.WorkingFamilies:
+                                var workingFamilyRow =  record as CheckRowWorkingFamilies;                          
+                                requestItem.LastName = workingFamilyRow.EligibilityCode;
+                                requestItem.DateOfBirth = workingFamilyRow.DOB;//must remain in original pre-parsed form to go through validator
+                                requestItem.NationalInsuranceNumber = workingFamilyRow.Ni.ToUpper();                        
+                                break;
+                            default:
+                                var row = record as CheckRow;
+                                requestItem.LastName = row.LastName;
+                                requestItem.DateOfBirth = row.DOB;//must remain in original pre-parsed form to go through validator
+                                requestItem.NationalInsuranceNumber = row.Ni.ToUpper();                              
+                                break;
+                        
+                        }                   
                         var validationResults = _validator.Validate(requestItem);
-
                         if (!validationResults.IsValid)
                         {
                             foreach (var error in validationResults.Errors)

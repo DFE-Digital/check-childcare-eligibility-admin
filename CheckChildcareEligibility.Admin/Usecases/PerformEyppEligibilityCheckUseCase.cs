@@ -1,6 +1,7 @@
 using System.Text;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
 
@@ -43,8 +44,9 @@ public class PerformEyppEligibilityCheckUseCase : IPerformEyppEligibilityCheckUs
         // Build ECS request
         var checkEligibilityRequest = new CheckEligibilityRequest
         {
-            Data = new CheckEligibilityRequestData(Domain.Enums.CheckEligibilityType.EarlyYearPupilPremium)
+            Data = new CheckEligibilityRequestData()
             {
+                Type = CheckEligibilityType.EarlyYearPupilPremium,
                 LastName = parentRequest.LastName,
                 NationalInsuranceNumber = parentRequest.NationalInsuranceNumber?.ToUpper(),
                 DateOfBirth = dobString
