@@ -44,7 +44,7 @@
                          "Download Results",
                          "Bulk_check_file_download",
                          "BulkCheck",
-                         new { groupId = Model.Guid, eligibilityType = Model.EligibilityType },
+                         new { groupId = Model.BulkCheckID, eligibilityType = Model.EligibilityType },
                          new { @class = "govuk-link" }
                          )
                 |
@@ -52,7 +52,7 @@
                          "Delete",
                          "Bulk_check_file_delete",
                          "BulkCheck",
-                         new { groupId = Model.Guid },
+                         new { groupId = Model.BulkCheckID },
                          new { @class = "govuk-link" }
                          )
             </td>

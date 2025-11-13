@@ -20,8 +20,7 @@ public class CheckEligibilityResponseBulkLinks
 
 public class CheckEligibilityBulkProgressResponse
 {
-    public string Guid { get; set; }
-    public string? ClientIdentifier { get; set; } = string.Empty;
+    public string BulkCheckID { get; set; }
     public string? Filename { get; set; } = string.Empty;
     public string EligibilityType { get; set; } = string.Empty;
     public DateTime SubmittedDate { get; set; }

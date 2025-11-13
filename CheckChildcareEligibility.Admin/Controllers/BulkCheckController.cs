@@ -181,7 +181,7 @@ public class BulkCheckController : BaseController
             return View("BulkOutcome/Error_Data_Issue", errorsViewModel);
         }
 
-        var result = await _checkGateway.PostBulkCheck(new CheckEligibilityRequestBulk { ClientIdentifier = establishmentNumber, Filename = fileName, SubmittedBy = submittedBy, Data = requestItems });
+        var result = await _checkGateway.PostBulkCheck(new CheckEligibilityRequestBulk { Meta = new(){Filename = fileName, SubmittedBy = submittedBy}, Data = requestItems });
         HttpContext.Session.SetString("Get_Progress_Check", result.Links.Get_Progress_Check);
         HttpContext.Session.SetString("Get_BulkCheck_Results", result.Links.Get_BulkCheck_Results);
         TempData["JustUploaded"] = "true";
@@ -311,11 +311,10 @@ public class BulkCheckController : BaseController
             .Take(pageSize)
             .Select(x => new BulkCheckStatusViewModel
             {
-                ClientIdentifier = x.ClientIdentifier,
                 DateSubmitted = x.SubmittedDate, 
                 EligibilityType = x.EligibilityType,
                 Filename = x.Filename,
-                Guid = x.Guid,
+                BulkCheckID = x.BulkCheckID,
                 Status = x.Status,
                 SubmittedBy = x.SubmittedBy          
             })
