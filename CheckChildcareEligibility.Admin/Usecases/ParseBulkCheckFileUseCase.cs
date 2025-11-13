@@ -32,13 +32,19 @@ namespace CheckChildcareEligibility.Admin.Usecases
     public class ParseBulkCheckFileUseCase : IParseBulkCheckFileUseCase
     {
         private readonly IValidator<CheckEligibilityRequestData> _validator;
+        private readonly IConfiguration _config;
+        private readonly int  _rowCountLimit;
 
-        public ParseBulkCheckFileUseCase(IValidator<CheckEligibilityRequestData> validator)
+        public ParseBulkCheckFileUseCase(IValidator<CheckEligibilityRequestData> validator, IConfiguration configuration)
         {
             _validator = validator;
+            _config = configuration;
+            _rowCountLimit = int.Parse(_config["BulkEligibilityCheckLimit"]); 
+            
         }
         public async Task<BulkCheckCsvResult> Execute(Stream csvStream, CheckEligibilityType eligibilityType)
         {
+            int checkrowLimit = int.Parse(_config["BulkEligibilityCheckLimit"]);
             string[] expectedHeaders = [];
 
             var result = new BulkCheckCsvResult();
@@ -66,26 +72,33 @@ namespace CheckChildcareEligibility.Admin.Usecases
                 csv.ReadHeader();     
                 var actualHeaders = csv.HeaderRecord;
 
-                // Validate headers
                 switch (eligibilityType) {
 
                     case CheckEligibilityType.WorkingFamilies:
                         expectedHeaders = ["Eligibility code", "National Insurance number", "Child date of birth"];
-                        records = csv.GetRecords<CheckRowWorkingFamilies>();
+                        records = csv.GetRecords<CheckRowWorkingFamilies>().ToList();
                         break;
                     default:
                        expectedHeaders = ["Parent Last Name", "Parent Date of Birth", "Parent National Insurance Number"];
-                        records = csv.GetRecords<CheckRow>();
+                        records = csv.GetRecords<CheckRow>().ToList();
                         break;
                 }
+                csv.Dispose();
+                // Validate headers 
                 if (!expectedHeaders.SequenceEqual(actualHeaders))
                 {
                     result.ErrorMessage = "The column headings in the selected file must exactly match the template";
 
                     return result;
                 }
+             
+                // Validate row count
+                if (records.Count() > _rowCountLimit) {
 
-                // check 
+                    result.ErrorMessage = $"The selected file must contain fewer than {_rowCountLimit} rows";
+                    return result;
+                }
+                // check for malformed rows
                 foreach (var record in records)
                 {
                     if (record == null)

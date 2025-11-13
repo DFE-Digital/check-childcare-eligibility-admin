@@ -1,4 +1,5 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Tests.Properties;
 using CheckChildcareEligibility.Admin.Usecases;
 using FluentAssertions;
@@ -128,12 +129,12 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
                 .Returns(validationResults);
 
             // Act
-            var result = await _sut.Execute(stream, Domain.Enums.CheckEligibilityType.TwoYearOffer);
+            var result = await _sut.Execute(stream, CheckEligibilityType.TwoYearOffer);
 
             // Assert
             result.Errors.Should().BeEquivalentTo(errors);
             result.Errors.Count().Should().Be(0);
-            result.ValidRequests[0].CheckType.Should().Be("TwoYearOffer");
+            result.ValidRequests[0].Type.Should().Be(CheckEligibilityType.TwoYearOffer);
         }
 
         [Test]
@@ -160,12 +161,12 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
                 .Returns(validationResults);
 
             // Act
-            var result = await _sut.Execute(stream, Domain.Enums.CheckEligibilityType.EarlyYearPupilPremium);
+            var result = await _sut.Execute(stream, CheckEligibilityType.EarlyYearPupilPremium);
 
             // Assert
             result.Errors.Should().BeEquivalentTo(errors);
             result.Errors.Count().Should().Be(0);
-            result.ValidRequests[0].CheckType.Should().Be("EarlyYearPupilPremium");
+            result.ValidRequests[0].Type.Should().Be(CheckEligibilityType.EarlyYearPupilPremium);
         }
 
         [Test]

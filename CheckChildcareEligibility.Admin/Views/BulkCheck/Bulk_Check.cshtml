@@ -30,7 +30,6 @@
 
     @if (!string.IsNullOrEmpty(errorMessage))
     {
-        ViewData["Title"] = "Error: Check Details";
         <div id="error-summary" class="govuk-error-summary" data-module="govuk-error-summary">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">There is a problem</h2>
@@ -70,7 +69,7 @@
         <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
         <strong class="govuk-warning-text__text">
             <span class="govuk-visually-hidden">Warning</span>
-            Your saved file must match the template fields and contain fewer than 500 rows.
+            Your saved file must match the template fields and contain fewer than 5000 rows.
         </strong>
     </div>
 

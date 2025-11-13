@@ -117,7 +117,7 @@ public class BulkCheckController : BaseController
 
         try
         {
-            var checkRowLimit = int.Parse(_config["BulkEligibilityCheckLimit"]);
+          //  var checkRowLimit = int.Parse(_config["BulkEligibilityCheckLimit"]);
 
             using (var fileStream = fileUpload.OpenReadStream())
             {
@@ -141,12 +141,7 @@ public class BulkCheckController : BaseController
                     }
                 }
 
-                if (parsedItems.ValidRequests.Count > checkRowLimit)
-                {
-                    TempData["ErrorMessage"] = $"The selected file must contain fewer than {checkRowLimit} rows";
-                    return RedirectToAction("Bulk_Check", viewModel);
-                }
-
+                // Display error message if returned from use case.
                 if (!string.IsNullOrWhiteSpace(parsedItems.ErrorMessage))
                 {
                     TempData["ErrorMessage"] = parsedItems.ErrorMessage;

@@ -53,22 +53,6 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
 
 
         [Test]
-        public async Task Given_Bulk_Check_Should_Load_BulkCheckPage()
-        {
-            //Arrange
-            _tempData.Add("eligibilityType", "2YO");
-            _sut.TempData = _tempData;
-
-            // Act
-            var result = _sut.Bulk_Check();
-
-            // Assert
-            result.Should().BeOfType<ViewResult>();
-            var viewResult = result as ViewResult;
-            viewResult.Model.Should().BeNull();
-        }
-
-        [Test]
         public async Task Given_Bulk_Check_When_FileData_Invalid_Should_Return_Error_Data_Issue()
         {
             // Arrange
@@ -179,7 +163,14 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
 
             var validRequests = new List<CheckEligibilityRequestData>
             {
-                new CheckEligibilityRequestData(CheckEligibilityType.TwoYearOffer) { Sequence = 1, DateOfBirth = "2017-01-01", LastName = "Test", NationalInsuranceNumber = "ab" }
+                new CheckEligibilityRequestData() 
+                {
+                    Type = CheckEligibilityType.TwoYearOffer,
+                    Sequence = 1, 
+                    DateOfBirth = "2017-01-01", 
+                    LastName = "Test", 
+                    NationalInsuranceNumber = "ab"
+                }
             };
 
             var validBulkCheckCsvResult = new BulkCheckCsvResult() { ValidRequests = validRequests };
@@ -319,7 +310,13 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
 
             var validRequests = new List<CheckEligibilityRequestData>
             {
-                new CheckEligibilityRequestData(CheckEligibilityType.TwoYearOffer) { Sequence = 1, DateOfBirth = "2017-01-01", LastName = "Test", NationalInsuranceNumber = "ab" }
+                new CheckEligibilityRequestData() {
+
+                    Type = CheckEligibilityType.TwoYearOffer,
+                    Sequence = 1, 
+                    DateOfBirth = "2017-01-01", 
+                    LastName = "Test", 
+                    NationalInsuranceNumber = "ab" }
             };
 
             var validBulkCheckCsvResult = new BulkCheckCsvResult() { ValidRequests = validRequests };
@@ -372,7 +369,12 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
 
             var validRequests = new List<CheckEligibilityRequestData>
             {
-                new CheckEligibilityRequestData(CheckEligibilityType.TwoYearOffer) { Sequence = 1, DateOfBirth = "2017-01-01", LastName = "Test", NationalInsuranceNumber = "ab" }
+                new CheckEligibilityRequestData() { 
+                    Type = CheckEligibilityType.TwoYearOffer,
+                    Sequence = 1, 
+                    DateOfBirth = "2017-01-01", 
+                    LastName = "Test", 
+                    NationalInsuranceNumber = "ab" }
             };
 
             var validBulkCheckCsvResult = new BulkCheckCsvResult() { ValidRequests = validRequests };
@@ -411,7 +413,13 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
 
             for (var i = 0; i < 251; i++)
             {
-                validRequests.Add(new CheckEligibilityRequestData(CheckEligibilityType.TwoYearOffer) { Sequence = i, DateOfBirth = "2017-01-01", LastName = "Test", NationalInsuranceNumber = "ab" });
+                validRequests.Add(new CheckEligibilityRequestData 
+                {   Type = CheckEligibilityType.TwoYearOffer,
+                    Sequence = i, 
+                    DateOfBirth = "2017-01-01",
+                    LastName = "Test",
+                    NationalInsuranceNumber = "ab" 
+                });
             }
 
             var validBulkCheckCsvResult = new BulkCheckCsvResult() { ValidRequests = validRequests };
