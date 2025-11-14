@@ -196,7 +196,6 @@ public class BaseGateway
         if (task.IsSuccessStatusCode)
         {
             var jsonString = await task.Content.ReadAsStringAsync();
-            Console.WriteLine(jsonString);
             result = JsonConvert.DeserializeObject<T>(jsonString);
         }
         else
