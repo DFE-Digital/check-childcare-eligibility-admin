@@ -41,7 +41,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
         {
             return new BulkCheck()
             {
-                BulkCheckID = response.BulkCheckID,
+                BulkCheckId = response.Id,
                 Status = response.Status,
                 SubmittedDate = response.SubmittedDate,
                 SubmittedBy = response.SubmittedBy,

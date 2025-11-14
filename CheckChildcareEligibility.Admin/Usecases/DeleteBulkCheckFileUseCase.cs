@@ -8,7 +8,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
 {
     public interface IDeleteBulkCheckFileUseCase
     {
-        Task<CheckEligiblityBulkDeleteResponse> Execute(string groupId, ISession session);
+        Task<CheckEligiblityBulkDeleteResponse> Execute(string bulkCheckId, ISession session);
     }
 
     public class DeleteBulkCheckFileUseCase : IDeleteBulkCheckFileUseCase
@@ -24,14 +24,14 @@ namespace CheckChildcareEligibility.Admin.Usecases
             _checkGateway = checkGateway;
         }
 
-        public async Task<CheckEligiblityBulkDeleteResponse> Execute(string groupId, ISession session)
+        public async Task<CheckEligiblityBulkDeleteResponse> Execute(string bulkCheckId, ISession session)
         {
-            _logger.LogInformation($"Deleting bulk check file {groupId}");
+            _logger.LogInformation($"Deleting bulk check file {bulkCheckId}");
 
             try
             {
                 var result =
-                    await _checkGateway.DeleteBulkChecksFor($"bulk-check/{groupId}");
+                    await _checkGateway.DeleteBulkChecksFor($"bulk-check/{bulkCheckId}");
 
                 var response = new CheckEligiblityBulkDeleteResponse();
 
@@ -39,7 +39,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Cannot delete file {groupId}", ex);
+                _logger.LogError($"Cannot delete file {bulkCheckId}", ex);
             }
 
             return null;

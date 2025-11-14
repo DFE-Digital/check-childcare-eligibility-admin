@@ -237,7 +237,7 @@ public class BulkCheckController : BaseController
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = fileName };
     }
 
-    public async Task<IActionResult> Bulk_check_file_download(string groupId, string eligibilityType = "")
+    public async Task<IActionResult> Bulk_check_file_download(string bulkCheckId, string eligibilityType = "")
     {
         if (string.IsNullOrWhiteSpace(eligibilityType))
             eligibilityType = TempData["eligibilityType"]?.ToString();
@@ -246,7 +246,7 @@ public class BulkCheckController : BaseController
         TempData["filePrefix"] = filePrefix;
 
         var resultData =
-            await _checkGateway.GetBulkCheckResults($"bulk-check/{groupId}/" );
+            await _checkGateway.GetBulkCheckResults($"bulk-check/{bulkCheckId}/" );
 
         var exportData = resultData.Data.Select(x => new BulkFSMExport
         {
@@ -264,10 +264,10 @@ public class BulkCheckController : BaseController
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = outputfileName };
     }
 
-    public async Task<IActionResult> Bulk_check_file_delete(string groupId)
+    public async Task<IActionResult> Bulk_check_file_delete(string bulkCheckId)
     {
         var result =
-            await  _deleteBulkCheckFileUseCase.Execute(groupId, HttpContext.Session);
+            await  _deleteBulkCheckFileUseCase.Execute(bulkCheckId, HttpContext.Session);
 
         return RedirectToAction("Bulk_Check_Status");
     }
@@ -314,10 +314,11 @@ public class BulkCheckController : BaseController
                 DateSubmitted = x.SubmittedDate, 
                 EligibilityType = x.EligibilityType,
                 Filename = x.Filename,
-                BulkCheckID = x.BulkCheckID,
+                BulkCheckId = x.BulkCheckId,
                 Status = x.Status,
                 SubmittedBy = x.SubmittedBy          
             })
+            .Where(x => x.Status != "Deleted")
             .OrderByDescending(x=> x.DateSubmitted);
 
         ViewBag.CurrentPage = pageNumber;

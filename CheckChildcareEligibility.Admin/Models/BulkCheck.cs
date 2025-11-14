@@ -2,7 +2,7 @@
 {
     public class BulkCheck
     {
-        public string BulkCheckID { get; set; }
+        public string BulkCheckId { get; set; }
         public string Filename {  get; set; } = string.Empty;
         public string EligibilityType  { get; set; } = string.Empty;
         public DateTime SubmittedDate { get; set; }
