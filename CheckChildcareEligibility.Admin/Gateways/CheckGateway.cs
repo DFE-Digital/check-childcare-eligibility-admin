@@ -173,14 +173,14 @@ public class CheckGateway : BaseGateway, ICheckGateway
     {
         try
         {
-            var response = await ApiDataGetAsynch($"bulk-check/status/{organisationId}",
+            var response = await ApiDataGetAsynch($"bulk-check/search?organisationId={organisationId}",
                 new CheckEligibilityBulkProgressByLAResponse());
             return response;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex,
-                $"Get Status failed. uri:-{_httpClient.BaseAddress}bulk-check/statuses");
+                $"Get Status failed. uri:-{_httpClient.BaseAddress}bulk-check/search");
         }
 
         return null;
