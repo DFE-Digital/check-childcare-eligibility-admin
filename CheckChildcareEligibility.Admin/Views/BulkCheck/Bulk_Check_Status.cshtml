@@ -12,10 +12,10 @@
     @if (TempData["JustUploaded"]?.ToString() == "true")
     {
         <div class="govuk-notification-banner" role="alert"
-        aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+             aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title"
-                id="govuk-notification-banner-title">
+                    id="govuk-notification-banner-title">
                     Batch checks status
                 </h2>
             </div>
@@ -35,15 +35,7 @@
         </div>
     }
 
-    <div class="govuk-grid-column-full">
-        <div class="govuk-grid-row">
-        <p class="govuk-body">
-            @Html.ActionLink("Get help with check results", "Bulk_Check_Explainer", "BulkCheck", null, new { @class = "govuk-link" })
-        </p>
-    </div>
-    </div>
-    
-    <div class="govuk-grid-row" id="content" data-type="Refresh" data-url="@Url.Action("Bulk_Check_Status", "BulkCheck", new { pageNumber = ViewBag.CurrentPage } )">
+    <div class="govuk-grid-row" id="content" data-type="Refresh" data-url="@Url.Action("Bulk_Check_Status", "BulkCheck", new { pageNumber = ViewBag.CurrentPage })">
 
         <div class="govuk-grid-column-full">
 
@@ -73,16 +65,25 @@
 
             @{
                 var paginationModel = new PaginationPartialViewModel
-            {
-                CurrentPage = ViewBag.CurrentPage,
-                TotalPages = ViewBag.TotalPages,
-                RecordsPerPage = ViewBag.RecordsPerPage,
-                TotalRecords = ViewBag.TotalRecords,
-                ControllerName = "BulkCheck"
-            };
+                {
+                    CurrentPage = ViewBag.CurrentPage,
+                    TotalPages = ViewBag.TotalPages,
+                    RecordsPerPage = ViewBag.RecordsPerPage,
+                    TotalRecords = ViewBag.TotalRecords,
+                    ControllerName = "BulkCheck"
+                };
 
                 @Html.Partial("PaginationPartial", paginationModel)
             }
+        </div>
+    </div>
+
+    <h2 class="govuk-heading-m">Guidance</h2>
+    <div class="govuk-grid-column-full">
+        <div class="govuk-grid-row">
+            <p class="govuk-body">
+                @Html.ActionLink("Get help with check results", "Bulk_Check_Explainer", "BulkCheck", null, new { @class = "govuk-link" })
+            </p>
         </div>
     </div>
 
