@@ -49,32 +49,52 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 return $"{GracePeriodEndDate:dd MMMM yyyy}";
             }
 
-            // Normalize to term start
-            DateTime termStart = GetTermStart(vsd);
+            // Define term start dates for the given year
+            DateTime springStart = new DateTime(vsd.Year, 1, 1);
+            DateTime summerStart = new DateTime(vsd.Year, 4, 1);
+            DateTime autumnStart = new DateTime(vsd.Year, 9, 1);
 
             string termName;
-            if (termStart.Month == 1)
-                termName = WorkingFamiliesResponseBanner.SpringTerm;
-            else if (termStart.Month == 4)
-                termName = WorkingFamiliesResponseBanner.SummerTerm;
-            else // September
-                termName = WorkingFamiliesResponseBanner.AutumnTerm;
 
-            return $"{termName} {termStart.Year}";
+            if (vsd >= autumnStart)
+            {
+                termName = (vsd <= autumnStart.AddDays(14)) ? WorkingFamiliesResponseBanner.AutumnTerm : WorkingFamiliesResponseBanner.SpringTerm;
+            }
+            else if (vsd >= summerStart)
+            {
+                termName = (vsd <= summerStart.AddDays(14)) ? WorkingFamiliesResponseBanner.SummerTerm : WorkingFamiliesResponseBanner.AutumnTerm;
+            }
+            else // Spring term
+            {
+                termName = (vsd <= springStart.AddDays(14)) ? WorkingFamiliesResponseBanner.SpringTerm : WorkingFamiliesResponseBanner.SummerTerm;
+            }
+
+            return $"{termName} {vsd.Year}";
         }
+
         public bool IsReconfirmed
         {
             get
             {
-                if (GetTermStart(ValidityStartDate) == GetTermStart(ValidityEndDate))
-                {
-                    return false;
-                }
-                else 
-                {
-                    return true;
-                }
+                string startTermName = GetTermName(ValidityStartDate);
+                string endTermName = GetTermName(GetTermStart(ValidityEndDate));
+
+                return startTermName != endTermName;
             }
+        }
+
+        private string GetTermName(DateTime date)
+        {
+            DateTime springStart = new DateTime(date.Year, 1, 1);
+            DateTime summerStart = new DateTime(date.Year, 4, 1);
+            DateTime autumnStart = new DateTime(date.Year, 9, 1);
+
+            if (date >= autumnStart)
+                return (date <= autumnStart.AddDays(14)) ? WorkingFamiliesResponseBanner.AutumnTerm : WorkingFamiliesResponseBanner.SpringTerm;
+            else if (date >= summerStart)
+                return (date <= summerStart.AddDays(14)) ? WorkingFamiliesResponseBanner.SummerTerm : WorkingFamiliesResponseBanner.AutumnTerm;
+            else
+                return (date <= springStart.AddDays(14)) ? WorkingFamiliesResponseBanner.SpringTerm : WorkingFamiliesResponseBanner.SummerTerm;
         }
         public static DateTime GetTermStart(DateTime date)
         {
@@ -169,7 +189,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
                 BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
-                TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor + " "+ Term + " and " + GetTerm(ValidityEndDate);
+                TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor + " "+ Term + " and " + GetTerm(GetTermStart(ValidityEndDate));
             }
         }
 
