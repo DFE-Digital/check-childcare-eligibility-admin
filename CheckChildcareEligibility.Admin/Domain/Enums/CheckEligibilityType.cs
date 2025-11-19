@@ -10,7 +10,6 @@ namespace CheckChildcareEligibility.Admin.Domain.Enums;
 public enum CheckEligibilityType
 {
     None = 0,
-    [Description("Free School Meals")] FreeSchoolMeals,
     EarlyYearPupilPremium,
     TwoYearOffer,
     WorkingFamilies

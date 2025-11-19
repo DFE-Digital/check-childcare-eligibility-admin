@@ -4,11 +4,21 @@ using CsvHelper.Configuration;
 namespace CheckChildcareEligibility.Admin.Models;
 
 [ExcludeFromCodeCoverage]
-public class CheckRow
+
+public class CheckRowBase { 
+    public string Ni { get; set; }
+    public string DOB { get; set; }
+}
+public class CheckRow : CheckRowBase
 {
     public string LastName { get; set; }
-    public string DOB { get; set; }
-    public string Ni { get; set; }
+
+}
+[ExcludeFromCodeCoverage]
+public class CheckRowWorkingFamilies : CheckRowBase {
+    public string EligibilityCode { get; set; }
+    
+
 }
 
 [ExcludeFromCodeCoverage]
@@ -19,5 +29,15 @@ public class CheckRowRowMap : ClassMap<CheckRow>
         Map(m => m.LastName).Index(0);
         Map(m => m.DOB).Index(1);
         Map(m => m.Ni).Index(2);
+    }
+}
+[ExcludeFromCodeCoverage]
+public class CheckRowRowMapWorkingFamilies : ClassMap<CheckRowWorkingFamilies>
+{
+    public CheckRowRowMapWorkingFamilies()
+    {
+        Map(m => m.EligibilityCode).Index(0);
+        Map(m => m.Ni).Index(1);
+        Map(m => m.DOB).Index(2);
     }
 }

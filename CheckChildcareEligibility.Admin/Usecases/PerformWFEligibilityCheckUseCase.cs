@@ -1,5 +1,6 @@
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.ViewModels;
 using System.Text;
@@ -44,8 +45,9 @@ public class PerformWFEligibilityCheckUseCase : IPerformWFEligibilityCheckUseCas
         // Build ECS request
         var checkEligibilityRequest = new CheckEligibilityRequest
         {
-            Data = new CheckEligibilityRequestData(Domain.Enums.CheckEligibilityType.WorkingFamilies)
+            Data = new CheckEligibilityRequestWorkingFamiliesData
             {
+                Type = CheckEligibilityType.WorkingFamilies,
                 EligibilityCode = parentAndChildRequest.Child.EligibilityCode,
                 NationalInsuranceNumber = parentAndChildRequest.NationalInsuranceNumber?.ToUpper(),
                 DateOfBirth = dobString

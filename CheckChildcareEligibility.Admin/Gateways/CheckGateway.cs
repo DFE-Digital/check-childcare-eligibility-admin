@@ -12,20 +12,18 @@ public class CheckGateway : BaseGateway, ICheckGateway
     private readonly HttpClient _httpClient;
     private readonly ILogger _logger;
 
-    private static readonly Dictionary<string, string> CheckUrls = new()
-    {
-        ["FreeSchoolMeals"] = "check/free-school-meals",
-        ["TwoYearOffer"] = "check/two-year-offer",
-        ["EarlyYearPupilPremium"] = "check/early-year-pupil-premium",
-        ["WorkingFamilies"] = "check/working-families",
+    private static readonly Dictionary<CheckEligibilityType, string> CheckUrls = new()
+    {        
+        [CheckEligibilityType.TwoYearOffer] = "check/two-year-offer",
+        [CheckEligibilityType.EarlyYearPupilPremium] = "check/early-year-pupil-premium",
+        [CheckEligibilityType.WorkingFamilies] = "check/working-families",
     };
 
-    private static readonly Dictionary<string, string> BulkCheckUrls = new()
+    private static readonly Dictionary<CheckEligibilityType, string> BulkCheckUrls = new()
     {
-        ["FreeSchoolMeals"] = "bulk-check/free-school-meals",
-        ["TwoYearOffer"] = "bulk-check/two-year-offer",
-        ["EarlyYearPupilPremium"] = "bulk-check/early-year-pupil-premium",
-        ["WorkingFamilies"] = "bulk-check/working-families",
+        [CheckEligibilityType.TwoYearOffer] = "bulk-check/two-year-offer",
+        [CheckEligibilityType.EarlyYearPupilPremium] = "bulk-check/early-year-pupil-premium",
+        [CheckEligibilityType.WorkingFamilies] = "bulk-check/working-families",
     };
 
     public CheckGateway(ILoggerFactory logger, HttpClient httpClient, IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : base("EcsService",
@@ -40,7 +38,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
         if (checkEligibilityRequest.Data == null)
             return "error";
 
-        return CheckUrls[checkEligibilityRequest.Data.CheckType];
+        return CheckUrls[checkEligibilityRequest.Data.Type];
     }
 
     private string BulkCheckUrl(CheckEligibilityRequestBulk checkEligibilityRequest)
@@ -48,7 +46,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
         if (checkEligibilityRequest.Data == null || !checkEligibilityRequest.Data.Any())
             return "error";        
 
-        return BulkCheckUrls[checkEligibilityRequest.Data.First().CheckType];
+        return BulkCheckUrls[checkEligibilityRequest.Data.First().Type];
     }
 
     public async Task<CheckEligibilityResponse> PostCheck(CheckEligibilityRequest requestBody)
@@ -147,26 +145,6 @@ public class CheckGateway : BaseGateway, ICheckGateway
                 $"Post failed. uri:-{_httpClient.BaseAddress}{BulkCheckUrl(requestBody)} content:-{JsonConvert.SerializeObject(requestBody)}");
             throw;
         }
-    }
-
-    private static CheckEligibilityType ExtractCheckType(CheckEligibilityRequestData data)
-    {
-        CheckEligibilityType checkType = CheckEligibilityType.None;
-
-        switch (data.CheckType)
-        {
-            case "FreeSchoolMeals":
-                checkType = CheckEligibilityType.FreeSchoolMeals;
-                break;
-            case "TwoYearOffer":
-                checkType = CheckEligibilityType.TwoYearOffer;
-                break;
-            case "EarlyYearPupilPremium":
-                checkType = CheckEligibilityType.EarlyYearPupilPremium;
-                break;
-        }
-
-        return checkType;
     }
 
     public async Task<CheckEligibilityBulkProgressByLAResponse> GetBulkCheckStatuses(string organisationId)

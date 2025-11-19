@@ -125,9 +125,7 @@ public class WorkingFamiliesCheckController : BaseController
                     return View("Outcome/Not_Found_WF", parentAndChild);
                 default:
                     var responseItem = JsonConvert.DeserializeObject<CheckEligibilityResponse>(responseJson);
-
                     var result = await _performWFEligibilityCheckUseCase.GetItemAsync(responseItem.Links.Get_EligibilityCheck);
-                   
                     WorkingFamiliesResponseViewModel viewModel = new WorkingFamiliesResponseViewModel() {
                         Response = result.Data
                     };

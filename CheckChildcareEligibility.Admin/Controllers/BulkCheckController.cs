@@ -1,20 +1,15 @@
-﻿using System.Globalization;
-using System.Linq.Expressions;
-using System.Text;
-using CheckChildcareEligibility.Admin.Boundary.Requests;
-using CheckChildcareEligibility.Admin.Boundary.Responses;
+﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
-using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
-using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.Usecases;
 using CheckChildcareEligibility.Admin.ViewModels;
 using CsvHelper;
-using CsvHelper.Configuration;
-using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
+using System.Reflection;
+using System.Text;
 
 namespace CheckChildcareEligibility.Admin.Controllers;
 
@@ -31,7 +26,7 @@ public class BulkCheckController : BaseController
     private ILogger<BulkCheckController> _loggerMock;
 
     public BulkCheckController(
-        ILogger<BulkCheckController> logger, 
+        ILogger<BulkCheckController> logger,
         ICheckGateway checkGateway,
         IConfiguration configuration,
         IParseBulkCheckFileUseCase parseBulkCheckFileUseCase,
@@ -51,23 +46,29 @@ public class BulkCheckController : BaseController
         var eligibilityType = TempData["eligibilityType"]?.ToString();
         TempData["eligibilityType"] = eligibilityType;
         var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
-        TempData["eligibilityTypeLabel"] = label; 
-        
-        return View();
+        TempData["eligibilityTypeLabel"] = label;
+        BulkCheckViewModel viewModel = new BulkCheckViewModel();
+       
+        return View("Bulk_Check", viewModel);
     }
 
     [HttpPost]
     public async Task<IActionResult> Bulk_Check(IFormFile fileUpload, string eligibilityType)
     {
         _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
-
+        BulkCheckViewModel viewModel = new BulkCheckViewModel();
         var establishmentNumber = _Claims.Organisation.EstablishmentNumber;
+        TempData["eligibilityType"] = eligibilityType;
+
+        if (fileUpload == null || fileUpload.ContentType.ToLower() != "text/csv")
+        {
+            TempData["ErrorMessage"] = "Select a CSV File";
+          
+            return RedirectToAction("Bulk_Check", viewModel);
+        }
 
         var fileName = fileUpload.FileName;
-        var submittedBy = $"{_Claims?.User.FirstName} {_Claims?.User.Surname}"; 
-
-        TempData["eligibilityType"] = eligibilityType;
-        
+        var submittedBy = $"{_Claims?.User.FirstName} {_Claims?.User.Surname}";
         var timeNow = DateTime.UtcNow;
 
         if (!string.IsNullOrEmpty(HttpContext.Session.GetString("FirstSubmissionTimeStamp")))
@@ -80,14 +81,8 @@ public class BulkCheckController : BaseController
         }
 
         TempData["Response"] = "data_issue";
-        
-        var requestItems = new List<CheckEligibilityRequestData>();
-        
-        if (fileUpload == null || fileUpload.ContentType.ToLower() != "text/csv")
-        {
-            TempData["ErrorMessage"] = "Select a CSV File";
-            return RedirectToAction("Bulk_Check");
-        }
+
+        var requestItems = new List<IEligibilityServiceType>();
 
         // limit csv submission attempts
         var sessionCount = 0;
@@ -113,7 +108,7 @@ public class BulkCheckController : BaseController
         {
             TempData["ErrorMessage"] =
                 $"No more than {_config["BulkUploadAttemptLimit"]} batch check requests can be made per hour";
-            return RedirectToAction("Bulk_Check");
+            return RedirectToAction("Bulk_Check", viewModel);
         }
 
         // check not more than 10, if it is return Bulk_Check() with ErrorMessage == too many requests made, wait a bit longer
@@ -122,15 +117,17 @@ public class BulkCheckController : BaseController
 
         try
         {
-            var checkRowLimit = int.Parse(_config["BulkEligibilityCheckLimit"]);
+          //  var checkRowLimit = int.Parse(_config["BulkEligibilityCheckLimit"]);
 
             using (var fileStream = fileUpload.OpenReadStream())
             {
-                var parsedItems = await _parseBulkCheckFileUseCase.Execute(fileStream, 
-                    eligibilityType == "EYPP" ? 
+              
+                var parsedItems = await _parseBulkCheckFileUseCase.Execute(fileStream,
+                    eligibilityType == "EYPP" ?
                     Domain.Enums.CheckEligibilityType.EarlyYearPupilPremium :
                     eligibilityType == "2YO" ? Domain.Enums.CheckEligibilityType.TwoYearOffer :
-                    Domain.Enums.CheckEligibilityType.FreeSchoolMeals);
+                    eligibilityType == "WF" ? Domain.Enums.CheckEligibilityType.WorkingFamilies :
+                    Domain.Enums.CheckEligibilityType.None);
 
                 if (parsedItems.ValidRequests == null || !parsedItems.ValidRequests.Any())
                 {
@@ -139,27 +136,22 @@ public class BulkCheckController : BaseController
 
                         TempData["ErrorMessage"] = "The selected file is empty.";
                         errorsViewModel.Errors = new List<CheckRowError>();
-
-                        return RedirectToAction("Bulk_Check");
-                    } 
+                        
+                        return RedirectToAction("Bulk_Check", viewModel);
+                    }
                 }
 
-                if (parsedItems.ValidRequests.Count > checkRowLimit)
-                {
-                    TempData["ErrorMessage"] = $"The selected file must contain fewer than {checkRowLimit} rows";
-                    return RedirectToAction("Bulk_Check");
-                }
-
+                // Display error message if returned from use case.
                 if (!string.IsNullOrWhiteSpace(parsedItems.ErrorMessage))
                 {
                     TempData["ErrorMessage"] = parsedItems.ErrorMessage;
-                    return RedirectToAction("Bulk_Check");
+                    return RedirectToAction("Bulk_Check", viewModel);
                 }
 
                 if (parsedItems.Errors.Any())
                 {
                     errorsViewModel.TotalErrorCount = parsedItems.Errors.Count();
-                    
+
                     var csvRowErrors = parsedItems.Errors.Take(TotalErrorsToDisplay);
 
                     errorsViewModel.Errors = parsedItems.Errors
@@ -187,7 +179,7 @@ public class BulkCheckController : BaseController
         TempData["JustUploaded"] = "true";
         return RedirectToAction("Bulk_Check_Status");
     }
-    
+
     public async Task<IActionResult> Bulk_Loader()
     {
         var result = await _checkGateway.GetBulkCheckProgress(HttpContext.Session.GetString("Get_Progress_Check"));
@@ -195,7 +187,7 @@ public class BulkCheckController : BaseController
         {
             TempData["totalCounter"] = result.Data.Total;
             TempData["currentCounter"] = result.Data.Complete;
-            
+
 
             if (result.Data.Complete >= result.Data.Total) return RedirectToAction("Bulk_check_success");
         }
@@ -286,7 +278,7 @@ public class BulkCheckController : BaseController
 
     private string GetFileNamePrefix(string? eligibilityType)
     {
-        switch (eligibilityType) 
+        switch (eligibilityType)
         {
             case "2YO":
             case "TwoYearOffer":
@@ -316,13 +308,13 @@ public class BulkCheckController : BaseController
                 Filename = x.Filename,
                 BulkCheckId = x.BulkCheckId,
                 Status = x.Status,
-                SubmittedBy = x.SubmittedBy          
+                SubmittedBy = x.SubmittedBy
             })
             .Where(x => x.Status != "Deleted")
             .OrderByDescending(x=> x.DateSubmitted);
 
         ViewBag.CurrentPage = pageNumber;
-        ViewBag.TotalPages =  (int)Math.Ceiling(filteredResponse.Count() / (float)pageSize);
+        ViewBag.TotalPages = (int)Math.Ceiling(filteredResponse.Count() / (float)pageSize);
         ViewBag.TotalRecords = filteredResponse.Count();
         ViewBag.RecordsPerPage = pageSize;
 

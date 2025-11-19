@@ -46,7 +46,7 @@ builder.Services.AddScoped<IValidateParentDetailsUseCase, ValidateParentDetailsU
 builder.Services.AddScoped<IValidateParentAndChildDetailsUseCase, ValidateParentAndChildDetailsUseCase>();
 builder.Services.AddScoped<IParseBulkCheckFileUseCase, ParseBulkCheckFileUseCase>();
 builder.Services.AddScoped<IDeleteBulkCheckFileUseCase, DeleteBulkCheckFileUseCase>();
-builder.Services.AddScoped<IValidator<CheckEligibilityRequestData>, CheckEligibilityRequestDataValidator>();
+builder.Services.AddScoped<IValidator<IEligibilityServiceType>, CheckEligibilityRequestDataValidator>();
 builder.Services.AddSession();
 
 

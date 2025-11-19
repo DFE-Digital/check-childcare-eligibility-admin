@@ -307,7 +307,9 @@ internal class CheckGatewayTests
         {
             Data = new List<CheckEligibilityRequestData>
             {
-                new CheckEligibilityRequestData(CheckEligibilityType.FreeSchoolMeals)
+                new CheckEligibilityRequestData(){
+                   Type =  CheckEligibilityType.EarlyYearPupilPremium
+                }
             }
         };
         var responseContent = new CheckEligibilityResponseBulk();
@@ -340,7 +342,9 @@ internal class CheckGatewayTests
         {
             Data = new List<CheckEligibilityRequestData>
             {
-                new CheckEligibilityRequestData(CheckEligibilityType.FreeSchoolMeals)
+                new CheckEligibilityRequestData(){
+                    Type = CheckEligibilityType.TwoYearOffer
+                }
             }
         };
         var responseMessage = new HttpResponseMessage
