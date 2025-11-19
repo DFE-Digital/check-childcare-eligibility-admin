@@ -1,16 +1,18 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Models;
+using CheckChildcareEligibility.Admin.Usecases.Constants;
 using CsvHelper;
 using CsvHelper.Configuration;
 using FluentValidation;
+using FluentValidation.Results;
 using System.Globalization;
 
 namespace CheckChildcareEligibility.Admin.Usecases
 {
     public class BulkCheckCsvResult
     {
-        public List<CheckEligibilityRequestData> ValidRequests { get; set; } = new();
+        public List<CheckEligibilityRequestDataBase> ValidRequests { get; set; } = new();
         public List<CsvRowError> Errors { get; set; } = new();
         public string ErrorMessage { get; set; } = string.Empty;
 
@@ -31,20 +33,19 @@ namespace CheckChildcareEligibility.Admin.Usecases
     }
     public class ParseBulkCheckFileUseCase : IParseBulkCheckFileUseCase
     {
-        private readonly IValidator<CheckEligibilityRequestData> _validator;
+        private readonly IValidator<IEligibilityServiceType> _validator;
         private readonly IConfiguration _config;
-        private readonly int  _rowCountLimit;
+        private readonly int _rowCountLimit;
 
-        public ParseBulkCheckFileUseCase(IValidator<CheckEligibilityRequestData> validator, IConfiguration configuration)
+        public ParseBulkCheckFileUseCase(IValidator<IEligibilityServiceType> validator, IConfiguration configuration)
         {
             _validator = validator;
             _config = configuration;
-            _rowCountLimit = int.Parse(_config["BulkEligibilityCheckLimit"]); 
-            
+            _rowCountLimit = int.Parse(_config["BulkEligibilityCheckLimit"]);
+
         }
         public async Task<BulkCheckCsvResult> Execute(Stream csvStream, CheckEligibilityType eligibilityType)
         {
-            int checkrowLimit = int.Parse(_config["BulkEligibilityCheckLimit"]);
             string[] expectedHeaders = [];
 
             var result = new BulkCheckCsvResult();
@@ -60,8 +61,6 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
             using var csv = new CsvReader(reader, config);
 
-            csv.Context.RegisterClassMap<CheckRowRowMap>();
-
             var lineNumber = 2; // headers on line 1
             var sequence = 1;
             IEnumerable<CheckRowBase> records = Enumerable.Empty<CheckRowBase>();
@@ -69,33 +68,48 @@ namespace CheckChildcareEligibility.Admin.Usecases
             try
             {
                 csv.Read();
-                csv.ReadHeader();     
-                var actualHeaders = csv.HeaderRecord;
+                csv.ReadHeader();
 
-                switch (eligibilityType) {
+                // Validate headers 
+                var actualHeaders = csv.HeaderRecord;
+                switch (eligibilityType)
+                {
 
                     case CheckEligibilityType.WorkingFamilies:
                         expectedHeaders = ["Eligibility code", "National Insurance number", "Child date of birth"];
-                        records = csv.GetRecords<CheckRowWorkingFamilies>().ToList();
                         break;
                     default:
-                       expectedHeaders = ["Parent Last Name", "Parent Date of Birth", "Parent National Insurance Number"];
-                        records = csv.GetRecords<CheckRow>().ToList();
+                        expectedHeaders = ["Parent Last Name", "Parent Date of Birth", "Parent National Insurance Number"];
                         break;
                 }
-                csv.Dispose();
-                // Validate headers 
+
                 if (!expectedHeaders.SequenceEqual(actualHeaders))
                 {
-                    result.ErrorMessage = "The column headings in the selected file must exactly match the template";
+                    result.ErrorMessage = BulkCheckUseCaseConstants.InvalidHeadersErrorMessage;
 
                     return result;
                 }
-             
-                // Validate row count
-                if (records.Count() > _rowCountLimit) {
+                // Map records according to the type
+                switch (eligibilityType)
+                {
 
-                    result.ErrorMessage = $"The selected file must contain fewer than {_rowCountLimit} rows";
+                    case CheckEligibilityType.WorkingFamilies:
+                        csv.Context.RegisterClassMap<CheckRowRowMapWorkingFamilies>();
+                        records = csv.GetRecords<CheckRowWorkingFamilies>().ToList();
+                        break;
+                    default:
+                        csv.Context.RegisterClassMap<CheckRowRowMap>();
+                        records = csv.GetRecords<CheckRow>().ToList();
+                        break;
+                }
+
+                csv.Dispose();
+
+                // Validate row count
+                if (records.Count() > _rowCountLimit)
+                {
+
+                    result.ErrorMessage = BulkCheckUseCaseConstants.TooManyRowsErrorMessage(_rowCountLimit);
                     return result;
                 }
                 // check for malformed rows
@@ -114,26 +128,43 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
                     try
                     {
-                        var requestItem = new CheckEligibilityRequestData();
-                        requestItem.Type = eligibilityType;
-                        requestItem.Sequence = sequence;
-
-                        switch (eligibilityType) {
+                        var validationResults = new ValidationResult();
+                       
+                        switch (eligibilityType)
+                        {
                             case CheckEligibilityType.WorkingFamilies:
-                                var workingFamilyRow =  record as CheckRowWorkingFamilies;                          
-                                requestItem.LastName = workingFamilyRow.EligibilityCode;
-                                requestItem.DateOfBirth = workingFamilyRow.DOB;//must remain in original pre-parsed form to go through validator
-                                requestItem.NationalInsuranceNumber = workingFamilyRow.Ni.ToUpper();                        
+                                var workingFamilyRow = record as CheckRowWorkingFamilies;
+                                var requestDataWF = new CheckEligibilityRequestWorkingFamiliesData();
+                                requestDataWF.EligibilityCode = workingFamilyRow.EligibilityCode;
+                                requestDataWF.DateOfBirth = workingFamilyRow.DOB;//must remain in original pre-parsed form to go through validator
+                                requestDataWF.NationalInsuranceNumber = workingFamilyRow.Ni.ToUpper();
+                                requestDataWF.Type = eligibilityType;
+                                requestDataWF.Sequence = sequence;
+                                validationResults = _validator.Validate(requestDataWF);
+                                if (validationResults.IsValid) {
+                                    //We know this passed parse earlier but it must be translated to correct format (yyyy-MM-dd) for Database to access
+                                    requestDataWF.DateOfBirth = DateTime.Parse(record.DOB).ToString("yyyy-MM-dd");
+                                    result.ValidRequests.Add(requestDataWF);
+                                }
                                 break;
                             default:
                                 var row = record as CheckRow;
-                                requestItem.LastName = row.LastName;
-                                requestItem.DateOfBirth = row.DOB;//must remain in original pre-parsed form to go through validator
-                                requestItem.NationalInsuranceNumber = row.Ni.ToUpper();                              
+                                var requestData = new CheckEligibilityRequestData();
+                                requestData.LastName = row.LastName;
+                                requestData.DateOfBirth = row.DOB;//must remain in original pre-parsed form to go through validator
+                                requestData.NationalInsuranceNumber = row.Ni.ToUpper();
+                                requestData.Type = eligibilityType;
+                                requestData.Sequence = sequence;
+                                validationResults = _validator.Validate(requestData);
+                                if (validationResults.IsValid)
+                                {
+                                    //We know this passed parse earlier but it must be translated to correct format (yyyy-MM-dd) for Database to access
+                                    requestData.DateOfBirth = DateTime.Parse(record.DOB).ToString("yyyy-MM-dd");
+                                    result.ValidRequests.Add(requestData);
+                                }
                                 break;
-                        
-                        }                   
-                        var validationResults = _validator.Validate(requestItem);
+
+                        }
                         if (!validationResults.IsValid)
                         {
                             foreach (var error in validationResults.Errors)
@@ -152,13 +183,6 @@ namespace CheckChildcareEligibility.Admin.Usecases
                                     Message = errorMessage
                                 });
                             }
-                        }
-                        else
-                        {
-                            //We know this passed parse earlier but it must be translated to correct format (yyyy-MM-dd) for Database to access
-                            requestItem.DateOfBirth = DateTime.Parse(record.DOB).ToString("yyyy-MM-dd");
-                            
-                            result.ValidRequests.Add(requestItem);
                         }
 
                     }
@@ -216,7 +240,6 @@ namespace CheckChildcareEligibility.Admin.Usecases
             return result;
 
         }
-
         private bool ContainsError(IEnumerable<CsvRowError> errors, int lineNumber, string errorMessage)
         {
             return errors.Any(x => x.LineNumber == lineNumber && string.Equals(x.Message, errorMessage));

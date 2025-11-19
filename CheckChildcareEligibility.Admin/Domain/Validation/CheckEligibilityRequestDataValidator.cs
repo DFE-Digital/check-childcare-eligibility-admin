@@ -31,12 +31,12 @@ public class CheckEligibilityRequestDataValidator : AbstractValidator<IEligibili
 
         When(x => x is CheckEligibilityRequestWorkingFamiliesData, () =>
         {
-            RuleFor(x => ((CheckEligibilityRequestData)x).LastName)
-           .NotEmpty().WithMessage(ValidationMessages.RequiredLastName)
-           .Must((x, lastName) => string.IsNullOrEmpty(lastName) || DataValidation.BeAValidName(lastName))
-           .WithMessage(ValidationMessages.ValidLastName);
+            RuleFor(x => ((CheckEligibilityRequestWorkingFamiliesData)x).NationalInsuranceNumber)
+             .NotEmpty().WithMessage(ValidationMessages.RequiredNI)
+             .Must((x, NINumber) => string.IsNullOrEmpty(NINumber) || DataValidation.BeAValidNi(NINumber))
+             .WithMessage(ValidationMessages.ValidNI);
 
-            RuleFor(x => ((CheckEligibilityRequestData)x).DateOfBirth)
+            RuleFor(x => ((CheckEligibilityRequestWorkingFamiliesData)x).DateOfBirth)
                 .NotEmpty().WithMessage(ValidationMessages.RequiredDOB)
                 .Must((x, dob) => string.IsNullOrEmpty(dob) || DataValidation.BeAValidDate(dob))
                 .WithMessage(ValidationMessages.ValidDOB);

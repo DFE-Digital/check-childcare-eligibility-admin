@@ -82,7 +82,7 @@ public class BulkCheckController : BaseController
 
         TempData["Response"] = "data_issue";
 
-        var requestItems = new List<CheckEligibilityRequestData>();
+        var requestItems = new List<IEligibilityServiceType>();
 
         // limit csv submission attempts
         var sessionCount = 0;

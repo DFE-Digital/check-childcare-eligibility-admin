@@ -61,9 +61,22 @@ namespace CheckChildcareEligibility.Admin.Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parent National Insurance number,Parent asylum support reference number,Parent Date of Birth,Parent Last Name
-        ///AB123456C,,01/01/1990,SIMPSON
-        ///AB123456D,,01/01/1990,smith
+        ///   Looks up a localized string similar to Parent Last Name,Parent Date of Birth,Parent National Insurance Number,InvalidHeader
+        ///SIMPSON,1990-01-01,AB123456C
+        ///Jones,1990-01-01,ABCD
+        ///smith,32/01/1990,AB123456D
+        ///flower,1990-01-01,.
+        /// </summary>
+        internal static string bulkchecktemplate_invalid_headers {
+            get {
+                return ResourceManager.GetString("bulkchecktemplate_invalid_headers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parent Last Name,Parent Date of Birth,Parent National Insurance Number
+        ///SIMPSON,01/01/1990,AB123456C
+        ///smith,01/01/1990,AB123456D
         ///.
         /// </summary>
         internal static string bulkchecktemplate_small_Valid {
@@ -73,12 +86,11 @@ namespace CheckChildcareEligibility.Admin.Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parent National Insurance number,Parent asylum support reference number,Parent Date of Birth,Parent Last Name
-        ///AB123456C,,1990-01-01,SIMPSON,
-        ///ABCD,,1990-01-01,Jones
-        ///AB123456D,,32/01/1990,smith,
-        ///,,1990-01-01,flower
-        ///.
+        ///   Looks up a localized string similar to Parent Last Name,Parent Date of Birth,Parent National Insurance Number
+        ///SIMPSON,1990-01-01,AB123456C
+        ///Jones,1990-01-01,ABCD
+        ///smith,32/01/1990,AB123456D
+        ///flower,1990-01-01,.
         /// </summary>
         internal static string bulkchecktemplate_some_invalid_items {
             get {
@@ -87,20 +99,22 @@ namespace CheckChildcareEligibility.Admin.Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parent National Insurance Number,Parent asylum seeker reference number,Parent Date of Birth,Parent Last Name
-        ///AB123456E,,01/01/2000,SIMPSON
-        ///AC123456D,,02/01/2000,GRIFFIN
-        ///AB123456C,,03/01/2000,SIMPSON
-        ///AC123456D,,04/01/2000,GRIFFIN
-        ///AB123456C,,05/01/2000,SIMPSON
-        ///AC123456D,,06/01/2000,GRIFFIN
-        ///AB123456C,,07/01/2000,SIMPSON
-        ///AC123456D,,08/01/2000,GRIFFIN
-        ///AB123456C,,09/01/2000,SIMPSON
-        ///AC123456D,,10/01/2000,GRIFFIN
-        ///AB123456C,,11/01/2000,SIMPSON
-        ///AC123456D,,12/01/2000,GRIFFIN
-        ///AB123456C,,13/01/2000,SIMPSON        /// [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to Parent Last Name,Parent Date of Birth,Parent National Insurance Number
+        ///SIMPSON,01/01/2000,AB123456E
+        ///GRIFFIN,02/01/2000,AC123456D
+        ///SIMPSON,03/01/2000,AB123456C
+        ///GRIFFIN,04/01/2000,AC123456D
+        ///SIMPSON,05/01/2000,AB123456C
+        ///GRIFFIN,06/01/2000,AC123456D
+        ///SIMPSON,07/01/2000,AB123456C
+        ///GRIFFIN,08/01/2000,AC123456D
+        ///SIMPSON,09/01/2000,AB123456C
+        ///GRIFFIN,10/01/2000,AC123456D
+        ///SIMPSON,11/01/2000,AB123456C
+        ///GRIFFIN,12/01/2000,AC123456D
+        ///SIMPSON,13/01/2000,AB123456C
+        ///GRIFFIN,14/01/2000,AC123456D
+        ///SIMPSON,15/01/2000,A [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string bulkchecktemplate_too_many_records {
             get {
@@ -114,6 +128,21 @@ namespace CheckChildcareEligibility.Admin.Tests.Properties {
         internal static string ClaimSchool {
             get {
                 return ResourceManager.GetString("ClaimSchool", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Eligibility code,National Insurance number,Child date of birth
+        ///90212345678,NN123456A,01/04/2023
+        ///90012345679,NN123456A,02/04/2023
+        ///90112345680,NN123456A,03/04/2023
+        ///90312345681,NN123456A,04/04/2023
+        ///90412345682,NN123456A,05/04/2023
+        ///.
+        /// </summary>
+        internal static string working_families_small_valid {
+            get {
+                return ResourceManager.GetString("working_families_small_valid", resourceCulture);
             }
         }
     }

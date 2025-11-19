@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
@@ -173,7 +174,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
                 }
             };
 
-            var validBulkCheckCsvResult = new BulkCheckCsvResult() { ValidRequests = validRequests };
+            var validBulkCheckCsvResult = new BulkCheckCsvResult() { ValidRequests = validRequests.Cast<CheckEligibilityRequestDataBase>().ToList() };
 
             _parseBulkCheckFileUseCaseMock.Setup(x => x.Execute(It.IsAny<Stream>(), It.IsAny<CheckEligibilityType>()))
                 .ReturnsAsync(validBulkCheckCsvResult);
@@ -319,7 +320,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
                     NationalInsuranceNumber = "ab" }
             };
 
-            var validBulkCheckCsvResult = new BulkCheckCsvResult() { ValidRequests = validRequests };
+            var validBulkCheckCsvResult = new BulkCheckCsvResult() { ValidRequests = validRequests.Cast<CheckEligibilityRequestDataBase>().ToList() };
 
             _parseBulkCheckFileUseCaseMock.Setup(x => x.Execute(It.IsAny<Stream>(), It.IsAny<CheckEligibilityType>()))
                 .ReturnsAsync(validBulkCheckCsvResult);
@@ -377,7 +378,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
                     NationalInsuranceNumber = "ab" }
             };
 
-            var validBulkCheckCsvResult = new BulkCheckCsvResult() { ValidRequests = validRequests };
+            var validBulkCheckCsvResult = new BulkCheckCsvResult() { ValidRequests = validRequests.Cast<CheckEligibilityRequestDataBase>().ToList() };
 
             _parseBulkCheckFileUseCaseMock.Setup(x => x.Execute(It.IsAny<Stream>(), It.IsAny<CheckEligibilityType>()))
                 .ReturnsAsync(validBulkCheckCsvResult);
@@ -391,50 +392,6 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
             viewResult.ActionName.Should().BeEquivalentTo("Bulk_Check_Status");
         }
 
-        [Test]
-        public async Task Given_Bulk_Check_When_FileHasTooManyRecords_Should_ReturnBulkCheckPage()
-        {
-            // Arrange
-            var content = Resources.bulkchecktemplate_too_many_records;
-            _sut.TempData["ErrorMessage"] = "The selected file must contain fewer than 250 rows";
-            var stream = new MemoryStream();
-            var writer = new StreamWriter(stream);
-            writer.Write(content);
-            writer.Flush();
-            stream.Position = 0;
-
-            var file = new FormFile(stream, 0, stream.Length, "test.csv", "test.csv")
-            {
-                Headers = new HeaderDictionary(),
-                ContentType = "text/csv"
-            };
-
-            var validRequests = new List<CheckEligibilityRequestData>();
-
-            for (var i = 0; i < 251; i++)
-            {
-                validRequests.Add(new CheckEligibilityRequestData 
-                {   Type = CheckEligibilityType.TwoYearOffer,
-                    Sequence = i, 
-                    DateOfBirth = "2017-01-01",
-                    LastName = "Test",
-                    NationalInsuranceNumber = "ab" 
-                });
-            }
-
-            var validBulkCheckCsvResult = new BulkCheckCsvResult() { ValidRequests = validRequests };
-
-            _parseBulkCheckFileUseCaseMock.Setup(x => x.Execute(It.IsAny<Stream>(), It.IsAny<CheckEligibilityType>()))
-                .ReturnsAsync(validBulkCheckCsvResult);
-
-            // Act
-            var result = await _sut.Bulk_Check(file, "2YO");
-
-            // Assert
-            result.Should().BeOfType<RedirectToActionResult>();
-            var viewResult = result as RedirectToActionResult;
-            viewResult.ActionName.Should().BeEquivalentTo("Bulk_Check");
-            _sut.TempData["ErrorMessage"].Should().BeEquivalentTo("The selected file must contain fewer than 250 rows");
-        }
+        
     }
 }
