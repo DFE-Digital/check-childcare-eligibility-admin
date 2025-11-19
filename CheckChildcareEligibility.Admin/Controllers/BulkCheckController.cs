@@ -173,7 +173,7 @@ public class BulkCheckController : BaseController
             return View("BulkOutcome/Error_Data_Issue", errorsViewModel);
         }
 
-        var result = await _checkGateway.PostBulkCheck(new CheckEligibilityRequestBulk { ClientIdentifier = establishmentNumber, Filename = fileName, SubmittedBy = submittedBy, Data = requestItems });
+        var result = await _checkGateway.PostBulkCheck(new CheckEligibilityRequestBulk { Meta = new(){Filename = fileName, SubmittedBy = submittedBy}, Data = requestItems });
         HttpContext.Session.SetString("Get_Progress_Check", result.Links.Get_Progress_Check);
         HttpContext.Session.SetString("Get_BulkCheck_Results", result.Links.Get_BulkCheck_Results);
         TempData["JustUploaded"] = "true";
@@ -229,7 +229,7 @@ public class BulkCheckController : BaseController
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = fileName };
     }
 
-    public async Task<IActionResult> Bulk_check_file_download(string groupId, string eligibilityType = "")
+    public async Task<IActionResult> Bulk_check_file_download(string bulkCheckId, string eligibilityType = "")
     {
         if (string.IsNullOrWhiteSpace(eligibilityType))
             eligibilityType = TempData["eligibilityType"]?.ToString();
@@ -238,7 +238,7 @@ public class BulkCheckController : BaseController
         TempData["filePrefix"] = filePrefix;
 
         var resultData =
-            await _checkGateway.GetBulkCheckResults($"bulk-check/{groupId}/");
+            await _checkGateway.GetBulkCheckResults($"bulk-check/{bulkCheckId}/" );
 
         var exportData = resultData.Data.Select(x => new BulkFSMExport
         {
@@ -256,10 +256,10 @@ public class BulkCheckController : BaseController
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = outputfileName };
     }
 
-    public async Task<IActionResult> Bulk_check_file_delete(string groupId)
+    public async Task<IActionResult> Bulk_check_file_delete(string bulkCheckId)
     {
         var result =
-            await _deleteBulkCheckFileUseCase.Execute(groupId, HttpContext.Session);
+            await  _deleteBulkCheckFileUseCase.Execute(bulkCheckId, HttpContext.Session);
 
         return RedirectToAction("Bulk_Check_Status");
     }
@@ -303,15 +303,15 @@ public class BulkCheckController : BaseController
             .Take(pageSize)
             .Select(x => new BulkCheckStatusViewModel
             {
-                ClientIdentifier = x.ClientIdentifier,
-                DateSubmitted = x.SubmittedDate,
+                DateSubmitted = x.SubmittedDate, 
                 EligibilityType = x.EligibilityType,
                 Filename = x.Filename,
-                Guid = x.Guid,
+                BulkCheckId = x.BulkCheckId,
                 Status = x.Status,
                 SubmittedBy = x.SubmittedBy
             })
-            .OrderByDescending(x => x.DateSubmitted);
+            .Where(x => x.Status != "Deleted")
+            .OrderByDescending(x=> x.DateSubmitted);
 
         ViewBag.CurrentPage = pageNumber;
         ViewBag.TotalPages = (int)Math.Ceiling(filteredResponse.Count() / (float)pageSize);
