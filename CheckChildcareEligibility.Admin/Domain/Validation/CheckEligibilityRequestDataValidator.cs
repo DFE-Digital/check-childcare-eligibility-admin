@@ -42,9 +42,9 @@ public class CheckEligibilityRequestDataValidator : AbstractValidator<IEligibili
                 .WithMessage(ValidationMessages.ValidDOB);
 
             RuleFor(x => ((CheckEligibilityRequestWorkingFamiliesData)x).EligibilityCode)
-                .NotEmpty().WithMessage(ValidationMessages.EligibilityCodeNullOrEmpty)
-                .Must(x => !long.TryParse(x, out _)).WithMessage(ValidationMessages.EligibilityCodeNumber)
-                .Must(x => x.Length != 11 ).WithMessage(ValidationMessages.EligibilityCodeIncorrectLength);
+                .NotEmpty().WithMessage(ValidationMessages.RequiredEligibilityCode)
+                .Must(x => long.TryParse(x, out _)).WithMessage(ValidationMessages.EligibilityCodeNumber)
+                .Must(x => x.Length == 11).WithMessage(ValidationMessages.EligibilityCodeIncorrectLength);
         });
 
     }

@@ -10,7 +10,7 @@ public class EligibilityCodeAttribute : ValidationAttribute
 
         if (string.IsNullOrEmpty(code))
         {
-            return new ValidationResult(ValidationMessages.EligibilityCodeNullOrEmpty);
+            return new ValidationResult(ValidationMessages.RequiredEligibilityCode);
         }
 
         if (!long.TryParse(code, out _))

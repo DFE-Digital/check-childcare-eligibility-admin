@@ -11,7 +11,7 @@ public static class ValidationMessages
     public const string ChildDOB = "Child Date of birth is required:- (yyyy-mm-dd)";
     public const string ChildLastName = "Child LastName is required";
     public const string ChildFirstName = "Child FirstName is required";
-    public const string EligibilityCodeNullOrEmpty = "Enter an eligibility code that is 11 digits long";
+    public const string RequiredEligibilityCode = "Enter an eligibility code that is 11 digits long";
     public const string EligibilityCodeNumber  = "Eligibility code must only contain numbers";
     public const string EligibilityCodeIncorrectLength = "Eligibility code must be 11 digits long";
 }
