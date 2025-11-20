@@ -9,10 +9,10 @@ describe('Cookie consent banner functionality', () => {
     });
 
     it('Should show the cookie banner on first visit when no choice has been made', () => {
-        cy.get('.govuk-cookie-banner')
+        cy.get('#cookie-banner')
             .should('be.visible')
             .within(() => {
-                cy.contains('h2', 'Cookies on check a family\'s eligibility');
+                cy.contains('h2', 'Cookies on Manage eligbility for childcare support');
                 cy.contains('button', 'Accept analytics cookies');
                 cy.contains('button', 'Reject analytics cookies');
             });

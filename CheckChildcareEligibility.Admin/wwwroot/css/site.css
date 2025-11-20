@@ -387,3 +387,9 @@ caption {
     display: block;
 }
 /*END - Class with associated JS function in cookieFunctions.js to show content when JS is enabled */
+
+/*BEGIN - Hide success banner on Cookies page when page first loads */
+#success-banner {
+    display: none;
+}
+/*END - Hide success banner on Cookies page when page first loads */
