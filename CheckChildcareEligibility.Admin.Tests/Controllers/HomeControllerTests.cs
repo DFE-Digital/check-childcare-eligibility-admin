@@ -43,21 +43,6 @@ internal class HomeControllerTests
     }
 
     [Test]
-    public void Given_Privacy_LoadsWithEmptyModel()
-    {
-        // Arrange
-        var controller = new HomeController();
-
-        // Act
-        var result = controller.Privacy();
-
-        // Assert
-        var viewResult = result as ViewResult;
-        viewResult.ViewName.Should().Be("Privacy");
-        viewResult.Model.Should().BeNull();
-    }
-
-    [Test]
     public void Given_Cookies_LoadsWithEmptyModel()
     {
         // Arrange
