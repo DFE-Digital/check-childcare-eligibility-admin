@@ -73,11 +73,6 @@ public class HomeController : BaseController
         return RedirectToAction("Bulk_Check", "BulkCheck");
     }
 
-    public IActionResult Privacy()
-    {
-        return View("Privacy");
-    }
-
     public IActionResult Accessibility()
     {
         return View("Accessibility");
