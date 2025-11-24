@@ -12,7 +12,7 @@ describe('Cookie consent banner functionality', () => {
         cy.get('#cookie-banner')
             .should('be.visible')
             .within(() => {
-                cy.contains('h2', 'Cookies on Manage eligbility for childcare support');
+                cy.contains('h2', 'Cookies on Manage eligibility for childcare support');
                 cy.contains('button', 'Accept analytics cookies');
                 cy.contains('button', 'Reject analytics cookies');
             });
