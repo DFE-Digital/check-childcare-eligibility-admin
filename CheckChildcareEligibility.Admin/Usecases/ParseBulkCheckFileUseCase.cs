@@ -85,7 +85,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
                 if (!expectedHeaders.SequenceEqual(actualHeaders))
                 {
-                    result.ErrorMessage = BulkCheckUseCaseConstants.InvalidHeadersErrorMessage;
+                    result.ErrorMessage = BulkCheckUseCaseValidationMessages.InvalidHeaders;
 
                     return result;
                 }
@@ -109,7 +109,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                 if (records.Count() > _rowCountLimit)
                 {
 
-                    result.ErrorMessage = BulkCheckUseCaseConstants.TooManyRowsErrorMessage(_rowCountLimit);
+                    result.ErrorMessage = BulkCheckUseCaseValidationMessages.TooManyRows(_rowCountLimit);
                     return result;
                 }
                 // check for malformed rows

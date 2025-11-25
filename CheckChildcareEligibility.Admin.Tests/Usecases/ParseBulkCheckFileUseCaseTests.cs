@@ -49,7 +49,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
 
 
             // Assert
-            result.ErrorMessage.Should().BeEquivalentTo(BulkCheckUseCaseConstants.InvalidHeadersErrorMessage);
+            result.ErrorMessage.Should().BeEquivalentTo(BulkCheckUseCaseValidationMessages.InvalidHeaders);
 
         }
 
@@ -69,7 +69,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
 
 
             // Assert
-            result.ErrorMessage.Should().BeEquivalentTo(BulkCheckUseCaseConstants.InvalidHeadersErrorMessage);
+            result.ErrorMessage.Should().BeEquivalentTo(BulkCheckUseCaseValidationMessages.InvalidHeaders);
         
         }
         [Test]
@@ -87,7 +87,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
             var result = await _sut.Execute(stream, CheckEligibilityType.WorkingFamilies);
 
             // Assert
-            result.ErrorMessage.Should().BeEquivalentTo(BulkCheckUseCaseConstants.InvalidHeadersErrorMessage);
+            result.ErrorMessage.Should().BeEquivalentTo(BulkCheckUseCaseValidationMessages.InvalidHeaders);
 
         }
 
@@ -106,7 +106,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
             var result = await _sut.Execute(stream, CheckEligibilityType.TwoYearOffer);
 
             // Assert
-            result.ErrorMessage.Should().BeEquivalentTo(BulkCheckUseCaseConstants.TooManyRowsErrorMessage(250));
+            result.ErrorMessage.Should().BeEquivalentTo(BulkCheckUseCaseValidationMessages.TooManyRows(250));
 
         }
         [Test]
