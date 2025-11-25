@@ -60,14 +60,25 @@ public class BulkCheckController : BaseController
         var establishmentNumber = _Claims.Organisation.EstablishmentNumber;
         TempData["eligibilityType"] = eligibilityType;
 
-        if (fileUpload == null || fileUpload.ContentType.ToLower() != "text/csv")
+        // Validation for file upload
+        if (fileUpload == null)
         {
             TempData["ErrorMessage"] = "Select a CSV File";
-          
+
+            return RedirectToAction("Bulk_Check", viewModel);
+        }
+        else if (fileUpload.ContentType.ToLower() != "text/csv") {
+
+            TempData["ErrorMessage"] = "The selected file must be a CSV";
+
+            return RedirectToAction("Bulk_Check", viewModel);
+        }
+        else if (fileUpload.Length >= 10 * 1024 * 1024) // 10 MB limit
+        {
+            TempData["ErrorMessage"] = "The selected file must be smaller than 10MB";
             return RedirectToAction("Bulk_Check", viewModel);
         }
 
-        var fileName = fileUpload.FileName;
         var submittedBy = $"{_Claims?.User.FirstName} {_Claims?.User.Surname}";
         var timeNow = DateTime.UtcNow;
 
