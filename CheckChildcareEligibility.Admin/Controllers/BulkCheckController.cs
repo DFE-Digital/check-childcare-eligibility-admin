@@ -1,4 +1,5 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
+using CheckChildcareEligibility.Admin.Controllers.Constants;
 using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
@@ -60,13 +61,24 @@ public class BulkCheckController : BaseController
         var establishmentNumber = _Claims.Organisation.EstablishmentNumber;
         TempData["eligibilityType"] = eligibilityType;
 
-        if (fileUpload == null || fileUpload.ContentType.ToLower() != "text/csv")
+        // Validation for file upload
+        if (fileUpload == null)
         {
-            TempData["ErrorMessage"] = "Select a CSV File";
-          
+            TempData["ErrorMessage"] = BulkCheckValidationMessages.NoFileSelected;
+
             return RedirectToAction("Bulk_Check", viewModel);
         }
+        else if (fileUpload.ContentType.ToLower() != "text/csv") {
 
+            TempData["ErrorMessage"] = BulkCheckValidationMessages.IncorrectFileType;
+
+            return RedirectToAction("Bulk_Check", viewModel);
+        }
+        else if (fileUpload.Length >= 10 * 1024 * 1024) // 10 MB limit
+        {
+            TempData["ErrorMessage"] = BulkCheckValidationMessages.FileTooLarge;
+            return RedirectToAction("Bulk_Check", viewModel);
+        }
         var fileName = fileUpload.FileName;
         var submittedBy = $"{_Claims?.User.FirstName} {_Claims?.User.Surname}";
         var timeNow = DateTime.UtcNow;
@@ -106,8 +118,7 @@ public class BulkCheckController : BaseController
         // validate
         if (sessionCount > int.Parse(_config["BulkUploadAttemptLimit"]))
         {
-            TempData["ErrorMessage"] =
-                $"No more than {_config["BulkUploadAttemptLimit"]} batch check requests can be made per hour";
+            TempData["ErrorMessage"] = BulkCheckValidationMessages.BulkUploadAttemptLimitReached(_config["BulkUploadAttemptLimit"]);
             return RedirectToAction("Bulk_Check", viewModel);
         }
 
@@ -134,7 +145,7 @@ public class BulkCheckController : BaseController
                     if (!parsedItems.Errors.Any() && string.IsNullOrWhiteSpace(parsedItems.ErrorMessage))
                     {
 
-                        TempData["ErrorMessage"] = "The selected file is empty.";
+                        TempData["ErrorMessage"] = BulkCheckValidationMessages.EmptyFile;
                         errorsViewModel.Errors = new List<CheckRowError>();
                         
                         return RedirectToAction("Bulk_Check", viewModel);

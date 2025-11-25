@@ -160,7 +160,7 @@ public class CheckController : BaseController
                 ParentNino = parent?.NationalInsuranceNumber ?? string.Empty
             };
 
-            var isLA = _Claims?.Organisation?.Category?.Name == Constants.CategoryTypeLA; //false=school
+            var isLA = _Claims?.Organisation?.Category?.Name == CheckChildcareEligibility.Admin.Models.Constants.CategoryTypeLA; //false=school
             switch (outcome)
             {
                 case "eligible":
