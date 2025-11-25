@@ -6,7 +6,7 @@
 @{
     var claims = DfeSignInExtensions.GetDfeClaims(_httpContext.HttpContext.User.Claims);
 
-    var clarityId = claims?.Organisation?.Category?.Name == Constants.CategoryTypeLA ? Configuration["Clarity:LA"] : Configuration["Clarity:School"];
+    var clarityId = Configuration["Clarity"];
 }
 
 <!DOCTYPE html>
