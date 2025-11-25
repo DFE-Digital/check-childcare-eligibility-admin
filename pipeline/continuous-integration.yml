@@ -10,7 +10,7 @@ variables:
 stages:
   
 ## -- Build Application Stage -- ##
-  - template: templates/build-app-template.yml.yml
+  - template: templates/build-app-template.yml
     parameters:
       stageName: 'BuildApp'
       displayName: 'Build App'
