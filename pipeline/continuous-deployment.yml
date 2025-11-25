@@ -76,32 +76,18 @@ stages:
         inputs:
          testResultsFiles: '**/combined-report.xml'
          searchFolder: 'tests'
-  - stage: DeployAppTest
-    displayName: Deploy App Test
-    jobs:
-    - deployment: testdeploy
-      displayName: Deploy App Test
-      pool:
-        name: Azure Pipelines
-        vmImage: 'windows-latest'
-      environment: TEST
-      strategy:
-        runOnce:
-          preDeploy:
-            steps:
-            - task: DownloadPipelineArtifact@2
-              inputs:
-                buildType: 'current'
-                targetPath: '$(Pipeline.Workspace)'
-          deploy:
-            steps:
-            - task: AzureRmWebAppDeployment@4
-              inputs:
-                ConnectionType: 'AzureRM'
-                azureSubscription: 's203t.azdo.deployment'
-                appType: 'webApp'
-                WebAppName: 'ece-test-as-childcare-admin'
-                packageForLinux: '$(Pipeline.Workspace)/checkChildcareEligibilityAdmin/CheckChildcareEligibility.Admin.zip'
+
+## -- Test deploy -- ##
+  - template: templates/deploy-app-template.yml
+    parameters:
+      stageName: 'DeployAppTest'
+      displayName: 'Deploy App Test'
+      deploymentName: 'testdeploy'
+      environment: 'TEST'
+      azureSubscription: 's203t.azdo.deployment'
+      webAppName: 'ece-test-as-childcare-admin'
+## -- Test deploy -- ##
+
   - stage: RunCypressTestsTestEnv
     displayName: Run Cypress Tests On Test Env
     jobs:
