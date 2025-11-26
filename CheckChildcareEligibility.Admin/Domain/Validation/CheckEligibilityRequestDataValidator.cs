@@ -4,6 +4,7 @@ using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
 using CheckYourEligibility.API.Domain.Validation;
 using FluentValidation;
+using System.Text.RegularExpressions;
 
 namespace CheckChildcareEligibility.Admin.Domain.Validation;
 
@@ -49,7 +50,7 @@ public class CheckEligibilityRequestDataValidator : AbstractValidator<IEligibili
             RuleFor(x => ((CheckEligibilityRequestWorkingFamiliesData)x).EligibilityCode)
                 .Cascade((CascadeMode.Stop))
                 .NotEmpty().WithMessage(ValidationMessages.RequiredEligibilityCode)
-                .Must(x => long.TryParse(x, out _)).WithMessage(ValidationMessages.EligibilityCodeNumber)
+                .Must(x => Regex.IsMatch(x.Trim(), @"^[+-]?\d+$")).WithMessage(ValidationMessages.EligibilityCodeNumber)
                 .Must(x => x.Length == 11).WithMessage(ValidationMessages.EligibilityCodeIncorrectLength);
         });
 

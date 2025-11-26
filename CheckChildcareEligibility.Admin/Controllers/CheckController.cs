@@ -151,7 +151,7 @@ public class CheckController : BaseController
                 TempData["Errors"]?.ToString()
             );
 
-            var eligbilityOutcomeVm = new EligibilityOutcomeViewModel
+            var eligibilityOutcomeVm = new EligibilityOutcomeViewModel
             {
                 EligibilityType = eligibilityType,
                 EligibilityTypeLabel = GetEligibilityTypeLabel(eligibilityType),
@@ -160,32 +160,32 @@ public class CheckController : BaseController
                 ParentNino = parent?.NationalInsuranceNumber ?? string.Empty
             };
 
-            var isLA = _Claims?.Organisation?.Category?.Name == Constants.CategoryTypeLA; //false=school
+            var isLA = _Claims?.Organisation?.Category?.Name == CheckChildcareEligibility.Admin.Models.Constants.CategoryTypeLA; //false=school
             switch (outcome)
             {
                 case "eligible":
-                    return View(isLA ? "Outcome/Eligible_LA" : "Outcome/Eligible", eligbilityOutcomeVm);
+                    return View(isLA ? "Outcome/Eligible_LA" : "Outcome/Eligible", eligibilityOutcomeVm);
 
                 case "notEligible":
-                    return View(isLA ? "Outcome/Not_Eligible_LA" : "Outcome/Not_Eligible", eligbilityOutcomeVm);
+                    return View(isLA ? "Outcome/Not_Eligible_LA" : "Outcome/Not_Eligible", eligibilityOutcomeVm);
 
                 case "parentNotFound":
-                    return View("Outcome/Not_Found", eligbilityOutcomeVm);
+                    return View("Outcome/Not_Found", eligibilityOutcomeVm);
                 
                 case "error":
-                    return View("Outcome/Technical_Error", eligbilityOutcomeVm);
+                    return View("Outcome/Technical_Error", eligibilityOutcomeVm);
 
                 case "queuedForProcessing":
-                    return View("Loader", eligbilityOutcomeVm);
+                    return View("Loader", eligibilityOutcomeVm);
 
                 default:
-                    return View("Outcome/Technical_Error", eligbilityOutcomeVm);
+                    return View("Outcome/Technical_Error", eligibilityOutcomeVm);
             }
         }
         catch (Exception ex)
         {
             // Create a minimal view model for the error case
-            var eligbilityOutcomeVm = new EligibilityOutcomeViewModel
+            var eligibilityOutcomeVm = new EligibilityOutcomeViewModel
             {
                 EligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty,
                 EligibilityTypeLabel = GetEligibilityTypeLabel(TempData.Peek("EligibilityType")?.ToString() ?? string.Empty)
@@ -201,13 +201,13 @@ public class CheckController : BaseController
 
                 if (parent != null)
                 {
-                    eligbilityOutcomeVm.ParentLastName = parent.LastName ?? string.Empty;
-                    eligbilityOutcomeVm.ParentDateOfBirth = GetDateOfBirth(parent.Day, parent.Month, parent.Year).ToString();
-                    eligbilityOutcomeVm.ParentNino = parent.NationalInsuranceNumber ?? string.Empty;
+                    eligibilityOutcomeVm.ParentLastName = parent.LastName ?? string.Empty;
+                    eligibilityOutcomeVm.ParentDateOfBirth = GetDateOfBirth(parent.Day, parent.Month, parent.Year).ToString();
+                    eligibilityOutcomeVm.ParentNino = parent.NationalInsuranceNumber ?? string.Empty;
                 }
             }
 
-            return View("Outcome/Technical_Error", eligbilityOutcomeVm);
+            return View("Outcome/Technical_Error", eligibilityOutcomeVm);
         }
     }
 

@@ -6,7 +6,7 @@
 @{
     var claims = DfeSignInExtensions.GetDfeClaims(_httpContext.HttpContext.User.Claims);
 
-    var clarityId = claims?.Organisation?.Category?.Name == Constants.CategoryTypeLA ? Configuration["Clarity:LA"] : Configuration["Clarity:School"];
+    var clarityId = Configuration["Clarity"];
 }
 
 <!DOCTYPE html>
@@ -26,11 +26,11 @@
 
 <body class="govuk-template__body  js-enabled" data-clarity="@clarityId">
     <div id="cookie-banner" class="govuk-cookie-banner cookie-hidden" role="region"
-         aria-label="Cookies on Manage eligbility for childcare support" data-nosnippet>
+         aria-label="Cookies on Manage eligibility for childcare support" data-nosnippet>
         <div class="govuk-cookie-banner__message govuk-width-container">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
-                    <h2 class="govuk-cookie-banner__heading govuk-heading-m">Cookies on Manage eligbility for childcare support</h2>
+                    <h2 class="govuk-cookie-banner__heading govuk-heading-m">Cookies on Manage eligibility for childcare support</h2>
                     <div class="govuk-cookie-banner__content">
                         <p class="govuk-body">
                             We use some essential cookies to make this service work.
@@ -54,7 +54,7 @@
         </div>
     </div>
     <div id="cookie-confirmation" class="govuk-cookie-banner cookie-hidden" role="region"
-         aria-label="Cookies on Manage eligbility for childcare support" data-nosnippet>
+         aria-label="Cookies on Manage eligibility for childcare support" data-nosnippet>
         <div class="govuk-cookie-banner__message govuk-width-container" role="alert">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
