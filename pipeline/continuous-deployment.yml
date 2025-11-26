@@ -27,8 +27,8 @@ stages:
       displayName: 'Deploy App Dev'
       deploymentName: 'devdeploy'
       environment: 'DEV'
-      azureSubscription: 's203d.azdo.deployment'
-      webAppName: 'ece-dev-as-childcare-admin'
+      azureSubscription: $(subscriptionDev)
+      webAppName: $(webAppNameDev)
 ## -- Dev deploy -- ##
 
 ## -- Dev cypress tests -- ##
@@ -48,8 +48,8 @@ stages:
       displayName: 'Deploy App Test'
       deploymentName: 'testdeploy'
       environment: 'TEST'
-      azureSubscription: 's203t.azdo.deployment'
-      webAppName: 'ece-test-as-childcare-admin'
+      azureSubscription: $(subscriptionTest)
+      webAppName: $(webAppNameTest)
 ## -- Test deploy -- ##
 
 ## -- Test cypress tests -- ##
@@ -69,8 +69,8 @@ stages:
       displayName: 'Deploy App Pre-prod'
       deploymentName: 'ppdeploy'
       environment: 'PRE-PROD'
-      azureSubscription: 's203t.azdo.deployment'
-      webAppName: 'ece-pp-as-childcare-admin'
+      azureSubscription: $(subscriptionPreProd)
+      webAppName: $(webAppNamePreProd)
 ## -- Pre-prod deploy -- ##
 
 ## -- Pre-prod cypress tests -- ##
@@ -90,6 +90,6 @@ stages:
       displayName: 'Deploy App Production'
       deploymentName: 'prodDeploy'
       environment: 'PROD'
-      azureSubscription: 's203p.azdo.deployment'
-      webAppName: 'ece-as-childcare-admin'
+      azureSubscription: $(subscriptionProd)
+      webAppName: $(webAppNameProd)
 ## -- Prod deploy -- ##
