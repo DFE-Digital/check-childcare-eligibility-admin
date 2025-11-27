@@ -68,17 +68,18 @@ public class BulkCheckController : BaseController
 
             return RedirectToAction("Bulk_Check", viewModel);
         }
+        else if (fileUpload.Length >= 10 * 1024 * 1024) // 10 MB limit
+        {
+            TempData["ErrorMessage"] = BulkCheckValidationMessages.FileTooLarge;
+            return RedirectToAction("Bulk_Check", viewModel);
+        }
         else if (fileUpload.ContentType.ToLower() != "text/csv") {
 
             TempData["ErrorMessage"] = BulkCheckValidationMessages.IncorrectFileType;
 
             return RedirectToAction("Bulk_Check", viewModel);
         }
-        else if (fileUpload.Length >= 10 * 1024 * 1024) // 10 MB limit
-        {
-            TempData["ErrorMessage"] = BulkCheckValidationMessages.FileTooLarge;
-            return RedirectToAction("Bulk_Check", viewModel);
-        }
+      
         var fileName = fileUpload.FileName;
         var submittedBy = $"{_Claims?.User.FirstName} {_Claims?.User.Surname}";
         var timeNow = DateTime.UtcNow;

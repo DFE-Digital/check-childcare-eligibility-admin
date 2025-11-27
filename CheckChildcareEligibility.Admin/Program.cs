@@ -1,4 +1,3 @@
-using System.Globalization;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using CheckChildcareEligibility.Admin;
@@ -9,6 +8,7 @@ using CheckChildcareEligibility.Admin.Middleware;
 using CheckChildcareEligibility.Admin.Usecases;
 using CheckChildcareEligibility.Admin.UseCases;
 using FluentValidation;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +30,10 @@ if (Environment.GetEnvironmentVariable("CHILDCARE_ADMIN_KEY_VAULT_NAME") != null
         }
     );
 }
-
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 104_857_600; // 100 MB
+});
 // Add services to the container.
 builder.Services.AddServices(builder.Configuration);
 builder.Services.AddSession();
