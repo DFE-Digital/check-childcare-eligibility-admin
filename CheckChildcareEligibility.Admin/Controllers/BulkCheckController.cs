@@ -299,7 +299,7 @@ public class BulkCheckController : BaseController
             case "EarlyYearPupilPremium":
                 return "early-year-pupil-premium";
             default:
-                return "free-school-meal";
+                return "working-families";
         }
     }
 
@@ -308,7 +308,6 @@ public class BulkCheckController : BaseController
         _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
 
         var response = await _getBulkCheckStatusesUseCase.Execute(_Claims.Organisation.EstablishmentNumber, HttpContext.Session);
-        var filteredResponse = response.Where(x => x.EligibilityType == "TwoYearOffer" || x.EligibilityType == "EarlyYearPupilPremium");
         var pageSize = 10;
         var checks = response
             .Skip((pageNumber - 1) * pageSize)
@@ -326,8 +325,8 @@ public class BulkCheckController : BaseController
             .OrderByDescending(x=> x.DateSubmitted);
 
         ViewBag.CurrentPage = pageNumber;
-        ViewBag.TotalPages = (int)Math.Ceiling(filteredResponse.Count() / (float)pageSize);
-        ViewBag.TotalRecords = filteredResponse.Count();
+        ViewBag.TotalPages = (int)Math.Ceiling(response.Count() / (float)pageSize);
+        ViewBag.TotalRecords = response.Count();
         ViewBag.RecordsPerPage = pageSize;
 
         var vm = new BulkCheckStatusesViewModel()

@@ -17,7 +17,8 @@
     Dictionary<string, string> eligibilityTypeName = new()
     {
         { "TwoYearOffer", "2 years old early learning" },
-        { "EarlyYearPupilPremium", "Early years pupil premium" }
+        { "EarlyYearPupilPremium", "Early years pupil premium" },
+        { "WorkingFamilies", "Working families" }
     };
 
     var dateCultureFormatted = TimeZoneInfo.ConvertTimeFromUtc(Model.DateSubmitted, TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time"));
@@ -25,8 +26,6 @@
 }
 
 <tr>
-    @if (Model.EligibilityType == "TwoYearOffer" || Model.EligibilityType == "EarlyYearPupilPremium")
-    {
         <td class="govuk-table__cell">@(Model.Filename)</td>
         <td class="govuk-table__cell">@(@eligibilityTypeName[Model.EligibilityType])</td>
         <td class="govuk-table__cell">@(dateSubmittedFormatted)</td>
@@ -61,5 +60,5 @@
         {
             <td class="govuk-table__cell"></td>
         }
-    }
+    
 </tr>
