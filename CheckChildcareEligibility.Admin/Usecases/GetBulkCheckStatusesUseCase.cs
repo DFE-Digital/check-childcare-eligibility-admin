@@ -11,7 +11,6 @@ namespace CheckChildcareEligibility.Admin.Usecases
         Task<IEnumerable<BulkCheck>> Execute(string request, ISession session);
     }
 
-
     public class GetBulkCheckStatusesUseCase : IGetBulkCheckStatusesUseCase
     {
         private readonly ICheckGateway _checkGateway;

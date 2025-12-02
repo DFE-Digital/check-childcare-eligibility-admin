@@ -2,6 +2,7 @@
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
+using CheckChildcareEligibility.Admin.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -114,11 +115,11 @@ public class CheckGateway : BaseGateway, ICheckGateway
         return null;
     }
 
-    public async Task<CheckEligibilityBulkResponse> GetBulkCheckResults(string resultsUrl)
+    public async Task<T> GetBulkCheckResults<T>(string resultsUrl) where T : CheckEligibilityBulkResponseBase, new()
     {
         try
         {
-            var result = await ApiDataGetAsynch(resultsUrl, new CheckEligibilityBulkResponse());
+            var result = await ApiDataGetAsynch(resultsUrl, new T());
             return result;
         }
         catch (Exception ex)
@@ -127,7 +128,22 @@ public class CheckGateway : BaseGateway, ICheckGateway
             throw;
         }
     }
+    public async Task<IEnumerable<IBulkExport>> LoadBulkCheckResults(string bulkCheckId, CheckEligibilityType eligibilityType)
+    {
+        CheckEligibilityBulkResponseBase bulkResult;
+       
+        switch (eligibilityType)
+        {
+            case CheckEligibilityType.WorkingFamilies:
+                bulkResult = await GetBulkCheckResults<CheckEligibilityBulkWorkingFamiliesResponse>($"bulk-check/{bulkCheckId}/");
+                break;
+            default:
+                bulkResult = await GetBulkCheckResults<CheckEligibilityBulkResponse>($"bulk-check/{bulkCheckId}/");
+                break;
 
+        }
+       return bulkResult.BulkDataMapper();
+    }
 
     public async Task<CheckEligibilityResponseBulk> PostBulkCheck(CheckEligibilityRequestBulk requestBody)
     {

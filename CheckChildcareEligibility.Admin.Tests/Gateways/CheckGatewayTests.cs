@@ -273,7 +273,7 @@ internal class CheckGatewayTests
             .ReturnsAsync(responseMessage);
 
         // Act
-        var result = await _sut.GetBulkCheckResults(resultsUrl);
+        var result = await _sut.GetBulkCheckResults<CheckEligibilityBulkResponse>(resultsUrl);
 
         // Assert
         result.Should().NotBeNull();
@@ -293,7 +293,7 @@ internal class CheckGatewayTests
             .ThrowsAsync(new HttpRequestException("Test exception"));
 
         // Act
-        Func<Task> act = async () => await _sut.GetBulkCheckResults(resultsUrl);
+        Func<Task> act = async () => await _sut.GetBulkCheckResults<CheckEligibilityBulkResponse>(resultsUrl);
 
         // Assert
         await act.Should().ThrowAsync<HttpRequestException>().WithMessage("Test exception");

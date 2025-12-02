@@ -1,6 +1,7 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Controllers.Constants;
 using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
@@ -8,6 +9,7 @@ using CheckChildcareEligibility.Admin.Usecases;
 using CheckChildcareEligibility.Admin.ViewModels;
 using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -224,19 +226,11 @@ public class BulkCheckController : BaseController
         var filePrefix = GetFileNamePrefix(eligibilityType);
         TempData["filePrefix"] = filePrefix;
 
-        var resultData =
-            await _checkGateway.GetBulkCheckResults(HttpContext.Session.GetString("Get_BulkCheck_Results"));
-        var exportData = resultData.Data.Select(x => new BulkFSMExport
-        {
-            LastName = x.LastName,
-            DOB = x.DateOfBirth,
-            NI = x.NationalInsuranceNumber,
-            Outcome = x.Status.GetFsmStatusDescription()
-        });
+        var exportData = _checkGateway.LoadBulkCheckResults(HttpContext.Session.GetString("Get_BulkCheck_Results"), Enum.Parse<CheckEligibilityType>(eligibilityType));
 
         var fileName = $"{filePrefix}-outcomes-{DateTime.Now.ToString("yyyyMMdd")}.csv";
 
-        var result = WriteCsvToMemory(exportData);
+        var result = WriteCsvToMemory((IEnumerable<IBulkExport>)exportData);
         var memoryStream = new MemoryStream(result);
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = fileName };
     }
@@ -249,21 +243,11 @@ public class BulkCheckController : BaseController
         var filePrefix = GetFileNamePrefix(eligibilityType);
         TempData["filePrefix"] = filePrefix;
 
-        var resultData =
-            await _checkGateway.GetBulkCheckResults($"bulk-check/{bulkCheckId}/" );
-
-        var exportData = resultData.Data.Select(x => new BulkFSMExport
-        {
-            LastName = x.LastName,
-            DOB = x.DateOfBirth,
-            NI = x.NationalInsuranceNumber,
-            // NASS field removed as it's not being used in the application
-            Outcome = x.Status.GetFsmStatusDescription()
-        });
+        var exportData = _checkGateway.LoadBulkCheckResults(bulkCheckId, Enum.Parse<CheckEligibilityType>(eligibilityType));
 
         var outputfileName = $"{filePrefix}-outcomes-{DateTime.Now.ToString("yyyyMMdd")}.csv";
 
-        var result = WriteCsvToMemory(exportData);
+        var result = WriteCsvToMemory((IEnumerable<IBulkExport>)exportData);
         var memoryStream = new MemoryStream(result);
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = outputfileName };
     }
@@ -276,7 +260,7 @@ public class BulkCheckController : BaseController
         return RedirectToAction("Bulk_Check_Status");
     }
 
-    private byte[] WriteCsvToMemory(IEnumerable<BulkFSMExport> records)
+    private byte[] WriteCsvToMemory(IEnumerable<IBulkExport> records)
     {
         using (var memoryStream = new MemoryStream())
         using (var streamWriter = new StreamWriter(memoryStream))
