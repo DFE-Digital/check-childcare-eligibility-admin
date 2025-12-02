@@ -225,11 +225,12 @@ public class BulkCheckController : BaseController
         var eligibilityType = TempData["eligibilityType"]?.ToString();
         var filePrefix = GetFileNamePrefix(eligibilityType);
         TempData["filePrefix"] = filePrefix;
-        var exportData = await _checkGateway.LoadBulkCheckResults(HttpContext.Session.GetString("Get_BulkCheck_Results"), eligibilityType);
+        Enum.TryParse(eligibilityType, out CheckEligibilityType eligibilityTypeEnum);
+        var exportData = await _checkGateway.LoadBulkCheckResults(HttpContext.Session.GetString("Get_BulkCheck_Results"), eligibilityTypeEnum);
 
         var fileName = $"{filePrefix}-outcomes-{DateTime.Now.ToString("yyyyMMdd")}.csv";
 
-        var result = WriteCsvToMemory(exportData);
+        var result = WriteCsvToMemory(exportData, eligibilityTypeEnum);
         var memoryStream = new MemoryStream(result);
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = fileName };
     }
@@ -241,12 +242,12 @@ public class BulkCheckController : BaseController
 
         var filePrefix = GetFileNamePrefix(eligibilityType);
         TempData["filePrefix"] = filePrefix;
-
-        var exportData = await _checkGateway.LoadBulkCheckResults(bulkCheckId,eligibilityType);
+        Enum.TryParse(eligibilityType, out CheckEligibilityType eligibilityTypeEnum);
+        var exportData = await _checkGateway.LoadBulkCheckResults(bulkCheckId, eligibilityTypeEnum);
 
         var outputfileName = $"{filePrefix}-outcomes-{DateTime.Now.ToString("yyyyMMdd")}.csv";
 
-        var result = WriteCsvToMemory(exportData);
+        var result = WriteCsvToMemory(exportData, eligibilityTypeEnum);
         var memoryStream = new MemoryStream(result);
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = outputfileName };
     }
@@ -259,18 +260,25 @@ public class BulkCheckController : BaseController
         return RedirectToAction("Bulk_Check_Status");
     }
 
-    private byte[] WriteCsvToMemory(IEnumerable<IBulkExport> records)
+    private byte[] WriteCsvToMemory(IEnumerable<IBulkExport> records, CheckEligibilityType checkEligibilityType)
     {
+
         using (var memoryStream = new MemoryStream())
         using (var streamWriter = new StreamWriter(memoryStream))
         using (var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture))
         {
-            csvWriter.WriteRecords(records);
+            switch (checkEligibilityType) {
+                case CheckEligibilityType.WorkingFamilies:
+                    csvWriter.WriteRecords(records.Cast<BulkExportWorkingFamilies>());
+                    break;
+                default:
+                    csvWriter.WriteRecords(records.Cast<BulkExport>());
+                    break;
+            }
             streamWriter.Flush();
             return memoryStream.ToArray();
         }
     }
-
     private string GetFileNamePrefix(string? eligibilityType)
     {
         switch (eligibilityType)

@@ -128,11 +128,11 @@ public class CheckGateway : BaseGateway, ICheckGateway
             throw;
         }
     }
-    public async Task<IEnumerable<IBulkExport>> LoadBulkCheckResults(string bulkCheckId, string eligibilityType)
+    public async Task<IEnumerable<IBulkExport>> LoadBulkCheckResults(string bulkCheckId, CheckEligibilityType eligibilityType)
     {
         CheckEligibilityBulkResponseBase bulkResult;
-        Enum.TryParse(eligibilityType, out CheckEligibilityType eligibilityTypeEnum);
-        switch (eligibilityTypeEnum)
+      
+        switch (eligibilityType)
         {
             case CheckEligibilityType.WorkingFamilies:
                 bulkResult = await GetBulkCheckResults<CheckEligibilityBulkWorkingFamiliesResponse>($"bulk-check/{bulkCheckId}/");

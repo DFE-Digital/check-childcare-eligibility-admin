@@ -25,9 +25,9 @@ public class BulkExportWorkingFamilies : IBulkExport
     [Name("Outcome")] public string Outcome { get; set; }
 
     // 28-11-2025 This will be the returned VSD from the API for now 
-    [Name("Eligibility confirmed on")] public string EligibilityConfirmedOn { get; set; }
+    [Name("Validity start date")] public string ValidityStartDate { get; set; }
     // 28-11-2025 This will be the returned VED from the API 
-    [Name("Reconfirm by")] public string ReconfirmBy { get; set; }
+    [Name("Validity end date")] public string ValidityEndDate { get; set; }
     [Name("Grace period ends")] public string GracePeriodEnds { get; set; }
 
 
