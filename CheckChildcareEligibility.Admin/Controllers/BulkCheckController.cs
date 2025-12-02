@@ -325,8 +325,9 @@ public class BulkCheckController : BaseController
             .OrderByDescending(x=> x.DateSubmitted);
 
         ViewBag.CurrentPage = pageNumber;
-        ViewBag.TotalPages = (int)Math.Ceiling(response.Count() / (float)pageSize);
-        ViewBag.TotalRecords = response.Count();
+        var totalRecords = response.Where(x => x.Status != "Deleted").Count();
+        ViewBag.TotalRecords = totalRecords;
+        ViewBag.TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
         ViewBag.RecordsPerPage = pageSize;
 
         var vm = new BulkCheckStatusesViewModel()
