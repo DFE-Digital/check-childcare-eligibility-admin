@@ -225,12 +225,11 @@ public class BulkCheckController : BaseController
         var eligibilityType = TempData["eligibilityType"]?.ToString();
         var filePrefix = GetFileNamePrefix(eligibilityType);
         TempData["filePrefix"] = filePrefix;
-
-        var exportData = _checkGateway.LoadBulkCheckResults(HttpContext.Session.GetString("Get_BulkCheck_Results"), Enum.Parse<CheckEligibilityType>(eligibilityType));
+        var exportData = await _checkGateway.LoadBulkCheckResults(HttpContext.Session.GetString("Get_BulkCheck_Results"), eligibilityType);
 
         var fileName = $"{filePrefix}-outcomes-{DateTime.Now.ToString("yyyyMMdd")}.csv";
 
-        var result = WriteCsvToMemory((IEnumerable<IBulkExport>)exportData);
+        var result = WriteCsvToMemory(exportData);
         var memoryStream = new MemoryStream(result);
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = fileName };
     }
@@ -243,11 +242,11 @@ public class BulkCheckController : BaseController
         var filePrefix = GetFileNamePrefix(eligibilityType);
         TempData["filePrefix"] = filePrefix;
 
-        var exportData = _checkGateway.LoadBulkCheckResults(bulkCheckId, Enum.Parse<CheckEligibilityType>(eligibilityType));
+        var exportData = await _checkGateway.LoadBulkCheckResults(bulkCheckId,eligibilityType);
 
         var outputfileName = $"{filePrefix}-outcomes-{DateTime.Now.ToString("yyyyMMdd")}.csv";
 
-        var result = WriteCsvToMemory((IEnumerable<IBulkExport>)exportData);
+        var result = WriteCsvToMemory(exportData);
         var memoryStream = new MemoryStream(result);
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = outputfileName };
     }

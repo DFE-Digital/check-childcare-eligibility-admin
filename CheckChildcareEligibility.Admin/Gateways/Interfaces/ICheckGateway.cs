@@ -13,7 +13,7 @@ public interface ICheckGateway
     Task<CheckEligibilityBulkProgressByLAResponse> GetBulkCheckStatuses(string organisationId);
     Task<T> GetBulkCheckResults<T>(string resultsUrl) where T : CheckEligibilityBulkResponseBase, new();
     Task<CheckEligibilityResponseBulk> PostBulkCheck(CheckEligibilityRequestBulk requestBody);
-    Task<IEnumerable<IBulkExport>> LoadBulkCheckResults(string bulkCheckId, CheckEligibilityType eligibilityType);
+    Task<IEnumerable<IBulkExport>> LoadBulkCheckResults(string bulkCheckId, string eligibilityType);
 
     // single
     Task<CheckEligibilityResponse> PostCheck(CheckEligibilityRequest requestBody);
