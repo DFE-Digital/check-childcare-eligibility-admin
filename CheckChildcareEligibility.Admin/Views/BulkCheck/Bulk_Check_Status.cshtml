@@ -8,32 +8,41 @@
 
 <div class="govuk-grid-column-full">
     <a class="govuk-back-link backLinkJS" href="@Url.Action("MenuBulkCheck", "Home")">Back</a>
-
     @if (TempData["JustUploaded"]?.ToString() == "true")
     {
-        <div class="govuk-notification-banner" role="alert"
-             aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
             <div class="govuk-notification-banner__header">
-                <h2 class="govuk-notification-banner__title"
-                    id="govuk-notification-banner-title">
-                    Batch checks status
+                <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                    File submitted
                 </h2>
             </div>
             <div class="govuk-notification-banner__content">
                 <h3 class="govuk-notification-banner__heading">
-                    Your file has been submitted but checks have not started
+                    Your file was submitted but checks have not started.
+                </h3>
+                <p>Processing time depends on file size and how many checks are currently running.</p>
+
+            </div>
+        </div>
+
+    }
+    else if (TempData["FileDeleted"]?.ToString() == "true")
+    {
+        <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                    Success
+                </h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <h3 class="govuk-notification-banner__heading">
+                    File deleted
                 </h3>
             </div>
         </div>
     }
-    else
-    {
-        <div class="moj-page-header-actions">
-            <div class="moj-page-header-actions__title">
-                <h1 class="govuk-heading-l">Batch checks status</h1>
-            </div>
-        </div>
-    }
+    <h1 class="govuk-heading-l">Batch checks status</h1>
+   
 
     <div class="govuk-grid-row" id="content" data-type="Refresh" data-url="@Url.Action("Bulk_Check_Status", "BulkCheck", new { pageNumber = ViewBag.CurrentPage })">
 

@@ -242,7 +242,6 @@ public class BulkCheckController : BaseController
         TempData["filePrefix"] = filePrefix;
         Enum.TryParse(eligibilityType, out CheckEligibilityType eligibilityTypeEnum);
         var exportData = await _checkGateway.LoadBulkCheckResults(bulkCheckId, eligibilityTypeEnum);
-
         var outputfileName = $"{filePrefix}-outcomes-{DateTime.Now.ToString("yyyyMMdd")}.csv";
 
         var result = WriteCsvToMemory(exportData, eligibilityTypeEnum);
@@ -252,10 +251,24 @@ public class BulkCheckController : BaseController
 
     public async Task<IActionResult> Bulk_check_file_delete(string bulkCheckId)
     {
-        var result =
-            await  _deleteBulkCheckFileUseCase.Execute(bulkCheckId, HttpContext.Session);
+        try
+        {
+            var result =
+            await _deleteBulkCheckFileUseCase.Execute(bulkCheckId, HttpContext.Session);
 
-        return RedirectToAction("Bulk_Check_Status");
+            TempData["FileDeleted"] = "true";
+
+            return RedirectToAction("Bulk_Check_Status");
+
+        }
+        catch (Exception ex) {
+            TempData["FileDeleted"] = "false";
+            return RedirectToAction("Bulk_Check_Status");
+
+        }
+
+
+
     }
 
     private byte[] WriteCsvToMemory(IEnumerable<IBulkExport> records, CheckEligibilityType checkEligibilityType)
