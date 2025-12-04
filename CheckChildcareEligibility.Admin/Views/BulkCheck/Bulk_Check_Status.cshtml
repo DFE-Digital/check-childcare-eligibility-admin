@@ -7,7 +7,7 @@
 @Html.AntiForgeryToken()
 
 <div class="govuk-grid-column-full">
-    <a class="govuk-back-link" href="@Url.Action("MenuBulkCheck", "Home")" onclick="history.back(); return false;">Back</a>
+    <a class="govuk-back-link backLinkJS" href="@Url.Action("MenuBulkCheck", "Home")">Back</a>
 
     @if (TempData["JustUploaded"]?.ToString() == "true")
     {
