@@ -309,7 +309,8 @@ public class BulkCheckController : BaseController
     {
         _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
 
-        var response = await _getBulkCheckStatusesUseCase.Execute(_Claims.Organisation.EstablishmentNumber, HttpContext.Session);
+        var response = (await _getBulkCheckStatusesUseCase.Execute(_Claims.Organisation.EstablishmentNumber, HttpContext.Session)).Where(x => x.Status != "Deleted");
+        var totalRecords = response.Count();
         var pageSize = 10;
         var checks = response
             .Skip((pageNumber - 1) * pageSize)
@@ -323,12 +324,11 @@ public class BulkCheckController : BaseController
                 Status = x.Status,
                 SubmittedBy = x.SubmittedBy
             })
-            .Where(x => x.Status != "Deleted")
             .OrderByDescending(x=> x.DateSubmitted);
 
         ViewBag.CurrentPage = pageNumber;
-        ViewBag.TotalPages = (int)Math.Ceiling(response.Count() / (float)pageSize);
-        ViewBag.TotalRecords = response.Count();
+        ViewBag.TotalRecords = totalRecords;
+        ViewBag.TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
         ViewBag.RecordsPerPage = pageSize;
 
         var vm = new BulkCheckStatusesViewModel()
