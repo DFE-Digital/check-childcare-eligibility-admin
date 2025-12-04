@@ -18,3 +18,12 @@ document.addEventListener("DOMContentLoaded", function () {
 document.querySelectorAll('.js-only').forEach(x => x.classList.add("show"))
 //END-- Can show elements only when JavaScript is enabled by using this class on the element
 
+
+//BEGIN-- Back link in views
+document.addEventListener("DOMContentLoaded", function () {
+    const backs = document.getElementsByClassName("backLinkJS");
+    for (var i = 0; i < backs.length; i++) {
+        backs[i].onclick = function () { history.back(); return false; };
+    }
+});
+//END-- Back link in views
