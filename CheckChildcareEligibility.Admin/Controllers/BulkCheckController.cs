@@ -9,9 +9,7 @@ using CheckChildcareEligibility.Admin.Usecases;
 using CheckChildcareEligibility.Admin.ViewModels;
 using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections;
 using System.Globalization;
-using System.Reflection;
 using System.Text;
 
 namespace CheckChildcareEligibility.Admin.Controllers;
@@ -66,18 +64,18 @@ public class BulkCheckController : BaseController
         // Validation for file upload
         if (fileUpload == null)
         {
-            TempData["ErrorMessage"] = BulkCheckValidationMessages.NoFileSelected;
+            TempData["ErrorMessage"] = BulkCheckControllerValidationMessages.NoFileSelected;
 
             return RedirectToAction("Bulk_Check", viewModel);
         }
         else if (fileUpload.Length >= 10 * 1024 * 1024) // 10 MB limit
         {
-            TempData["ErrorMessage"] = BulkCheckValidationMessages.FileTooLarge;
+            TempData["ErrorMessage"] = BulkCheckControllerValidationMessages.FileTooLarge;
             return RedirectToAction("Bulk_Check", viewModel);
         }
         else if (fileUpload.ContentType.ToLower() != "text/csv") {
 
-            TempData["ErrorMessage"] = BulkCheckValidationMessages.IncorrectFileType;
+            TempData["ErrorMessage"] = BulkCheckControllerValidationMessages.IncorrectFileType;
 
             return RedirectToAction("Bulk_Check", viewModel);
         }
@@ -121,7 +119,7 @@ public class BulkCheckController : BaseController
         // validate
         if (sessionCount > int.Parse(_config["BulkUploadAttemptLimit"]))
         {
-            TempData["ErrorMessage"] = BulkCheckValidationMessages.BulkUploadAttemptLimitReached(_config["BulkUploadAttemptLimit"]);
+            TempData["ErrorMessage"] = BulkCheckControllerValidationMessages.BulkUploadAttemptLimitReached(_config["BulkUploadAttemptLimit"]);
             return RedirectToAction("Bulk_Check", viewModel);
         }
 
@@ -148,7 +146,7 @@ public class BulkCheckController : BaseController
                     if (!parsedItems.Errors.Any() && string.IsNullOrWhiteSpace(parsedItems.ErrorMessage))
                     {
 
-                        TempData["ErrorMessage"] = BulkCheckValidationMessages.EmptyFile;
+                        TempData["ErrorMessage"] = BulkCheckControllerValidationMessages.EmptyFile;
                         errorsViewModel.Errors = new List<CheckRowError>();
                         
                         return RedirectToAction("Bulk_Check", viewModel);
