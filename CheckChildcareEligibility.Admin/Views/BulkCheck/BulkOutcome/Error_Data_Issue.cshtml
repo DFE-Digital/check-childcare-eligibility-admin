@@ -21,8 +21,14 @@
         <li>@Html.ActionLink("Upload your file again and run another check.", "Bulk_Check", "BulkCheck")</li>
     </ol>
 
-    <table class="govuk-table" id="errors">
-        <caption class="govuk-table__caption govuk-table__caption--s"></caption>
+    <table class="govuk-table govuk-!-margin-top-6" id="errors">
+        <caption class="govuk-table__caption govuk-table__caption--s">
+            @{
+                int errorCount = Model.Errors.Count();
+                string displayCount = (errorCount < 25) ? errorCount.ToString() : "25";
+            }
+            Showing @displayCount of @errorCount errors
+        </caption>
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
                 <th scope="col" class="govuk-table__header">Line</th>
@@ -30,7 +36,7 @@
             </tr>
         </thead>
         <tbody class="govuk-table__body">
-            @foreach (var error in Model.Errors)
+            @foreach (var error in Model.Errors.Take(25))
             {
                 <tr class="govuk-table__row">
                     <td class="govuk-table__cell">@error.LineNumber</td>
