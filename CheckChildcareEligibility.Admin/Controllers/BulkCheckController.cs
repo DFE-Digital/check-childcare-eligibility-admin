@@ -1,6 +1,7 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Controllers.Constants;
 using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
+using CheckChildcareEligibility.Admin.Domain.DfeSignIn;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
@@ -9,6 +10,7 @@ using CheckChildcareEligibility.Admin.ViewModels;
 using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -307,7 +309,8 @@ public class BulkCheckController : BaseController
     {
         _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
 
-        var response = await _getBulkCheckStatusesUseCase.Execute(_Claims.Organisation.EstablishmentNumber, HttpContext.Session);
+        var response = (await _getBulkCheckStatusesUseCase.Execute(_Claims.Organisation.EstablishmentNumber, HttpContext.Session)).Where(x => x.Status != "Deleted");
+        var totalRecords = response.Count();
         var pageSize = 10;
         var checks = response
             .Skip((pageNumber - 1) * pageSize)
@@ -321,11 +324,9 @@ public class BulkCheckController : BaseController
                 Status = x.Status,
                 SubmittedBy = x.SubmittedBy
             })
-            .Where(x => x.Status != "Deleted")
             .OrderByDescending(x=> x.DateSubmitted);
 
         ViewBag.CurrentPage = pageNumber;
-        var totalRecords = response.Where(x => x.Status != "Deleted").Count();
         ViewBag.TotalRecords = totalRecords;
         ViewBag.TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
         ViewBag.RecordsPerPage = pageSize;
