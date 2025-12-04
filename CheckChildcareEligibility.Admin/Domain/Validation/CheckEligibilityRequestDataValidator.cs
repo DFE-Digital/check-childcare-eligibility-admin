@@ -40,7 +40,6 @@ public class CheckEligibilityRequestDataValidator : AbstractValidator<IEligibili
                 .NotEmpty().WithMessage(ValidationMessages.RequiredEligibilityCode)
                 .Must(x => Regex.IsMatch(x.Trim(), @"^[+-]?\d+$")).WithMessage(ValidationMessages.EligibilityCodeNumber)
                 .Must(x => x.Length == 11).WithMessage(ValidationMessages.EligibilityCodeIncorrectLength);
-
             RuleFor(x => ((CheckEligibilityRequestWorkingFamiliesData)x).NationalInsuranceNumber)
              .Cascade((CascadeMode.Stop))
              .NotEmpty().WithMessage(ValidationMessages.RequiredNI)

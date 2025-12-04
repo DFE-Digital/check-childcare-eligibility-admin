@@ -253,29 +253,29 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
             viewResult.ViewName.Should().BeEquivalentTo("BulkOutcome/Success");
         }
 
-        //[Test]
-        //public async Task Given_Bulk_check_download_When_LoadingPage_Should_return_csvFile()
-        //{
-        //    //arrange
-        //    var response =
-        //        new CheckEligibilityBulkResponse
-        //        {
-        //            Data = new List<CheckEligibilityItem>
-        //            {
-        //            new() { Status = CheckEligibilityStatus.eligible.ToString() }
-        //            }
-        //        };
+        [Test]
+        public async Task Given_Bulk_check_download_When_LoadingPage_Should_return_csvFile()
+        {
+            //arrange
+            var response =
+                new CheckEligibilityBulkResponse
+                {
+                    Data = new List<CheckEligibilityItem>
+                    {
+                    new() { Status = CheckEligibilityStatus.eligible.ToString() }
+                    }
+                };
 
-        //    _checkGatewayMock.Setup(s => s.GetBulkCheckResults(It.IsAny<string>()))
-        //        .ReturnsAsync(response);
-        //    // Act
-        //    var result = await _sut.Bulk_check_download();
+            _checkGatewayMock.Setup(s => s.GetBulkCheckResults<CheckEligibilityBulkResponse>(It.IsAny<string>()))
+                .ReturnsAsync(response);
+            // Act
+            var result = await _sut.Bulk_check_download();
 
-        //    // Assert
-        //    result.Should().BeOfType<FileStreamResult>();
-        //    var viewResult = result as FileStreamResult;
-        //    viewResult.ContentType.Should().BeEquivalentTo("text/csv");
-        //}
+            // Assert
+            result.Should().BeOfType<FileStreamResult>();
+            var viewResult = result as FileStreamResult;
+            viewResult.ContentType.Should().BeEquivalentTo("text/csv");
+        }
 
 
         [TestCase]
