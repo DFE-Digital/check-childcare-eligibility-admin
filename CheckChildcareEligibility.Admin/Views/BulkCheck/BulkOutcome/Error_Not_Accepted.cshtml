@@ -4,8 +4,7 @@
 
 <div class="govuk-grid-column-full">
     <div id="content" data-type="ErrorNotAccepted">
-        @Html.ActionLink("Back", "Index", "Home", null, new { @class = "govuk-back-link" })
-        @* <a class="govuk-back-link-nolink"></a> *@
+        @Html.ActionLink("Back", "Index", "Home", null, new { @class = "govuk-back-link backLinkJS" })
 
         <div class="govuk-error-summary govuk-grid-column-full" data-module="govuk-error-summary" data-type="success">
             <div role="alert">
@@ -24,7 +23,7 @@
             </div>
         </div>
 
-        <p><a href="/TryAgain" onclick="history.back(); return false;">Try again</a>></p>
+        <p><a class="backLinkJS" href="/TryAgain">Try again</a></p>
         <p><a href="@Url.Action("Index", "Home")">Return to dashboard</a></p>
         <p> @Html.ActionLink("Sign Out", "SignOut", "Account")</p>
     </div>
