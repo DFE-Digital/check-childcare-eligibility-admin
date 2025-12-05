@@ -93,7 +93,7 @@ it("will run a successful batch check and redirect to bulk check status page", (
       ]);
     });
     cy.contains("Run check").click();
-    cy.get("h2", { timeout: 80000 }).should(
+    cy.get("h1.govuk-heading-l", { timeout: 80000 }).should(
       "include.text",
       "Batch checks status"
     );
