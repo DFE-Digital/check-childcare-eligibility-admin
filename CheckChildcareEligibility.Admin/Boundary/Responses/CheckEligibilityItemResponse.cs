@@ -5,6 +5,7 @@ public class CheckEligibilityItemResponseBase
 {
     public CheckEligibilityResponseLinks Links { get; set; }
 }
+
 #region 2YO EYPP
 public class CheckEligibilityItem
 {
@@ -26,9 +27,13 @@ public class CheckEligibilityItemResponse : CheckEligibilityItemResponseBase
 #endregion
 
 #region Working Families
-public class CheckEligibilityItemWorkingFamilies : CheckEligibilityItem
+public class CheckEligibilityItemWorkingFamilies
 {
-
+    public string NationalInsuranceNumber { get; set; }
+    public string LastName { get; set; }
+    public string DateOfBirth { get; set; }
+    public string Status { get; set; }
+    public DateTime Created { get; set; }
     public string EligibilityCode { get; set; }
     public string ValidityStartDate { get; set; }
     public string ValidityEndDate { get; set; }

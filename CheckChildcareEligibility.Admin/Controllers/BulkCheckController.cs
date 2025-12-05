@@ -1,7 +1,7 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Controllers.Constants;
 using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
-using CheckChildcareEligibility.Admin.Domain.DfeSignIn;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
@@ -10,8 +10,6 @@ using CheckChildcareEligibility.Admin.ViewModels;
 using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace CheckChildcareEligibility.Admin.Controllers;
@@ -66,18 +64,18 @@ public class BulkCheckController : BaseController
         // Validation for file upload
         if (fileUpload == null)
         {
-            TempData["ErrorMessage"] = BulkCheckValidationMessages.NoFileSelected;
+            TempData["ErrorMessage"] = BulkCheckControllerValidationMessages.NoFileSelected;
 
             return RedirectToAction("Bulk_Check", viewModel);
         }
         else if (fileUpload.Length >= 10 * 1024 * 1024) // 10 MB limit
         {
-            TempData["ErrorMessage"] = BulkCheckValidationMessages.FileTooLarge;
+            TempData["ErrorMessage"] = BulkCheckControllerValidationMessages.FileTooLarge;
             return RedirectToAction("Bulk_Check", viewModel);
         }
         else if (fileUpload.ContentType.ToLower() != "text/csv") {
 
-            TempData["ErrorMessage"] = BulkCheckValidationMessages.IncorrectFileType;
+            TempData["ErrorMessage"] = BulkCheckControllerValidationMessages.IncorrectFileType;
 
             return RedirectToAction("Bulk_Check", viewModel);
         }
@@ -121,7 +119,7 @@ public class BulkCheckController : BaseController
         // validate
         if (sessionCount > int.Parse(_config["BulkUploadAttemptLimit"]))
         {
-            TempData["ErrorMessage"] = BulkCheckValidationMessages.BulkUploadAttemptLimitReached(_config["BulkUploadAttemptLimit"]);
+            TempData["ErrorMessage"] = BulkCheckControllerValidationMessages.BulkUploadAttemptLimitReached(_config["BulkUploadAttemptLimit"]);
             return RedirectToAction("Bulk_Check", viewModel);
         }
 
@@ -148,7 +146,7 @@ public class BulkCheckController : BaseController
                     if (!parsedItems.Errors.Any() && string.IsNullOrWhiteSpace(parsedItems.ErrorMessage))
                     {
 
-                        TempData["ErrorMessage"] = BulkCheckValidationMessages.EmptyFile;
+                        TempData["ErrorMessage"] = BulkCheckControllerValidationMessages.EmptyFile;
                         errorsViewModel.Errors = new List<CheckRowError>();
                         
                         return RedirectToAction("Bulk_Check", viewModel);
@@ -225,20 +223,12 @@ public class BulkCheckController : BaseController
         var eligibilityType = TempData["eligibilityType"]?.ToString();
         var filePrefix = GetFileNamePrefix(eligibilityType);
         TempData["filePrefix"] = filePrefix;
-
-        var resultData =
-            await _checkGateway.GetBulkCheckResults(HttpContext.Session.GetString("Get_BulkCheck_Results"));
-        var exportData = resultData.Data.Select(x => new BulkFSMExport
-        {
-            LastName = x.LastName,
-            DOB = x.DateOfBirth,
-            NI = x.NationalInsuranceNumber,
-            Outcome = x.Status.GetFsmStatusDescription()
-        });
+        Enum.TryParse(eligibilityType, out CheckEligibilityType eligibilityTypeEnum);
+        var exportData = await _checkGateway.LoadBulkCheckResults(HttpContext.Session.GetString("Get_BulkCheck_Results"), eligibilityTypeEnum);
 
         var fileName = $"{filePrefix}-outcomes-{DateTime.Now.ToString("yyyyMMdd")}.csv";
 
-        var result = WriteCsvToMemory(exportData);
+        var result = WriteCsvToMemory(exportData, eligibilityTypeEnum);
         var memoryStream = new MemoryStream(result);
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = fileName };
     }
@@ -250,46 +240,56 @@ public class BulkCheckController : BaseController
 
         var filePrefix = GetFileNamePrefix(eligibilityType);
         TempData["filePrefix"] = filePrefix;
-
-        var resultData =
-            await _checkGateway.GetBulkCheckResults($"bulk-check/{bulkCheckId}/" );
-
-        var exportData = resultData.Data.Select(x => new BulkFSMExport
-        {
-            LastName = x.LastName,
-            DOB = x.DateOfBirth,
-            NI = x.NationalInsuranceNumber,
-            // NASS field removed as it's not being used in the application
-            Outcome = x.Status.GetFsmStatusDescription()
-        });
-
+        Enum.TryParse(eligibilityType, out CheckEligibilityType eligibilityTypeEnum);
+        var exportData = await _checkGateway.LoadBulkCheckResults(bulkCheckId, eligibilityTypeEnum);
         var outputfileName = $"{filePrefix}-outcomes-{DateTime.Now.ToString("yyyyMMdd")}.csv";
 
-        var result = WriteCsvToMemory(exportData);
+        var result = WriteCsvToMemory(exportData, eligibilityTypeEnum);
         var memoryStream = new MemoryStream(result);
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = outputfileName };
     }
 
     public async Task<IActionResult> Bulk_check_file_delete(string bulkCheckId)
     {
-        var result =
-            await  _deleteBulkCheckFileUseCase.Execute(bulkCheckId, HttpContext.Session);
+        try
+        {
+            var result =
+            await _deleteBulkCheckFileUseCase.Execute(bulkCheckId, HttpContext.Session);
 
-        return RedirectToAction("Bulk_Check_Status");
+            TempData["FileDeleted"] = "true";
+
+            return RedirectToAction("Bulk_Check_Status");
+
+        }
+        catch (Exception ex) {
+            TempData["FileDeleted"] = "false";
+            return RedirectToAction("Bulk_Check_Status");
+
+        }
+
+
+
     }
 
-    private byte[] WriteCsvToMemory(IEnumerable<BulkFSMExport> records)
+    private byte[] WriteCsvToMemory(IEnumerable<IBulkExport> records, CheckEligibilityType checkEligibilityType)
     {
+
         using (var memoryStream = new MemoryStream())
         using (var streamWriter = new StreamWriter(memoryStream))
         using (var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture))
         {
-            csvWriter.WriteRecords(records);
+            switch (checkEligibilityType) {
+                case CheckEligibilityType.WorkingFamilies:
+                    csvWriter.WriteRecords(records.Cast<BulkExportWorkingFamilies>());
+                    break;
+                default:
+                    csvWriter.WriteRecords(records.Cast<BulkExport>());
+                    break;
+            }
             streamWriter.Flush();
             return memoryStream.ToArray();
         }
     }
-
     private string GetFileNamePrefix(string? eligibilityType)
     {
         switch (eligibilityType)

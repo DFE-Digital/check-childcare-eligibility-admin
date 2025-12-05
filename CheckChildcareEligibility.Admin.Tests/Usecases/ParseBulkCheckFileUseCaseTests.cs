@@ -67,7 +67,6 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
             // Act
             var result = await _sut.Execute(stream, CheckEligibilityType.EarlyYearPupilPremium);
 
-
             // Assert
             result.ErrorMessage.Should().BeEquivalentTo(BulkCheckUseCaseValidationMessages.InvalidHeaders);
         

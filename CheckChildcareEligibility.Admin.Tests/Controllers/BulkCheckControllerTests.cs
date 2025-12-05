@@ -266,7 +266,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
                     }
                 };
 
-            _checkGatewayMock.Setup(s => s.GetBulkCheckResults(It.IsAny<string>()))
+            _checkGatewayMock.Setup(s => s.GetBulkCheckResults<CheckEligibilityBulkResponse>(It.IsAny<string>()))
                 .ReturnsAsync(response);
             // Act
             var result = await _sut.Bulk_check_download();
