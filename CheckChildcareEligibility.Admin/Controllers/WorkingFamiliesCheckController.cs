@@ -167,4 +167,9 @@ public class WorkingFamiliesCheckController : BaseController
             : "eligibility";
     }
 
+    public IActionResult Guidance_WF()
+    {
+        return View("Guidance_WF");
+    }
+
 }
