@@ -1,7 +1,8 @@
 ﻿@model CheckChildcareEligibility.Admin.ViewModels.BulkCheckViewModel
 @{
     ViewData["Title"] = "Run a batch check";
-    var eligibilityType = TempData["eligibilityType"];
+    var eligibilityType = TempData["eligibilityType"]?.ToString();
+    TempData["eligibilityType"] = eligibilityType;
     var errorMessage = TempData["ErrorMessage"] as string;
 
     switch (eligibilityType)
@@ -54,7 +55,7 @@
         @if (eligibilityType == "WF")
         {
             <li>Add the details of the eligibility codes you need to check.</li>
-            
+
         }
         else
         {
@@ -72,7 +73,7 @@
         </strong>
     </div>
 
-        <p>You must include:</p>
+    <p>You must include:</p>
     <ul>
         @foreach (var fieldDescription in Model.FieldDescriptions)
         {
