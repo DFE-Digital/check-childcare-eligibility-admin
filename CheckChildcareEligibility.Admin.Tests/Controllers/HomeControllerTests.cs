@@ -153,11 +153,11 @@ internal class HomeControllerTests
     public void Given_Guidance_ReturnsView()
     {
         // Act
-        var result = _sut.Guidance();
+        var result = _sut.GuidanceForReviewingEvidence();
 
         // Assert
         var viewResult = result as ViewResult;
-        viewResult.ViewName.Should().Be("Guidance");
+        viewResult.ViewName.Should().Be("GuidanceForReviewingEvidence");
     }
 
     [Test]
