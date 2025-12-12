@@ -241,7 +241,9 @@ public class CheckController : BaseController
     }
 
     public IActionResult Eypp_Guidance()
-        { return View("Guidance/Eypp_Evidence"); }
+        { return View("Guidance/Eypp_Guidance"); }
     public IActionResult _2yo_Guidance()
-        { return View("Guidance/2yo_Evidence"); }
+    { return View("Guidance/2yo_Guidance"); }
+    public IActionResult _30h_Guidance()
+    { return View("Guidance/30h_Guidance"); }
 }
