@@ -171,7 +171,7 @@ public class CheckController : BaseController
 
                 case "parentNotFound":
                     return View("Outcome/Not_Found", eligibilityOutcomeVm);
-                
+
                 case "error":
                     return View("Outcome/Technical_Error", eligibilityOutcomeVm);
 
@@ -241,7 +241,7 @@ public class CheckController : BaseController
     }
 
     public IActionResult Eypp_Guidance()
-        { return View("Guidance/Eypp_Guidance"); }
+    { return View("Guidance/Eypp_Guidance"); }
     public IActionResult _2yo_Guidance()
     { return View("Guidance/2yo_Guidance"); }
 }
