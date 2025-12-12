@@ -83,9 +83,14 @@ public class HomeController : BaseController
         return View("Cookies");
     }
 
-    public IActionResult Guidance()
+    public IActionResult GuidanceForReviewingEvidence()
     {
-        return View("Guidance");
+        return View("GuidanceForReviewingEvidence");
+    }
+
+    public IActionResult GuidanceHome()
+    {
+        return View("GuidanceHome");
     }
 
     public IActionResult FSMFormDownload()
