@@ -11,9 +11,12 @@
         <main class="govuk-main-wrapper" id="main-content">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
-                    <partial name="_CheckResponseBannerPartial" model="Model">
-                        <partial name="_CheckResponseDetailsPartial" model="Model">
-                            <p>You can <a href="#" id="print-link" class="govuk-link">print this page</a> for the parent or guardian to keep.</p>
+                    <partial name="_CheckResponseBannerPartial" model="Model" />
+                    <partial name="_CheckResponseDetailsPartial" model="Model" />
+                    <p>You can <a href="#" id="print-link" class="govuk-link">print this page</a> for the parent or guardian to keep.</p>
+
+                    <h2 class="govuk-heading-m">Guidance</h2>
+                    <p>View @Html.ActionLink("guidance for childcare for working families", "WF_Guidance", "WorkingFamiliesCheck")</p>
                 </div>
             </div>
         </main>
