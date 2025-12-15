@@ -67,7 +67,7 @@
             @{
                 if (Model.EligibilityType == "TwoYearOffer")
                 {
-                    <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="/childcare/dev/guidance/eypp-evidence">See a complete list of acceptable evidence (opens in new tab)</a>
+                    <p> @Html.ActionLink("See a complete list of acceptable evidence (opens in new tab)", "_2yo_Guidance", "Check", null, new { @class = "govuk-link", target = "_blank" }) </P> 
                 }
             }
 
