@@ -8,7 +8,7 @@
 
 <div class="govuk-grid-column-full">
     <a class="govuk-back-link backLinkJS" href="@Url.Action("MenuBulkCheck", "Home")">Back</a>
-    @if (TempData["JustUploaded"]?.ToString() == "true")
+    @* @if (TempData["JustUploaded"]?.ToString() == "true")
     {
         <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
             <div class="govuk-notification-banner__header">
@@ -24,9 +24,9 @@
 
             </div>
         </div>
-
     }
-    else if (TempData["FileDeleted"]?.ToString() == "true")
+    else *@
+    @if (TempData["FileDeleted"]?.ToString() == "true")
     {
         <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
             <div class="govuk-notification-banner__header">
