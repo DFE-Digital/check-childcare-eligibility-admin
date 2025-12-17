@@ -65,7 +65,8 @@ public class CheckController : BaseController
             TempData.Remove("Errors");
         }
 
-        var eligibilityType = TempData["eligibilityType"].ToString();
+        string eligibilityType = TempData["eligibilityType"] as string;
+        if (eligibilityType == null) { eligibilityType = "Unknown eligibility type"; }
         TempData["eligibilityType"] = eligibilityType;
         var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
         TempData["eligibilityTypeLabel"] = label;
