@@ -1,7 +1,8 @@
 ﻿@model CheckChildcareEligibility.Admin.ViewModels.BulkCheckViewModel
 @{
     ViewData["Title"] = "Run a batch check";
-    var eligibilityType = TempData["eligibilityType"]?.ToString();
+    string eligibilityType = TempData["eligibilityType"] as string;
+    if (eligibilityType == null) { eligibilityType = "Unknown eligibility type"; }
     TempData["eligibilityType"] = eligibilityType;
     var errorMessage = TempData["ErrorMessage"] as string;
 

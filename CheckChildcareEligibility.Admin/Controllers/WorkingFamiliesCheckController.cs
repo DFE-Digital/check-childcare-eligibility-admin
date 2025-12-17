@@ -25,7 +25,7 @@ public class WorkingFamiliesCheckController : BaseController
         ILoadParentDetailsUseCase loadParentDetailsUseCase,
         ILoadParentAndChildDetailsUseCase loadParentAndChildDetailsUseCase,
         IPerformWFEligibilityCheckUseCase performWFEligibilityCheckUseCase,
-        IGetCheckStatusUseCase getCheckStatusUseCase, 
+        IGetCheckStatusUseCase getCheckStatusUseCase,
         IValidateParentAndChildDetailsUseCase validateParentAndChildDetailsUseCase)
     {
 
@@ -46,9 +46,10 @@ public class WorkingFamiliesCheckController : BaseController
             TempData.Remove("Errors");
         }
 
-        var eligibilityType = TempData["eligibilityType"].ToString();
+        string eligibilityType = TempData["eligibilityType"] as string;
+        if (eligibilityType == null) { eligibilityType = "Unknown eligibility type"; }
         TempData["eligibilityType"] = eligibilityType;
-        var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
+        string label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
         TempData["eligibilityTypeLabel"] = label;
 
         var (parentAndChild, validationErrors) = await _loadParentAndChildDetailsUseCase.Execute(
@@ -103,34 +104,36 @@ public class WorkingFamiliesCheckController : BaseController
             var outcome = await _getCheckStatusUseCase.Execute(responseJson, HttpContext.Session);
             CheckEligibilityStatus outcomeStatus = (CheckEligibilityStatus)Enum.Parse(typeof(CheckEligibilityStatus), outcome);
 
-            if (outcome == "queuedForProcessing") {
+            if (outcome == "queuedForProcessing")
+            {
                 TempData["Response"] = responseJson;
             }
-            
+
             _logger.LogError(outcome);
-    
+
             var parentAndChildDetailsJson = TempData["ParentAndChildDetails"]?.ToString();
             TempData["ParentAndChildDetails"] = parentAndChildDetailsJson;
-            
+
             var (parentAndChild, validationErrors) = await _loadParentAndChildDetailsUseCase.Execute(
             parentAndChildDetailsJson,
             TempData["Errors"]?.ToString());
 
-                switch (outcomeStatus)
+            switch (outcomeStatus)
             {
                 case CheckEligibilityStatus.queuedForProcessing:
-                  
+
                     return View("Loader_WF", parentAndChild);
                 case CheckEligibilityStatus.notFound:
                     return View("Outcome/Not_Found_WF", parentAndChild);
                 default:
                     var responseItem = JsonConvert.DeserializeObject<CheckEligibilityResponse>(responseJson);
                     var result = await _performWFEligibilityCheckUseCase.GetItemAsync(responseItem.Links.Get_EligibilityCheck);
-                    WorkingFamiliesResponseViewModel viewModel = new WorkingFamiliesResponseViewModel() {
+                    WorkingFamiliesResponseViewModel viewModel = new WorkingFamiliesResponseViewModel()
+                    {
                         Response = result.Data
                     };
-                    return View("Outcome/Response_WF", viewModel );
-            }      
+                    return View("Outcome/Response_WF", viewModel);
+            }
         }
         catch (Exception ex)
         {

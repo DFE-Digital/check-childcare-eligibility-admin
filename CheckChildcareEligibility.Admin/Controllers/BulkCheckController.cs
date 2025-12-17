@@ -44,7 +44,8 @@ public class BulkCheckController : BaseController
 
     public IActionResult Bulk_Check()
     {
-        var eligibilityType = TempData["eligibilityType"]?.ToString();
+        string eligibilityType = TempData["eligibilityType"] as string;
+        if (eligibilityType == null) { eligibilityType = "Unknown eligibility type"; }
         TempData["eligibilityType"] = eligibilityType;
         var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
         TempData["eligibilityTypeLabel"] = label;
@@ -209,7 +210,8 @@ public class BulkCheckController : BaseController
 
     public async Task<IActionResult> Bulk_check_success()
     {
-        var eligibilityType = TempData["eligibilityType"]?.ToString();
+        string eligibilityType = TempData["eligibilityType"] as string;
+        if (eligibilityType == null) { eligibilityType = "Unknown eligibility type"; }
         TempData["eligibilityType"] = eligibilityType;
         var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
         TempData["eligibilityTypeLabel"] = label;
@@ -220,7 +222,8 @@ public class BulkCheckController : BaseController
 
     public async Task<IActionResult> Bulk_check_download()
     {
-        var eligibilityType = TempData["eligibilityType"]?.ToString();
+        string eligibilityType = TempData["eligibilityType"] as string;
+        if (eligibilityType == null) { eligibilityType = "Unknown eligibility type"; }
         var filePrefix = GetFileNamePrefix(eligibilityType);
         TempData["filePrefix"] = filePrefix;
         Enum.TryParse(eligibilityType, out CheckEligibilityType eligibilityTypeEnum);
