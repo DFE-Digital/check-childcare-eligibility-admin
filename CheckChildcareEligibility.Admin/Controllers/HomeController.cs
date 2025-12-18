@@ -5,7 +5,14 @@ namespace CheckChildcareEligibility.Admin.Controllers;
 
 public class HomeController : BaseController
 {
-    public IActionResult Index()
+    private readonly IDfeSignInApiService _dfeSignInApiService;
+
+    public HomeController(IDfeSignInApiService dfeSignInApiService)
+    {
+        _dfeSignInApiService = dfeSignInApiService;
+    }
+
+    public async Task<IActionResult> Index()
     {
         _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
 
@@ -14,6 +21,22 @@ public class HomeController : BaseController
             !_Claims.Organisation.Category.Name.Equals("Local Authority", StringComparison.OrdinalIgnoreCase))
         {
             return View("UnauthorizedOrganization");
+        }
+
+        // Fetch roles from DfE Sign-in API
+        if (_Claims.Organisation.Id != Guid.Empty && !string.IsNullOrEmpty(_Claims.User?.Id))
+        {
+            _Claims.Roles = await _dfeSignInApiService.GetUserRolesAsync(_Claims.User.Id, _Claims.Organisation.Id);
+        }
+
+        // Check if the user has the required role
+        const string requiredRoleCode = "mefcsLocalAuthority";
+        var hasRequiredRole = _Claims.Roles.Any(r => 
+            r.Code.Equals(requiredRoleCode, StringComparison.OrdinalIgnoreCase));
+
+        if (!hasRequiredRole)
+        {
+            return View("UnauthorizedRole");
         }
 
         return View(_Claims);
