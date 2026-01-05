@@ -29,6 +29,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
 
         public string Term => GetTerm(ValidityStartDate);
+        public string CurrentTerm => GetTerm(DateTime.Now);
 
         public string GetTerm(DateTime date)
         {
@@ -72,10 +73,8 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         {
             get
             {
-                string startTermName = GetTermName(ValidityStartDate);
-                string endTermName = GetTermName(GetTermStart(ValidityEndDate));
-
-                return startTermName != endTermName;
+                string endTermName = GetTermName(GetTermStart(GracePeriodEndDate));
+                return IsEligible && CurrentTerm != endTermName;
             }
         }
 
@@ -181,11 +180,11 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
                 TermValidityDetails = WorkingFamiliesResponseBanner.TermExpiredOn;
             }
-            else if(IsReconfirmed)
+            else if (IsReconfirmed)
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
                 BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
-                TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor + " "+ Term + " and " + GetTerm(GetTermStart(ValidityEndDate));
+                TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor + " "+ CurrentTerm + " and " + GetTerm(GetTermStart(GracePeriodEndDate));
             }
         }
 
