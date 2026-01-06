@@ -65,11 +65,11 @@ Cypress.Commands.add('loginLocalAuthorityUser', () => {
   cy.get('button[type="submit"]').click();
   cy.get('#password').type(Cypress.env('DFE_ADMIN_PASSWORD'));
   cy.get('button[type="submit"]').click();
-  cy.contains('Telford and Wrekin Council')
-    .parent()
-    .find('input[type="radio"]')
-    .check();
-  cy.contains('Continue').click();
+  // cy.contains('Telford and Wrekin Council')
+  //   .parent()
+  //   .find('input[type="radio"]')
+  //   .check();
+  // cy.contains('Continue').click();
 });
 
 Cypress.Commands.add('storeCookies', (userType: string) => {
