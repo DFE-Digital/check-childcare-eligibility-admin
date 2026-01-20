@@ -51,24 +51,19 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             DateTime summerStart = new DateTime(vsd.Year, 4, 1);
             DateTime autumnStart = new DateTime(vsd.Year, 9, 1);
 
-            string termName;
-
-            // Defines term that the code is valid from
-            // TODO: Remove the discretionary period, the vsd returned from the API is the DSVD so no need to include and assume discretion being applied
+            // Determine the next term that the code is valid from DSVD already returned from API
             if (vsd >= autumnStart)
             {
-                termName = (vsd <= autumnStart.AddDays(14)) ? WorkingFamiliesResponseBanner.AutumnTerm : WorkingFamiliesResponseBanner.SpringTerm; //TODO: Needs to increment the year if the spring term
+                return $"{WorkingFamiliesResponseBanner.SpringTerm} {vsd.AddYears(1).Year}";
             }
             else if (vsd >= summerStart)
             {
-                termName = (vsd <= summerStart.AddDays(14)) ? WorkingFamiliesResponseBanner.SummerTerm : WorkingFamiliesResponseBanner.AutumnTerm;
+                return $"{WorkingFamiliesResponseBanner.AutumnTerm} {vsd.Year}";
             }
-            else // Spring term
+            else // Validity start during spring term so valid from summer term
             {
-                termName = (vsd <= springStart.AddDays(14)) ? WorkingFamiliesResponseBanner.SpringTerm : WorkingFamiliesResponseBanner.SummerTerm;
+                return $"{WorkingFamiliesResponseBanner.SummerTerm} {vsd.Year}";
             }
-
-            return $"{termName} {vsd.Year}";
         }
 
         public bool IsReconfirmed
@@ -174,16 +169,16 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFrom;
                 CodeType = string.Empty;
             }
+            else if (IsNotValidYet) // Code cannot be used yet
+            {
+                CodeStatus = WorkingFamiliesResponseBanner.CodeNotValidYet;
+                BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
+            }
             else if (IsExpired) // Expired
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
                 BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
                 TermValidityDetails = WorkingFamiliesResponseBanner.TermExpiredOn;
-            }
-            else if (IsNotValidYet) // Code cannot be used yet
-            {
-                CodeStatus = WorkingFamiliesResponseBanner.CodeNotValidYet;
-                BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
             }
             else if (IsInGracePeriod) // Code is in grace period
             {
