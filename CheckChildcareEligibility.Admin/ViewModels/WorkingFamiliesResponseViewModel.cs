@@ -28,7 +28,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
 
         public string Term => GetTerm(ValidityStartDate);
-        public string CurrentTerm => GetTerm(DateTime.Now);
+        public string CurrentTerm => GetTermName(DateTime.Now);
 
         public string GetTerm(DateTime vsd)
         {
@@ -71,7 +71,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             get
             {
                 string endTermName = GetTermName(GetTermStart(GracePeriodEndDate));
-                return IsEligible && CurrentTerm != endTermName;
+                return IsEligible && !IsNotValidYet && CurrentTerm != endTermName;
             }
         }
 
@@ -91,11 +91,11 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             DateTime autumnStart = new DateTime(date.Year, 9, 1);
 
             if (date >= autumnStart)
-                return (date <= autumnStart.AddDays(14)) ? WorkingFamiliesResponseBanner.AutumnTerm : WorkingFamiliesResponseBanner.SpringTerm;
+                return $"{WorkingFamiliesResponseBanner.AutumnTerm} {date.Year}";
             else if (date >= summerStart)
-                return (date <= summerStart.AddDays(14)) ? WorkingFamiliesResponseBanner.SummerTerm : WorkingFamiliesResponseBanner.AutumnTerm;
+                return $"{WorkingFamiliesResponseBanner.SummerTerm} {date.Year}";
             else
-                return (date <= springStart.AddDays(14)) ? WorkingFamiliesResponseBanner.SpringTerm : WorkingFamiliesResponseBanner.SummerTerm;
+                return $"{WorkingFamiliesResponseBanner.SpringTerm} {date.Year}";
         }
         public static DateTime GetTermStart(DateTime date)
         {
@@ -190,7 +190,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
                 BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
-                TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor + " "+ CurrentTerm + " and " + GetTerm(GetTermStart(GracePeriodEndDate)); //TODO: Rework this to always be the next term name if grace period > next term start
+                TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor + " " + CurrentTerm + " and " + GetTermName(GetNextTerm(GetTermStart(DateTime.Now)));
             }
         }
 
