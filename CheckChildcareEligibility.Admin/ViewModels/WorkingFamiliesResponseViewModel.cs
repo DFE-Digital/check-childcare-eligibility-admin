@@ -27,10 +27,11 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
 
 
-        public string Term => GetTerm(ValidityStartDate);
+        public string TermInfo => GetTermInfo(ValidityStartDate);
         public string CurrentTerm => GetTermName(DateTime.Now);
+        public string NextTerm => GetTermName(GetNextTerm(GetTermStart(DateTime.Now)));
 
-        public string GetTerm(DateTime vsd)
+        public string GetTermInfo(DateTime vsd)
         {
             DateTime nineMonthsDate = ChildDateOfBirth.AddMonths(9);
 
@@ -45,13 +46,19 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             {
                 return $"{GracePeriodEndDate:dd MMMM yyyy}";
             }
+            
+            // If code is already active return current term info
+            if (vsd < GetTermStart(DateTime.Now))
+            {
+                return CurrentTerm;
+            }
 
             // Define term start dates for the given year
             DateTime springStart = new DateTime(vsd.Year, 1, 1);
             DateTime summerStart = new DateTime(vsd.Year, 4, 1);
             DateTime autumnStart = new DateTime(vsd.Year, 9, 1);
-
-            // Determine the next term that the code is valid from DSVD already returned from API
+            
+            // If the code isn't yet active determine the next term that the code is valid from DSVD already returned from API
             if (vsd >= autumnStart)
             {
                 return $"{WorkingFamiliesResponseBanner.SpringTerm} {vsd.AddYears(1).Year}";
@@ -190,7 +197,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
                 BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
-                TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor + " " + CurrentTerm + " and " + GetTermName(GetNextTerm(GetTermStart(DateTime.Now)));
+                TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor + " " + CurrentTerm + " and " + NextTerm;
             }
         }
 
