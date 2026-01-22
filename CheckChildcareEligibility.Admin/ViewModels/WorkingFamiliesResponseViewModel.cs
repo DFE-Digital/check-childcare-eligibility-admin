@@ -41,7 +41,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 vsd = nineMonthsDate;
             }
 
-            // Define when the code expires if in the grace period
+            // Define when the code expires if in the grace period or has expired
             if (DateTime.UtcNow > ValidityEndDate)
             {
                 return $"{GracePeriodEndDate:dd MMMM yyyy}";
@@ -180,6 +180,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeNotValidYet;
                 BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
+                TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFrom;
             }
             else if (IsExpired) // Expired
             {
