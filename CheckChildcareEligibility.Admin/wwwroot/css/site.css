@@ -359,8 +359,11 @@ caption {
 }
 
 .govuk-panel--blue {
-    color: #ffffff;
+    color: #ffffff; 
     background: #1d70b8;
+    & > .govuk-body-l {
+        color: #ffffff;
+    }
 }
 
 .govuk-panel--orange {

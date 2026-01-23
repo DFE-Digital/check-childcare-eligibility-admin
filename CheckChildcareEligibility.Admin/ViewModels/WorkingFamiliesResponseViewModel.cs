@@ -78,7 +78,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             get
             {
                 string endTermName = GetTermName(GetTermStart(GracePeriodEndDate));
-                return IsEligible && !IsNotValidYet && CurrentTerm != endTermName;
+                return IsEligible && !IsNotValidYet && !IsInGracePeriod && CurrentTerm != endTermName;
             }
         }
 
