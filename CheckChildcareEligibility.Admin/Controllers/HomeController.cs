@@ -116,6 +116,11 @@ public class HomeController : BaseController
         return View("GuidanceHome");
     }
 
+    public IActionResult ManageFosterFamilies()
+    {
+        return View("ManageFosterFamilies");
+    }
+
     public IActionResult FSMFormDownload()
     {
         return View("FSMFormDownload");
