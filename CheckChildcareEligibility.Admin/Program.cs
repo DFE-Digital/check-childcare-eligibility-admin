@@ -1,6 +1,7 @@
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using CheckChildcareEligibility.Admin;
+using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Infrastructure;
@@ -62,6 +63,8 @@ builder.Services.AddDfeSignInAuthentication(dfeSignInConfiguration);
 //builder.Services.AddProblemDetails();
 
 builder.Services.AddHealthChecks();
+
+builder.Services.AddSingleton<IMenuProvider, MenuProvider>();
 
 var app = builder.Build();
 

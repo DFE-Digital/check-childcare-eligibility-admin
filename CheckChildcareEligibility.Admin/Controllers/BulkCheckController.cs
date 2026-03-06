@@ -32,7 +32,8 @@ public class BulkCheckController : BaseController
         IConfiguration configuration,
         IParseBulkCheckFileUseCase parseBulkCheckFileUseCase,
         IGetBulkCheckStatusesUseCase getBulkCheckStatusesUseCase,
-        IDeleteBulkCheckFileUseCase deleteBulkCheckFileUseCase)
+        IDeleteBulkCheckFileUseCase deleteBulkCheckFileUseCase,
+        IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService)
     {
         _config = configuration;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -57,7 +58,6 @@ public class BulkCheckController : BaseController
     [HttpPost]
     public async Task<IActionResult> Bulk_Check(IFormFile fileUpload, string eligibilityType)
     {
-        _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
         BulkCheckViewModel viewModel = new BulkCheckViewModel();
         var establishmentNumber = _Claims.Organisation.EstablishmentNumber;
         TempData["eligibilityType"] = eligibilityType;
@@ -310,8 +310,6 @@ public class BulkCheckController : BaseController
 
     public async Task<IActionResult> Bulk_Check_Status(int pageNumber = 1)
     {
-        _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
-
         var response = (await _getBulkCheckStatusesUseCase.Execute(_Claims.Organisation.EstablishmentNumber, HttpContext.Session)).Where(x => x.Status != "Deleted");
         var totalRecords = response.Count();
         var pageSize = 10;

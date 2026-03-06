@@ -1,12 +1,15 @@
 ﻿@using Azure.Core
 @using CheckChildcareEligibility.Admin.Infrastructure
 @using Microsoft.AspNetCore.Mvc.TagHelpers
+@using CheckChildcareEligibility.Admin.Gateways.Interfaces
 @inject IConfiguration Configuration
 @inject IHttpContextAccessor _httpContext
-@{
-    var claims = DfeSignInExtensions.GetDfeClaims(_httpContext.HttpContext.User.Claims);
+@inject IMenuProvider MenuProvider
 
+@{
+    var claims = ViewBag.Claims;
     var clarityId = Configuration["Clarity"];
+    var menu = MenuProvider.GetMenuItemsFor(claims);
 }
 
 <!DOCTYPE html>
@@ -19,12 +22,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="~/assets/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link href="~/css/govuk-frontend-6.0.0.min.css" rel="stylesheet" />
     <link href="~/css/application.css" rel="stylesheet" />
+    <link href="~/css/govuk-frontend-6.0.0.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 
-<body class="govuk-template__body  js-enabled" data-clarity="@clarityId">
+<body class="govuk-template__body js-enabled" data-clarity="@clarityId">
     <div id="cookie-banner" class="govuk-cookie-banner cookie-hidden" role="region"
          aria-label="Cookies on Manage eligibility for childcare support" data-nosnippet>
         <div class="govuk-cookie-banner__message govuk-width-container">
@@ -74,49 +77,34 @@
     </div>
     <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
 
-    <header class="dfe-header" role="banner">
-        <div class="dfe-width-container dfe-header__container">
-            <div class="dfe-header__logo">
-                <a class="dfe-header__link dfe-header__link--service " href="/" aria-label="DfE homepage">
-                    <img src="~/images/dfe-logo.png" class="dfe-logo" alt="DfE Homepage">
-                    <img src="~/images/dfe-logo-alt.png" class="dfe-logo-hover" alt="DfE Homepage">
+    <header class="govuk-header" data-module="govuk-header">
+        <div class="govuk-header__container govuk-width-container">
+            <div class="govuk-header__logo">
+                <a href="/" class="govuk-header__link govuk-header__link--homepage">
+                    <img src="~/assets/images/department-for-education_white.png" class="govuk-header__logotype" alt="Department for Education">
                 </a>
             </div>
             <div class="dfe-header__content" id="content-header">
-                <ul class="dfe-header__action-links">
-                    @* <li>
-                        <a href="#">My account</a>
-                        </li> *@
+                <ul class="dfe-header__action-links govuk-!-margin-top-3">
                     <li>
-                        @Html.ActionLink("Sign out", "SignOut", "Account", null, new { @class = "signOut" })
+                        @Html.ActionLink("Sign out", "SignOut", "Account", null, new { @class = "govuk-link govuk-link--inverse, signOut" })
                     </li>
                 </ul>
             </div>
-            <nav id="header-navigation" class="dfe-header__navigation" aria-label="Primary navigation"
-                 aria-labelledby="label-navigation">
-                <ul class="dfe-header__navigation-list" id="navigation">
-                    <li class="dfe-header__navigation-item">
-                        <a class="dfe-header__navigation-link" href="/">
-                            Manage eligibility for childcare support
-                        </a>
-                    </li>
-                </ul>
-            </nav>
         </div>
     </header>
 
-    <div class="app-phase-banner__wrapper">
-        <div class="govuk-phase-banner app-phase-banner govuk-width-container">
-            <p class="govuk-phase-banner__content">
-                <strong class="govuk-tag govuk-phase-banner__content__tag">
-                    beta
-                </strong>
-                <span class="govuk-phase-banner__text">
-                    This is a new service - your <a class="govuk-link" href="@Configuration["FeedbackUrl"]"
-                                                    target="_blank">feedback</a> will help us to improve it.
-                </span>
-            </p>
-        </div>
+    @await Html.PartialAsync("_HeaderMenu")
+
+    <div class="govuk-phase-banner govuk-width-container">
+        <p class="govuk-phase-banner__content">
+            <strong class="govuk-tag govuk-phase-banner__content__tag">
+                beta
+            </strong>
+            <span class="govuk-phase-banner__text">
+                This is a new service - your <a class="govuk-link" href="@Configuration["FeedbackUrl"]" target="_blank">feedback</a> will help us to improve it.
+            </span>
+        </p>
     </div>
 
     <div class="govuk-width-container ">
