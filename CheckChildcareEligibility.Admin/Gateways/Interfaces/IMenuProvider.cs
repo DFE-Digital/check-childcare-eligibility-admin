@@ -58,7 +58,7 @@ public class MenuProvider : IMenuProvider
                         ),
                     new MenuItem(
                         "Guidance",
-                        "Guidance for reviewing evidence",
+                        "Guidance",
                         "Read guidance on running eligibility checks and managing foster families.",
                         "Home",
                         "GuidanceHome"
