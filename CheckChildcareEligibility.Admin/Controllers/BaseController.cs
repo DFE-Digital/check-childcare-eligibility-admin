@@ -9,6 +9,8 @@ namespace CheckChildcareEligibility.Admin.Controllers;
 [Authorize]
 public class BaseController : Controller
 {
+    protected DfeClaims? _Claims;
+
     private readonly IDfeSignInApiService _dfeSignInApiService;
 
     public BaseController(IDfeSignInApiService dfeSignInApiService)
@@ -16,8 +18,7 @@ public class BaseController : Controller
         _dfeSignInApiService = dfeSignInApiService;
     }
 
-    protected DfeClaims? _Claims;
-    public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    public async Task GetDfeClaimsAsync()
     {
         _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
 
@@ -26,7 +27,11 @@ public class BaseController : Controller
         {
             _Claims.Roles = await _dfeSignInApiService.GetUserRolesAsync(_Claims.User.Id, _Claims.Organisation.Id);
         }
+    }
 
+    public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    {
+        await GetDfeClaimsAsync();
         ViewBag.Claims = _Claims;
         await base.OnActionExecutionAsync(context, next);
     }

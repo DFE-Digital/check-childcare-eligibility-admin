@@ -3,6 +3,7 @@ using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Controllers;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
+using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Tests.Properties;
 using CheckChildcareEligibility.Admin.Usecases;
 using FluentAssertions;
@@ -27,13 +28,22 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
             _parseBulkCheckFileUseCaseMock = new Mock<IParseBulkCheckFileUseCase>();
             _getBulkCheckStatusesUseCaseMock = new Mock<IGetBulkCheckStatusesUseCase>();
             _deleteBulkCheckFileUseCase = new Mock<IDeleteBulkCheckFileUseCase>();
+            _mockDfeSignInApiService = new Mock<IDfeSignInApiService>();
 
-            _sut = new BulkCheckController(_loggerMock, _checkGatewayMock.Object, _configMock.Object, _parseBulkCheckFileUseCaseMock.Object, _getBulkCheckStatusesUseCaseMock.Object, _deleteBulkCheckFileUseCase.Object);
+            _sut = new BulkCheckController(
+                _loggerMock, 
+                _checkGatewayMock.Object, 
+                _configMock.Object, 
+                _parseBulkCheckFileUseCaseMock.Object, 
+                _getBulkCheckStatusesUseCaseMock.Object, 
+                _deleteBulkCheckFileUseCase.Object,
+                _mockDfeSignInApiService.Object
+            );
 
             base.SetUp();
-
-            _sut.TempData = _tempData;
             _sut.ControllerContext.HttpContext = _httpContext.Object;
+            _sut.GetDfeClaimsAsync().Wait();
+            _sut.TempData = _tempData;
         }
 
         [TearDown]
@@ -48,6 +58,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
         private Mock<IParseBulkCheckFileUseCase> _parseBulkCheckFileUseCaseMock;
         private Mock<IGetBulkCheckStatusesUseCase> _getBulkCheckStatusesUseCaseMock;
         private Mock<IDeleteBulkCheckFileUseCase> _deleteBulkCheckFileUseCase;
+        private Mock<IDfeSignInApiService> _mockDfeSignInApiService;
         // system under test
         private BulkCheckController _sut;
 

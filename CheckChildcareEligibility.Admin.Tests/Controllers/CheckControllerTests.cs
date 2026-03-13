@@ -2,6 +2,7 @@
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Controllers;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
+using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
 using CheckChildcareEligibility.Admin.ViewModels;
@@ -36,6 +37,7 @@ public class CheckControllerTests : TestBase
         _getCheckStatusUseCaseMock = new Mock<IGetCheckStatusUseCase>();
         _validateParentDetailsUseCaseMock = new Mock<IValidateParentDetailsUseCase>();
         _validateParentAndChildDetailsUseCaseMock = new Mock<IValidateParentAndChildDetailsUseCase>();
+        _mockDfeSignInApiService = new Mock<IDfeSignInApiService>();
 
         // Initialize controller with all dependencies
         _sut = new CheckController(
@@ -46,14 +48,14 @@ public class CheckControllerTests : TestBase
             _perform2YoEligibilityCheckUseCaseMock.Object,
             _performEyppEligibilityCheckUseCaseMock.Object,
             _getCheckStatusUseCaseMock.Object,
-            _validateParentDetailsUseCaseMock.Object);
-
+            _validateParentDetailsUseCaseMock.Object,
+            _mockDfeSignInApiService.Object
+        );
         SetUpSessionData();
-
         base.SetUp();
-
-        _sut.TempData = _tempData;
         _sut.ControllerContext.HttpContext = _httpContext.Object;
+        _sut.GetDfeClaimsAsync().Wait();
+        _sut.TempData = _tempData;
     }
 
     [TearDown]
@@ -72,6 +74,7 @@ public class CheckControllerTests : TestBase
     private Mock<IGetCheckStatusUseCase> _getCheckStatusUseCaseMock;
     private Mock<IValidateParentDetailsUseCase> _validateParentDetailsUseCaseMock;
     private Mock<IValidateParentAndChildDetailsUseCase> _validateParentAndChildDetailsUseCaseMock;
+    private Mock<IDfeSignInApiService> _mockDfeSignInApiService;
 
     // Legacy service mocks
     private Mock<ICheckGateway> _checkGatewayMock;
@@ -132,7 +135,7 @@ public class CheckControllerTests : TestBase
         result.Should().BeOfType<ViewResult>();
         var viewResult = result as ViewResult;
         viewResult.Model.Should().Be(expectedParent);
-        
+
         // Verify ModelState contains the expected errors
         _sut.ModelState.ErrorCount.Should().Be(2);
         _sut.ModelState["TestError"].Errors.Count.Should().Be(2);
@@ -268,7 +271,7 @@ public class CheckControllerTests : TestBase
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
         redirectResult.ActionName.Should().Be("Loader");
-        
+
         // Verify that TempData entries are removed
         _sut.TempData.Keys.Should().NotContain("FsmApplication");
         _sut.TempData.Keys.Should().NotContain("FsmEvidence");
@@ -282,7 +285,7 @@ public class CheckControllerTests : TestBase
             x => x.Execute(request, _sut.HttpContext.Session),
             Times.Once);
     }
-    
+
     [Test]
     public async Task Loader_Should_Handle_Exceptions_And_Return_Technical_Error_View()
     {
@@ -290,7 +293,7 @@ public class CheckControllerTests : TestBase
         var responseJson = JsonConvert.SerializeObject(_fixture.Create<CheckEligibilityResponse>());
         _tempData["Response"] = responseJson;
         _tempData["EligibilityType"] = "2YO";
-        
+
         // Setup mock to throw an exception when called
         _getCheckStatusUseCaseMock
             .Setup(x => x.Execute(It.IsAny<string>(), _sessionMock.Object))
@@ -303,7 +306,7 @@ public class CheckControllerTests : TestBase
         result.Should().BeOfType<ViewResult>();
         var viewResult = result as ViewResult;
         viewResult.ViewName.Should().Be("Outcome/Technical_Error");
-        
+
         // Verify model has some basic properties set
         var model = viewResult.Model as EligibilityOutcomeViewModel;
         model.Should().NotBeNull();
@@ -336,15 +339,15 @@ public class CheckControllerTests : TestBase
         var responseJson = JsonConvert.SerializeObject(checkEligibilityResponse);
         _tempData["Response"] = responseJson;
         _tempData["EligibilityType"] = "2YO";
-        
+
         // Setup parent details
         var parent = _fixture.Create<ParentGuardian>();
         _tempData["ParentDetails"] = JsonConvert.SerializeObject(parent);
-        
+
         _getCheckStatusUseCaseMock
             .Setup(x => x.Execute(responseJson, _sessionMock.Object))
             .ReturnsAsync("eligible");
-            
+
         _loadParentDetailsUseCaseMock
             .Setup(x => x.Execute(
                 It.IsAny<string>(),
@@ -386,16 +389,16 @@ public class CheckControllerTests : TestBase
         parent.Day = "99"; // Invalid day
         parent.Month = "99"; // Invalid month
         parent.Year = "9999"; // Future year
-        
+
         var responseJson = JsonConvert.SerializeObject(checkEligibilityResponse);
         _tempData["Response"] = responseJson;
         _tempData["EligibilityType"] = "2YO";
         _tempData["ParentDetails"] = JsonConvert.SerializeObject(parent);
-        
+
         _getCheckStatusUseCaseMock
             .Setup(x => x.Execute(responseJson, _sessionMock.Object))
             .ReturnsAsync("notEligible");
-            
+
         _loadParentDetailsUseCaseMock
             .Setup(x => x.Execute(
                 It.IsAny<string>(),
@@ -409,14 +412,14 @@ public class CheckControllerTests : TestBase
         result.Should().BeOfType<ViewResult>();
         var viewResult = result as ViewResult;
         viewResult.ViewName.Should().Be("Outcome/Not_Eligible");
-        
+
         // The view model should have the date conversion handled properly
         var model = viewResult.Model as EligibilityOutcomeViewModel;
         model.Should().NotBeNull();
         // It should default to DateTime.MinValue if invalid
         model.ParentDateOfBirth.Should().Be(DateTime.MinValue.ToString());
     }
-    
+
     [Test]
     public async Task Loader_When_ParentDetails_Is_Null_Should_Handle_Gracefully_In_Error_Case()
     {
@@ -424,12 +427,12 @@ public class CheckControllerTests : TestBase
         _tempData["Response"] = JsonConvert.SerializeObject(_fixture.Create<CheckEligibilityResponse>());
         _tempData["EligibilityType"] = "EYPP";
         _tempData["ParentDetails"] = null;
-        
+
         // Setup mock to throw an exception when called
         _getCheckStatusUseCaseMock
             .Setup(x => x.Execute(It.IsAny<string>(), _sessionMock.Object))
             .ThrowsAsync(new Exception("Test exception"));
-            
+
         _loadParentDetailsUseCaseMock
             .Setup(x => x.Execute(
                 It.IsAny<string>(),
@@ -443,7 +446,7 @@ public class CheckControllerTests : TestBase
         result.Should().BeOfType<ViewResult>();
         var viewResult = result as ViewResult;
         viewResult.ViewName.Should().Be("Outcome/Technical_Error");
-        
+
         // The view model should still be created with default values
         var model = viewResult.Model as EligibilityOutcomeViewModel;
         model.Should().NotBeNull();
