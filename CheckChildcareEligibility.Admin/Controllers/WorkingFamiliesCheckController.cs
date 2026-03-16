@@ -26,7 +26,8 @@ public class WorkingFamiliesCheckController : BaseController
         ILoadParentAndChildDetailsUseCase loadParentAndChildDetailsUseCase,
         IPerformWFEligibilityCheckUseCase performWFEligibilityCheckUseCase,
         IGetCheckStatusUseCase getCheckStatusUseCase,
-        IValidateParentAndChildDetailsUseCase validateParentAndChildDetailsUseCase)
+        IValidateParentAndChildDetailsUseCase validateParentAndChildDetailsUseCase,
+        IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService)
     {
 
         _logger = logger;
@@ -95,8 +96,6 @@ public class WorkingFamiliesCheckController : BaseController
 
     public async Task<IActionResult> Loader_WF()
     {
-        _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
-
         var responseJson = TempData["Response"] as string;
 
         try

@@ -42,7 +42,7 @@
 .govuk-back-link {
     font-size: 0.875rem;
     line-height: 1.14286;
-/*    font-family: "GDS Transport", arial, sans-serif;*/
+    /*    font-family: "GDS Transport", arial, sans-serif;*/
     -webkit-font-smoothing: antialiased;
     text-underline-offset: 0.1578em;
     display: inline-block;
@@ -56,7 +56,7 @@
 .govuk-back-link-nolink {
     font-size: 0.875rem;
     line-height: 1.14286;
-/*    font-family: "GDS Transport", arial, sans-serif;*/
+    /*    font-family: "GDS Transport", arial, sans-serif;*/
     -webkit-font-smoothing: antialiased;
     text-underline-offset: 0.1578em;
     display: inline-block;
@@ -78,6 +78,10 @@
 
     #content-header .dfe-header__action-links a:hover {
         text-decoration: underline;
+    }
+
+    #content-header .dfe-header__action-links a:focus {
+        color: #0b0c0c;
     }
 
 .govuk-pagination {
@@ -207,71 +211,6 @@
 /* END MENU ITEM */
 
 
-/*BEGIN - Header overrides */
-.dfe-header__container {
-    padding: 0;
-    padding-top: 20px;
-}
-
-.dfe-header__navigation {
-    background-color: #003a69;
-    display: block;
-    margin: 0 auto;
-    max-width: 1264px;
-}
-
-.dfe-header__navigation-link:visited {
-    color: white;
-}
-
-.dfe-header__link--service {
-    align-items: baseline;
-    display: flex;
-    -ms-flex-align: center;
-    margin-bottom: 0;
-    width: auto;
-}
-
-.dfe-header__navigation-list {
-    border-top: 0px solid rgba(255, 255, 255, 0.2); /*HR Border between DfE logo and home link should not be visible*/
-    display: flex;
-    justify-content: flex-start;
-    padding: 0;
-    width: 100%;
-}
-
-img, svg {
-    vertical-align: baseline;
-}
-
-.dfe-header__navigation-item {
-    border-top: 0
-}
-
-.dfe-header__service-name {
-    max-width: 1264px;
-    display: inline;
-}
-
-@media (max-width: 61.865em) {
-    .dfe-header__service-name {
-        padding-left: 10px;
-        padding-top: 5px;
-    }
-}
-
-.dfe-header__navigation-link {
-    padding: 5px 10px;
-}
-
-@media (max-width: 48.0525em) {
-    .dfe-header__logo {
-        max-width: 100%;
-    }
-}
-/*END - Header overrides */
-
-
 /*BEGIN - Child Details form title width extention override */
 @media (min-width: 40.0625em) {
     .govuk-summary-list__key {
@@ -359,17 +298,19 @@ caption {
 }
 
 .govuk-panel--blue {
-    color: #ffffff; 
+    color: #ffffff;
     background: #1d70b8;
-    & > .govuk-body-l {
+}
+
+    .govuk-panel--blue > .govuk-body-l {
         color: #ffffff;
     }
-}
 
 .govuk-panel--orange {
     color: #000000;
     background: #f47738;
 }
+
 .govuk-panel--confirmation > div {
     color: #ffffff !important;
 }
@@ -396,3 +337,102 @@ caption {
     display: none;
 }
 /*END - Hide success banner on Cookies page when page first loads */
+
+/*BEGIN Header overrides for v6 brand refresh */
+.govuk-header__link:focus .govuk-header__logotype {
+    content: url(/assets/images/department-for-education_black.png); /*black image when active*/
+    height: 30px;
+}
+
+.govuk-link:focus {
+    color: #0b0c0c;
+}
+
+.govuk-header__container { /*Blue header sizing*/
+    position: relative;
+    margin-bottom: 0px;
+    padding: 0;
+    border-bottom: none;
+    height: 60px;
+}
+
+.govuk-header__link .govuk-header__logotype { /*name logo image sizing*/
+    height: 30px;
+}
+
+.govuk-width-container {
+    margin: 0 16px;
+    max-width: 1200px;
+}
+
+@media (min-width: 48.0625em) { /*641px*/
+    .govuk-width-container {
+        margin: 0 32px;
+    }
+}
+
+@media (min-width: 1264px) {
+    .govuk-width-container {
+        margin: 0 auto;
+    }
+}
+
+.govuk-service-navigation__container {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    padding-bottom: 10px;
+}
+
+@media (min-width: 40.0625em) {
+    .govuk-service-navigation__container {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}
+
+@media (min-width: 48.0625em) {
+    .govuk-service-navigation__container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        min-width: 90%;
+    }
+}
+
+.govuk-service-navigation {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #8eb8dc;
+    background-color: #f4f8fb;
+}
+
+.govuk-service-navigation__item, .govuk-service-navigation__service-name {
+    padding: 5px 0;
+}
+
+.dfe-card .govuk-link {
+    text-decoration: none;
+}
+
+.dfe-header__content { /* sign out link position*/
+    position: absolute;
+    top: 4px;
+    right: 0px;
+}
+
+@media (min-width: 40.0625em) {
+    .dfe-header__content {
+        position: absolute;
+        top: 4px;
+        right: 0px;
+    }
+}
+/* custom sign out link position for very very thin screens to avoid overlap with DfE logo*/
+@media (max-width: 375px) {
+    .dfe-header__content {
+        position: absolute;
+        top: 25px;
+        right: 0px;
+    }
+}
+/*END Header overrides for v6 brand refresh */

@@ -1,5 +1,11 @@
-﻿@{
+﻿@using CheckChildcareEligibility.Admin.Gateways.Interfaces
+@using System.Globalization
+
+@inject IMenuProvider MenuProvider
+
+@{
     ViewData["Title"] = "Dashboard";
+    var menu = MenuProvider.GetMenuItemsFor(ViewBag.Claims);
 }
 
 @model CheckChildcareEligibility.Admin.Domain.DfeSignIn.DfeClaims;
@@ -15,50 +21,25 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-
-            <span class="govuk-caption-l">@Model.Organisation.Name</span>
+            <span class="govuk-caption-l">@CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Model.Organisation.Name.ToLower())</span>
             <h1 class="govuk-heading-l">Manage eligibility for childcare support</h1>
 
             <div class="dfe-grid-container">
-                <div class="dfe-card">
-                    <div class="dfe-card-container">
-                        <h2 class="govuk-heading-m">
-                            <a class="govuk-link govuk-link--no-visited-state dfe-card-link--header"
-                               href="@Url.Action("MenuSingleCheck", "Home")">Run a check</a>
-                        </h2>
-                        <p>Run an eligibility check for one parent or guardian.</p>
+                @foreach (var item in menu)
+                {
+                    if (item.UrlView == "")
+                    {
+                        continue; //Don't show a 'Home' Dashboard tile
+                    }
+                    <div class="dfe-card">
+                        <div class="dfe-card-container">
+                            <h2 class="govuk-heading-m">
+                                <a class="govuk-link govuk-link--no-visited-state dfe-card-link--header" href="/@item.UrlController/@item.UrlView">@item.TileText</a>
+                            </h2>
+                            <p>@item.TileSubText</p>
+                        </div>
                     </div>
-                </div>
-
-                <div class="dfe-card">
-                    <div class="dfe-card-container">
-                        <h2 class="govuk-heading-m">
-                            <a class="govuk-link govuk-link--no-visited-state dfe-card-link--header"
-                               href="@Url.Action("MenuBulkCheck", "Home")">Run a batch check</a>
-                        </h2>
-                        <p>Run an eligibility check for multiple parents or guardians.</p>
-                    </div>
-                </div>
-
-                <div class="dfe-card">
-                    <div class="dfe-card-container">
-                        <h2 class="govuk-heading-m">
-                            <a class="govuk-link govuk-link--no-visited-state dfe-card-link--header"
-                               href="@Url.Action("GuidanceHome", "Home")">Guidance</a>
-                        </h2>
-                        <p>Read guidance on running eligibility checks and managing foster families.</p>
-                    </div>
-                </div>
-
-                <div class="dfe-card">
-                    <div class="dfe-card-container">
-                        <h2 class="govuk-heading-m">
-                            <a class="govuk-link govuk-link--no-visited-state dfe-card-link--header"
-                               href="@Url.Action("ManageFosterFamilies", "Home")">Manage foster families</a>
-                        </h2>
-                        <p>Manage foster families claiming Childcare for working families.</p>
-                    </div>
-                </div>
+                }
             </div>
         </div>
     </div>

@@ -6,12 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System.Security.Claims;
-using System.Collections.Generic;
 
 namespace CheckChildcareEligibility.Admin.Tests.Controllers;
 
 [TestFixture]
-internal class HomeControllerTests
+internal class HomeControllerTests : TestBase
 {
     private Mock<IDfeSignInApiService> _mockDfeSignInApiService;
     private HomeController _sut;
@@ -21,6 +20,9 @@ internal class HomeControllerTests
     {
         _mockDfeSignInApiService = new Mock<IDfeSignInApiService>();
         _sut = new HomeController(_mockDfeSignInApiService.Object);
+        base.SetUp();
+        _sut.ControllerContext.HttpContext = _httpContext.Object;
+        _sut.GetDfeClaimsAsync().Wait();
     }
 
     [TearDown]
@@ -92,6 +94,7 @@ internal class HomeControllerTests
         _mockDfeSignInApiService
             .Setup(x => x.GetUserRolesAsync(userId, organisationId))
             .ReturnsAsync(roles);
+        await _sut.GetDfeClaimsAsync();
 
         // Act
         var result = await _sut.Index();
@@ -177,6 +180,7 @@ internal class HomeControllerTests
         _mockDfeSignInApiService
             .Setup(x => x.GetUserRolesAsync(userId, organisationId))
             .ReturnsAsync(new List<Role>());
+        await _sut.GetDfeClaimsAsync();
 
         // Act
         var result = await _sut.Index();

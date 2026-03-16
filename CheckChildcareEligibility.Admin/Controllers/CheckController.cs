@@ -29,7 +29,8 @@ public class CheckController : BaseController
         IPerform2YoEligibilityCheckUseCase perform2YoEligibilityCheckUseCase,
         IPerformEyppEligibilityCheckUseCase performEyppEligibilityCheckUseCase,
         IGetCheckStatusUseCase getCheckStatusUseCase,
-        IValidateParentDetailsUseCase validateParentDetailsUseCase)
+        IValidateParentDetailsUseCase validateParentDetailsUseCase,
+        IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService)
     {
         _config = configuration;
         _logger = logger;
@@ -125,8 +126,6 @@ public class CheckController : BaseController
 
     public async Task<IActionResult> Loader()
     {
-        _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
-
         var responseJson = TempData["Response"] as string;
         try
         {
