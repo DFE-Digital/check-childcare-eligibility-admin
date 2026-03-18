@@ -4,6 +4,9 @@
 
 @{
     ViewData["Title"] = "Dashboard";
+    
+    var allowedLAs = Configuration.GetSection("FeatureFlags:LAsThatCanUseWF")
+        .Get<string[]>() ?? Array.Empty<string>();
 }
 
 
@@ -24,7 +27,7 @@
 
             <div class="dfe-grid-container">
 
-                @if (Configuration["FeatureFlags:LAsThatCanUseWF"].Contains(Model.Organisation.Name.ToLower()))
+                @if (allowedLAs.Contains(Model.Organisation.Name.ToLower()))
                 {
                     <div class="dfe-card">
                         <div class="dfe-card-container">
