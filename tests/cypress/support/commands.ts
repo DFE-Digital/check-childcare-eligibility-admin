@@ -50,11 +50,16 @@ Cypress.Commands.add('loginSchoolUser', () => {
   cy.get('#password').type(Cypress.env('DFE_ADMIN_PASSWORD'));
   cy.get('button[type="submit"]').click();
   cy.reload();
-  cy.contains('The Telford Park School')
-    .parent()
-    .find('input[type="radio"]')
-    .check();
-  cy.contains('Continue').click();
+  //Only select the establishment if select screen exists. Account with only one option skip this selection.
+  cy.get('body').then($body => {
+    if ($body.find('input[type="radio"]').parent().text().includes('The Telford Park School')) {
+      cy.contains('The Telford Park School')
+        .parent()
+        .find('input[type="radio"]')
+        .check();
+      cy.contains('Continue').click();
+    }
+  });
 });
 
 Cypress.Commands.add('loginLocalAuthorityUser', () => {
@@ -65,11 +70,16 @@ Cypress.Commands.add('loginLocalAuthorityUser', () => {
   cy.get('button[type="submit"]').click();
   cy.get('#password').type(Cypress.env('DFE_ADMIN_PASSWORD'));
   cy.get('button[type="submit"]').click();
-  // cy.contains('Telford and Wrekin Council')
-  //   .parent()
-  //   .find('input[type="radio"]')
-  //   .check();
-  // cy.contains('Continue').click();
+  //Only select the establishment if select screen exists. Account with only one option skip this selection.
+  cy.get('body').then($body => {
+    if ($body.find('input[type="radio"]').parent().text().includes('Telford and Wrekin Council')) {
+      cy.contains('Telford and Wrekin Council')
+        .parent()
+        .find('input[type="radio"]')
+        .check();
+      cy.contains('Continue').click();
+    }
+  });
 });
 
 Cypress.Commands.add('storeCookies', (userType: string) => {
