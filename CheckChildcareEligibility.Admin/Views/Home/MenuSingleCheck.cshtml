@@ -27,7 +27,7 @@
 
             <div class="dfe-grid-container">
 
-                @if (allowedLAs.Contains(Model.Organisation.Name.ToLower()))
+                @if (allowedLAs.Contains(Model.Organisation.Name.ToLower())||allowedLAs.Length==0)
                 {
                     <div class="dfe-card">
                         <div class="dfe-card-container">
