@@ -31,7 +31,7 @@ public class HomeController : BaseController
     }
 
     //Single
-
+    [HttpGet("Home/MenuSingleCheck")]
     public IActionResult MenuSingleCheck(bool clearData = false)
     {
         // If clearData is true, remove the ParentDetails from TempData
@@ -45,7 +45,7 @@ public class HomeController : BaseController
     }
 
 
-    [HttpPost("MenuSingleCheck")]
+    [HttpPost("Home/MenuSingleCheck")]
     public IActionResult MenuSingleCheck([FromForm] string eligibilityType)
     {
         if (string.IsNullOrEmpty(eligibilityType))
