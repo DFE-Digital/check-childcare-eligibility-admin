@@ -209,7 +209,7 @@ describe('Last Name Validation Tests', () => {
         cy.contains('Run check').click();
 
         // Should proceed without the last name validation error
-        cy.get('.govuk-error-message').should('not.contain', 'Enter a last name with valid characters');
+        cy.contains('There is a problem').should('not.exist');
     });
 });
 
