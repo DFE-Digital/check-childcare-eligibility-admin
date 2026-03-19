@@ -45,7 +45,7 @@ public class HomeController : BaseController
     }
 
 
-    [HttpPost("MenuSingleCheck")]
+    [HttpPost]
     public IActionResult MenuSingleCheck([FromForm] string eligibilityType)
     {
         if (string.IsNullOrEmpty(eligibilityType))
