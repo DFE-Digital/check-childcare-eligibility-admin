@@ -11,11 +11,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Remove="Attributes\**" />
         <Compile Remove="Models\**" />
-        <EmbeddedResource Remove="Attributes\**" />
         <EmbeddedResource Remove="Models\**" />
-        <None Remove="Attributes\**" />
         <None Remove="Models\**" />
     </ItemGroup>
 

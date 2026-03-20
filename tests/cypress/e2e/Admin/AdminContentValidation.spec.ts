@@ -192,6 +192,25 @@ describe('Last Name Validation Tests', () => {
         // Should proceed to next step without validation errors
         cy.contains('There is a problem').should('not.exist');
     });
+
+    it('allows curly apostrophe in last name', () => {
+        // Fill in valid date of birth
+        cy.get('[id="DateOfBirth.Day"]').clear().type('15');
+        cy.get('[id="DateOfBirth.Month"]').clear().type('06');
+        cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
+
+        // Fill in valid NI number
+        cy.get('#NationalInsuranceNumber').clear().type(validNIN);
+
+        // Enter last name containing a curly/right single quotation mark (U+2019)
+        cy.get('#LastName').clear().type('O\u2019Brien');
+
+        // Submit the form
+        cy.contains('Run check').click();
+
+        // Should proceed without the last name validation error
+        cy.contains('There is a problem').should('not.exist');
+    });
 });
 
 describe('National Insurance Number Validation Tests', () => {
