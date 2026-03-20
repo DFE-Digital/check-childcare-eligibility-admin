@@ -1,8 +1,12 @@
 ﻿@model CheckChildcareEligibility.Admin.Domain.DfeSignIn.DfeClaims;
 @using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels
+@inject IConfiguration Configuration
 
 @{
     ViewData["Title"] = "Dashboard";
+    
+    var allowedLAs = Configuration.GetSection("FeatureFlags:LAsThatCanUseWF")
+        .Get<string[]>() ?? Array.Empty<string>();
 }
 
 
@@ -22,26 +26,30 @@
             <p class="govuk-">Choose which eligibility you want to run a check for.</p>
 
             <div class="dfe-grid-container">
-                @* <div class="dfe-card">
-                    <div class="dfe-card-container">
-                        <h2 class="govuk-heading-m">
-                            <form method="post" action="@Url.Action("MenuSingleCheck", "Home")">
-                                <input type="hidden" name="eligibilityType" value="WF" />
-                                <button class="button-as-link-dfe-card-style govuk-link govuk-link--no-visited-state dfe-card-link--header"
-                                        type="submit">
-                                    @EligibilityTypeLabels.Labels["WF"]
-                                </button>
-                            </form>
-                        </h2>
-                        <p>30 hours free childcare for children aged 9 months to 4 years.</p>
+
+                @if (allowedLAs.Contains(Model.Organisation.Name.ToLower())||allowedLAs.Length==0)
+                {
+                    <div class="dfe-card">
+                        <div class="dfe-card-container">
+                            <h2 class="govuk-heading-m">
+                                <form method="post" action="@Url.Action("MenuSingleCheck", "Home")">
+                                    <input type="hidden" name="eligibilityType" value="WF"/>
+                                    <button class="button-as-link-dfe-card-style govuk-link govuk-link--no-visited-state dfe-card-link--header"
+                                            type="submit">
+                                        @EligibilityTypeLabels.Labels["WF"]
+                                    </button>
+                                </form>
+                            </h2>
+                            <p>30 hours free childcare for children aged 9 months to 4 years.</p>
+                        </div>
                     </div>
-                </div> *@
+                }
 
                 <div class="dfe-card">
                     <div class="dfe-card-container">
                         <h2 class="govuk-heading-m">
                             <form method="post" action="@Url.Action("MenuSingleCheck", "Home")">
-                                <input type="hidden" name="eligibilityType" value="2YO" />
+                                <input type="hidden" name="eligibilityType" value="2YO"/>
                                 <button class="button-as-link-dfe-card-style govuk-link govuk-link--no-visited-state dfe-card-link--header"
                                         type="submit">
                                     @EligibilityTypeLabels.Labels["2YO"]
@@ -56,7 +64,7 @@
                     <div class="dfe-card-container">
                         <h2 class="govuk-heading-m">
                             <form method="post" action="@Url.Action("MenuSingleCheck", "Home")">
-                                <input type="hidden" name="eligibilityType" value="EYPP" />
+                                <input type="hidden" name="eligibilityType" value="EYPP"/>
                                 <button class="button-as-link-dfe-card-style govuk-link govuk-link--no-visited-state dfe-card-link--header"
                                         type="submit">
                                     @EligibilityTypeLabels.Labels["EYPP"]

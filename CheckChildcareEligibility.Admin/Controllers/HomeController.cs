@@ -41,7 +41,7 @@ public class HomeController : BaseController
             TempData.Remove("ParentAndChildDetails");
             TempData.Remove("Errors");
         }
-        return View("MenuSingleCheck");
+        return View(_Claims);
     }
 
 
@@ -66,7 +66,7 @@ public class HomeController : BaseController
     //Bulk
     public IActionResult MenuBulkCheck()
     {
-        return View("MenuBulkCheck");
+        return View(_Claims);
     }
 
     [HttpPost]
