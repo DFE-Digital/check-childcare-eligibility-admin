@@ -411,3 +411,4 @@ FodyWeavers.xsd
 /tests/cypress/downloads/
 /tests/cypress/screenshots/
 /tests/cypress/fixtures/*.json
+/CheckChildcareEligibility.Admin/CheckChildcareEligibility.Admin.sln
