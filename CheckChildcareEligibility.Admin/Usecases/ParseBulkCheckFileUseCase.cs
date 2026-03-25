@@ -137,7 +137,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                                 var requestDataWF = new CheckEligibilityRequestWorkingFamiliesData();
                                 requestDataWF.EligibilityCode = workingFamilyRow.EligibilityCode;
                                 requestDataWF.DateOfBirth = workingFamilyRow.DOB;//must remain in original pre-parsed form to go through validator
-                                requestDataWF.NationalInsuranceNumber = workingFamilyRow.Ni.ToUpper();
+                                requestDataWF.NationalInsuranceNumber = workingFamilyRow.Ni.ToUpper().Replace(" ", "");
                                 requestDataWF.Type = eligibilityType;
                                 requestDataWF.Sequence = sequence;
                                 validationResults = _validator.Validate(requestDataWF);
@@ -152,7 +152,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                                 var requestData = new CheckEligibilityRequestData();
                                 requestData.LastName = row.LastName;
                                 requestData.DateOfBirth = row.DOB;//must remain in original pre-parsed form to go through validator
-                                requestData.NationalInsuranceNumber = row.Ni.ToUpper();
+                                requestData.NationalInsuranceNumber = row.Ni.ToUpper().Replace(" ", "");
                                 requestData.Type = eligibilityType;
                                 requestData.Sequence = sequence;
                                 validationResults = _validator.Validate(requestData);
