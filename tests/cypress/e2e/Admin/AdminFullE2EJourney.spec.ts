@@ -25,6 +25,9 @@ describe('Full journey of checking eligibility in LA portal', () => {
         // Consent declaration (if exists in the flow)
         cy.url().should('include', '/Check/Enter_Details');
 
+        //Verify guidance link is present
+        cy.contains('a', 'Parent or guardian is an asylum seeker (opens in new tab)').should('have.attr', 'href').and('include', '/Check/_2yo_Guidance');
+
         // Add parent details
         cy.get('#LastName').type(parentLastName);
         cy.get('[id="DateOfBirth.Day"]').type('01');
@@ -80,6 +83,8 @@ describe('Full journey of checking eligibility in LA portal', () => {
         // Enter Details page
         cy.url().should('include', '/Check/Enter_Details');
 
+         //Verify guidance link is present
+        cy.contains('a', 'Parent or guardian is an asylum seeker (opens in new tab)').should('have.attr', 'href').and('include', '/Check/Eypp_Guidance');
         // Add parent details
         cy.get('#LastName').type(parentLastName);
         cy.get('[id="DateOfBirth.Day"]').type('01');

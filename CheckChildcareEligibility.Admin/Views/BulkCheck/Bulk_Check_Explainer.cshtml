@@ -1,4 +1,4 @@
-﻿@using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels
+﻿@using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeConstants;
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -16,7 +16,7 @@
             <div class="govuk-accordion__section-header">
                 <h2 class="govuk-accordion__section-heading">
                     <span class="govuk-accordion__section-button" id="accordion-default-heading-1">
-                        @EligibilityTypeLabels.Labels["WF"]
+                        @EligibilityTypeConstants.Labels["WF"]
                     </span>
                 </h2>
             </div>
@@ -34,7 +34,7 @@
             <div class="govuk-accordion__section-header">
                 <h2 class="govuk-accordion__section-heading">
                     <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
-                        @EligibilityTypeLabels.Labels["2YO"]
+                        @EligibilityTypeConstants.Labels["2YO"]
                     </span>
                 </h2>
             </div>
@@ -53,7 +53,7 @@
             <div class="govuk-accordion__section-header">
                 <h2 class="govuk-accordion__section-heading">
                     <span class="govuk-accordion__section-button" id="accordion-default-heading-3">
-                        @EligibilityTypeLabels.Labels["EYPP"]
+                        @EligibilityTypeConstants.Labels["EYPP"]
                     </span>
                 </h2>
             </div>

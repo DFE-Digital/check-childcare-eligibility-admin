@@ -1,5 +1,5 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Responses;
-using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
+using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeConstants;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
@@ -50,7 +50,7 @@ public class WorkingFamiliesCheckController : BaseController
         string eligibilityType = TempData["eligibilityType"] as string;
         if (eligibilityType == null) { eligibilityType = "Unknown eligibility type"; }
         TempData["eligibilityType"] = eligibilityType;
-        string label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
+        string label = EligibilityTypeConstants.Labels.ContainsKey(eligibilityType) ? EligibilityTypeConstants.Labels[eligibilityType] : "Unknown eligibility type";
         TempData["eligibilityTypeLabel"] = label;
 
         var (parentAndChild, validationErrors) = await _loadParentAndChildDetailsUseCase.Execute(
@@ -164,8 +164,8 @@ public class WorkingFamiliesCheckController : BaseController
         if (string.IsNullOrEmpty(eligibilityType))
             return "eligibility";
 
-        return EligibilityTypeLabels.Labels.ContainsKey(eligibilityType)
-            ? EligibilityTypeLabels.Labels[eligibilityType]
+        return EligibilityTypeConstants.Labels.ContainsKey(eligibilityType)
+            ? EligibilityTypeConstants.Labels[eligibilityType]
             : "eligibility";
     }
 

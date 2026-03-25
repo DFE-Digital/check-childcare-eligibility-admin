@@ -1,6 +1,6 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Controllers.Constants;
-using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
+using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeConstants;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
@@ -48,7 +48,7 @@ public class BulkCheckController : BaseController
         string eligibilityType = TempData["eligibilityType"] as string;
         if (eligibilityType == null) { eligibilityType = "Unknown eligibility type"; }
         TempData["eligibilityType"] = eligibilityType;
-        var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
+        var label = EligibilityTypeConstants.Labels.ContainsKey(eligibilityType) ? EligibilityTypeConstants.Labels[eligibilityType] : "Unknown eligibility type";
         TempData["eligibilityTypeLabel"] = label;
         BulkCheckViewModel viewModel = new BulkCheckViewModel();
        
@@ -213,7 +213,7 @@ public class BulkCheckController : BaseController
         string eligibilityType = TempData["eligibilityType"] as string;
         if (eligibilityType == null) { eligibilityType = "Unknown eligibility type"; }
         TempData["eligibilityType"] = eligibilityType;
-        var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
+        var label = EligibilityTypeConstants.Labels.ContainsKey(eligibilityType) ? EligibilityTypeConstants.Labels[eligibilityType] : "Unknown eligibility type";
         TempData["eligibilityTypeLabel"] = label;
         TempData["filePrefix"] = GetFileNamePrefix(eligibilityType);
 

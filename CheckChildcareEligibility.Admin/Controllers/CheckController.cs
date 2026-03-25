@@ -1,4 +1,4 @@
-﻿using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeLabels;
+﻿using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeConstants;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
@@ -69,8 +69,11 @@ public class CheckController : BaseController
         string eligibilityType = TempData["eligibilityType"] as string;
         if (eligibilityType == null) { eligibilityType = "Unknown eligibility type"; }
         TempData["eligibilityType"] = eligibilityType;
-        var label = EligibilityTypeLabels.Labels.ContainsKey(eligibilityType) ? EligibilityTypeLabels.Labels[eligibilityType] : "Unknown eligibility type";
+        var label = EligibilityTypeConstants.Labels.ContainsKey(eligibilityType) ? EligibilityTypeConstants.Labels[eligibilityType] : "Unknown eligibility type";
+        var guidanceLink = EligibilityTypeConstants.GuidanceLinks.ContainsKey(eligibilityType) ? EligibilityTypeConstants.GuidanceLinks[eligibilityType] : "Unknown eligibility type";
+        
         TempData["eligibilityTypeLabel"] = label;
+        TempData["GuidanceLink"] = guidanceLink;
 
         var (parent, validationErrors) = await _loadParentDetailsUseCase.Execute(
             TempData["ParentDetails"]?.ToString(),
@@ -235,8 +238,8 @@ public class CheckController : BaseController
         if (string.IsNullOrEmpty(eligibilityType))
             return "eligibility";
 
-        return EligibilityTypeLabels.Labels.ContainsKey(eligibilityType)
-            ? EligibilityTypeLabels.Labels[eligibilityType]
+        return EligibilityTypeConstants.Labels.ContainsKey(eligibilityType)
+            ? EligibilityTypeConstants.Labels[eligibilityType]
             : "eligibility";
     }
 
