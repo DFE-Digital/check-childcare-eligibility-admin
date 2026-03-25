@@ -97,5 +97,5 @@ app.Use((context, next) =>
 app.UseSession();
 app.MapControllerRoute(
     "default",
-    "{controller=Home}/{action=Index}/{id?}");
+    "{controller=Start}/{action=Index}/{id?}");
 app.Run();
