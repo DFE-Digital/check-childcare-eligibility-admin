@@ -19,6 +19,7 @@ public sealed class AccountController : Controller
     [Route("/account/sign-out")]
     public async Task<IActionResult> SignOut()
     {
+        HttpContext.Session.Clear();
         return new SignOutResult(new[]
             { OpenIdConnectDefaults.AuthenticationScheme, CookieAuthenticationDefaults.AuthenticationScheme });
     }
