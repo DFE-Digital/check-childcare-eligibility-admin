@@ -152,7 +152,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                                 var requestData = new CheckEligibilityRequestData();
                                 requestData.LastName = row.LastName;
                                 requestData.DateOfBirth = row.DOB;//must remain in original pre-parsed form to go through validator
-                                requestData.NationalInsuranceNumber = row.Ni.ToUpper().Replace(" ", ""); ;
+                                requestData.NationalInsuranceNumber = row.Ni.ToUpper().Replace(" ", "");
                                 requestData.Type = eligibilityType;
                                 requestData.Sequence = sequence;
                                 validationResults = _validator.Validate(requestData);
