@@ -9,7 +9,6 @@
 
     @if (!ViewData.ModelState.IsValid)
     {
-        @*         ViewData["Title"] = "Error: Check Details";*@
         <partial name="_ValidationSummary" model="ViewData.ModelState" />
     }
 
@@ -103,6 +102,7 @@
             Run check
         </button>
     </form>
+    <p class="govuk-body"><a class="govuk-link" rel="noreferrer noopener" target="_blank" href="@TempData["GuidanceLink"]">Parent or guardian is an asylum seeker (opens in new tab)</a></p>
 </div>
 
 <script src="/js/validationSummary.js"></script>
