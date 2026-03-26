@@ -27,15 +27,15 @@ const visitPrefilledForm = (onlyfill?: boolean) => {
 describe('Date of Birth Validation Tests', () => {
     beforeEach(() => {
         cy.checkSession('LA');
-        cy.visit(Cypress.config().baseUrl ?? "");
-        
+        cy.visit((Cypress.config().baseUrl ?? "") + "/home")
+
         // Navigate from Dashboard to SingleCheckMenu
-        cy.visit('/');
+        cy.visit('/home');
         cy.contains('a', 'Run a check').click();
-        
+
         // From SingleCheckMenu, select an option (e.g. Early learning for 2-year-olds)
         cy.contains('button', 'Early learning for 2-year-olds').click();
-        
+
         // We should now be on the Enter_Details page
         cy.url().should('include', '/Check/Enter_Details');
     });
@@ -43,15 +43,15 @@ describe('Date of Birth Validation Tests', () => {
     it('displays error messages for missing date fields', () => {
         // Fill in the last name to avoid that validation error
         cy.get('#LastName').type(parentLastName);
-        
+
         // Fill in the NI number to avoid that validation error
         cy.get('#NationalInsuranceNumber').type(NIN);
-        
+
         // Clear the date fields
         cy.get('[id="DateOfBirth.Day"]').clear();
         cy.get('[id="DateOfBirth.Month"]').clear();
         cy.get('[id="DateOfBirth.Year"]').clear();
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -120,14 +120,14 @@ describe('Last Name Validation Tests', () => {
     beforeEach(() => {
         // Start by logging in as LA type
         cy.checkSession('LA');
-        
+
         // Navigate from Dashboard to SingleCheckMenu
-        cy.visit('/');
+        cy.visit('/home');
         cy.contains('a', 'Run a check').click();
-        
+
         // From SingleCheckMenu, select an option (e.g. Early learning for 2-year-olds)
         cy.contains('button', 'Early learning for 2-year-olds').click();
-        
+
         // We should now be on the Enter_Details page
         cy.url().should('include', '/Check/Enter_Details');
     });
@@ -137,13 +137,13 @@ describe('Last Name Validation Tests', () => {
         cy.get('[id="DateOfBirth.Day"]').clear().type('15');
         cy.get('[id="DateOfBirth.Month"]').clear().type('06');
         cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
-        
+
         // Fill in valid NI number
         cy.get('#NationalInsuranceNumber').clear().type(validNIN);
-        
+
         // Leave last name empty
         cy.get('#LastName').clear();
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -158,13 +158,13 @@ describe('Last Name Validation Tests', () => {
         cy.get('[id="DateOfBirth.Day"]').clear().type('15');
         cy.get('[id="DateOfBirth.Month"]').clear().type('06');
         cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
-        
+
         // Fill in valid NI number
         cy.get('#NationalInsuranceNumber').clear().type(validNIN);
-        
+
         // Enter invalid last name with special characters
         cy.get('#LastName').clear().type('Smith123@');
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -179,13 +179,13 @@ describe('Last Name Validation Tests', () => {
         cy.get('[id="DateOfBirth.Day"]').clear().type('15');
         cy.get('[id="DateOfBirth.Month"]').clear().type('06');
         cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
-        
+
         // Fill in valid NI number
         cy.get('#NationalInsuranceNumber').clear().type(validNIN);
-        
+
         // Enter valid last name (removing the backslash that was escaping the apostrophe)
         cy.get('#LastName').clear().type('Smith-O\'Brien');
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -198,14 +198,14 @@ describe('National Insurance Number Validation Tests', () => {
     beforeEach(() => {
         // Start by logging in as LA type
         cy.checkSession('LA');
-        
+
         // Navigate from Dashboard to SingleCheckMenu
-        cy.visit('/');
+        cy.visit('/home');
         cy.contains('a', 'Run a check').click();
-        
+
         // From SingleCheckMenu, select an option (e.g. Early learning for 2-year-olds)
         cy.contains('button', 'Early learning for 2-year-olds').click();
-        
+
         // We should now be on the Enter_Details page
         cy.url().should('include', '/Check/Enter_Details');
     });
@@ -215,13 +215,13 @@ describe('National Insurance Number Validation Tests', () => {
         cy.get('[id="DateOfBirth.Day"]').clear().type('15');
         cy.get('[id="DateOfBirth.Month"]').clear().type('06');
         cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
-        
+
         // Fill in valid last name
         cy.get('#LastName').clear().type('Smith');
-        
+
         // Leave NI number empty
         cy.get('#NationalInsuranceNumber').clear();
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -236,13 +236,13 @@ describe('National Insurance Number Validation Tests', () => {
         cy.get('[id="DateOfBirth.Day"]').clear().type('15');
         cy.get('[id="DateOfBirth.Month"]').clear().type('06');
         cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
-        
+
         // Fill in valid last name
         cy.get('#LastName').clear().type('Smith');
-        
+
         // Enter invalid NI number
         cy.get('#NationalInsuranceNumber').clear().type(invalidNIN);
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -257,13 +257,13 @@ describe('National Insurance Number Validation Tests', () => {
         cy.get('[id="DateOfBirth.Day"]').clear().type('15');
         cy.get('[id="DateOfBirth.Month"]').clear().type('06');
         cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
-        
+
         // Fill in valid last name
         cy.get('#LastName').clear().type('Smith');
-        
+
         // Enter NI number with disallowed prefix
         cy.get('#NationalInsuranceNumber').clear().type('GB123456C');
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -278,13 +278,13 @@ describe('National Insurance Number Validation Tests', () => {
         cy.get('[id="DateOfBirth.Day"]').clear().type('15');
         cy.get('[id="DateOfBirth.Month"]').clear().type('06');
         cy.get('[id="DateOfBirth.Year"]').clear().type('1990');
-        
+
         // Fill in valid last name
         cy.get('#LastName').clear().type('Smith');
-        
+
         // Enter valid NI number
         cy.get('#NationalInsuranceNumber').clear().type(validNIN);
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -299,7 +299,7 @@ describe("Navigation and links test", () => {
     });
 
     it("Dashboard should have run a check option", () => {
-        cy.visit('/');
+        cy.visit('/home');
         cy.contains('a', 'Run a check').should('exist');
     });
 });

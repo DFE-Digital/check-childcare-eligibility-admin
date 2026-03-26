@@ -23,4 +23,9 @@ public class StartController : Controller
 
         return View();
     }
+
+    public IActionResult Cookies() => View("Cookies");
+
+    public IActionResult UserGuidance() => View("UserGuidance");
+
 }

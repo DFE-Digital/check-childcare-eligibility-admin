@@ -9,7 +9,7 @@ describe('Full journey of checking eligibility in LA portal', () => {
     beforeEach(() => {
         // Login with LA session
         cy.checkSession('LA');
-        cy.visit(Cypress.config().baseUrl ?? "");
+        cy.visit((Cypress.config().baseUrl ?? "") + "/home")
         cy.wait(1);
         cy.get('h1').should('include.text', 'Manage eligibility for childcare support');
     });

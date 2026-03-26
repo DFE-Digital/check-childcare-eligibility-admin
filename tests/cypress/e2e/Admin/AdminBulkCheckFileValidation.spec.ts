@@ -3,7 +3,7 @@ import "cypress-file-upload";
 describe("Admin Bulk Check File Validation Journey", () => {
   beforeEach(() => {
     cy.checkSession("LA");
-    cy.visit(Cypress.config().baseUrl ?? "");
+    cy.visit((Cypress.config().baseUrl ?? "") + "/home")
     cy.contains("Run a batch check").click();
     cy.contains("button", "Early learning for 2-year-olds").click();
   });
@@ -71,7 +71,7 @@ describe("Admin Bulk Check File Validation Journey", () => {
     });
   });
 
-    it("will return an error message if file is empty", () => {
+  it("will return an error message if file is empty", () => {
     cy.fixture("BulkcheckFileValidaiton/bulkchecktemplate_empty.csv").then(
       (fileContent1) => {
         cy.get('input[type="file"]').attachFile([

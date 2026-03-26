@@ -78,4 +78,36 @@ internal class StartControllerTests
         var viewResult = result as ViewResult;
         viewResult.Should().NotBeNull();
     }
+
+    [Test]
+    public void Given_Cookies_LoadsWithEmptyModel()
+    {
+        // Arrange
+        var sut = CreateController(isAuthenticated: false, redirectSetting: true);
+
+        // Act
+        var result = sut.Cookies();
+
+        // Assert
+        var viewResult = result as ViewResult;
+        viewResult.Should().NotBeNull();
+        viewResult!.ViewName.Should().Be("Cookies");
+        viewResult.Model.Should().BeNull();
+    }
+
+    [Test]
+    public void Given_UserGuidance_LoadsWithEmptyModel()
+    {
+        // Arrange
+        var sut = CreateController(isAuthenticated: false, redirectSetting: true);
+
+        // Act
+        var result = sut.UserGuidance();
+
+        // Assert
+        var viewResult = result as ViewResult;
+        viewResult.Should().NotBeNull();
+        viewResult!.ViewName.Should().Be("UserGuidance");
+        viewResult.Model.Should().BeNull();
+    }
 }
