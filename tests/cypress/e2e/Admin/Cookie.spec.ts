@@ -5,7 +5,7 @@ interface CustomWindow extends Window {
 describe('Cookie consent banner functionality', () => {
     beforeEach(() => {
         cy.checkSession('LA');
-        cy.visit(Cypress.config().baseUrl ?? "");
+        cy.visit((Cypress.config().baseUrl ?? "") + "/home")
     });
 
     it('Should show the cookie banner on first visit when no choice has been made', () => {
@@ -56,7 +56,7 @@ describe('Cookie consent banner functionality', () => {
         // Then reject to remove them
         cy.clearCookies();
         cy.checkSession('LA');
-        cy.visit(Cypress.config().baseUrl ?? "");
+        cy.visit((Cypress.config().baseUrl ?? "") + "/home")
         cy.get('#reject-cookies').click();
         cy.wait(1000);
 

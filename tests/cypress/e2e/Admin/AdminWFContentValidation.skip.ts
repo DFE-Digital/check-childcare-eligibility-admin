@@ -27,15 +27,15 @@ const visitPrefilledFormWF = (onlyfill?: boolean) => {
 describe('Date of Birth Validation Tests', () => {
     beforeEach(() => {
         cy.checkSession('LA');
-        cy.visit(Cypress.config().baseUrl ?? "");
-        
+        cy.visit((Cypress.config().baseUrl ?? "") + "/home")
+
         // Navigate from Dashboard to SingleCheckMenu
-        cy.visit('/');
+        cy.visit('/home');
         cy.contains('a', 'Run a check').click();
-        
+
         // From SingleCheckMenu, select an option (e.g. Early learning for 2-year-olds)
         cy.contains('button', 'Childcare for working families').click();
-        
+
         // We should now be on the Enter_Details page
         cy.url().should('include', '/Check/Enter_Details_WF');
     });
@@ -43,12 +43,12 @@ describe('Date of Birth Validation Tests', () => {
     it('displays error messages for missing date fields', () => {
         // Fill in the Eligibility Code to avoid that validation error
         cy.get('#Child_EligibilityCode').type(eligibilityCode);
-        
+
         // Clear the date fields
         cy.get('#Day').clear();
         cy.get('#Month').clear();
         cy.get('#Year').clear();
-        
+
         // Fill in the NI number to avoid that validation error
         cy.get('#NationalInsuranceNumber').type(NIN_WF);
 
@@ -120,14 +120,14 @@ describe('Eligibility Code Validation Tests', () => {
     beforeEach(() => {
         // Start by logging in as LA type
         cy.checkSession('LA');
-        
+
         // Navigate from Dashboard to SingleCheckMenu
-        cy.visit('/');
+        cy.visit('/home');
         cy.contains('a', 'Run a check').click();
-        
+
         // From SingleCheckMenu, select an option (e.g. Early learning for 2-year-olds)
         cy.contains('button', 'Childcare for working families').click();
-        
+
         // We should now be on the Enter_Details page
         cy.url().should('include', '/Check/Enter_Details_WF');
     });
@@ -137,13 +137,13 @@ describe('Eligibility Code Validation Tests', () => {
         cy.get('#Day').clear().type('15');
         cy.get('#Month').clear().type('06');
         cy.get('#Year').clear().type('1990');
-        
+
         // Fill in valid NI number
         cy.get('#NationalInsuranceNumber').clear().type(validNIN_WF);
-        
+
         // Leave Eligibility Code empty
         cy.get('#Child_EligibilityCode').clear();
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -158,13 +158,13 @@ describe('Eligibility Code Validation Tests', () => {
         cy.get('#Day').clear().type('15');
         cy.get('#Month').clear().type('06');
         cy.get('#Year').clear().type('1990');
-        
+
         // Fill in valid NI number
         cy.get('#NationalInsuranceNumber').clear().type(validNIN_WF);
-        
+
         // Enter invalid Eligibility Code with special characters
         cy.get('#Child_EligibilityCode').clear().type('NotNum!');
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -174,18 +174,18 @@ describe('Eligibility Code Validation Tests', () => {
         cy.get('#Child_EligibilityCode').should('have.class', 'govuk-input--error');
     });
 
-        it('displays error messages for incorrect number of Eligibility Code characters', () => {
+    it('displays error messages for incorrect number of Eligibility Code characters', () => {
         // Fill in valid date of birth
         cy.get('#Day').clear().type('15');
         cy.get('#Month').clear().type('06');
         cy.get('#Year').clear().type('1990');
-        
+
         // Fill in valid NI number
         cy.get('#NationalInsuranceNumber').clear().type(validNIN_WF);
-        
+
         // Enter invalid length Eligibility Code
         cy.get('#Child_EligibilityCode').clear().type('1234');
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -200,13 +200,13 @@ describe('Eligibility Code Validation Tests', () => {
         cy.get('#Day').clear().type('15');
         cy.get('#Month').clear().type('06');
         cy.get('#Year').clear().type('1990');
-        
+
         // Fill in valid NI number
         cy.get('#NationalInsuranceNumber').clear().type(validNIN_WF);
-        
+
         // Enter valid EligibilityCode
         cy.get('#Child_EligibilityCode').clear().type('12345678900');
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -219,14 +219,14 @@ describe('National Insurance Number Validation Tests', () => {
     beforeEach(() => {
         // Start by logging in as LA type
         cy.checkSession('LA');
-        
+
         // Navigate from Dashboard to SingleCheckMenu
-        cy.visit('/');
+        cy.visit('/home');
         cy.contains('a', 'Run a check').click();
-        
+
         // From SingleCheckMenu, select an option (e.g. Early learning for 2-year-olds)
         cy.contains('button', 'Childcare for working families').click();
-        
+
         // We should now be on the Enter_Details page
         cy.url().should('include', '/Check/Enter_Details_WF');
     });
@@ -236,13 +236,13 @@ describe('National Insurance Number Validation Tests', () => {
         cy.get('#Day').clear().type('15');
         cy.get('#Month').clear().type('06');
         cy.get('#Year').clear().type('1990');
-        
+
         // Fill in valid Eligibility Code
         cy.get('#Child_EligibilityCode').clear().type('12345678900');
-        
+
         // Leave NI number empty
         cy.get('#NationalInsuranceNumber').clear();
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -257,13 +257,13 @@ describe('National Insurance Number Validation Tests', () => {
         cy.get('#Day').clear().type('15');
         cy.get('#Month').clear().type('06');
         cy.get('#Year').clear().type('1990');
-        
+
         // Fill in valid Eligibility Code
         cy.get('#Child_EligibilityCode').clear().type('12345678900');
-        
+
         // Enter invalid NI number
         cy.get('#NationalInsuranceNumber').clear().type(invalidNIN_WF);
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -278,13 +278,13 @@ describe('National Insurance Number Validation Tests', () => {
         cy.get('#Day').clear().type('15');
         cy.get('#Month').clear().type('06');
         cy.get('#Year').clear().type('1990');
-        
+
         // Fill in valid Eligibility Code
         cy.get('#Child_EligibilityCode').clear().type('12345678900');
-        
+
         // Enter NI number with disallowed prefix
         cy.get('#NationalInsuranceNumber').clear().type('GB123456C');
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -299,13 +299,13 @@ describe('National Insurance Number Validation Tests', () => {
         cy.get('#Day').clear().type('15');
         cy.get('#Month').clear().type('06');
         cy.get('#Year').clear().type('1990');
-        
+
         // Fill in valid Eligibility Code
         cy.get('#Child_EligibilityCode').clear().type('12345678900');
-        
+
         // Enter valid NI number
         cy.get('#NationalInsuranceNumber').clear().type(validNIN_WF);
-        
+
         // Submit the form
         cy.contains('Run check').click();
 
@@ -320,7 +320,7 @@ describe("Navigation and links test", () => {
     });
 
     it("Dashboard should have run a check option", () => {
-        cy.visit('/');
+        cy.visit('/home');
         cy.contains('a', 'Run a check').should('exist');
     });
 });
