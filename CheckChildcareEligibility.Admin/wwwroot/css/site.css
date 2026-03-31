@@ -448,6 +448,7 @@ caption {
     position: sticky;
     top: 0;
 }
+
 .userGuidanceAnchorMenu {
     position: sticky;
     top: 10px;
@@ -460,18 +461,22 @@ caption {
         display: inline-block;
     }
 
+@media (max-width: 640px) {
+    .userGuidanceNavSticky {
+        position: relative;
+    }
 
-.contents-list-item {
-    list-style-type: none;
-}
+    .contents-list-item {
+        list-style-type: none;
+    }
 
-.contents-list-item-number {
-    min-width: 1.5em;
-    display: table-cell;
-}
+    .contents-list-item-number {
+        min-width: 1.5em;
+        display: table-cell;
+    }
 
-.contents-list-item-text {
-    padding-left: 0.3em;
-    display: table-cell;
-}
-/* END - User Guidance page left hand anchor menu one-quarter panel */
+    .contents-list-item-text {
+        padding-left: 0.3em;
+        display: table-cell;
+    }
+    /* END - User Guidance page left hand anchor menu one-quarter panel */
