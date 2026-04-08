@@ -3,7 +3,7 @@
 @inject IConfiguration Configuration
 
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Run a check for one parent or guardian";
     
     var allowedLAs = Configuration.GetSection("FeatureFlags:LAsThatCanUseWF")
         .Get<string[]>() ?? Array.Empty<string>();
@@ -22,7 +22,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
 
-            <h1 class="govuk-heading-l">Run a check for one parent or guardian</h1>
+            <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
             <p class="govuk-">Choose which eligibility you want to run a check for.</p>
 
             <div class="dfe-grid-container">
