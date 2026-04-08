@@ -41,7 +41,7 @@ public class HomeController : BaseController
             TempData.Remove("ParentAndChildDetails");
             TempData.Remove("Errors");
         }
-        return View(_Claims);
+        return View("MenuSingleCheck", _Claims);
     }
 
 
