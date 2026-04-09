@@ -2,19 +2,21 @@ import 'cypress-file-upload';
 
 Cypress.Commands.add('checkSession', (userType: string) => {
   // Check if a logged in session exists and re-use that, else log in
-  const filePath = userType === 'school' ? 'cypress/fixtures/SchoolUserCookies1.json' : 'cypress/fixtures/LAUserCookies1.json';
+  const filePath = userType === 'school' ? 'cypress/fixtures/SchoolUserCookies1.json' : userType === 'manchesterLA' ? 'cypress/fixtures/ManchesterLAUserCookies1.json' : 'cypress/fixtures/LAUserCookies1.json';
   cy.task<Cypress.CookieData | null>('readFileMaybe', filePath).then((data) => {
     if (data && data.cookies) {
       if (data.cookies.length > 0) {
         cy.loadCookies(userType);
         cy.visit((Cypress.config().baseUrl ?? "") + "/home")
 
-        const expectedText = userType === 'school' ? 'The Telford Park School' : 'Telford and Wrekin Council';
+        const expectedText = userType === 'school' ? 'The Telford Park School' : userType === 'manchesterLA' ? 'Manchester City Council' : 'Telford and Wrekin Council';
         cy.get('.govuk-caption-l').should('include.text', expectedText);
       } else {
         cy.log('No cookies found, forcing new login');
         if (userType === 'school') {
           cy.login('school');
+        } else if (userType === 'manchesterLA') {
+          cy.login('manchesterLA');
         } else {
           cy.login('LA');
         }
@@ -23,6 +25,8 @@ Cypress.Commands.add('checkSession', (userType: string) => {
       cy.log(`File not found or invalid data: ${filePath}`);
       if (userType === 'school') {
         cy.login('school');
+      } else if (userType === 'manchesterLA') {
+        cy.login('manchesterLA');
       } else {
         cy.login('LA');
       }
@@ -35,6 +39,8 @@ Cypress.Commands.add('login', (userType) => {
   cy.session([userType], () => {
     if (userType === 'school') {
       cy.loginSchoolUser();
+    } else if (userType === 'manchesterLA') {
+      cy.loginManchesterLA();
     } else {
       cy.loginLocalAuthorityUser();
     }
@@ -83,8 +89,28 @@ Cypress.Commands.add('loginLocalAuthorityUser', () => {
   });
 });
 
+Cypress.Commands.add('loginManchesterLA', () => {
+  // Log in as a Manchester City Council LA user - For persisting session use checkSession('manchesterLA')
+  cy.reload(true);
+  cy.visit((Cypress.config().baseUrl ?? "") + "/home")
+  cy.get('#username').type(Cypress.env('DFE_ADMIN_EMAIL_ADDRESS'));
+  cy.get('button[type="submit"]').click();
+  cy.get('#password').type(Cypress.env('DFE_ADMIN_PASSWORD'));
+  cy.get('button[type="submit"]').click();
+  //Only select the establishment if select screen exists. Account with only one option skip this selection.
+  cy.get('body').then($body => {
+    if ($body.find('input[type="radio"]').parent().text().includes('MANCHESTER CITY COUNCIL')) {
+      cy.contains('MANCHESTER CITY COUNCIL')
+        .parent()
+        .find('input[type="radio"]')
+        .check();
+      cy.contains('Continue').click();
+    }
+  });
+});
+
 Cypress.Commands.add('storeCookies', (userType: string) => {
-  const filePath = userType === 'school' ? 'cypress/fixtures/SchoolUserCookies.json' : 'cypress/fixtures/LAUserCookies.json';
+  const filePath = userType === 'school' ? 'cypress/fixtures/SchoolUserCookies.json' : userType === 'manchesterLA' ? 'cypress/fixtures/ManchesterLAUserCookies.json' : 'cypress/fixtures/LAUserCookies.json';
   cy.getCookies().then((cookies: Cypress.Cookie[]) => {
     const data: Cypress.CookieData = {
       timestamp: Date.now(),
@@ -95,7 +121,7 @@ Cypress.Commands.add('storeCookies', (userType: string) => {
 });
 
 Cypress.Commands.add('loadCookies', (userType: string) => {
-  const filePath = userType === 'school' ? 'cypress/fixtures/SchoolUserCookies.json' : 'cypress/fixtures/LAUserCookies.json';
+  const filePath = userType === 'school' ? 'cypress/fixtures/SchoolUserCookies.json' : userType === 'manchesterLA' ? 'cypress/fixtures/ManchesterLAUserCookies.json' : 'cypress/fixtures/LAUserCookies.json';
   cy.readFile(filePath).then((data: Cypress.CookieData) => {
     if (data && data.cookies) {
       const currentTime = Date.now();
@@ -114,6 +140,8 @@ Cypress.Commands.add('loadCookies', (userType: string) => {
         cy.log('Cookies are older than 1 hour, forcing new login');
         if (userType === 'school') {
           cy.login('school');
+        } else if (userType === 'manchesterLA') {
+          cy.login('manchesterLA');
         } else {
           cy.login('LA');
         }
