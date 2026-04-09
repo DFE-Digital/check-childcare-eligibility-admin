@@ -22,15 +22,15 @@ describe('Single check menu — Telford LA (WF disabled)', () => {
         cy.url().should('include', '/Home/MenuSingleCheck');
     });
 
-    it('shows the "Childcare for working families" tile', () => {
+    it('does not show the "Childcare for working families" tile', () => {
         cy.contains('button', WF_TILE_TEXT).should('not.exist');
     });
 
-    it('shows the "Early learning for 2-year-olds" tile', () => {
+    it('still shows the "Early learning for 2-year-olds" tile', () => {
         cy.contains('button', TWO_YO_TILE_TEXT).should('exist');
     });
 
-    it('shows the "Early years pupil premium" tile', () => {
+    it('still shows the "Early years pupil premium" tile', () => {
         cy.contains('button', EYPP_TILE_TEXT).should('exist');
     });
 });
@@ -43,15 +43,15 @@ describe('Single check menu — Manchester City Council LA (WF enabled)', () => 
         cy.url().should('include', '/Home/MenuSingleCheck');
     });
 
-    it('does not show the "Childcare for working families" tile', () => {
+    it('shows the "Childcare for working families" tile', () => {
         cy.contains('button', WF_TILE_TEXT).should('exist');
     });
 
-    it('still shows the "Early learning for 2-year-olds" tile', () => {
+    it('shows the "Early learning for 2-year-olds" tile', () => {
         cy.contains('button', TWO_YO_TILE_TEXT).should('exist');
     });
 
-    it('still shows the "Early years pupil premium" tile', () => {
+    it('shows the "Early years pupil premium" tile', () => {
         cy.contains('button', EYPP_TILE_TEXT).should('exist');
     });
 });
@@ -64,15 +64,15 @@ describe('Batch check menu — Telford LA (WF disabled)', () => {
         cy.url().should('include', '/Home/MenuBulkCheck');
     });
 
-    it('shows the "Childcare for working families" tile', () => {
+    it('does not show the "Childcare for working families" tile', () => {
         cy.contains('button', WF_TILE_TEXT).should('not.exist');
     });
 
-    it('shows the "Early learning for 2-year-olds" tile', () => {
+    it('still shows the "Early learning for 2-year-olds" tile', () => {
         cy.contains('button', TWO_YO_TILE_TEXT).should('exist');
     });
 
-    it('shows the "Early years pupil premium" tile', () => {
+    it('still shows the "Early years pupil premium" tile', () => {
         cy.contains('button', EYPP_TILE_TEXT).should('exist');
     });
 });
@@ -85,15 +85,15 @@ describe('Batch check menu — Manchester City Council LA (WF enabled)', () => {
         cy.url().should('include', '/Home/MenuBulkCheck');
     });
 
-    it('does not show the "Childcare for working families" tile', () => {
+    it('shows the "Childcare for working families" tile', () => {
         cy.contains('button', WF_TILE_TEXT).should('exist');
     });
 
-    it('still shows the "Early learning for 2-year-olds" tile', () => {
+    it('shows the "Early learning for 2-year-olds" tile', () => {
         cy.contains('button', TWO_YO_TILE_TEXT).should('exist');
     });
 
-    it('still shows the "Early years pupil premium" tile', () => {
+    it('shows the "Early years pupil premium" tile', () => {
         cy.contains('button', EYPP_TILE_TEXT).should('exist');
     });
 });
