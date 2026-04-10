@@ -10,19 +10,19 @@
 
     <h1 class="govuk-heading-l govuk-!-margin-bottom-4">@ViewData["Title"]</h1>
 
-    <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+    <div class="govuk-accordion" data-module="govuk-accordion" id="accordion">
         <div class="govuk-accordion__section">
 
             <div class="govuk-accordion__section-header">
                 <h2 class="govuk-accordion__section-heading">
-                    <span class="govuk-accordion__section-button" id="accordion-default-heading-1">
+                    <span class="govuk-accordion__section-button" id="accordion-heading-WF">
                         @EligibilityTypeConstants.Labels["WF"]
                     </span>
                 </h2>
             </div>
 
-            <div id="accordion-default-content-1" class="govuk-accordion__section-content"
-                 aria-labelledby="accordion-default-heading-1">
+            <div id="accordion-content-WF" class="govuk-accordion__section-content"
+                 aria-labelledby="accordion-heading-WF">
                 <p><strong>Code valid</strong> - The eligibility code is valid. The code could be one that can be used now, one that is in the grace period, or in the case of some new codes, one that cannot be used until the next term.</p>
                 <p><strong>Code expired</strong> - The eligibility code is no longer valid and cannot be used.</p>
                 <p><strong>Information does not match records</strong> - The eligibility code and personal information does not match departmental records. Either the data was entered incorrectly or the entitlement is not currently updated on the system.</p>
@@ -33,14 +33,14 @@
         <div class="govuk-accordion__section">
             <div class="govuk-accordion__section-header">
                 <h2 class="govuk-accordion__section-heading">
-                    <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
+                    <span class="govuk-accordion__section-button" id="accordion-heading-2YO">
                         @EligibilityTypeConstants.Labels["2YO"]
                     </span>
                 </h2>
             </div>
 
-            <div id="accordion-default-content-2" class="govuk-accordion__section-content"
-                 aria-labelledby="accordion-default-heading-2">
+            <div id="accordion-content-2YO" class="govuk-accordion__section-content"
+                 aria-labelledby="accordion-heading-2YO">
                 <p><strong>Eligible</strong> - The children of this parent or guardian are eligible for early learning for 2-year-olds.</p>
                 <p><strong>May not be eligible</strong> - The children of this parent or guardian may not be eligible for early learning for 2-year-olds. If they wish to appeal, ask the parent or guardian for evidence. <!-- <a href="#">View the list of acceptable evidence</a>.--> </p>
                 <p><strong>Information does not match records</strong> - This parent or guardian's personal information doesn't match the departmental records. Either their data was entered incorrectly or their entitlement isn't currently updated on the system.</p>
@@ -49,17 +49,16 @@
         </div>
 
         <div class="govuk-accordion__section">
-
             <div class="govuk-accordion__section-header">
                 <h2 class="govuk-accordion__section-heading">
-                    <span class="govuk-accordion__section-button" id="accordion-default-heading-3">
+                    <span class="govuk-accordion__section-button" id="accordion-heading-EYPP">
                         @EligibilityTypeConstants.Labels["EYPP"]
                     </span>
                 </h2>
             </div>
 
-            <div id="accordion-default-content-1" class="govuk-accordion__section-content"
-                 aria-labelledby="accordion-default-heading-1">
+            <div id="accordion-content-EYPP" class="govuk-accordion__section-content"
+                 aria-labelledby="accordion-heading-EYPP">
                 <p><strong>Eligible</strong> - The children of this parent or guardian are eligible for early years pupil premium.</p>
                 <p><strong>May not be eligible</strong> - The children of this parent or guardian may not be eligible for early years pupil premium. If they wish to appeal, ask the parent or guardian for evidence. <!-- <a href="#">View the list of acceptable evidence</a>. --></p>
                 <p><strong>Information does not match records</strong> - This parent or guardian's personal information doesn't match the departmental records. Either their data was entered incorrectly or their entitlement isn't currently updated on the system.</p>
