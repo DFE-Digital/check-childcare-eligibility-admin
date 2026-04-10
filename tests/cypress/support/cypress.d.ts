@@ -29,6 +29,7 @@ declare namespace Cypress {
     login(userType: string): Chainable<void>;
     loginSchoolUser(): Chainable<void>;
     loginLocalAuthorityUser(): Chainable<void>;
+    loginManchesterLA(): Chainable<void>;
     storeCookies(userType: string): Chainable<void>;
     loadCookies(userType: string): Chainable<void>;
     SignInSchool(): Chainable<void>;

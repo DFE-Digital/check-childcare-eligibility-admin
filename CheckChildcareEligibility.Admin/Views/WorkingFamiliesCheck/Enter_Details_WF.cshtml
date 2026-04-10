@@ -35,7 +35,7 @@
             </div>
 
             <div class="govuk-form-group">
-                <label class="govuk-label govuk-label--m" for="ni-number-entered">
+                <label class="govuk-label govuk-label--m" for="NationalInsuranceNumber">
                     National Insurance number
                 </label>
                 <div id="ni-number-entered-hint" class="govuk-hint">
@@ -46,8 +46,7 @@
                 </p>
                 <input class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["NationalInsuranceNumber"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
                        asp-controller="Check" asp-for="NationalInsuranceNumber" type="text"
-                       spellcheck="false" autocomplete="text"
-                       aria-label="National Insurance number">
+                       spellcheck="false" autocomplete="text">
             </div>
 
             <div class="govuk-form-group" data-type="dob-form-group">
@@ -70,34 +69,31 @@
                     <div class="govuk-date-input" id="Child.ChildDateOfBirth">
                         <div class="govuk-date-input__item">
                             <div class="govuk-form-group">
-                                <label class="govuk-label govuk-date-input__label" for="Day">
+                                <label class="govuk-label govuk-date-input__label" for="Child.ChildDateOfBirth.Day">
                                     Day
                                 </label>
                                 <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["Child.ChildDateOfBirth.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                       asp-for="Child.Day" id="Child.ChildDateOfBirth.Day" type="text" inputmode="numeric" maxlength="2"
-                                       aria-label="Day" />
+                                       asp-for="Child.Day" id="Child.ChildDateOfBirth.Day" type="text" inputmode="numeric" maxlength="2" />
                             </div>
                         </div>
 
                         <div class="govuk-date-input__item">
                             <div class="govuk-form-group">
-                                <label class="govuk-label govuk-date-input__label" for="Month">
+                                <label class="govuk-label govuk-date-input__label" for="Child.ChildDateOfBirth.Month">
                                     Month
                                 </label>
                                 <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["Child.ChildDateOfBirth.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                       asp-for="Child.Month" id="Child.ChildDateOfBirth.Month" type="text" inputmode="numeric" maxlength="2"
-                                       aria-label="Month" />
+                                       asp-for="Child.Month" id="Child.ChildDateOfBirth.Month" type="text" inputmode="numeric" maxlength="2" />
                             </div>
                         </div>
 
                         <div class="govuk-date-input__item">
                             <div class="govuk-form-group">
-                                <label class="govuk-label govuk-date-input__label" for="Year">
+                                <label class="govuk-label govuk-date-input__label" for="Child.ChildDateOfBirth.Year">
                                     Year
                                 </label>
                                 <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["Child.ChildDateOfBirth.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                       asp-for="Child.Year" id="Child.ChildDateOfBirth.Year" type="text" inputmode="numeric" maxlength="4"
-                                       aria-label="Year" />
+                                       asp-for="Child.Year" id="Child.ChildDateOfBirth.Year" type="text" inputmode="numeric" maxlength="4" />
                             </div>
                         </div>
                     </div>
