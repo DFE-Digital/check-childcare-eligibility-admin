@@ -2,7 +2,8 @@ import "cypress-file-upload";
 
 describe("Admin Working Families Bulk Check Content Validation Journey", () => {
   beforeEach(() => {
-    cy.checkSession("LA");
+    // cy.checkSession("LA");
+    cy.loginManchesterLA();
     cy.visit((Cypress.config().baseUrl ?? "") + "/home")
     cy.contains("Run a batch check").click();
     cy.contains("button", "Childcare for working families").click();

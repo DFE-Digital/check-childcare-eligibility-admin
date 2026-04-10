@@ -104,7 +104,7 @@
 
     @await Html.PartialAsync("_HeaderMenu")
 
-    <div class="govuk-phase-banner govuk-width-container">
+    <div class="govuk-phase-banner govuk-width-container" role="complementary">
         <p class="govuk-phase-banner__content">
             <strong class="govuk-tag govuk-phase-banner__content__tag">
                 beta
@@ -152,10 +152,10 @@
                         <li class="govuk-footer__inline-list-item">
                             <a class="govuk-footer__link" href="https://www.gov.uk/government/organisations/department-for-education/about/personal-information-charter">Privacy policy</a>
                         </li>
-                        @*
-                            <li class="govuk-footer__inline-list-item">
-                            <a class="govuk-footer__link" href="@Url.Action("Accessibility", "Home")">Accessibility</a>
-                            </li> *@
+
+                        <li class="govuk-footer__inline-list-item">
+                            <a class="govuk-footer__link" href="https://accessibility-statements.education.gov.uk/s/72">Accessibility statement</a>
+                        </li>
 
                         <li class="govuk-footer__inline-list-item">
                             <a class="govuk-footer__link" href="@Url.Action("Cookies", controllerRouting)">Cookies</a>
