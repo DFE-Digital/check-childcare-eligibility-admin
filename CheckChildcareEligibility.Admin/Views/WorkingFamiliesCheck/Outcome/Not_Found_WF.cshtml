@@ -7,7 +7,7 @@
 <div class="govuk-grid-column-full">
     <a class="govuk-back-link-nolink"></a>
 
-    <div id="content" data-type="Not_Found" class="govuk-grid-row">
+    <div data-type="Not_Found" class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title"
                  data-module="govuk-notification-banner">
@@ -59,10 +59,8 @@
             <h1 class="govuk-heading-l">What to do next</h1>
             <p class="govuk-body">Check that you entered the parent or guardian last name in full and that all other details are correct.</p>
             <p class="govuk-body">If this keeps happening, <a href="#" id="print-link">print this page</a> for the parent or guardian to check their details.</p>
-            <p class="govuk-body">@Html.ActionLink("Try again", "Enter_Details_WF", "WorkingFamiliesCheck", new { clearData = true }, new { @class = "govuk-button" })</p> <!--change the method that is called here when Jenna has updated-->
-
+            <p class="govuk-body">@Html.ActionLink("Try again", "Enter_Details_WF", "WorkingFamiliesCheck", new { clearData = true }, new { @class = "govuk-button" })</p>
         </div>
-
     </div>
 </div>
 
