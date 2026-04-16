@@ -1,7 +1,7 @@
 ﻿@using CheckChildcareEligibility.Admin.ViewModels
 @model CheckChildcareEligibility.Admin.ViewModels.BulkCheckStatusesViewModel;
 @{
-    ViewData["Title"] = "Batch check history";
+    ViewData["Title"] = "Batch checks status";
 }
 
 @Html.AntiForgeryToken()
@@ -41,7 +41,7 @@
             </div>
         </div>
     }
-    <h1 class="govuk-heading-l">Batch checks status</h1>
+    <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
    
 
     <div class="govuk-grid-row" id="content" data-type="Refresh" data-url="@Url.Action("Bulk_Check_Status", "BulkCheck", new { pageNumber = ViewBag.CurrentPage })">
