@@ -47,7 +47,7 @@ public class NinoAttribute : ValidationAttribute
 
         if (!regex.IsMatch(nino))
         {
-            return new ValidationResult("Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
+            return new ValidationResult("Enter a National Insurance number in the correct format");
         }
 
         // Set the cleaned NINO back into the model

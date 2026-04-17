@@ -288,7 +288,7 @@ describe('National Insurance Number Validation Tests', () => {
 
         // Check that the validation error appears
         cy.get('.govuk-error-summary').should('exist');
-        cy.get('.govuk-error-message').should('contain', 'Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D');
+        cy.get('.govuk-error-message').should('contain', 'Enter a National Insurance number');
         cy.get('#NationalInsuranceNumber').should('have.class', 'govuk-input--error');
     });
 
