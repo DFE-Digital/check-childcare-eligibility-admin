@@ -61,7 +61,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parent Last Name,Parent Date of Birth,Parent National Insurance Number,InvalidHeader
+        ///   Looks up a localized string similar to Parent Last Name,Parent Date of Birth,Parent National Insurance number,InvalidHeader
         ///SIMPSON,1990-01-01,AB123456C
         ///Jones,1990-01-01,ABCD
         ///smith,32/01/1990,AB123456D
@@ -74,7 +74,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parent Last Name,Parent Date of Birth,Parent National Insurance Number
+        ///   Looks up a localized string similar to Parent Last Name,Parent Date of Birth,Parent National Insurance number
         ///SIMPSON,01/01/1990,AB123456C
         ///smith,01/01/1990,AB123456D
         ///.
@@ -86,7 +86,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parent Last Name,Parent Date of Birth,Parent National Insurance Number
+        ///   Looks up a localized string similar to Parent Last Name,Parent Date of Birth,Parent National Insurance number
         ///SIMPSON,1990-01-01,AB123456C
         ///Jones,1990-01-01,ABCD
         ///smith,32/01/1990,AB123456D
@@ -99,7 +99,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parent Last Name,Parent Date of Birth,Parent National Insurance Number
+        ///   Looks up a localized string similar to Parent Last Name,Parent Date of Birth,Parent National Insurance number
         ///SIMPSON,01/01/2000,AB123456E
         ///GRIFFIN,02/01/2000,AC123456D
         ///SIMPSON,03/01/2000,AB123456C

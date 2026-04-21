@@ -62,11 +62,11 @@ describe("Admin Working Families Bulk Check Content Validation Journey", () => {
     );
 
     const validationErrors = [
-      { line: "2", error: "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C" },
+      { line: "2", error: "Enter a National Insurance number in the correct format" },
       { line: "4", error: "Eligibility code must only contain numbers" },
       { line: "5", error: "The date of birth must be in yyyy-mm-dd or dd-mm-yyyy format" },
       { line: "6", error: "Eligibility code must be 11 digits long" },
-      { line: "6", error: "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C" },
+      { line: "6", error: "Enter a National Insurance number in the correct format" },
       { line: "6", error: "The date of birth must be in yyyy-mm-dd or dd-mm-yyyy format" },
       { line: "7", error: "Enter an eligibility code that is 11 digits long" },
       { line: "8", error: "Enter parent or guardian's National Insurance number" },
