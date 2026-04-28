@@ -22,13 +22,13 @@
                 <label class="govuk-label govuk-label--m" for="Child.EligibilityCode">
                     Eligibility Code
                 </label>
-                <div id="Child.EligibilityCode" class="govuk-hint">
+                <div id="Child.EligibilityCode-hint" class="govuk-hint">
                     Eligibility code must be 11 digits long
                 </div>
                 <p class="govuk-error-message">
                     <span asp-validation-for="Child.EligibilityCode"></span>
                 </p>
-                <input class="govuk-input govuk-input--width-10 @(ViewData.ModelState["Child.EligibilityCode"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                <input id="Child.EligibilityCode" class="govuk-input govuk-input--width-10 @(ViewData.ModelState["Child.EligibilityCode"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
                        asp-controller="Check" asp-for="Child.EligibilityCode" type="text"
                        spellcheck="false" autocomplete="text"
                        aria-label="Eligibility Code">
