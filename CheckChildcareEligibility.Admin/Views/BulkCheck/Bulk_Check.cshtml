@@ -37,7 +37,7 @@
                 <div class="govuk-error-summary__body">
                     <ul class="govuk-list govuk-error-summary__list">
                         <li>
-                            <a class="govuk-error-message" href="#fileUploadField">@errorMessage</a>
+                            <a class="govuk-error-message" href="#BulkUploader">@errorMessage</a>
                         </li>
                     </ul>
                 </div>
@@ -92,12 +92,12 @@
                 </p>
             }
             <div class="govuk-form-group">
-                <label class="govuk-label" for="EvidenceFiles">
+                <label class="govuk-label" for="BulkUploader">
                     Upload a file
                 </label>
                 <div class="govuk-drop-zone" data-module="govuk-file-upload">
                     <input class="govuk-file-upload @(string.IsNullOrEmpty(errorMessage) ? "" : "govuk-file-upload--error")"
-                           id="EvidenceFiles" name="fileUpload" type="file" accept=".csv"
+                           id="BulkUploader" name="fileUpload" type="file" accept=".csv"
                            aria-describedby="file-upload-1-error" />
                 </div>
             </div>

@@ -26,39 +26,39 @@
 }
 
 <tr>
-        <td class="govuk-table__cell">@(Model.Filename)</td>
-        <td class="govuk-table__cell">@(@eligibilityTypeName[Model.EligibilityType])</td>
-        <td class="govuk-table__cell">@(dateSubmittedFormatted)</td>
-        <td class="govuk-table__cell">@(Model.SubmittedBy)</td>
-        <td class="govuk-table__cell">
-            <strong class="govuk-tag @statusColor[Model.Status]">
-                @statusName[Model.Status]
-            </strong>
-        </td>
+    <td class="govuk-table__cell">@(Model.Filename)</td>
+    <td class="govuk-table__cell">@(@eligibilityTypeName[Model.EligibilityType])</td>
+    <td class="govuk-table__cell">@(dateSubmittedFormatted)</td>
+    <td class="govuk-table__cell">@(Model.SubmittedBy)</td>
+    <td class="govuk-table__cell">
+        <strong class="govuk-tag @statusColor[Model.Status]">
+            @statusName[Model.Status]
+        </strong>
+    </td>
 
-        @if (Model.Status == "Completed")
-        {
-            <td class="govuk-table__cell">
-                @Html.ActionLink(
-                         "Download Results",
-                         "Bulk_check_file_download",
-                         "BulkCheck",
-                         new { bulkCheckId = Model.BulkCheckId, eligibilityType = Model.EligibilityType },
-                         new { @class = "govuk-link" }
-                         )
-                |
-                @Html.ActionLink(
-                         "Delete",
-                         "Bulk_check_file_delete",
-                         "BulkCheck",
-                         new { bulkCheckId = Model.BulkCheckId },
-                         new { @class = "govuk-link" }
-                         )
-            </td>
+    @if (Model.Status == "Completed")
+    {
+        <td class="govuk-table__cell">
+            @Html.ActionLink(
+            "Download Results",
+                "Bulk_check_file_download",
+                "BulkCheck",
+                new { bulkCheckId = Model.BulkCheckId, eligibilityType = Model.EligibilityType },
+                new { @class = "govuk-link", aria_label = "Download results submitted on " + dateSubmittedFormatted }
+                )
+        |
+        @Html.ActionLink(
+                "Delete",
+                "Bulk_check_file_delete",
+                "BulkCheck",
+                new { bulkCheckId = Model.BulkCheckId },
+                new { @class = "govuk-link", aria_label = "Delete results submitted on " + dateSubmittedFormatted }
+                )
+    </td>
         }
-        else
-        {
-            <td class="govuk-table__cell"></td>
-        }
-    
+    else
+    {
+        <td class="govuk-table__cell"></td>
+    }
+
 </tr>
