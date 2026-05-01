@@ -2,14 +2,23 @@ import 'cypress-file-upload';
 
 Cypress.Commands.add('checkSession', (userType: string) => {
   // Check if a logged in session exists and re-use that, else log in
-  const filePath = userType === 'school' ? 'cypress/fixtures/SchoolUserCookies1.json' : userType === 'manchesterLA' ? 'cypress/fixtures/ManchesterLAUserCookies1.json' : 'cypress/fixtures/LAUserCookies1.json';
+  const filePath = userType === 'school'
+    ? 'cypress/fixtures/SchoolUserCookies.json'
+    : userType === 'manchesterLA'
+      ? 'cypress/fixtures/ManchesterLAUserCookies.json'
+      : 'cypress/fixtures/LAUserCookies.json';
   cy.task<Cypress.CookieData | null>('readFileMaybe', filePath).then((data) => {
     if (data && data.cookies) {
       if (data.cookies.length > 0) {
         cy.loadCookies(userType);
         cy.visit((Cypress.config().baseUrl ?? "") + "/home")
 
-        const expectedText = userType === 'school' ? 'The Telford Park School' : userType === 'manchesterLA' ? 'Manchester City Council' : 'Telford and Wrekin Council';
+        const expectedText =
+          userType === 'school'
+            ? 'The Telford Park School'
+            : userType === 'manchesterLA'
+              ? 'Manchester City Council'
+              : 'Telford And Wrekin Council';
         cy.get('.govuk-caption-l').should('include.text', expectedText);
       } else {
         cy.log('No cookies found, forcing new login');
@@ -44,7 +53,7 @@ Cypress.Commands.add('login', (userType) => {
     } else {
       cy.loginLocalAuthorityUser();
     }
-    // cy.storeCookies(userType);
+    cy.storeCookies(userType);
   });
 });
 
@@ -125,8 +134,8 @@ Cypress.Commands.add('loadCookies', (userType: string) => {
   cy.readFile(filePath).then((data: Cypress.CookieData) => {
     if (data && data.cookies) {
       const currentTime = Date.now();
-      const twoHoursInMillis = 60 * 60 * 1000; //Changed from 2 hours to 1 hour. Actual invalidation time unknown.
-      if (currentTime - data.timestamp < twoHoursInMillis) {
+      const oneHourInMillis = 60 * 60 * 1000; //Changed from 2 hours to 1 hour. Actual invalidation time unknown.
+      if (currentTime - data.timestamp < oneHourInMillis) {
         data.cookies.forEach((cookie: Cypress.Cookie) => {
           cy.setCookie(cookie.name, cookie.value, {
             domain: cookie.domain,

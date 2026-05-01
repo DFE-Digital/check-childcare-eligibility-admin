@@ -5,8 +5,9 @@
 @{
     ViewData["Title"] = "Run a check for one parent or guardian";
     
-    var allowedLASetting = Configuration.GetSection("FeatureFlags:LAsThatCanUseWF").Get<string>();
-    var allowedLAs = allowedLASetting != null ? allowedLASetting.Split(',').Select(x => x.Trim()).ToArray() : Array.Empty<string>();
+    var allowedLAs = Configuration
+    .GetSection("FeatureFlags:LAsThatCanUseWF")
+    .Get<string[]>() ?? Array.Empty<string>();
 }
 
 <div class="govuk-grid-column-full">
@@ -26,7 +27,7 @@
 
             <div class="dfe-grid-container">
 
-                @if (allowedLAs.Contains(Model.Organisation.EstablishmentNumber.ToLower())||allowedLAs.Length==0)
+                @if (allowedLAs.Contains(Model.Organisation.EstablishmentNumber))
                 {
                     <div class="dfe-card">
                         <div class="dfe-card-container">
