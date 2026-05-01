@@ -4,10 +4,21 @@
 
 @{
 	ViewData["Title"] = "Run a batch check";
+    
+	var allowedLASection = Configuration.GetSection("FeatureFlags:LAsThatCanUseWF");
 
-	var allowedLAs = Configuration
-	.GetSection("FeatureFlags:LAsThatCanUseWF")
-	.Get<string[]>() ?? Array.Empty<string>();
+	var allowedLAs = allowedLASection.Get<string[]>() ?? Array.Empty<string>();
+
+	if (!allowedLAs.Any())
+	{
+		var allowedLASetting = allowedLASection.Get<string>();
+
+		allowedLAs = string.IsNullOrWhiteSpace(allowedLASetting)
+			? Array.Empty<string>()
+			: allowedLASetting.Split(',').Select(x => x.Trim()).ToArray();
+	}
+
+	var canUseWorkingFamilies = allowedLAs.Contains(Model.Organisation.EstablishmentNumber?.Trim());
 }
 
 <div class="govuk-grid-column-full">
@@ -57,7 +68,7 @@
 					</div>
 				</div>
 
-				@if (allowedLAs.Contains(Model.Organisation.EstablishmentNumber))
+				@if (canUseWorkingFamilies)
 				{
 					<div class="dfe-card">
 						<div class="dfe-card-container">
