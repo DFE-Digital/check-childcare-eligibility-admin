@@ -44,7 +44,7 @@ public class MenuProvider : IMenuProvider
                         ),
                     new MenuItem(
                         "Run a check",
-                        "Run a check for one parent or guardian",
+                        "Run a check",
                         "Run an eligibility check for one parent or guardian.",
                         "Home",
                         "MenuSingleCheck"

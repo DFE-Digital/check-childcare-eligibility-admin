@@ -1,4 +1,6 @@
-﻿@model CheckChildcareEligibility.Admin.ViewModels.BulkCheckStatusViewModel
+﻿@using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeConstants
+
+@model CheckChildcareEligibility.Admin.ViewModels.BulkCheckStatusViewModel
 @{
     Dictionary<string, string> statusColor = new()
     {
@@ -14,11 +16,11 @@
         { "Completed", "Complete" },
     };
 
-    Dictionary<string, string> eligibilityTypeName = new()
+    Dictionary<string, string> eligibilityTypeKeyMap = new()
     {
-        { "TwoYearOffer", "2 years old early learning" },
-        { "EarlyYearPupilPremium", "Early years pupil premium" },
-        { "WorkingFamilies", "Childcare for working families" }
+        { "TwoYearOffer", "2YO" },
+        { "EarlyYearPupilPremium", "EYPP" },
+        { "WorkingFamilies", "WF" }
     };
 
     var dateCultureFormatted = TimeZoneInfo.ConvertTimeFromUtc(Model.DateSubmitted, TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time"));
@@ -27,7 +29,7 @@
 
 <tr>
     <td class="govuk-table__cell">@(Model.Filename)</td>
-    <td class="govuk-table__cell">@(@eligibilityTypeName[Model.EligibilityType])</td>
+    <td class="govuk-table__cell">@(@EligibilityTypeConstants.Labels[eligibilityTypeKeyMap[Model.EligibilityType]])</td>
     <td class="govuk-table__cell">@(dateSubmittedFormatted)</td>
     <td class="govuk-table__cell">@(Model.SubmittedBy)</td>
     <td class="govuk-table__cell">
@@ -46,16 +48,16 @@
                 new { bulkCheckId = Model.BulkCheckId, eligibilityType = Model.EligibilityType },
                 new { @class = "govuk-link", aria_label = "Download results submitted on " + dateSubmittedFormatted }
                 )
-        |
-        @Html.ActionLink(
-                "Delete",
-                "Bulk_check_file_delete",
-                "BulkCheck",
-                new { bulkCheckId = Model.BulkCheckId },
-                new { @class = "govuk-link", aria_label = "Delete results submitted on " + dateSubmittedFormatted }
-                )
-    </td>
-        }
+            |
+            @Html.ActionLink(
+                    "Delete",
+                    "Bulk_check_file_delete",
+                    "BulkCheck",
+                    new { bulkCheckId = Model.BulkCheckId },
+                    new { @class = "govuk-link", aria_label = "Delete results submitted on " + dateSubmittedFormatted }
+                    )
+        </td>
+    }
     else
     {
         <td class="govuk-table__cell"></td>
