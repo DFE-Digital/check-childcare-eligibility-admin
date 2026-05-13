@@ -163,4 +163,28 @@ describe("Admin Bulk Check File Validation Journey", () => {
     );
     cy.get("td").should("include.text", "bulkchecktemplate_complete.csv");
   });
+
+  it("will run a successful batch check when last name contains a curly apostrophe", () => {
+    cy.fixture("BulkcheckFileValidaiton/bulkchecktemplate_curly_apostrophe.csv").then((fileContent1) => {
+      cy.get('input[type="file"]').attachFile([
+        {
+          fileContent: fileContent1,
+          fileName: "bulkchecktemplate_curly_apostrophe.csv",
+          mimeType: "text/csv",
+        },
+      ]);
+    });
+  
+    cy.contains("Run check").click();
+  
+    cy.get("h1.govuk-heading-l", { timeout: 80000 }).should(
+      "include.text",
+      "Batch checks status"
+    );
+  
+    cy.get("td").should(
+      "include.text",
+      "bulkchecktemplate_curly_apostrophe.csv"
+    );
+  });
 });

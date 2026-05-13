@@ -7,6 +7,7 @@ using CsvHelper.Configuration;
 using FluentValidation;
 using FluentValidation.Results;
 using System.Globalization;
+using System.Text;
 
 namespace CheckChildcareEligibility.Admin.Usecases
 {
@@ -50,7 +51,11 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
             var result = new BulkCheckCsvResult();
 
-            using var reader = new StreamReader(csvStream);
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            var csvContent = await ReadCsvContent(csvStream);
+
+            using var reader = new StringReader(csvContent);
 
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
@@ -240,6 +245,37 @@ namespace CheckChildcareEligibility.Admin.Usecases
             return result;
 
         }
+
+        private async Task<string> ReadCsvContent(Stream csvStream)
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            csvStream.Position = 0;
+
+            using var utf8Reader = new StreamReader(
+                csvStream,
+                Encoding.UTF8,
+                detectEncodingFromByteOrderMarks: true,
+                leaveOpen: true);
+
+            var content = await utf8Reader.ReadToEndAsync();
+
+            if (!content.Contains('\uFFFD'))
+            {
+                return content;
+            }
+
+            csvStream.Position = 0;
+
+            using var windows1252Reader = new StreamReader(
+                csvStream,
+                Encoding.GetEncoding(1252),
+                detectEncodingFromByteOrderMarks: true,
+                leaveOpen: true);
+
+            return await windows1252Reader.ReadToEndAsync();
+        }
+
         private bool ContainsError(IEnumerable<CsvRowError> errors, int lineNumber, string errorMessage)
         {
             return errors.Any(x => x.LineNumber == lineNumber && string.Equals(x.Message, errorMessage));
