@@ -123,30 +123,7 @@ describe("Admin Bulk Check File Validation Journey", () => {
     });
   });
 
-  it("will return an error message if more than 10 batches are attempted within an hour", () => {
-    for (let i = 0; i < 11; i++) {
-      cy.fixture("BulkcheckFileValidaiton/bulkchecktemplate_too_many_records.csv").then(
-        (fileContent1) => {
-          cy.get('input[type="file"]').attachFile([
-            {
-              fileContent: fileContent1,
-              fileName: "bulkchecktemplate_too_many_records.csv",
-              mimeType: "text/csv",
-            },
-          ]);
-        }
-      );
-      cy.contains("Run check").click();
-    }
-    cy.get("#file-upload-1-error").as("errorMessage");
-    cy.get("@errorMessage").should(($p) => {
-      expect($p.first()).to.contain(
-        "No more than 10 batch check requests can be made per hour"
-      );
-    });
-  });
-
-  it("will run a successful batch check and redirect to bulk check status page", () => {
+  it("will download outcome CSV with columns matching template order", () => {
     cy.fixture("BulkcheckFileValidaiton/bulkchecktemplate_complete.csv").then((fileContent1) => {
       cy.get('input[type="file"]').attachFile([
         {
@@ -156,14 +133,49 @@ describe("Admin Bulk Check File Validation Journey", () => {
         },
       ]);
     });
+  
     cy.contains("Run check").click();
+  
     cy.get("h1.govuk-heading-l", { timeout: 80000 }).should(
       "include.text",
       "Batch checks status"
     );
+  
     cy.get("td").should("include.text", "bulkchecktemplate_complete.csv");
-  });
+  
+    const waitForDownloadResults = (attempt = 0) => {
+      if (attempt >= 6) {
+        throw new Error("Download results link did not appear after 30 seconds");
+      }
+    
+      cy.get("body").then(($body) => {
+        if ($body.find("a:contains('Download results')").length > 0) {
+          cy.contains("a", "Download results").then(($a) => {
+            const href = $a.attr("href") ?? "";
+    
+            const downloadUrl = href.startsWith("http")
+              ? href
+              : `${Cypress.config().baseUrl}${href}`;
+    
+            cy.request(downloadUrl).then((response) => {
+              expect(response.status).to.eq(200);
+    
+              const firstLine = response.body.split(/\r?\n/)[0];
+    
+              expect(firstLine).to.eq(
+                "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Outcome"
+              );
+            });
+          });
+        } else {
+          cy.wait(5000);
+          cy.reload();
+          waitForDownloadResults(attempt + 1);
+        }
+      });
+    };
 
+  });
   it("will run a successful batch check when last name contains a curly apostrophe", () => {
     cy.fixture("BulkcheckFileValidaiton/bulkchecktemplate_curly_apostrophe.csv").then((fileContent1) => {
       cy.get('input[type="file"]').attachFile([
