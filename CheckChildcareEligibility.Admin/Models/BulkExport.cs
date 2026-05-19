@@ -16,13 +16,17 @@ public class BulkExport : IBulkExport
 
 public class BulkExportWorkingFamilies : IBulkExport
 {
-    [Name("Eligibility code")] public string EligibilityCode { get; set; }
+    [Name("Parent Last Name")]
+    public string LastName { get; set; }
 
-    [Name("National Insurance number")] public string NI { get; set; }
+    [Name("Parent Date of Birth")]
+    public string DOB { get; set; }
 
-    [Name("Child date of birth")] public string ChildDOB { get; set; }
+    [Name("Parent National Insurance number")]
+    public string NI { get; set; }
 
-    [Name("Outcome")] public string Outcome { get; set; }
+    [Name("Outcome")]
+    public string Outcome { get; set; }
 
     // 28-11-2025 This will be the returned VSD from the API for now 
     [Name("Validity start date")] public string ValidityStartDate { get; set; }
