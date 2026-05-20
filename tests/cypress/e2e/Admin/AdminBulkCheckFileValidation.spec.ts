@@ -123,6 +123,29 @@ describe("Admin Bulk Check File Validation Journey", () => {
     });
   });
 
+  it("will return an error message if more than 10 batches are attempted within an hour", () => {
+    for (let i = 0; i < 11; i++) {
+      cy.fixture("BulkcheckFileValidaiton/bulkchecktemplate_too_many_records.csv").then(
+        (fileContent1) => {
+          cy.get('input[type="file"]').attachFile([
+            {
+              fileContent: fileContent1,
+              fileName: "bulkchecktemplate_too_many_records.csv",
+              mimeType: "text/csv",
+            },
+          ]);
+        }
+      );
+      cy.contains("Run check").click();
+    }
+    cy.get("#file-upload-1-error").as("errorMessage");
+    cy.get("@errorMessage").should(($p) => {
+      expect($p.first()).to.contain(
+        "No more than 10 batch check requests can be made per hour"
+      );
+    });
+  });
+  
   it("will download outcome CSV with columns matching template order", () => {
     cy.fixture("BulkcheckFileValidaiton/bulkchecktemplate_complete.csv").then((fileContent1) => {
       cy.get('input[type="file"]').attachFile([
