@@ -252,26 +252,35 @@ public class BulkCheckController : BaseController
         return new FileStreamResult(memoryStream, "text/csv") { FileDownloadName = outputfileName };
     }
 
+    [HttpGet]
     public async Task<IActionResult> Bulk_check_file_delete(string bulkCheckId)
     {
-        try
+        var response = await _getBulkCheckStatusesUseCase.Execute(
+            _Claims.Organisation.EstablishmentNumber,
+            HttpContext.Session);
+
+        var batchFile = response.FirstOrDefault(x => x.BulkCheckId == bulkCheckId);
+
+        if (batchFile == null)
         {
-            var result =
-            await _deleteBulkCheckFileUseCase.Execute(bulkCheckId, HttpContext.Session);
-
-            TempData["FileDeleted"] = "true";
-
             return RedirectToAction("Bulk_Check_Status");
-
-        }
-        catch (Exception ex) {
-            TempData["FileDeleted"] = "false";
-            return RedirectToAction("Bulk_Check_Status");
-
         }
 
+        ViewBag.BulkCheckId = batchFile.BulkCheckId;
+        ViewBag.Filename = batchFile.Filename;
 
+        return View();
+    }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Bulk_check_file_delete_confirmed(string bulkCheckId)
+    {
+        await _deleteBulkCheckFileUseCase.Execute(bulkCheckId, HttpContext.Session);
+
+        TempData["FileDeleted"] = "true";
+
+        return RedirectToAction("Bulk_Check_Status");
     }
 
     private byte[] WriteCsvToMemory(IEnumerable<IBulkExport> records, CheckEligibilityType checkEligibilityType)

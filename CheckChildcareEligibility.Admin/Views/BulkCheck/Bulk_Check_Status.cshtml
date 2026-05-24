@@ -4,8 +4,6 @@
     ViewData["Title"] = "Batch checks status";
 }
 
-@Html.AntiForgeryToken()
-
 <div class="govuk-grid-column-full">
     <a class="govuk-back-link backLinkJS" href="@Url.Action("MenuBulkCheck", "Home")">Back</a>
     @* @if (TempData["JustUploaded"]?.ToString() == "true")

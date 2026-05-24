@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Delete file";
+}
+
+<div class="govuk-grid-column-two-thirds">
+
+    <a class="govuk-back-link" href="@Url.Action("Bulk_Check_Status", "BulkCheck")">Back</a>
+
+    <h1 class="govuk-heading-l">
+        Delete batch file @ViewBag.Filename?
+    </h1>
+    <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+            <span class="govuk-warning-text__assistive">Warning</span>
+            You will no longer be able to view or download results.
+        </strong>
+    </div>
+
+    <form method="post" asp-action="Bulk_check_file_delete_confirmed" asp-controller="BulkCheck">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="bulkCheckId" value="@ViewBag.BulkCheckId" />
+
+        <button class="govuk-button govuk-button--warning" type="submit">
+            Delete file
+        </button>
+    </form>
+
+</div>
