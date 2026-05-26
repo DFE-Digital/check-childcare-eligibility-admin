@@ -222,4 +222,43 @@ describe("Admin Bulk Check File Validation Journey", () => {
       "bulkchecktemplate_curly_apostrophe.csv"
     );
   });
+
+  it("shows a confirmation page before deleting a batch file", () => {
+    cy.fixture("BulkcheckFileValidaiton/bulkchecktemplate_complete.csv").then((fileContent1) => {
+      cy.get('input[type="file"]').attachFile([
+        {
+          fileContent: fileContent1,
+          fileName: "bulkchecktemplate_complete.csv",
+          mimeType: "text/csv",
+        },
+      ]);
+    });
+  
+    cy.contains("Run check").click();
+  
+    cy.get("h1.govuk-heading-l", { timeout: 80000 }).should(
+      "include.text",
+      "Batch checks status"
+    );
+  
+    cy.contains("tr", "bulkchecktemplate_complete.csv")
+      .contains("Delete")
+      .click();
+  
+    cy.get("h1.govuk-heading-l").should(
+      "include.text",
+      "Delete batch file bulkchecktemplate_complete.csv?"
+    );
+  
+    cy.contains(
+      "You will no longer be able to view or download results."
+    ).should("be.visible");
+  
+    cy.contains("button", "Delete file").click();
+  
+    cy.get("h1.govuk-heading-l").should("include.text", "Batch checks status");
+    cy.contains("File deleted").should("be.visible");
+    cy.contains("File deleted").should("be.visible");
+  });
+
 });

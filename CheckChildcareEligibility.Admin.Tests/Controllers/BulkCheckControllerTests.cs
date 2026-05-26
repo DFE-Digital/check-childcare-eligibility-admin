@@ -4,6 +4,7 @@ using CheckChildcareEligibility.Admin.Controllers;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
+using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.Tests.Properties;
 using CheckChildcareEligibility.Admin.Usecases;
 using FluentAssertions;
@@ -403,6 +404,56 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
             viewResult.ActionName.Should().BeEquivalentTo("Bulk_Check_Status");
         }
 
-        
+        [Test]
+        public async Task Given_Bulk_Check_File_Delete_When_FileExists_Should_Return_Delete_Confirmation_View()
+        {
+            // Arrange
+            var bulkCheckId = "bulk-check-id-1";
+            var filename = "test-file.csv";
+
+            _getBulkCheckStatusesUseCaseMock
+                .Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<ISession>()))
+                .ReturnsAsync(new List<BulkCheck>
+                {
+            new()
+            {
+                BulkCheckId = bulkCheckId,
+                Filename = filename
+            }
+                });
+
+            // Act
+            var result = await _sut.Bulk_check_file_delete(bulkCheckId);
+
+            // Assert
+            result.Should().BeOfType<ViewResult>();
+
+            ((string)_sut.ViewBag.BulkCheckId).Should().Be(bulkCheckId);
+            ((string)_sut.ViewBag.Filename).Should().Be(filename);
+        }
+
+        [Test]
+        public async Task Given_Bulk_Check_File_Delete_Confirmed_When_Called_Should_Delete_File_And_Redirect_To_Status()
+        {
+            // Arrange
+            var bulkCheckId = "bulk-check-id-1";
+
+            // Act
+            var result = await _sut.Bulk_check_file_delete_confirmed(bulkCheckId);
+
+            // Assert
+            _deleteBulkCheckFileUseCase.Verify(
+                x => x.Execute(bulkCheckId, It.IsAny<ISession>()),
+                Times.Once);
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            var redirectResult = result as RedirectToActionResult;
+            redirectResult.ActionName.Should().BeEquivalentTo("Bulk_Check_Status");
+
+            _sut.TempData["FileDeleted"].Should().Be("true");
+        }
     }
+
+
 }

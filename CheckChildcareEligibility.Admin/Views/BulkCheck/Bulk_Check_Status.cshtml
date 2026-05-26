@@ -4,8 +4,6 @@
     ViewData["Title"] = "Batch checks status";
 }
 
-@Html.AntiForgeryToken()
-
 <div class="govuk-grid-column-full">
     <a class="govuk-back-link backLinkJS" href="@Url.Action("MenuBulkCheck", "Home")">Back</a>
     @* @if (TempData["JustUploaded"]?.ToString() == "true")
@@ -40,9 +38,13 @@
                 </h3>
             </div>
         </div>
+        <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
+        ViewData["Title"] = "Success: File deleted - Batch checks status"; //Change only tab title for screenreader announcement of status.
     }
-    <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
-   
+    else
+    {
+        <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
+    }
 
     <div class="govuk-grid-row" id="content" data-type="Refresh" data-url="@Url.Action("Bulk_Check_Status", "BulkCheck", new { pageNumber = ViewBag.CurrentPage })">
 
@@ -50,7 +52,7 @@
 
             @if (Model.Checks != null && Model.Checks.Any())
             {
-                <table class="govuk-table govuk-table--small-text-until-tablet" style="caption-side: top;">
+                <table class="govuk-table govuk-table--small-text-until-tablet">
                     <caption class="govuk-table__caption govuk-table__caption--s govuk-!-margin-bottom-4">Showing @ViewBag.TotalRecords batch files uploaded in the last 7 days</caption>
                     <thead class="govuk-table__head">
                         <tr class="govuk-table__row">
