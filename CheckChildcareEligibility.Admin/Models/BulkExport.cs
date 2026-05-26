@@ -5,15 +5,18 @@ namespace CheckChildcareEligibility.Admin.Models;
 public interface IBulkExport { }
 public class BulkExport : IBulkExport
 {
-    [Name("Parent NI Number")] public string NI { get; set; }
+    [Name("Parent Last Name")]
+    public string LastName { get; set; }
 
-    [Name("Parent Date of Birth")] public string DOB { get; set; }
+    [Name("Parent Date of Birth")]
+    public string DOB { get; set; }
 
-    [Name("Parent Last Name")] public string LastName { get; set; }
+    [Name("Parent National Insurance number")]
+    public string NI { get; set; }
 
-    [Name("Outcome")] public string Outcome { get; set; }
+    [Name("Outcome")]
+    public string Outcome { get; set; }
 }
-
 public class BulkExportWorkingFamilies : IBulkExport
 {
     [Name("Eligibility code")] public string EligibilityCode { get; set; }
