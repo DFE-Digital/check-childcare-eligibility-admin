@@ -414,3 +414,6 @@ FodyWeavers.xsd
 /CheckChildcareEligibility.Admin/CheckChildcareEligibility.Admin.sln
 /tests/audit.txt
 /tests/run-cypress.ps1
+
+# Copilot
+/.github/copilot-instructions.md

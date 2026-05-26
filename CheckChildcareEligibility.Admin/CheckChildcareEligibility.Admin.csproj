@@ -41,4 +41,6 @@
         <Folder Include="wwwroot\documents\" />
     </ItemGroup>
 
+    <ProjectExtensions><VisualStudio><UserProperties wwwroot_4css_4govuk-frontend-6_10_10_1min_1css_1map__JsonSchema="" /></VisualStudio></ProjectExtensions>
+
 </Project>
