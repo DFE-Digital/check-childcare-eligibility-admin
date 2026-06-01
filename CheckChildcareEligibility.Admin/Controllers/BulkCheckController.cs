@@ -287,7 +287,9 @@ public class BulkCheckController : BaseController
     {
 
         using (var memoryStream = new MemoryStream())
-        using (var streamWriter = new StreamWriter(memoryStream))
+        using (var streamWriter = new StreamWriter(
+            memoryStream,
+            new UTF8Encoding(encoderShouldEmitUTF8Identifier: true)))
         using (var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture))
         {
             switch (checkEligibilityType) {
