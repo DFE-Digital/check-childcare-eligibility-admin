@@ -14,7 +14,7 @@
                 "a National Insurance number (can be for a parent, guardian or partner)",
                 "the child's date of birth (format DD/MM/YYYY or YYYY-MM-DD)"
           ];
-            Model.DocumentTemplatePath = "/documents/WFBulkCheckTemplate.csv";
+            Model.DocumentTemplatePath = Url.Action("DownloadTemplate", "BulkCheck", new { eligibilityType = "WF" });
             break;
         default:
             Model.FieldDescriptions = [
@@ -22,7 +22,7 @@
                 "date of birth (format DD/MM/YYYY or YYYY-MM-DD)",
                 "National Insurance number"
               ];
-            Model.DocumentTemplatePath = "/documents/BulkCheckTemplate.csv";
+            Model.DocumentTemplatePath = Url.Action("DownloadTemplate", "BulkCheck", new { eligibilityType });
             break;
     }
 }
