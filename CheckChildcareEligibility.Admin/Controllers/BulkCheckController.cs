@@ -25,22 +25,25 @@ public class BulkCheckController : BaseController
     private readonly IDeleteBulkCheckFileUseCase _deleteBulkCheckFileUseCase;
     private readonly ILogger<BulkCheckController> _logger;
     private ILogger<BulkCheckController> _loggerMock;
+    private readonly IWebHostEnvironment _environment;
 
     public BulkCheckController(
         ILogger<BulkCheckController> logger,
         ICheckGateway checkGateway,
         IConfiguration configuration,
+        IWebHostEnvironment environment,
         IParseBulkCheckFileUseCase parseBulkCheckFileUseCase,
         IGetBulkCheckStatusesUseCase getBulkCheckStatusesUseCase,
-        IDeleteBulkCheckFileUseCase deleteBulkCheckFileUseCase,
+        IDeleteBulkCheckFileUseCase deleteBulkCheckFileUseCase,        
         IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService)
     {
         _config = configuration;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _checkGateway = checkGateway ?? throw new ArgumentNullException(nameof(checkGateway));
+        _environment = environment ?? throw new ArgumentNullException(nameof(environment));
         _parseBulkCheckFileUseCase = parseBulkCheckFileUseCase;
         _getBulkCheckStatusesUseCase = getBulkCheckStatusesUseCase;
-        _deleteBulkCheckFileUseCase = deleteBulkCheckFileUseCase;
+        _deleteBulkCheckFileUseCase = deleteBulkCheckFileUseCase;        
     }
 
     public IActionResult Bulk_Check()
