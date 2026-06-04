@@ -2,6 +2,13 @@
 
 @{
     ViewData["Title"] = "Enter the eligibility code details";
+
+    var ninoInputClasses = "govuk-input govuk-!-width-one-third js-nino-input";
+
+    if (ViewData.ModelState["NationalInsuranceNumber"]?.Errors.Count > 0)
+    {
+        ninoInputClasses += " govuk-input--error";
+    }
 }
 
 <div class="govuk-grid-column-two-thirds">
@@ -44,9 +51,13 @@
                 <p class="govuk-error-message">
                     <span asp-validation-for="NationalInsuranceNumber"></span>
                 </p>
-                <input class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["NationalInsuranceNumber"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                       asp-controller="Check" asp-for="NationalInsuranceNumber" type="text"
-                       spellcheck="false" autocomplete="text">
+                <input class="@ninoInputClasses"
+                       asp-controller="Check"
+                       asp-for="NationalInsuranceNumber"
+                       type="text"
+                       spellcheck="false"
+                       autocomplete="text"
+                       maxlength="9">
             </div>
 
             <div class="govuk-form-group" data-type="dob-form-group">
