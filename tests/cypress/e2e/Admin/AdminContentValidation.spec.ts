@@ -1,7 +1,7 @@
 const parentLastName = /* Cypress.env('lastName') || */ 'Tester';
 const NIN = 'PN668767B';
 const validNIN = 'NN123456C';
-const invalidNIN = 'INVALID123';
+const invalidNIN = 'QQ123456Z';
 
 const visitPrefilledForm = (onlyfill?: boolean) => {
     if (!onlyfill) {
@@ -267,7 +267,7 @@ describe('National Insurance Number Validation Tests', () => {
 
         // Check that the validation error appears
         cy.get('.govuk-error-summary').should('exist');
-        cy.get('.govuk-error-message').should('contain', 'National Insurance number should contain no more than 9 alphanumeric characters');
+        cy.get('.govuk-error-message').should('contain', 'Enter a National Insurance number in the correct format');
         cy.get('#NationalInsuranceNumber').should('have.class', 'govuk-input--error');
     });
 
