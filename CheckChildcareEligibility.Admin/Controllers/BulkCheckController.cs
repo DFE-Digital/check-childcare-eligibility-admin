@@ -25,22 +25,25 @@ public class BulkCheckController : BaseController
     private readonly IDeleteBulkCheckFileUseCase _deleteBulkCheckFileUseCase;
     private readonly ILogger<BulkCheckController> _logger;
     private ILogger<BulkCheckController> _loggerMock;
+    private readonly IWebHostEnvironment _environment;
 
     public BulkCheckController(
         ILogger<BulkCheckController> logger,
         ICheckGateway checkGateway,
         IConfiguration configuration,
+        IWebHostEnvironment environment,
         IParseBulkCheckFileUseCase parseBulkCheckFileUseCase,
         IGetBulkCheckStatusesUseCase getBulkCheckStatusesUseCase,
-        IDeleteBulkCheckFileUseCase deleteBulkCheckFileUseCase,
+        IDeleteBulkCheckFileUseCase deleteBulkCheckFileUseCase,        
         IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService)
     {
         _config = configuration;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _checkGateway = checkGateway ?? throw new ArgumentNullException(nameof(checkGateway));
+        _environment = environment ?? throw new ArgumentNullException(nameof(environment));
         _parseBulkCheckFileUseCase = parseBulkCheckFileUseCase;
         _getBulkCheckStatusesUseCase = getBulkCheckStatusesUseCase;
-        _deleteBulkCheckFileUseCase = deleteBulkCheckFileUseCase;
+        _deleteBulkCheckFileUseCase = deleteBulkCheckFileUseCase;        
     }
 
     public IActionResult Bulk_Check()
@@ -53,6 +56,22 @@ public class BulkCheckController : BaseController
         BulkCheckViewModel viewModel = new BulkCheckViewModel();
        
         return View("Bulk_Check", viewModel);
+    }
+
+    [HttpGet]
+    public IActionResult DownloadTemplate(string eligibilityType)
+    {
+        string fileName = eligibilityType == "WF"
+            ? "WFBulkCheckTemplate.csv"
+            : "BulkCheckTemplate.csv";
+
+        var path = Path.Combine(_environment.WebRootPath, "documents", fileName);
+
+        Response.Headers.CacheControl = "no-store, no-cache, must-revalidate, max-age=0";
+        Response.Headers.Pragma = "no-cache";
+        Response.Headers.Expires = "0";
+
+        return PhysicalFile(path, "text/csv", fileName);
     }
 
     [HttpPost]

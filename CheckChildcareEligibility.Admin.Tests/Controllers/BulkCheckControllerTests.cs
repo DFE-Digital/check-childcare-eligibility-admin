@@ -8,6 +8,7 @@ using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.Tests.Properties;
 using CheckChildcareEligibility.Admin.Usecases;
 using FluentAssertions;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -34,7 +35,8 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
             _sut = new BulkCheckController(
                 _loggerMock, 
                 _checkGatewayMock.Object, 
-                _configMock.Object, 
+                _configMock.Object,
+                _webHostEnvironmentMock.Object,
                 _parseBulkCheckFileUseCaseMock.Object, 
                 _getBulkCheckStatusesUseCaseMock.Object, 
                 _deleteBulkCheckFileUseCase.Object,
@@ -60,6 +62,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
         private Mock<IGetBulkCheckStatusesUseCase> _getBulkCheckStatusesUseCaseMock;
         private Mock<IDeleteBulkCheckFileUseCase> _deleteBulkCheckFileUseCase;
         private Mock<IDfeSignInApiService> _mockDfeSignInApiService;
+        private readonly Mock<IWebHostEnvironment> _webHostEnvironmentMock = new();
         // system under test
         private BulkCheckController _sut;
 
