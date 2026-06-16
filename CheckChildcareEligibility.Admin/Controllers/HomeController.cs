@@ -57,10 +57,16 @@ public class HomeController : BaseController
 
         if (eligibilityType.Equals("WF"))
         {
-            return RedirectToAction("Enter_Details_WF", "WorkingFamiliesCheck");
+            return RedirectToAction(
+                "Enter_Details_WF",
+                "WorkingFamiliesCheck",
+                new { clearData = true });
         }
 
-        return RedirectToAction("Enter_Details", "Check");
+        return RedirectToAction(
+            "Enter_Details",
+            "Check",
+            new { clearData = true });
     }
 
     //Bulk
