@@ -20,19 +20,12 @@ public static class DateTimeExtensions
         }
         return offset;
     }
+
     public static DateTime GetLocalTime(DateTime time)
     {
         return TimeZoneInfo.ConvertTimeFromUtc(time, TimeZoneInfo);
     }
 
-    public static DateTime GetUTCTime(DateTime time)
-    {
-        if (time.Kind != DateTimeKind.Utc)
-        {
-            time = TimeZoneInfo.ConvertTimeToUtc(time);
-        }
-        return time;
-    }
     public static string ToLocalString12HourFormatReadable(this DateTime datetime)
     {
         return GetLocalTime(datetime).ToString("dd MMM yyyy h:mmtt").Replace("AM", "am").Replace("PM", "pm");
