@@ -536,40 +536,4 @@ public class CheckControllerTests : TestBase
         var viewResult = result as ViewResult;
         viewResult.ViewName.Should().Be("Loader");
     }
-
-    [Test]
-    public async Task Consent_Declaration_Should_Return_View()
-    {
-        // Act
-        var result = await _sut.Consent_Declaration();
-
-        // Assert
-        result.Should().BeOfType<ViewResult>();
-        var viewResult = result as ViewResult;
-        viewResult.ViewName.Should().BeNull(); // Uses default view name
-    }
-
-    [Test]
-    [TestCase("checked", "Enter_Details")]
-    [TestCase("notchecked", "Consent_Declaration")]
-    public async Task Consent_Declaration_Approval_Should_Redirect_Based_On_Consent(string consent, string expectedAction)
-    {
-        // Act
-        var result = await _sut.Consent_Declaration_Approval(consent);
-
-        // Assert
-        if (consent == "checked")
-        {
-            result.Should().BeOfType<RedirectToActionResult>();
-            var redirectResult = result as RedirectToActionResult;
-            redirectResult.ActionName.Should().Be(expectedAction);
-        }
-        else
-        {
-            result.Should().BeOfType<ViewResult>();
-            var viewResult = result as ViewResult;
-            viewResult.ViewName.Should().Be(expectedAction);
-            viewResult.Model.Should().Be(true);
-        }
-    }
 }

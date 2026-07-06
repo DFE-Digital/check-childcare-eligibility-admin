@@ -42,21 +42,6 @@ public class CheckController : BaseController
         _validateParentDetailsUseCase = validateParentDetailsUseCase;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Consent_Declaration()
-    {
-        return View();
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> Consent_Declaration_Approval(string consent)
-    {
-        if (consent == "checked") return RedirectToAction("Enter_Details");
-
-        return View("Consent_Declaration", true);
-    }
-
-    [HttpGet]
     public async Task<IActionResult> Enter_Details(bool clearData = false)
     {
         // If clearData is true, remove the ParentDetails from TempData
