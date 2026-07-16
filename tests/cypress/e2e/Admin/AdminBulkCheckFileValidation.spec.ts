@@ -123,8 +123,10 @@ describe("Admin Bulk Check File Validation Journey", () => {
     });
   });
 
-  it("will return an error message if more than 10 batches are attempted within an hour", () => {
-    for (let i = 0; i < 11; i++) {
+  it("does not count failed uploads towards the attempt limit", () => {
+    // Upload more failing files than the attempt limit - none of these should
+    // ever trigger the "exceeded" error, since only successful uploads count.
+    for (let i = 0; i <= 13; i++) {
       cy.fixture("BulkcheckFileValidaiton/bulkchecktemplate_too_many_records.csv").then(
         (fileContent1) => {
           cy.get('input[type="file"]').attachFile([
@@ -137,12 +139,69 @@ describe("Admin Bulk Check File Validation Journey", () => {
         }
       );
       cy.contains("Run check").click();
+
+      cy.get("#file-upload-1-error")
+        .should("contain", "The selected file must contain fewer than 250 rows")
+        .and(
+          "not.contain",
+          "No more than 10 batch check requests can be made per hour"
+        );
     }
-    cy.get("#file-upload-1-error").as("errorMessage");
-    cy.get("@errorMessage").should(($p) => {
-      expect($p.first()).to.contain(
-        "No more than 10 batch check requests can be made per hour"
-      );
+  });
+
+  it("returns error after exceeding attempt limit with successful uploads", () => {
+    // Note: login cookies are cached/reused across tests (and cypress runs), so
+    // the rate-limit session counter may not start at 0 here - don't assume an
+    // exact number of successful uploads before the limit kicks in, just that it
+    // does kick in within a generous number of attempts, and that uploads succeed
+    // normally up until that point.
+    let limitReached = false;
+    const maxAttempts = 12;
+
+    for (let i = 0; i < maxAttempts; i++) {
+      cy.then(() => limitReached).then((reached) => {
+        if (reached) return;
+
+        cy.fixture("BulkcheckFileValidaiton/bulkchecktemplate_complete.csv").then(
+          (fileContent1) => {
+            cy.get('input[type="file"]').attachFile([
+              {
+                fileContent: fileContent1,
+                fileName: `bulkchecktemplate_complete_${i}.csv`,
+                mimeType: "text/csv",
+              },
+            ]);
+          }
+        );
+
+        cy.contains("Run check").click();
+
+        cy.get("body").then(($body) => {
+          if (
+            $body
+              .text()
+              .includes("No more than 10 batch check requests can be made per hour")
+          ) {
+            limitReached = true;
+          } else {
+            cy.get("h1.govuk-heading-l", { timeout: 80000 }).should(
+              "include.text",
+              "Batch checks status"
+            );
+            // The back link uses history.back() client-side (see site.js), which
+            // returns straight to the upload page (not via the eligibility type menu).
+            cy.get(".govuk-back-link").click();
+            cy.get('input[type="file"]').should("exist");
+          }
+        });
+      });
+    }
+
+    cy.then(() => {
+      expect(
+        limitReached,
+        `expected to hit the bulk upload attempt limit within ${maxAttempts} successful uploads`
+      ).to.be.true;
     });
   });
   

@@ -104,46 +104,32 @@ public class BulkCheckController : BaseController
         var submittedBy = $"{_Claims?.User.FirstName} {_Claims?.User.Surname}";
         var timeNow = DateTime.UtcNow;
 
+        // Rate limiting - only successful uploads count towards the limit; failed/errored
+        // uploads (validation issues, parse errors, submission failures) are not counted.
         if (!string.IsNullOrEmpty(HttpContext.Session.GetString("FirstSubmissionTimeStamp")))
         {
             var firstSubmissionTimeStampString = HttpContext.Session.GetString("FirstSubmissionTimeStamp");
             DateTime.TryParse(firstSubmissionTimeStampString, out var firstSubmissionTimeStamp);
             var timein1Hour = firstSubmissionTimeStamp.AddHours(1);
 
-            if (timeNow >= timein1Hour) HttpContext.Session.Remove("BulkSubmissions");
+            if (timeNow >= timein1Hour)
+            {
+                HttpContext.Session.Remove("BulkSubmissions");
+                HttpContext.Session.Remove("FirstSubmissionTimeStamp");
+            }
         }
 
         TempData["Response"] = "data_issue";
 
         var requestItems = new List<IEligibilityServiceType>();
 
-        // limit csv submission attempts
-        var sessionCount = 0;
-        if (string.IsNullOrEmpty(HttpContext.Session.GetString("BulkSubmissions")))
-        {
-            // set session value as 0 if it didnt exist
-            HttpContext.Session.SetInt32("BulkSubmissions", 0);
-            // Set time in its own session value
-            HttpContext.Session.SetString("FirstSubmissionTimeStamp", DateTime.UtcNow.ToString());
-        }
-        else
-        {
-            // if it exists, get the value
-            sessionCount = (int)HttpContext.Session.GetInt32("BulkSubmissions");
-        }
+        var sessionCount = HttpContext.Session.GetInt32("BulkSubmissions") ?? 0;
 
-        // increment
-        sessionCount++;
-        HttpContext.Session.SetInt32("BulkSubmissions", sessionCount);
-
-        // validate
-        if (sessionCount > int.Parse(_config["BulkUploadAttemptLimit"]))
+        if (sessionCount >= int.Parse(_config["BulkUploadAttemptLimit"]))
         {
             TempData["ErrorMessage"] = BulkCheckControllerValidationMessages.BulkUploadAttemptLimitReached(_config["BulkUploadAttemptLimit"]);
             return RedirectToAction("Bulk_Check", viewModel);
         }
-
-        // check not more than 10, if it is return Bulk_Check() with ErrorMessage == too many requests made, wait a bit longer
 
         var errorsViewModel = new BulkCheckErrorsViewModel();
 
@@ -206,10 +192,30 @@ public class BulkCheckController : BaseController
         }
 
         var result = await _checkGateway.PostBulkCheck(new CheckEligibilityRequestBulk { Meta = new(){Filename = fileName, SubmittedBy = submittedBy}, Data = requestItems });
+
+        if (string.IsNullOrWhiteSpace(result?.Links?.Get_Progress_Check))
+        {
+            TempData["ErrorMessage"] = BulkCheckControllerValidationMessages.BulkSubmissionFailed;
+            return RedirectToAction("Bulk_Check", viewModel);
+        }
+
+        RecordSuccessfulBulkUploadAttempt();
+
         HttpContext.Session.SetString("Get_Progress_Check", result.Links.Get_Progress_Check);
         HttpContext.Session.SetString("Get_BulkCheck_Results", result.Links.Get_BulkCheck_Results);
         TempData["JustUploaded"] = "true";
         return RedirectToAction("Bulk_Check_Status");
+    }
+
+    private void RecordSuccessfulBulkUploadAttempt()
+    {
+        var newCount = (HttpContext.Session.GetInt32("BulkSubmissions") ?? 0) + 1;
+        HttpContext.Session.SetInt32("BulkSubmissions", newCount);
+
+        if (newCount == 1)
+        {
+            HttpContext.Session.SetString("FirstSubmissionTimeStamp", DateTime.UtcNow.ToString());
+        }
     }
 
     public async Task<IActionResult> Bulk_Loader()
