@@ -11,15 +11,18 @@ Cypress.Commands.add('checkSession', (userType: string) => {
     if (data && data.cookies) {
       if (data.cookies.length > 0) {
         cy.loadCookies(userType);
-        cy.visit((Cypress.config().baseUrl ?? "") + "/home")
+        cy.visit((Cypress.config().baseUrl ?? "") + "/home", { failOnStatusCode: false })
 
-        const expectedText =
-          userType === 'school'
-            ? 'The Telford Park School'
-            : userType === 'manchesterLA'
-              ? 'Manchester City Council'
-              : 'Telford And Wrekin Council';
-        cy.get('.govuk-caption-l').should('include.text', expectedText);
+
+        cy.get('body').then(($body) => {
+          const expectedText =
+            userType === 'school'
+              ? 'The Telford Park School'
+              : userType === 'manchesterLA'
+                ? 'Manchester City Council'
+                : 'Telford And Wrekin Council';
+          cy.get('.govuk-caption-l').should('include.text', expectedText);
+        });
       } else {
         cy.log('No cookies found, forcing new login');
         if (userType === 'school') {
