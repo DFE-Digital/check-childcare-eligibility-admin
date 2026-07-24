@@ -22,15 +22,12 @@
         { "EarlyYearPupilPremium", "EYPP" },
         { "WorkingFamilies", "WF" }
     };
-
-    var dateCultureFormatted = TimeZoneInfo.ConvertTimeFromUtc(Model.DateSubmitted, TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time"));
-    var dateSubmittedFormatted = $"{dateCultureFormatted.ToString("dd MMMM yyyy")} {dateCultureFormatted.ToString("h:mmtt").ToLower()}";
 }
 
 <tr>
     <td class="govuk-table__cell">@(Model.Filename)</td>
     <td class="govuk-table__cell">@(@EligibilityTypeConstants.Labels[eligibilityTypeKeyMap[Model.EligibilityType]])</td>
-    <td class="govuk-table__cell">@(dateSubmittedFormatted)</td>
+    <td class="govuk-table__cell">@(Model.DateSubmitted.ToLocalString12HourFormatReadable())</td>
     <td class="govuk-table__cell">@(Model.SubmittedBy)</td>
     <td class="govuk-table__cell">
         <strong class="govuk-tag @statusColor[Model.Status]">
@@ -46,7 +43,7 @@
                 "Bulk_check_file_download",
                 "BulkCheck",
                 new { bulkCheckId = Model.BulkCheckId, eligibilityType = Model.EligibilityType },
-                new { @class = "govuk-link", aria_label = "Download results submitted on " + dateSubmittedFormatted }
+                new { @class = "govuk-link", aria_label = "Download results submitted on " + Model.DateSubmitted.ToLocalString12HourFormatReadable() }
                 )
             |
             @Html.ActionLink(
@@ -54,7 +51,7 @@
                     "Bulk_check_file_delete",
                     "BulkCheck",
                     new { bulkCheckId = Model.BulkCheckId },
-                    new { @class = "govuk-link", aria_label = "Delete results submitted on " + dateSubmittedFormatted }
+                new { @class = "govuk-link", aria_label = "Delete results submitted on " + Model.DateSubmitted.ToLocalString12HourFormatReadable() }
                     )
         </td>
     }
