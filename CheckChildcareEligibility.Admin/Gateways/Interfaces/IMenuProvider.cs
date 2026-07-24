@@ -7,6 +7,7 @@ namespace CheckChildcareEligibility.Admin.Gateways.Interfaces;
 public interface IMenuProvider
 {
     IEnumerable<MenuItem> GetMenuItemsFor(DfeClaims claims);
+    IEnumerable<MenuItem> GetMenuItemsForReports(DfeClaims claims);
 }
 
 public class MenuProvider : IMenuProvider
@@ -57,11 +58,48 @@ public class MenuProvider : IMenuProvider
                         "MenuBulkCheck"
                         ),
                     new MenuItem(
+                        "Run reports",
+                        "Run reports",
+                        "Run and export reports on all applications for childcare.",
+                        "Reports",
+                        "Reports"),
+                    new MenuItem(
                         "Guidance",
                         "Guidance",
                         "Read guidance on running eligibility checks and managing foster families.",
                         "Home",
                         "GuidanceHome"
+                        )
+                };
+            default: return Enumerable.Empty<MenuItem>();
+        }
+    }
+    public IEnumerable<MenuItem> GetMenuItemsForReports(DfeClaims claims)
+    {
+        if (claims == null || !claims.Roles.Any())
+        {
+            return Array.Empty<MenuItem>();
+        }
+        var role = claims.Roles[0].Code;
+
+        return _cache.GetOrCreate($"ReportsMenu_{role}", entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1);
+            return BuildMenuForRoleReports(role);
+        });
+    }
+    private IEnumerable<MenuItem> BuildMenuForRoleReports(string role)
+    {
+        switch (role)
+        {
+            case "mefcsLocalAuthority":
+                return new[] {
+                    new MenuItem(
+                        "View eligibility code history",
+                        "View eligibility code history",
+                        "View the event listing for a code, showing application and reconfirmation history",
+                        "Reports",
+                        "CodeHistory"
                         )
                 };
             default: return Enumerable.Empty<MenuItem>();

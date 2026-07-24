@@ -1,0 +1,31 @@
+﻿@page
+@using CheckChildcareEligibility.Admin.Gateways.Interfaces
+@model IEnumerable<MenuItem>
+@{
+    ViewData["Title"] = "Run reports";
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+        <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
+
+        <div class="dfe-grid-container">
+            @foreach (var item in Model)
+            {
+                if (item.UrlView == "")
+                {
+                    continue;
+                }
+                <div class="dfe-card">
+                    <div class="dfe-card-container">
+                        <h2 class="govuk-heading-m">
+                            <a class="govuk-link govuk-link--no-visited-state dfe-card-link--header" href="/@item.UrlController/@item.UrlView">@item.TileText</a>
+                        </h2>
+                        <p>@item.TileSubText</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
