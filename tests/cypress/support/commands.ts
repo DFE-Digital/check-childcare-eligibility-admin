@@ -11,15 +11,18 @@ Cypress.Commands.add('checkSession', (userType: string) => {
     if (data && data.cookies) {
       if (data.cookies.length > 0) {
         cy.loadCookies(userType);
-        cy.visit((Cypress.config().baseUrl ?? "") + "/home")
+        cy.visit((Cypress.config().baseUrl ?? "") + "/home", { failOnStatusCode: false })
 
-        const expectedText =
-          userType === 'school'
-            ? 'The Telford Park School'
-            : userType === 'manchesterLA'
-              ? 'Manchester City Council'
-              : 'Telford And Wrekin Council';
-        cy.get('.govuk-caption-l').should('include.text', expectedText);
+
+        cy.get('body').then(($body) => {
+          const expectedText =
+            userType === 'school'
+              ? 'The Telford Park School'
+              : userType === 'manchesterLA'
+                ? 'Manchester City Council'
+                : 'Telford And Wrekin Council';
+          cy.get('.govuk-caption-l').should('include.text', expectedText);
+        });
       } else {
         cy.log('No cookies found, forcing new login');
         if (userType === 'school') {
@@ -59,8 +62,8 @@ Cypress.Commands.add('login', (userType) => {
 
 Cypress.Commands.add('loginSchoolUser', () => {
   // Log in as a school user - For persisting session use checkSession('school')
-  cy.reload();
-  cy.visit((Cypress.config().baseUrl ?? "") + "/home")
+  cy.reload(true);
+  cy.visit((Cypress.config().baseUrl ?? "") + "/home");
   cy.get('#username').type(Cypress.env('DFE_ADMIN_EMAIL_ADDRESS'));
   cy.get('button[type="submit"]').click();
   cy.get('#password').type(Cypress.env('DFE_ADMIN_PASSWORD'));
@@ -81,7 +84,7 @@ Cypress.Commands.add('loginSchoolUser', () => {
 Cypress.Commands.add('loginLocalAuthorityUser', () => {
   // Log in as a local authority user - For persisting session use checkSession('LA')
   cy.reload(true);
-  cy.visit((Cypress.config().baseUrl ?? "") + "/home")
+  cy.visit((Cypress.config().baseUrl ?? "") + "/home");
   cy.get('#username').type(Cypress.env('DFE_ADMIN_EMAIL_ADDRESS'));
   cy.get('button[type="submit"]').click();
   cy.get('#password').type(Cypress.env('DFE_ADMIN_PASSWORD'));
@@ -101,7 +104,7 @@ Cypress.Commands.add('loginLocalAuthorityUser', () => {
 Cypress.Commands.add('loginManchesterLA', () => {
   // Log in as a Manchester City Council LA user - For persisting session use checkSession('manchesterLA')
   cy.reload(true);
-  cy.visit((Cypress.config().baseUrl ?? "") + "/home")
+  cy.visit((Cypress.config().baseUrl ?? "") + "/home");
   cy.get('#username').type(Cypress.env('DFE_ADMIN_EMAIL_ADDRESS'));
   cy.get('button[type="submit"]').click();
   cy.get('#password').type(Cypress.env('DFE_ADMIN_PASSWORD'));
@@ -163,43 +166,6 @@ Cypress.Commands.add('loadCookies', (userType: string) => {
         cy.login('LA');
       }
     }
-  });
-});
-
-Cypress.Commands.add('SignInLA', () => {
-  cy.session('Session SessionLA', () => {
-    cy.visit('/');
-    cy.get('#username').type(Cypress.env('DFE_ADMIN_EMAIL_ADDRESS'));
-    cy.get('button[type="submit"]').click()
-
-    cy.get('#password').type(Cypress.env('DFE_ADMIN_PASSWORD'));
-    cy.get('button[type="submit"]').click()
-
-    cy.contains('Telford and Wrekin Council')
-      .parent()
-      .find('input[type="radio"]')
-      .check();
-
-    cy.contains('Continue', { timeout: 15000 }).click();
-  });
-});
-
-Cypress.Commands.add('SignInSchool', () => {
-  cy.session('Session SessionSchool', () => {
-
-    cy.visit('/');
-    cy.get('#username').type(Cypress.env('DFE_ADMIN_EMAIL_ADDRESS'));
-    cy.get('button[type="submit"]').click()
-
-    cy.get('#password').type(Cypress.env('DFE_ADMIN_PASSWORD'));
-    cy.get('button[type="submit"]').click()
-
-    cy.contains('The Telford Park School')
-      .parent()
-      .find('input[type="radio"]')
-      .check();
-
-    cy.contains('Continue').click();
   });
 });
 

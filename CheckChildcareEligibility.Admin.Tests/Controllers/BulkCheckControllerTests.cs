@@ -308,21 +308,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
                     s => s.PostBulkCheck(It.IsAny<CheckEligibilityRequestBulk>()))
                 .ReturnsAsync(response);
 
-            _sut.TempData["ErrorMessage"] = "No more than 10 batch check requests can be made per hour";
             var content = Resources.bulkchecktemplate_small_Valid;
-
-            var stream = new MemoryStream();
-            var writer = new StreamWriter(stream);
-            writer.Write(content);
-            writer.Flush();
-            stream.Position = 0;
-
-            //create FormFile with desired data
-            var file = new FormFile(stream, 0, stream.Length, "test.csv", "test.csv")
-            {
-                Headers = new HeaderDictionary(),
-                ContentType = "text/csv"
-            };
 
             var validRequests = new List<CheckEligibilityRequestData>
             {
@@ -340,17 +326,130 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
             _parseBulkCheckFileUseCaseMock.Setup(x => x.Execute(It.IsAny<Stream>(), It.IsAny<CheckEligibilityType>()))
                 .ReturnsAsync(validBulkCheckCsvResult);
 
-            //act
+            IFormFile CreateFile()
+            {
+                var stream = new MemoryStream();
+                var writer = new StreamWriter(stream);
+                writer.Write(content);
+                writer.Flush();
+                stream.Position = 0;
+
+                return new FormFile(stream, 0, stream.Length, "test.csv", "test.csv")
+                {
+                    Headers = new HeaderDictionary(),
+                    ContentType = "text/csv"
+                };
+            }
+
+            // act - the first 10 successful uploads (matching the configured limit) should all succeed
             for (var i = 0; i < 10; i++)
             {
-                var result = await _sut.Bulk_Check(file, "2YO");
+                var result = await _sut.Bulk_Check(CreateFile(), "2YO");
                 result.Should().BeOfType<RedirectToActionResult>();
                 var viewResult = result as RedirectToActionResult;
                 viewResult.ActionName.Should().BeEquivalentTo("Bulk_Check_Status");
+            }
 
-                if (i == 10)
-                    // assert
-                    viewResult.ActionName.Should().BeEquivalentTo("Bulk_Check");
+            // assert - the 11th upload should be blocked by the attempt limit
+            var blockedResult = await _sut.Bulk_Check(CreateFile(), "2YO");
+            blockedResult.Should().BeOfType<RedirectToActionResult>();
+            var blockedViewResult = blockedResult as RedirectToActionResult;
+            blockedViewResult.ActionName.Should().BeEquivalentTo("Bulk_Check");
+            _sut.TempData["ErrorMessage"].Should()
+                .BeEquivalentTo("No more than 10 batch check requests can be made per hour");
+
+            _checkGatewayMock.Verify(s => s.PostBulkCheck(It.IsAny<CheckEligibilityRequestBulk>()), Times.Exactly(10));
+        }
+
+        [Test]
+        public async Task Given_Bulk_Check_When_FileHasValidationErrors_Repeatedly_DoesNotCountTowardsAttemptLimit()
+        {
+            // Arrange
+            _configMock.Setup(x => x["BulkUploadAttemptLimit"]).Returns("2");
+
+            var errors = new List<CsvRowError>
+            {
+                new CsvRowError() { LineNumber = 1, Message = "Something is wrong" }
+            };
+            var invalidBulkCheckCsvResult = new BulkCheckCsvResult() { Errors = errors };
+
+            _parseBulkCheckFileUseCaseMock.Setup(x => x.Execute(It.IsAny<Stream>(), It.IsAny<CheckEligibilityType>()))
+                .ReturnsAsync(invalidBulkCheckCsvResult);
+
+            var content = Resources.bulkchecktemplate_some_invalid_items;
+
+            // Act - upload more failing files than the (very low) attempt limit
+            for (var i = 0; i < 5; i++)
+            {
+                var stream = new MemoryStream();
+                var writer = new StreamWriter(stream);
+                writer.Write(content);
+                writer.Flush();
+                stream.Position = 0;
+
+                var file = new FormFile(stream, 0, stream.Length, "test.csv", "test.csv")
+                {
+                    Headers = new HeaderDictionary(),
+                    ContentType = "text/csv"
+                };
+
+                var result = await _sut.Bulk_Check(file, "2YO");
+
+                // Assert - every attempt still shows the data-issue view, never the rate limit error
+                result.Should().BeOfType<ViewResult>();
+                var viewResult = result as ViewResult;
+                viewResult.ViewName.Should().BeEquivalentTo("BulkOutcome/Error_Data_Issue");
+            }
+        }
+
+        [Test]
+        public async Task Given_Bulk_Check_When_SubmissionFails_Repeatedly_DoesNotCountTowardsAttemptLimit()
+        {
+            // Arrange
+            _configMock.Setup(x => x["BulkUploadAttemptLimit"]).Returns("2");
+
+            var validRequests = new List<CheckEligibilityRequestData>
+            {
+                new CheckEligibilityRequestData()
+                {
+                    Type = CheckEligibilityType.TwoYearOffer,
+                    Sequence = 1,
+                    DateOfBirth = "2017-01-01",
+                    LastName = "Test",
+                    NationalInsuranceNumber = "ab"
+                }
+            };
+            var validBulkCheckCsvResult = new BulkCheckCsvResult() { ValidRequests = validRequests.Cast<CheckEligibilityRequestDataBase>().ToList() };
+
+            _parseBulkCheckFileUseCaseMock.Setup(x => x.Execute(It.IsAny<Stream>(), It.IsAny<CheckEligibilityType>()))
+                .ReturnsAsync(validBulkCheckCsvResult);
+
+            // Gateway call fails to return a usable response (no status link)
+            _checkGatewayMock.Setup(s => s.PostBulkCheck(It.IsAny<CheckEligibilityRequestBulk>()))
+                .ReturnsAsync(new CheckEligibilityResponseBulk());
+
+            var content = Resources.bulkchecktemplate_small_Valid;
+
+            // Act - submission fails more times than the (very low) attempt limit
+            for (var i = 0; i < 5; i++)
+            {
+                var stream = new MemoryStream();
+                var writer = new StreamWriter(stream);
+                writer.Write(content);
+                writer.Flush();
+                stream.Position = 0;
+
+                var file = new FormFile(stream, 0, stream.Length, "test.csv", "test.csv")
+                {
+                    Headers = new HeaderDictionary(),
+                    ContentType = "text/csv"
+                };
+
+                var result = await _sut.Bulk_Check(file, "2YO");
+
+                // Assert - every attempt reports the submission failure, never the rate limit error
+                result.Should().BeOfType<RedirectToActionResult>();
+                _sut.TempData["ErrorMessage"].Should().BeEquivalentTo("Failed to submit bulk check. Please try again.");
             }
         }
 
