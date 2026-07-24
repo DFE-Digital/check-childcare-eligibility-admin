@@ -38,7 +38,7 @@ describe('Test that approved accented characters are accepted in name input fiel
         // [("ĊċĖėĠġİẊẋŻż", "dot above")]
         // [("ĄąĘęĮįŲų", "ogonek")]
         // [("ŐőŰű", "double acute")]
-        cy.get('#LastName').type('2222OBrienO\'BrienO\u2019BrienO\u2018BrienSmith-JonesSt. Clairevan den BergÁáÉéÍíÓóÚúÝýĆćĹĺŃńŔŕŚśŹźÀàÈèÌìÒòÙùẀẁỲỳÀàÈèÌìÒòÙùẀẁỲỳÃãÑñÕõĨĩŨũẼẽỸỹÄäËëÏïÖöÜüŸÿÇçĢģĶķĻļŅņŖŗŞşŢţÅåŮůĀāĒēĪīŌōŪūȲȳĂăĔĕĞğĬĭŎŏŬŭĊċĖėĠġİẊẋŻżĄąĘęĮįŲųŐőŰű');
+        cy.get('#LastName').type('OBrienO\'BrienO\u2019BrienO\u2018BrienSmith-JonesSt. Clairevan den BergÁáÉéÍíÓóÚúÝýĆćĹĺŃńŔŕŚśŹźÀàÈèÌìÒòÙùẀẁỲỳÀàÈèÌìÒòÙùẀẁỲỳÃãÑñÕõĨĩŨũẼẽỸỹÄäËëÏïÖöÜüŸÿÇçĢģĶķĻļŅņŖŗŞşŢţÅåŮůĀāĒēĪīŌōŪūȲȳĂăĔĕĞğĬĭŎŏŬŭĊċĖėĠġİẊẋŻżĄąĘęĮįŲųŐőŰű');
         cy.contains('button', 'Run check').click();
         cy.get('#error-summary')
             .should('not.contain.text', 'Enter a last name with valid characters');
