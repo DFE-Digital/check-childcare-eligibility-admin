@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace CheckChildcareEligibility.Admin.Models;
+﻿namespace CheckChildcareEligibility.Admin.Models;
 
 public static class DateTimeExtensions
 {
