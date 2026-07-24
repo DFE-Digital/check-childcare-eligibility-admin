@@ -8,19 +8,6 @@ public static class DateTimeExtensions
 
     private const string timezone = "GMT Standard Time";
 
-    public static DateTimeOffset GetDateTimeOffsetFromString(string datetime)
-    {
-        DateTime raw = DateTime.ParseExact(datetime, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None);
-
-        DateTimeOffset offset = new DateTimeOffset(raw, TimeZoneInfo.BaseUtcOffset);
-        var rules = TimeZoneInfo.GetAdjustmentRules();
-        if (TimeZoneInfo.IsDaylightSavingTime(raw))
-        {
-            offset = new DateTimeOffset(raw.AddHours(-1), rules.First().DaylightDelta);
-        }
-        return offset;
-    }
-
     public static DateTime GetLocalTime(DateTime time)
     {
         return TimeZoneInfo.ConvertTimeFromUtc(time, TimeZoneInfo);
