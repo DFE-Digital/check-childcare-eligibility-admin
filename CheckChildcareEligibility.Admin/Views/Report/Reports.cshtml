@@ -1,33 +1,37 @@
-﻿@page
-@using CheckChildcareEligibility.Admin.Gateways.Interfaces
+﻿@using CheckChildcareEligibility.Admin.Gateways.Interfaces
 @inject IMenuProvider MenuProvider
 @{
     ViewData["Title"] = "Run reports";
     var menu = MenuProvider.GetMenuItemsForReports();
 }
 @model CheckChildcareEligibility.Admin.Domain.DfeSignIn.DfeClaims;
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
 
-        <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
+<div class="govuk-grid-column-full">
+    <a class="govuk-back-link backLinkJS" href="@Url.Action("Index", "Home")">Back</a>
 
-        <div class="dfe-grid-container">
-            @foreach (var item in menu)
-            {
-                if (item.UrlView == "")
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+
+            <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
+
+            <div class="dfe-grid-container">
+                @foreach (var item in menu)
                 {
-                    continue;
-                }
-                <div class="dfe-card">
-                    <div class="dfe-card-container">
-                        <h2 class="govuk-heading-m">
-                            <a class="govuk-link govuk-link--no-visited-state dfe-card-link--header" href="/@item.UrlController/@item.UrlView">@item.TileText</a>
-                        </h2>
-                        <p>@item.TileSubText</p>
+                    if (item.UrlView == "")
+                    {
+                        continue;
+                    }
+                    <div class="dfe-card">
+                        <div class="dfe-card-container">
+                            <h2 class="govuk-heading-m">
+                                <a class="govuk-link govuk-link--no-visited-state dfe-card-link--header" href="/@item.UrlController/@item.UrlView">@item.TileText</a>
+                            </h2>
+                            <p>@item.TileSubText</p>
+                        </div>
                     </div>
-                </div>
-            }
-        </div>
+                }
+            </div>
 
+        </div>
     </div>
 </div>
