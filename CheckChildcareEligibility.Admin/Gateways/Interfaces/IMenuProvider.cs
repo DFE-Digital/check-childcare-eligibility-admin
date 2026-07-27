@@ -7,7 +7,7 @@ namespace CheckChildcareEligibility.Admin.Gateways.Interfaces;
 public interface IMenuProvider
 {
     IEnumerable<MenuItem> GetMenuItemsFor(DfeClaims claims);
-    IEnumerable<MenuItem> GetMenuItemsForReports(DfeClaims claims);
+    IEnumerable<MenuItem> GetMenuItemsForReports();
 }
 
 public class MenuProvider : IMenuProvider
@@ -61,7 +61,7 @@ public class MenuProvider : IMenuProvider
                         "Run reports",
                         "Run reports",
                         "Run and export reports on all applications for childcare.",
-                        "Reports",
+                        "Report",
                         "Reports"),
                     new MenuItem(
                         "Guidance",
@@ -74,35 +74,21 @@ public class MenuProvider : IMenuProvider
             default: return Enumerable.Empty<MenuItem>();
         }
     }
-    public IEnumerable<MenuItem> GetMenuItemsForReports(DfeClaims claims)
-    {
-        if (claims == null || !claims.Roles.Any())
-        {
-            return Array.Empty<MenuItem>();
-        }
-        var role = claims.Roles[0].Code;
-
-        return _cache.GetOrCreate($"ReportsMenu_{role}", entry =>
-        {
-            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1);
-            return BuildMenuForRoleReports(role);
-        });
+    public IEnumerable<MenuItem> GetMenuItemsForReports()
+    { 
+        return BuildMenuForRoleReports();
     }
-    private IEnumerable<MenuItem> BuildMenuForRoleReports(string role)
+    private IEnumerable<MenuItem> BuildMenuForRoleReports()
     {
-        switch (role)
-        {
-            case "mefcsLocalAuthority":
-                return new[] {
-                    new MenuItem(
-                        "View eligibility code history",
-                        "View eligibility code history",
-                        "View the event listing for a code, showing application and reconfirmation history",
-                        "Reports",
-                        "CodeHistory"
-                        )
-                };
-            default: return Enumerable.Empty<MenuItem>();
-        }
+        return new[] {
+            new MenuItem(
+            "View eligibility code history",
+            "View eligibility code history",
+            "View the event listing for a code, showing application and reconfirmation history",
+            "Reports",
+            "CodeHistory"
+            )
+        };
     }
+    
 }

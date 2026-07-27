@@ -15,12 +15,9 @@ namespace CheckChildcareEligibility.Admin.Controllers
         {
             _menuProvider = menuProvider;
         }
-        public async Task<IActionResult> Reports()
+        public IActionResult Reports()
         {
-            await GetDfeClaimsAsync();
-            ViewBag.Claims = _Claims;
-            var menu = _menuProvider.GetMenuItemsForReports(_Claims);
-            return View(menu);
+            return View();
         }
     }
 }

@@ -1,16 +1,18 @@
 ﻿@page
 @using CheckChildcareEligibility.Admin.Gateways.Interfaces
-@model IEnumerable<MenuItem>
+@inject IMenuProvider MenuProvider
 @{
     ViewData["Title"] = "Run reports";
+    var menu = MenuProvider.GetMenuItemsForReports();
 }
+@model CheckChildcareEligibility.Admin.Domain.DfeSignIn.DfeClaims;
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
 
         <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
 
         <div class="dfe-grid-container">
-            @foreach (var item in Model)
+            @foreach (var item in menu)
             {
                 if (item.UrlView == "")
                 {
