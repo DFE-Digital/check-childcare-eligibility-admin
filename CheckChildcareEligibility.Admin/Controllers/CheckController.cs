@@ -119,11 +119,11 @@ public class CheckController : BaseController
         {
             var outcome = await _getCheckStatusUseCase.Execute(responseJson, HttpContext.Session);
 
-            if (outcome == "queuedForProcessing")
+            if (outcome.Status == "queuedForProcessing")
                 // Save the response back to TempData for the next poll
                 TempData["Response"] = responseJson;
 
-            _logger.LogError(outcome);
+            _logger.LogError(outcome.Status);
 
             var eligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty;
 
@@ -149,7 +149,7 @@ public class CheckController : BaseController
             };
 
             var isLA = _Claims?.Organisation?.Category?.Name == CheckChildcareEligibility.Admin.Models.Constants.CategoryTypeLA; //false=school
-            switch (outcome)
+            switch (outcome.Status)
             {
                 case "eligible":
                     return View(isLA ? "Outcome/Eligible_LA" : "Outcome/Eligible", eligibilityOutcomeVm);
@@ -160,13 +160,12 @@ public class CheckController : BaseController
                 case "parentNotFound":
                     return View("Outcome/Not_Found", eligibilityOutcomeVm);
 
-                case "error":
-                    return View("Outcome/Technical_Error", eligibilityOutcomeVm);
-
                 case "queuedForProcessing":
                     return View("Loader", eligibilityOutcomeVm);
 
                 default:
+                    ViewData["CorellationID"] = outcome.CorrelationID;
+                    ViewData["ErrorCode"] = outcome.ErrorCode;
                     return View("Outcome/Technical_Error", eligibilityOutcomeVm);
             }
         }
