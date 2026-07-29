@@ -313,6 +313,28 @@ public class CheckControllerTests : TestBase
         model.EligibilityType.Should().Be("2YO");
     }
 
+    public async Task Given_Loader_When_Status_TechnicalError_Should_ReturnErrorCode()
+    {
+        // Arrange
+        var response = new CheckEligibilityResponse
+        {
+            Data = new StatusValue { Status = "error", ErrorCode = "TE21" }
+        };
+        var responseJson = JsonConvert.SerializeObject(response);
+        _sut.TempData["Response"] = responseJson;
+
+        _getCheckStatusUseCaseMock
+            .Setup(x => x.Execute(responseJson, _sessionMock.Object))
+            .ReturnsAsync(response.Data);
+
+        // Act
+        var result = await _sut.Loader();
+
+        // Assert
+        var viewResult = result as ViewResult;
+        viewResult.ViewData["ErrorCode"].Should().Be(response.Data.ErrorCode);
+    }
+
     [Test]
     public async Task Loader_When_School_User_Should_Return_Non_LA_View()
     {
@@ -346,7 +368,7 @@ public class CheckControllerTests : TestBase
 
         _getCheckStatusUseCaseMock
             .Setup(x => x.Execute(responseJson, _sessionMock.Object))
-            .ReturnsAsync("eligible");
+            .ReturnsAsync(statusValue);
 
         _loadParentDetailsUseCaseMock
             .Setup(x => x.Execute(
@@ -397,7 +419,7 @@ public class CheckControllerTests : TestBase
 
         _getCheckStatusUseCaseMock
             .Setup(x => x.Execute(responseJson, _sessionMock.Object))
-            .ReturnsAsync("notEligible");
+            .ReturnsAsync(statusValue);
 
         _loadParentDetailsUseCaseMock
             .Setup(x => x.Execute(
@@ -488,7 +510,7 @@ public class CheckControllerTests : TestBase
         _tempData["Response"] = responseJson;
         _getCheckStatusUseCaseMock
             .Setup(x => x.Execute(responseJson, _sessionMock.Object))
-            .ReturnsAsync(status);
+            .ReturnsAsync(statusValue);
 
         // Act
         var result = await _sut.Loader();
@@ -526,7 +548,7 @@ public class CheckControllerTests : TestBase
         _tempData["Response"] = JsonConvert.SerializeObject(response);
 
         _getCheckStatusUseCaseMock.Setup(x => x.Execute(It.IsAny<string>(), _sessionMock.Object))
-            .ReturnsAsync("queuedForProcessing");
+            .ReturnsAsync(response.Data);
 
         // Act
         var result = await _sut.Loader();
