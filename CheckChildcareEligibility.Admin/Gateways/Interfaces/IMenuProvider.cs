@@ -7,6 +7,7 @@ namespace CheckChildcareEligibility.Admin.Gateways.Interfaces;
 public interface IMenuProvider
 {
     IEnumerable<MenuItem> GetMenuItemsFor(DfeClaims claims);
+    IEnumerable<MenuItem> GetMenuItemsForReports();
 }
 
 public class MenuProvider : IMenuProvider
@@ -57,6 +58,12 @@ public class MenuProvider : IMenuProvider
                         "MenuBulkCheck"
                         ),
                     new MenuItem(
+                        "Run reports",
+                        "Run reports",
+                        "Run and export reports on all applications for childcare.",
+                        "Report",
+                        "Reports"),
+                    new MenuItem(
                         "Guidance",
                         "Guidance",
                         "Read guidance on running eligibility checks and managing foster families.",
@@ -67,4 +74,21 @@ public class MenuProvider : IMenuProvider
             default: return Enumerable.Empty<MenuItem>();
         }
     }
+    public IEnumerable<MenuItem> GetMenuItemsForReports()
+    { 
+        return BuildMenuForRoleReports();
+    }
+    private IEnumerable<MenuItem> BuildMenuForRoleReports()
+    {
+        return new[] {
+            new MenuItem(
+            "View eligibility code history",
+            "View eligibility code history",
+            "View the event listing for a code, showing application and reconfirmation history",
+            "Reports",
+            "CodeHistory"
+            )
+        };
+    }
+    
 }
