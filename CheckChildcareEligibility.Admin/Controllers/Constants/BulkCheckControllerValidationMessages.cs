@@ -9,5 +9,6 @@
             return $"No more than {bulkUploadAttemptLimit} batch check requests can be made per hour"; 
         }
         public const string EmptyFile = "The selected file is empty";
+        public const string BulkSubmissionFailed = "Failed to submit bulk check. Please try again.";
     }
 }
