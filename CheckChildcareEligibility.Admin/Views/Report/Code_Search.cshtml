@@ -1,0 +1,33 @@
+﻿
+@{
+    ViewData["Title"] = "Event History";
+}
+<div class="govuk-grid-column-two-thirds">
+
+    <a class="govuk-back-link backLinkJS" href="@Url.Action("Report", "Reports")">Back</a>
+
+    <h1 class="govuk-heading-l">View eligibility code history</h1>
+
+    <form asp-controller="Report" asp-action="Code_Search" method="post">
+
+        <fieldset class="govuk-fieldset">
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-label--m" for="30h-code">
+                    Eligibility code
+                </label>
+
+                <div id="30h-code-hint" class="govuk-hint">
+                    Eligibility code must be 11 digits long
+                </div>
+
+                <input class="govuk-input govuk-input--width-20"
+                       name="EligibilityCode" type="text" aria-label="Eligibility Code">
+
+            </div>
+        </fieldset>
+        <button class="govuk-button govuk-!-margin-top-5" data-module="govuk-button">
+            View code history
+        </button>
+    </form>
+</div>
+
