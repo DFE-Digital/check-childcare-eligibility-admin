@@ -10,6 +10,7 @@ namespace CheckChildcareEligibility.Admin.Domain.Constants.Generic
         public const string StatusDueNow = "Due now";
         public const string StatusOverdue = "Overdue";
         public const string StatusChildTooOld = "Child too old";
+        public const string GracePeriodEndDateNotAvailable = "Date will appear here when the code can be used";
         public static readonly string[] ReconfirmationStatusNotApplicable = {StatusNotApplicable,"grey"};
         public static readonly string[] ReconfirmationStatusNotDueYet = { StatusNotDueYet, "green"};
         public static readonly string[] ReconfirmationStatusDueNow = { StatusDueNow, "yellow"};
