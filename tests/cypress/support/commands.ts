@@ -1,5 +1,10 @@
 import 'cypress-file-upload';
 
+// Strips any trailing slash so manual `baseUrl + "/path"` concatenation never produces a double slash.
+function getBaseUrl(): string {
+  return (Cypress.config().baseUrl ?? "").replace(/\/+$/, "");
+}
+
 Cypress.Commands.add('checkSession', (userType: string) => {
   // Check if a logged in session exists and re-use that, else log in
   const filePath = userType === 'school'
@@ -11,8 +16,24 @@ Cypress.Commands.add('checkSession', (userType: string) => {
     if (data && data.cookies) {
       if (data.cookies.length > 0) {
         cy.loadCookies(userType);
-        cy.visit((Cypress.config().baseUrl ?? "") + "/home", { failOnStatusCode: false })
+        cy.visit(getBaseUrl() + "/home", { failOnStatusCode: false })
 
+        // Restored cookies can be stale/invalid server-side even though the local cache looked fresh -
+        // if that happens we get redirected away from the app (e.g. to the sign-in domain), so fall back to a real login.
+        cy.url().then((url) => {
+          const baseUrl = getBaseUrl();
+          if (!url.startsWith(baseUrl)) {
+            cy.log('Restored cookies did not authenticate, forcing new login');
+            if (userType === 'school') {
+              cy.login('school');
+            } else if (userType === 'manchesterLA') {
+              cy.login('manchesterLA');
+            } else {
+              cy.login('LA');
+            }
+            cy.visit(baseUrl + "/home");
+          }
+        });
 
         cy.get('body').then(($body) => {
           const expectedText =
@@ -63,7 +84,7 @@ Cypress.Commands.add('login', (userType) => {
 Cypress.Commands.add('loginSchoolUser', () => {
   // Log in as a school user - For persisting session use checkSession('school')
   cy.reload(true);
-  cy.visit((Cypress.config().baseUrl ?? "") + "/home");
+  cy.visit(getBaseUrl() + "/home");
   cy.get('#username').type(Cypress.env('DFE_ADMIN_EMAIL_ADDRESS'));
   cy.get('button[type="submit"]').click();
   cy.get('#password').type(Cypress.env('DFE_ADMIN_PASSWORD'));
@@ -84,7 +105,7 @@ Cypress.Commands.add('loginSchoolUser', () => {
 Cypress.Commands.add('loginLocalAuthorityUser', () => {
   // Log in as a local authority user - For persisting session use checkSession('LA')
   cy.reload(true);
-  cy.visit((Cypress.config().baseUrl ?? "") + "/home");
+  cy.visit(getBaseUrl() + "/home");
   cy.get('#username').type(Cypress.env('DFE_ADMIN_EMAIL_ADDRESS'));
   cy.get('button[type="submit"]').click();
   cy.get('#password').type(Cypress.env('DFE_ADMIN_PASSWORD'));
@@ -104,7 +125,7 @@ Cypress.Commands.add('loginLocalAuthorityUser', () => {
 Cypress.Commands.add('loginManchesterLA', () => {
   // Log in as a Manchester City Council LA user - For persisting session use checkSession('manchesterLA')
   cy.reload(true);
-  cy.visit((Cypress.config().baseUrl ?? "") + "/home");
+  cy.visit(getBaseUrl() + "/home");
   cy.get('#username').type(Cypress.env('DFE_ADMIN_EMAIL_ADDRESS'));
   cy.get('button[type="submit"]').click();
   cy.get('#password').type(Cypress.env('DFE_ADMIN_PASSWORD'));
