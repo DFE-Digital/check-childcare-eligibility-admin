@@ -18,9 +18,15 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public DateTime ValidityEndDate => DateTime.Parse(Response.ValidityEndDate);
         public DateTime GracePeriodEndDate => DateTime.Parse(Response.GracePeriodEndDate);
         public string GracePeriodEndDisplay =>
-            (IsEligible && ChildIsTooYoung) || IsNotValidYet
-                ? WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable
-                : GracePeriodEndDate.ToString("d MMMM yyyy");
+            ChildIsTooOld
+                ? ValidityEndDate.ToString("d MMMM yyyy")
+                : (IsEligible && ChildIsTooYoung) || IsNotValidYet
+                    ? WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable
+                    : GracePeriodEndDate.ToString("d MMMM yyyy");
+        public string GracePeriodEndLabel =>
+            ChildIsTooOld
+                ? "Grace period ended"
+                : "Grace period ends";
         public DateTime ChildDateOfBirth => DateTime.Parse(Response.DateOfBirth);
         private DateTime StartReconfirmDate => ValidityEndDate.AddDays(-28);
         public int CurrentYear => DateTime.UtcNow.Year;
@@ -31,7 +37,10 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
 
 
-        public string TermInfo => GetTermInfo(ValidityStartDate);
+        public string TermInfo =>
+            ChildIsTooOld
+                ? ValidityEndDate.ToString("d MMMM yyyy")
+                : GetTermInfo(ValidityStartDate);
         public string CurrentTerm => GetTermName(DateTime.Now);
         public string NextTerm => GetTermName(GetNextTerm(GetTermStart(DateTime.Now)));
 
@@ -179,6 +188,12 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
                 TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFrom;
                 CodeType = string.Empty;
+            }
+            else if (ChildIsTooOld) // Child has reached compulsory school age
+            {
+                CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
+                BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
+                TermValidityDetails = WorkingFamiliesResponseBanner.TermExpiredOn;
             }
             else if (IsNotValidYet) // Code cannot be used yet
             {

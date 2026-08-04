@@ -1,4 +1,5 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.Constants.Generic;
 using CheckChildcareEligibility.Admin.ViewModels;
 using FluentAssertions;
 
@@ -66,7 +67,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
         }
 
         [Test]
-        public void GracePeriodEndDisplay_WhenChildIsTooOld_ShouldReturnFormattedGracePeriodEndDate()
+        public void GracePeriodEndDisplay_WhenChildIsTooOld_ShouldReturnFormattedValidityEndDate()
         {
             // Arrange
             var currentTermStart = WorkingFamiliesResponseViewModel.GetTermStart(DateTime.Now);
@@ -83,7 +84,53 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
 
             // Assert
             sut.ChildIsTooOld.Should().BeTrue();
-            result.Should().Be(gracePeriodEndDate.ToString("d MMMM yyyy"));
+            result.Should().Be(sut.ValidityEndDate.ToString("d MMMM yyyy"));
+            result.Should().NotBe(gracePeriodEndDate.ToString("d MMMM yyyy"));
+            sut.GracePeriodEndLabel.Should().Be("Grace period ended");
+        }
+
+        [Test]
+        public void SetBannerValues_WhenChildIsTooOldAndCodeIsNotValidYet_ShouldSetExpiredBanner()
+        {
+            // Arrange
+            var currentTermStart = WorkingFamiliesResponseViewModel.GetTermStart(DateTime.Now);
+            var childDateOfBirth = currentTermStart.AddYears(-6);
+            var validityStartDate = currentTermStart.AddDays(1);
+            var sut = CreateViewModel(childDateOfBirth, validityStartDate);
+
+            // Act
+            sut.SetBannerValues();
+
+            // Assert
+            sut.ChildIsTooOld.Should().BeTrue();
+            sut.IsNotValidYet.Should().BeTrue();
+            sut.CodeStatus.Should().Be(WorkingFamiliesResponseBanner.CodeExpired);
+            sut.BannerColour.Should().Be(WorkingFamiliesResponseBanner.ColourOrange);
+            sut.TermValidityDetails.Should().Be(WorkingFamiliesResponseBanner.TermExpiredOn);
+            sut.TermInfo.Should().Be(sut.ValidityEndDate.ToString("d MMMM yyyy"));
+            sut.GracePeriodEndDisplay.Should().Be(sut.ValidityEndDate.ToString("d MMMM yyyy"));
+            sut.GracePeriodEndLabel.Should().Be("Grace period ended");
+        }
+
+        [Test]
+        public void SetBannerValues_WhenChildIsTooYoungAndCodeIsNotValidYet_ShouldSetChildTooYoungBanner()
+        {
+            // Arrange
+            var currentTermStart = WorkingFamiliesResponseViewModel.GetTermStart(DateTime.Now);
+            var childDateOfBirth = currentTermStart.AddMonths(-1);
+            var validityStartDate = currentTermStart.AddDays(1);
+            var sut = CreateViewModel(childDateOfBirth, validityStartDate);
+
+            // Act
+            sut.SetBannerValues();
+
+            // Assert
+            sut.ChildIsTooYoung.Should().BeTrue();
+            sut.IsNotValidYet.Should().BeTrue();
+            sut.CodeStatus.Should().Be(WorkingFamiliesResponseBanner.CodeChildTooYoung);
+            sut.BannerColour.Should().Be(WorkingFamiliesResponseBanner.ColourBlue);
+            sut.TermValidityDetails.Should().Be(WorkingFamiliesResponseBanner.TermValidFrom);
+            sut.GracePeriodEndLabel.Should().Be("Grace period ends");
         }
 
         private static WorkingFamiliesResponseViewModel CreateViewModel(
