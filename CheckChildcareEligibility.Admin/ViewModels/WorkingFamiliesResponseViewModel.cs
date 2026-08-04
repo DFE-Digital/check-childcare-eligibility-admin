@@ -17,6 +17,10 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public DateTime ValidityStartDate => DateTime.Parse(Response.ValidityStartDate);
         public DateTime ValidityEndDate => DateTime.Parse(Response.ValidityEndDate);
         public DateTime GracePeriodEndDate => DateTime.Parse(Response.GracePeriodEndDate);
+        public string GracePeriodEndDisplay =>
+            (IsEligible && ChildIsTooYoung) || IsNotValidYet
+                ? WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable
+                : GracePeriodEndDate.ToString("d MMMM yyyy");
         public DateTime ChildDateOfBirth => DateTime.Parse(Response.DateOfBirth);
         private DateTime StartReconfirmDate => ValidityEndDate.AddDays(-28);
         public int CurrentYear => DateTime.UtcNow.Year;
