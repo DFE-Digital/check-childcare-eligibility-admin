@@ -7,6 +7,8 @@ using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
 using CheckChildcareEligibility.Admin.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Reflection;
 
 namespace CheckChildcareEligibility.Admin.Controllers
 {
@@ -14,13 +16,16 @@ namespace CheckChildcareEligibility.Admin.Controllers
     {
         private readonly IMenuProvider _menuProvider;
         private readonly IPerformEligibilityCodeHistoryReportUseCase _performEligibilityCodeHistoryReportUseCase;
+        private readonly IValidateEligibilityCodeUseCase _validateEligibilityCodeUseCase;
         public ReportController(
              IMenuProvider menuProvider,
              IPerformEligibilityCodeHistoryReportUseCase performEligibilityCodeHistoryReportUse,
+             IValidateEligibilityCodeUseCase validateEligibilityCodeUseCase,
             IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService)
         {
             _menuProvider = menuProvider;
             _performEligibilityCodeHistoryReportUseCase = performEligibilityCodeHistoryReportUse;
+            _validateEligibilityCodeUseCase = validateEligibilityCodeUseCase;
         }
         public IActionResult Reports()
         {
@@ -28,16 +33,38 @@ namespace CheckChildcareEligibility.Admin.Controllers
         }
         public IActionResult Code_Search()
         {
-            return View();
+            var model = new EligibilityCodeSearchViewModel();
+
+            var errorsJson = TempData["Errors"]?.ToString();
+
+            if (!string.IsNullOrEmpty(errorsJson))
+            {
+                var errors = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(errorsJson);
+
+                foreach (var (key, errorList) in errors)
+                {
+                    foreach (var error in errorList)
+                    {
+                        ModelState.AddModelError(key, error);
+                    }
+                }
+            }
+
+            model.EligibilityCode = TempData["EligibilityCode"]?.ToString();
+
+            return View(model);
         }
         [HttpPost]
         public async Task<IActionResult> Code_Search(string EligibilityCode)
         {
-            if (EligibilityCode == null)
+            var validationResult = _validateEligibilityCodeUseCase.Execute(eligibilityCode);
+            if (!validationResult.IsValid)
             {
-                TempData["ErrorMessage"] = "Please enter an Eligibility Code";
+                TempData["EligibilityCode"] = eligibilityCode;
+                TempData["Errors"] =
+                JsonConvert.SerializeObject(validationResult.Errors);
 
-                return RedirectToAction("Code_Seach");
+                return RedirectToAction("Code_Search");
             }
             var response = await _performEligibilityCodeHistoryReportUseCase.Execute(EligibilityCode);
             var viewModel = new EligibilityCodeHistoryReportViewModel
@@ -45,7 +72,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 EligibilityCode = EligibilityCode,
                 Response = response
             };
-            return View("Report/Event_History", viewModel);
+            return View("Event_History", viewModel);
         }
     }
 }
