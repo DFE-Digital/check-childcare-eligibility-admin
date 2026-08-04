@@ -57,12 +57,13 @@ public class MenuProvider : IMenuProvider
                         "Home",
                         "MenuBulkCheck"
                         ),
-                    new MenuItem(
+              /*      new MenuItem(
                         "Run reports",
                         "Run reports",
                         "Run and export reports on all applications for childcare.",
                         "Report",
                         "Reports"),
+              */
                     new MenuItem(
                         "Guidance",
                         "Guidance",
