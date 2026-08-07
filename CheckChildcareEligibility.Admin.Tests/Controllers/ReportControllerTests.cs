@@ -1,10 +1,10 @@
-﻿using CheckChildcareEligibility.Admin.Controllers;
+﻿using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Controllers;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
 using CheckChildcareEligibility.Admin.ViewModels;
-using CheckChildcareEligibility.Admin.Boundary.Responses;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CheckChildcareEligibility.Admin.Tests.Controllers;
 [TestFixture]
@@ -110,9 +111,9 @@ public class ReportControllerTests : TestBase
         const string eligibilityCode = "123";
 
         _validateEligibilityCodeUseCaseMock.Setup(x => x.Execute(eligibilityCode)).Returns(new ValidationResult
-            {
-                IsValid = false,
-                Errors = new Dictionary<string, List<string>>
+        {
+            IsValid = false,
+            Errors = new Dictionary<string, List<string>>
                 {
                     {
                         "EligibilityCode",
@@ -122,7 +123,7 @@ public class ReportControllerTests : TestBase
                         }
                     }
                 }
-            });
+        });
 
         // Act
         var result = await _sut.Code_Search(eligibilityCode);
@@ -149,7 +150,22 @@ public class ReportControllerTests : TestBase
                 IsValid = true
             });
 
-        var reportResponse = new WorkingFamilyEventByEligibilityCodeResponse();
+        var reportResponse = new WorkingFamilyEventByEligibilityCodeResponse
+        {
+            Data = new List<WorkingFamilyEventByEligibilityCodeResponseItem>
+            {
+                new()
+                {
+                    Event = WorkingFamilyEventType.Application,
+                    Record = new WorkingFamiliesEventEligibilityCodeResponseRecord
+                    {
+                        EventId = "123",
+                        ParentFirstName = "John",
+                        ParentLastName = "Smith"
+                    }
+                }
+            }
+        };
 
         _performEligibilityCodeHistoryReportUseCaseMock
             .Setup(x => x.Execute(eligibilityCode))
@@ -169,5 +185,37 @@ public class ReportControllerTests : TestBase
         model.Should().NotBeNull();
         model!.EligibilityCode.Should().Be(eligibilityCode);
         model.Response.Should().Be(reportResponse);
+    }
+    [Test]
+    public async Task CodeSearch_Post_When_Validation_Passes_And_Result_Empty_Should_Return_No_Match_View()
+    {
+        // Arrange
+        const string eligibilityCode = "12345678901";
+
+        _validateEligibilityCodeUseCaseMock.Setup(x => x.Execute(eligibilityCode))
+            .Returns(new ValidationResult
+            {
+                IsValid = true
+            });
+
+        var reportResponse = new WorkingFamilyEventByEligibilityCodeResponse
+        {
+            Data = new List<WorkingFamilyEventByEligibilityCodeResponseItem>()
+        };
+
+        _performEligibilityCodeHistoryReportUseCaseMock
+            .Setup(x => x.Execute(eligibilityCode))
+            .ReturnsAsync(reportResponse);
+
+        // Act
+        var result = await _sut.Code_Search(eligibilityCode);
+
+        // Assert
+        var viewResult = result as ViewResult;
+
+        viewResult.Should().NotBeNull();
+        viewResult!.ViewName.Should().Be("No_Match");
+
+        var model = viewResult.Model as EligibilityCodeHistoryReportViewModel;
     }
 }
