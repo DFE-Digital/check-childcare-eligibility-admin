@@ -20,4 +20,7 @@ public interface ICheckGateway
     Task<CheckEligibilityStatusResponse> GetStatus(CheckEligibilityResponse responseBody);
     Task<CheckEligibilityItemWorkingFamiliesResponse> GetWFResult(string getEligibilityCheck);
     Task<CheckEligiblityBulkDeleteResponse> DeleteBulkChecksFor(string bulkCheckDeleteUrl);
+
+    //FosterFamilies
+    Task<FosterFamiliesSearchResponse> GetFosterFamiliesSearchRecords(int pageNumber, int pageSize);
 }

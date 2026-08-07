@@ -5,6 +5,7 @@ using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Drawing.Printing;
 
 namespace CheckChildcareEligibility.Admin.Gateways;
 
@@ -25,6 +26,11 @@ public class CheckGateway : BaseGateway, ICheckGateway
         [CheckEligibilityType.TwoYearOffer] = "bulk-check/two-year-offer",
         [CheckEligibilityType.EarlyYearPupilPremium] = "bulk-check/early-year-pupil-premium",
         [CheckEligibilityType.WorkingFamilies] = "bulk-check/working-families",
+    };
+
+    private static readonly Dictionary<FosterFamiliesUrls, string> FosterFamiliesUrlsDict = new()
+    {
+        [FosterFamiliesUrls.FosterFamilySearch] = "foster-family/search",
     };
 
     public CheckGateway(ILoggerFactory logger, HttpClient httpClient, IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : base("EcsService",
@@ -195,5 +201,36 @@ public class CheckGateway : BaseGateway, ICheckGateway
         }
 
         return null;
+    }
+
+    public async Task<FosterFamiliesSearchResponse> GetFosterFamiliesSearchRecords(int pageNumber, int pageSize)
+    {
+        try
+        {
+            var response = await ApiDataGetAsynch($"{FosterFamiliesUrlsDict[FosterFamiliesUrls.FosterFamilySearch]}?pageNumber={pageNumber}&pageSize={pageSize}", new FosterFamiliesSearchResponse());
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                $"Get FosterFamiliesSearchRecords failed. uri:-{_httpClient.BaseAddress}{FosterFamiliesUrlsDict[FosterFamiliesUrls.FosterFamilySearch]}");
+        }
+
+        return null;
+    }
+
+    public async Task<FosterFamilyCreatedResponse> CreateFosterFamily(FosterFamilyRequest request)
+    {
+        try
+        {
+            var result = await ApiDataPostAsynch("foster-family", request, new FosterFamilyCreatedResponse());
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                $"Post CreateFosterFamily failed. uri:-{_httpClient.BaseAddress}foster-family content:-{JsonConvert.SerializeObject(request)}");
+            throw;
+        }
     }
 }
