@@ -1,0 +1,108 @@
+﻿@model CheckChildcareEligibility.Admin.ViewModels.EligibilityCodeHistoryReportViewModel
+@{
+    ViewData["Title"] = $"History for eligibility code {Model.EligibilityCode}";
+}
+
+<div class="govuk-grid-column-full">
+    <a class="govuk-back-link backLinkJS" href="@Url.Action("Report", "Code_Search")">Back</a>
+    <h1 class="govuk-heading-l">
+        History for eligibility code @Model.EligibilityCode
+    </h1>
+
+    <div class="govuk-!-margin-bottom-6 table-scroll">
+        <table class="govuk-table govuk-table--small-text-until-tablet">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">Event</th>
+                    <th scope="col" class="govuk-table__header">Submitted on</th>
+                    <th scope="col" class="govuk-table__header">Discretionary start date</th>
+                    <th scope="col" class="govuk-table__header">Validity start date</th>
+                    <th scope="col" class="govuk-table__header">Validity end date</th>
+                    <th scope="col" class="govuk-table__header">Grace period ends</th>
+                    <th scope="col" class="govuk-table__header">Event ID</th>
+                    <th scope="col" class="govuk-table__header">Parent NINO</th>
+                    <th scope="col" class="govuk-table__header">Parent first name</th>
+                    <th scope="col" class="govuk-table__header">Parent last name</th>
+                    <th scope="col" class="govuk-table__header">Parent DOB</th>
+                    <th scope="col" class="govuk-table__header">Partner NINO</th>
+                    <th scope="col" class="govuk-table__header">Partner first name</th>
+                    <th scope="col" class="govuk-table__header">Partner last name</th>
+                    <th scope="col" class="govuk-table__header">Partner DOB</th>
+                    <th scope="col" class="govuk-table__header">Child first name</th>
+                    <th scope="col" class="govuk-table__header">Child last name</th>
+                    <th scope="col" class="govuk-table__header">Child DOB</th>
+                    <th scope="col" class="govuk-table__header">Child postcode</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+
+                @foreach (var item in Model.Response.Data)
+                {
+                    <tr class="govuk-table__row">
+
+                        <th scope="row" class="govuk-table__header">
+                            @item.Event
+                        </th>
+                        <td class="govuk-table__cell">
+                            @(item.Record.SubmissionDate?.ToString("dd MMM yyyy") ?? "-")
+                        </td>
+                        <td class="govuk-table__cell">
+                            @(item.Record.DiscretionaryStartDate?.ToString("dd MMM yyyy") ?? "-")
+                        </td>
+                        <td class="govuk-table__cell">
+                            @(item.Record.ValidityStartDate?.ToString("dd MMM yyyy") ?? "-")
+                        </td>
+                        <td class="govuk-table__cell">
+                            @(item.Record.ValidityEndDate?.ToString("dd MMM yyyy") ?? "-")
+                        </td>
+                        <td class="govuk-table__cell">
+                            @(item.Record.GracePeriodEndDate?.ToString("dd MMM yyyy") ?? "-")
+                        </td>
+                        <td class="govuk-table__cell">
+                            @item.Record.EventId
+                        </td>
+                        <td class="govuk-table__cell">
+                            @item.Record.ParentNationalInsuranceNumber
+                        </td>
+                        <td class="govuk-table__cell">
+                            @item.Record.ParentFirstName
+                        </td>
+                        <td class="govuk-table__cell">
+                            @item.Record.ParentLastName
+                        </td>
+                        <td class="govuk-table__cell">
+                            @(item.Record.ParentDateOfBirth?.ToString("dd MMM yyyy") ?? "-")
+                        </td>
+                        <td class="govuk-table__cell">
+                            @item.Record.PartnerNationalInsuranceNumber
+                        </td>
+                        <td class="govuk-table__cell">
+                            @item.Record.PartnerFirstName
+                        </td>
+                        <td class="govuk-table__cell">
+                            @item.Record.PartnerLastName
+                        </td>
+                        <td class="govuk-table__cell">
+                            @(item.Record.PartnerDateOfBirth?.ToString("dd MMM yyyy") ?? "-")
+                        </td>
+                        <td class="govuk-table__cell">
+                            @item.Record.ChildFirstName
+                        </td>
+                        <td class="govuk-table__cell">
+                            @item.Record.ChildLastName
+                        </td>
+                        <td class="govuk-table__cell">
+                            @(item.Record.ChildDateOfBirth?.ToString("dd MMM yyyy") ?? "-")
+                        </td>
+                        <td class="govuk-table__cell">
+                            @item.Record.ChildPostCode
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+        <p class="govuk-!-margin-top-7"><a href="/public/csv/childcare/dev/eligibility-code-history-50012345678.csv">Download as CSV file</a></p>
+    </div>
+
+</div>
