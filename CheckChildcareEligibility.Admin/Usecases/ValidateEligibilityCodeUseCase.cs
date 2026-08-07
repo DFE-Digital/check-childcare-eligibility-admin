@@ -34,45 +34,40 @@ public class ValidateEligibilityCodeUseCase : IValidateEligibilityCodeUseCase
         };
     }
 
-    private Dictionary<string, List<string>> ProcessErrors(
-        string eligibilityCode)
+    private Dictionary<string, List<string>> ProcessErrors(string eligibilityCode)
     {
         var errors = new Dictionary<string, List<string>>();
 
         if (string.IsNullOrWhiteSpace(eligibilityCode))
         {
-            errors.Add(
-                "EligibilityCode",
+            errors.Add("EligibilityCode",
                 new List<string>
                 {
-                    "Enter an eligibility code that is 11 digits long"
+                "Enter an eligibility code that is 11 digits long"
                 });
 
             return errors;
         }
-
-        if (eligibilityCode.Length != 11)
-        {
-            errors.Add(
-                "EligibilityCode",
-                new List<string>
-                {
-                    "Eligibility code must be 11 digits long"
-                });
-
-            return errors;
-        }
-
         if (!eligibilityCode.All(char.IsDigit))
         {
-            errors.Add(
-                "EligibilityCode",
+            errors.Add("EligibilityCode",
                 new List<string>
                 {
-                    "Eligibility code must only contain numbers"
+                "Eligibility code must only contain numbers"
                 });
-        }
 
+            return errors;
+        }
+        if (eligibilityCode.Length != 11)
+        {
+            errors.Add("EligibilityCode",
+                new List<string>
+                {
+                "Eligibility code must be 11 digits long"
+                });
+
+            return errors;
+        }
         return errors;
     }
 }

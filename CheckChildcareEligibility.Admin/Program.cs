@@ -52,6 +52,7 @@ builder.Services.AddScoped<IParseBulkCheckFileUseCase, ParseBulkCheckFileUseCase
 builder.Services.AddScoped<IDeleteBulkCheckFileUseCase, DeleteBulkCheckFileUseCase>();
 builder.Services.AddScoped<IValidator<IEligibilityServiceType>, CheckEligibilityRequestDataValidator>();
 builder.Services.AddScoped<IPerformEligibilityCodeHistoryReportUseCase, PerformEligibilityCodeHistoryReportUseCase > ();
+builder.Services.AddScoped <IValidateEligibilityCodeUseCase,ValidateEligibilityCodeUseCase>();
 builder.Services.AddSession();
 
 

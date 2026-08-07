@@ -57,10 +57,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Code_Search(string EligibilityCode)
         {
-            var validationResult = _validateEligibilityCodeUseCase.Execute(eligibilityCode);
+            var validationResult = _validateEligibilityCodeUseCase.Execute(EligibilityCode);
             if (!validationResult.IsValid)
             {
-                TempData["EligibilityCode"] = eligibilityCode;
+                TempData["EligibilityCode"] = EligibilityCode;
                 TempData["Errors"] =
                 JsonConvert.SerializeObject(validationResult.Errors);
 
