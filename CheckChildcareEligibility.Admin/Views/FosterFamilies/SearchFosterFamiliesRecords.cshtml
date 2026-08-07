@@ -1,0 +1,67 @@
+﻿@using CheckChildcareEligibility.Admin.ViewModels
+@model CheckChildcareEligibility.Admin.ViewModels.FosterFamilyViewModel
+@{
+    ViewData["Title"] = "Manage foster families";
+}
+
+<div class="govuk-grid-column-full">
+    <a class="govuk-back-link backLinkJS" href="@Url.Action("Index", "Home")">Back</a>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+
+            <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
+            <p>Manage foster families claiming Childcare for working families.</p>
+
+            @Html.ActionLink("Add family and create code", "Enter_Carer_Details", "FosterFamilies", new { clearData = true }, new { @class = "govuk-button govuk-!-margin-bottom-9" })
+             
+            <h2 class="govuk-heading-m">Children and eligibility codes</h2>
+            @if (Model.Data != null && Model.Data.Any())
+            {
+                <table class="govuk-table govuk-table--small-text-until-tablet">
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header">Child name</th>
+                            <th scope="col" class="govuk-table__header">Child date of birth</th>
+                            <th scope="col" class="govuk-table__header">Eligibility code</th>
+                            <th scope="col" class="govuk-table__header">Carer name</th>
+                            <th scope="col" class="govuk-table__header">Eligibility confirmed on</th>
+                            <th scope="col" class="govuk-table__header">Reconfirm between</th>
+                            <th scope="col" class="govuk-table__header">Grace period ends</th>
+                            <th scope="col" class="govuk-table__header govuk-visually-hidden">Code status</th>
+                            <th scope="col" class="govuk-table__header">Reconfirmation status</th>
+
+                        </tr>
+                    </thead>
+                    <tbody class="govuk-table__body">
+                        @Html.DisplayFor(model => model.Data)
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No results found.</p>
+            }
+
+            @{
+                var paginationModel = new PaginationPartialViewModel
+                {
+                    CurrentPage = Model.PageNumber,
+                    TotalPages = (int)Math.Ceiling((double)Model.TotalNumberOfRecords / Model.PageSize),
+                    RecordsPerPage = Model.PageSize,
+                    TotalRecords = Model.TotalNumberOfRecords,
+                    ControllerName = "FosterFamilies"
+                };
+
+                @if (paginationModel.TotalPages > 1)
+                {
+                    <partial name="PaginationPartial" model="paginationModel" />
+                }
+            }
+            @if (Model.Data == null)
+            {
+                <p class="govuk-!-margin-bottom-6"><a href="/public/csv/childcare/dev/foster-families-codes-YYYY-MM-DD.csv">Download as CSV file</a></p>
+            }
+        </div>
+    </div>
+</div>
