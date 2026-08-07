@@ -1,8 +1,9 @@
 describe('Full journey of checking reporting in LA portal', () => {
-    const validEligibilityCode = '12345678901'; // Example eligibility code for testing
+    const validEligibilityCode = '92011122209'; // Example eligibility code for testing
     const invalidEligibilityCode = '00'; // Example invalid eligibility code for testing  
     const invalidEligibilityCodeletters = 'abc123'; // Example invalid code for testing
-    
+    const noMatchEligibilityCode = '00000000000'; // Example eligibility code that does not match any records
+
     beforeEach(() => {
         // Login with LA session
         cy.checkSession('LA');
@@ -18,7 +19,7 @@ describe('Full journey of checking reporting in LA portal', () => {
         cy.get('h1').should('include.text', 'View eligibility code history');
         cy.get('#EligibilityCode').type(validEligibilityCode);
         cy.contains('button', 'View code history').click();
-        cy.get('h1').should('include.text', 'History for eligibility code 12345678901');
+        cy.get('h1').should('include.text', `History for eligibility code ${validEligibilityCode}`);
     });
     it('Will return an error message from an invalid eligibility code', () => {
         cy.contains('Run reports').click();
@@ -37,5 +38,16 @@ describe('Full journey of checking reporting in LA portal', () => {
         cy.get('#EligibilityCode').type(invalidEligibilityCodeletters);
         cy.contains('button', 'View code history').click();
         cy.get('.govuk-error-message').should('contain.text', 'Eligibility code must only contain numbers');
+    });
+    it('Will return the no match page from a non-matching eligibility code', () => {
+        cy.contains('Run reports').click();
+        cy.get('h1').should('include.text', 'Run reports');
+        cy.contains('a', 'View eligibility code history').click();
+        cy.get('h1').should('include.text', 'View eligibility code history');
+        cy.get('#EligibilityCode').type(noMatchEligibilityCode);
+        cy.contains('button', 'View code history').click();
+        cy.get('.govuk-summary-list__value').should('include.text', `${noMatchEligibilityCode}`);
+        cy.contains('a', 'Try again').click();
+        cy.get('h1').should('include.text', 'View eligibility code history');
     });
 });

@@ -67,6 +67,14 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return RedirectToAction("Code_Search");
             }
             var response = await _performEligibilityCodeHistoryReportUseCase.Execute(EligibilityCode);
+            if (response.Data.Count == 0)
+            {
+                var noMatchView = new EligibilityCodeSearchViewModel
+                {
+                    EligibilityCode = EligibilityCode,
+                };
+                return View("No_Match", noMatchView);
+            }
             var viewModel = new EligibilityCodeHistoryReportViewModel
             {
                 EligibilityCode = EligibilityCode,
