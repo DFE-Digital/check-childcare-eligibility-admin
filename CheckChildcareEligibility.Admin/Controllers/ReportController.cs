@@ -90,18 +90,15 @@ namespace CheckChildcareEligibility.Admin.Controllers
 
         public async Task<IActionResult> Report_Download(string EligibilityCode)
         {
-            var filePrefix = "eligibility-code-history";
+            var filePrefix = ReportHistoryType.downloadPrefix;
 
             var exportData = await _performEligibilityCodeHistoryReportUseCase.Execute(EligibilityCode);
-
-            var outputfileName =
-                $"{filePrefix}-{EligibilityCode}.csv";
 
             var result = WriteCsvToMemory(exportData);
 
             var memoryStream = new MemoryStream(result);
 
-            return File(result, "text/csv", $"eligibility-code-history-{EligibilityCode}.csv");
+            return File(result, "text/csv", $"{filePrefix}-{EligibilityCode}.csv");
         }
         private byte[] WriteCsvToMemory(WorkingFamilyEventByEligibilityCodeResponse eventHistory)
         {
