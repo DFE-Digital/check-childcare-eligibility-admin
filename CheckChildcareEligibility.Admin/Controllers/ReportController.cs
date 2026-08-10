@@ -1,14 +1,19 @@
-﻿using CheckChildcareEligibility.Admin.Controllers.Constants;
+﻿using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Controllers.Constants;
 using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeConstants;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
 using CheckChildcareEligibility.Admin.ViewModels;
+using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Globalization;
 using System.Reflection;
+using System.Text;
 
 namespace CheckChildcareEligibility.Admin.Controllers
 {
@@ -81,6 +86,62 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 Response = response
             };
             return View("Event_History", viewModel);
+        }
+
+        public async Task<IActionResult> Report_Download(string EligibilityCode)
+        {
+            var filePrefix = "eligibility-code-history";
+
+            var exportData = await _performEligibilityCodeHistoryReportUseCase.Execute(EligibilityCode);
+
+            var outputfileName =
+                $"{filePrefix}-{EligibilityCode}.csv";
+
+            var result = WriteCsvToMemory(exportData);
+
+            var memoryStream = new MemoryStream(result);
+
+            return File(result, "text/csv", $"eligibility-code-history-{EligibilityCode}.csv");
+        }
+        private byte[] WriteCsvToMemory(WorkingFamilyEventByEligibilityCodeResponse eventHistory)
+        {
+            var exportData = eventHistory.Data.Select(item =>
+                new EligibilityCodeHistoryCsvExport
+                {
+                    Event = item.Event.ToString(),
+
+                    SubmissionDate = item.Record?.SubmissionDate?.ToString("dd/MM/yyyy"),
+                    DiscretionaryStartDate = item.Record?.DiscretionaryStartDate?.ToString("dd/MM/yyyy"),
+                    ValidityStartDate = item.Record?.ValidityStartDate?.ToString("dd/MM/yyyy"),
+                    ValidityEndDate = item.Record?.ValidityEndDate?.ToString("dd/MM/yyyy"),
+                    GracePeriodEndDate = item.Record?.GracePeriodEndDate?.ToString("dd/MM/yyyy"),
+                    EventId = item.Record?.EventId,
+                    ParentNationalInsuranceNumber = item.Record?.ParentNationalInsuranceNumber,
+                    ParentFirstName = item.Record?.ParentFirstName,
+                    ParentLastName = item.Record?.ParentLastName,
+                    ParentDateOfBirth = item.Record?.ParentDateOfBirth?.ToString("dd/MM/yyyy"),
+
+                    PartnerNationalInsuranceNumber = item.Record?.PartnerNationalInsuranceNumber,
+                    PartnerFirstName = item.Record?.PartnerFirstName,
+                    PartnerLastName = item.Record?.PartnerLastName,
+                    PartnerDateOfBirth = item.Record?.PartnerDateOfBirth?.ToString("dd/MM/yyyy"),
+
+                    ChildFirstName = item.Record?.ChildFirstName,
+                    ChildLastName = item.Record?.ChildLastName,
+                    ChildDateOfBirth = item.Record?.ChildDateOfBirth?.ToString("dd/MM/yyyy"),
+                    ChildPostCode = item.Record?.ChildPostCode
+                })
+                .ToList();
+
+            using var memoryStream = new MemoryStream();
+
+            using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
+            using (var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture))
+            {
+                csvWriter.WriteRecords(exportData);
+            }
+
+            return memoryStream.ToArray();
         }
     }
 }
