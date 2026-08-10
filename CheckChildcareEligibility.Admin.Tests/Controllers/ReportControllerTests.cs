@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
+using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CheckChildcareEligibility.Admin.Tests.Controllers;
@@ -217,5 +218,42 @@ public class ReportControllerTests : TestBase
         viewResult!.ViewName.Should().Be("No_Match");
 
         var model = viewResult.Model as EligibilityCodeHistoryReportViewModel;
+    }
+    [Test]
+    public async Task Report_Download_Should_Return_Csv_File()
+    {
+        // Arrange
+        const string eligibilityCode = "12345678901";
+
+        var response = new WorkingFamilyEventByEligibilityCodeResponse
+        {
+            Data = new List<WorkingFamilyEventByEligibilityCodeResponseItem>
+        {
+            new()
+            {
+                Event = WorkingFamilyEventType.Application,
+                Record = new WorkingFamiliesEventEligibilityCodeResponseRecord
+                {
+                    SubmissionDate = new DateTime(2026, 08, 10),
+                    ParentFirstName = "John",
+                    ParentLastName = "Smith",
+                    ChildPostCode = "SW1A 1AA"
+                }
+            }
+        }
+        };
+        _performEligibilityCodeHistoryReportUseCaseMock.Setup(x => x.Execute(eligibilityCode)).ReturnsAsync(response);
+
+        // Act
+        var result = await _sut.Report_Download(eligibilityCode);
+
+        // Assert
+        result.Should().BeOfType<FileContentResult>();
+
+        var fileResult = (FileContentResult)result;
+
+        fileResult.ContentType.Should().Be("text/csv");
+        fileResult.FileDownloadName.Should().Be($"eligibility-code-history-{eligibilityCode}.csv");
+        fileResult.FileContents.Should().NotBeNullOrEmpty();
     }
 }

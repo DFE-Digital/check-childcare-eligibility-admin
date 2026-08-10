@@ -50,4 +50,16 @@ describe('Full journey of checking reporting in LA portal', () => {
         cy.contains('a', 'Try again').click();
         cy.get('h1').should('include.text', 'View eligibility code history');
     });
+    it('Allows an LA user to download the eligibility code history CSV report', () => {
+    cy.contains('Run reports').click();
+    cy.get('h1').should('include.text', 'Run reports');
+    cy.contains('a', 'View eligibility code history').click();
+    cy.get('h1').should('include.text', 'View eligibility code history');
+    cy.get('#EligibilityCode').type(validEligibilityCode);
+    cy.contains('button', 'View code history').click();
+    cy.get('h1').should('include.text', `History for eligibility code ${validEligibilityCode}`);
+    cy.contains('a', 'Download as CSV file').click();
+    const fileName = `eligibility-code-history-${validEligibilityCode}.csv`;
+    cy.readFile(`cypress/downloads/${fileName}`, { timeout: 10000 }).should('exist');
+});
 });
