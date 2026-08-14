@@ -496,8 +496,15 @@ hr {
 }
 /* END - Override bootstrap <hr> conflict with GOV.UK <hr> so the element is actually visible */
 
-/*BEGIN - Custom styling for scroll bar on big table in Event_History.cshtml */
+/*BEGIN - Custom styling for Event_History.cshtml */
 .table-scroll {
     overflow-x: scroll;
 }
-/*END - Custom styling for scroll bar on big table */
+
+.min-width-120 {
+    min-width: 120px
+}
+.min-width-180 {
+    min-width: 180px
+}
+/*END - Custom styling for Event_History.cshtml */
