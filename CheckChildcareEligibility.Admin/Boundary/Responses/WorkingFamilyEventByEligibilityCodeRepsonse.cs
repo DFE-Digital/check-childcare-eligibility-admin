@@ -8,7 +8,7 @@ public class WorkingFamilyEventByEligibilityCodeResponse
 
 public class WorkingFamilyEventByEligibilityCodeResponseItem
 {
-
+    public string? EventName {  get; set; }
     public WorkingFamilyEventType Event { get; set; }
     public WorkingFamiliesEventEligibilityCodeResponseRecord Record { get; set; }
 }

@@ -105,7 +105,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             var exportData = eventHistory.Data.Select(item =>
                 new EligibilityCodeHistoryCsvExport
                 {
-                    Event = item.Event.ToString(),
+                    Event = item.EventName,
 
                     SubmissionDate = item.Record?.SubmissionDate?.ToString("dd/MM/yyyy"),
                     DiscretionaryStartDate = item.Record?.DiscretionaryStartDate?.ToString("dd/MM/yyyy"),

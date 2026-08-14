@@ -13,25 +13,25 @@
         <table class="govuk-table govuk-table--small-text-until-tablet">
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header">Event</th>
-                    <th scope="col" class="govuk-table__header">Submitted on</th>
-                    <th scope="col" class="govuk-table__header">Discretionary start date</th>
-                    <th scope="col" class="govuk-table__header">Validity start date</th>
-                    <th scope="col" class="govuk-table__header">Validity end date</th>
-                    <th scope="col" class="govuk-table__header">Grace period ends</th>
-                    <th scope="col" class="govuk-table__header">Event ID</th>
-                    <th scope="col" class="govuk-table__header">Parent NINO</th>
-                    <th scope="col" class="govuk-table__header">Parent first name</th>
-                    <th scope="col" class="govuk-table__header">Parent last name</th>
-                    <th scope="col" class="govuk-table__header">Parent DOB</th>
-                    <th scope="col" class="govuk-table__header">Partner NINO</th>
-                    <th scope="col" class="govuk-table__header">Partner first name</th>
-                    <th scope="col" class="govuk-table__header">Partner last name</th>
-                    <th scope="col" class="govuk-table__header">Partner DOB</th>
-                    <th scope="col" class="govuk-table__header">Child first name</th>
-                    <th scope="col" class="govuk-table__header">Child last name</th>
-                    <th scope="col" class="govuk-table__header">Child DOB</th>
-                    <th scope="col" class="govuk-table__header">Child postcode</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Event</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Submitted on</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Discretionary start date</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Validity start date</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Validity end date</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Grace period ends</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Event ID</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Parent NINO</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Parent first name</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Parent last name</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Parent DOB</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Partner NINO</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Partner first name</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Partner last name</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Partner DOB</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Child first name</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Child last name</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Child DOB</th>
+                    <th scope="col" class="govuk-table__header min-width-120">Child postcode</th>
                 </tr>
             </thead>
             <tbody class="govuk-table__body">
@@ -39,9 +39,9 @@
                 @foreach (var item in Model.Response.Data)
                 {
                     <tr class="govuk-table__row">
-
-                        <th scope="row" class="govuk-table__header">
-                            @item.Event
+                      
+                        <th scope="row" class="govuk-table__header min-width-180">
+                            @item.EventName
                         </th>
                         <td class="govuk-table__cell">
                             @(item.Record.SubmissionDate?.ToString("dd MMM yyyy") ?? "-")
