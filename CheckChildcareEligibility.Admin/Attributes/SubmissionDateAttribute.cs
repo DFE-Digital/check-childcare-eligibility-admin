@@ -1,42 +1,56 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-public class DobAttribute : ValidationAttribute
+public class SubmissionDateAttribute : ValidationAttribute
 {
-    private readonly bool _applyAgeRange;
-    private readonly string _childIndexPropertyName;
+    private readonly string _isTodaySelectedPropertyName;
     private readonly string _dayPropertyName;
-    private readonly string _fieldName;
-    private readonly bool _isRequired;
     private readonly string _monthPropertyName;
-    private readonly string _objectName;
     private readonly string _yearPropertyName;
+    private readonly bool _isRequired;
 
-    public DobAttribute(string fieldName, string objectName, string? childIndexPropertyName, string dayPropertyName,
-        string monthPropertyName, string yearPropertyName, bool isRequired = true, bool applyAgeRange = false,
-        string? errorMessage = null) : base(errorMessage)
+    public SubmissionDateAttribute(
+        string isTodaySelectedPropertyName,
+        string dayPropertyName,
+        string monthPropertyName,
+        string yearPropertyName,
+        bool isRequired = true,
+        string? errorMessage = null)
+        : base(errorMessage)
     {
-        _fieldName = fieldName;
-        _objectName = objectName;
-        _isRequired = isRequired;
-        _applyAgeRange = applyAgeRange;
-        _childIndexPropertyName = childIndexPropertyName;
+        _isTodaySelectedPropertyName = isTodaySelectedPropertyName;
         _dayPropertyName = dayPropertyName;
         _monthPropertyName = monthPropertyName;
         _yearPropertyName = yearPropertyName;
+        _isRequired = isRequired;
     }
 
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
         var model = validationContext.ObjectInstance;
 
+        var isTodaySelectedProperty =
+            validationContext.ObjectType.GetProperty(_isTodaySelectedPropertyName);
+
+        var isTodaySelected =
+            (bool?)isTodaySelectedProperty?.GetValue(model);
+
+        if (isTodaySelected == true)
+        {
+            return ValidationResult.Success;
+        }
+        else if (isTodaySelected == null)
+        {
+            return ValidationResult.Success; 
+        }
+
         var dayString = GetPropertyStringValue(model, _dayPropertyName);
         var monthString = GetPropertyStringValue(model, _monthPropertyName);
         var yearString = GetPropertyStringValue(model, _yearPropertyName);
 
         var allFieldsEmpty = string.IsNullOrEmpty(dayString) &&
-                             string.IsNullOrEmpty(monthString) &&
-                             string.IsNullOrEmpty(yearString);
+                                 string.IsNullOrEmpty(monthString) &&
+                                 string.IsNullOrEmpty(yearString);
 
         if (!_isRequired && allFieldsEmpty) return ValidationResult.Success;
 
@@ -106,17 +120,17 @@ public class DobAttribute : ValidationAttribute
             }
         }
 
-        // Always add DateOfBirth to error fields if we have any errors
-        if (errorFields.Any() && !errorFields.Contains("DateOfBirth")) errorFields.Insert(0, "DateOfBirth");
+        // Always add SubmissionDate to error fields if we have any errors
+        if (errorFields.Any() && !errorFields.Contains("SubmissionDate")) errorFields.Insert(0, "SubmissionDate");
 
         // Determine the appropriate error message while maintaining all error fields
         string message = "";
         if (hasEmptyFields)
         {
-            if (errorFields.Count == 2) // One field missing (plus DateOfBirth)
+            if (errorFields.Count == 2) // One field missing (plus SubmissionDate)
             {
-                var missingField = errorFields[1]; // [0] is DateOfBirth
-                message = $"Date of birth must include a {missingField.ToLower()}";
+                var missingField = errorFields[1]; // [0] is SubmissionDate
+                message = $"Submission Date must include a {missingField.ToLower()}";
             }
             else if (errorFields.Count == 4) // All fields missing
             {
@@ -126,28 +140,12 @@ public class DobAttribute : ValidationAttribute
                 }
                 else
                 {
-                    message = model switch
-                    {
-                        CheckChildcareEligibility.Admin.Models.Child =>
-                            "Enter child's date of birth",
-
-                        CheckChildcareEligibility.Admin.Models.ParentGuardian =>
-                            "Enter parent or guardian's date of birth",
-
-                        CheckChildcareEligibility.Admin.ViewModels.FosterCarerDetailsViewModel =>
-                            "Enter carer's date of birth",
-                        CheckChildcareEligibility.Admin.ViewModels.FosterPartnerDetailsViewModel =>
-                            "Enter partner's date of birth",
-                        CheckChildcareEligibility.Admin.ViewModels.FosterChildDetailsViewModel =>
-                            "Enter child's date of birth",
-
-                        _ => "Enter date of birth"
-                    };
+                    message = "Enter application submitted on date";
                 }
             }
             else // Multiple but not all fields missing
             {
-                message = "Enter a complete date of birth";
+                message = "Enter a complete submission date";
             }
         }
         else if (errorFields.Any())
@@ -158,7 +156,7 @@ public class DobAttribute : ValidationAttribute
             }
             else
             {
-                message = "Date of birth must be a real date";
+                message = "Submission date must be a real date";
             }
         }
         else
@@ -172,14 +170,19 @@ public class DobAttribute : ValidationAttribute
                 var dob = new DateTime(yearInt, monthInt, dayInt);
 
                 if (dob > DateTime.Now)
-                    return new ValidationResult("Date of birth must be in the past",
-                        new[] { "DateOfBirth", "Day", "Month", "Year" });
+                    return new ValidationResult("Submission date must be in the past",
+                        new[] { "SubmissionDate", "Day", "Month", "Year" });
+
+                DateTime backdateWindow = DateTime.Now.AddDays(-31);
+                if (dob < DateTime.Now.AddDays(-31))
+                    return new ValidationResult("The application submitted on date must be after " + @backdateWindow.ToString("d MMMM yyyy"),
+                        new[] { "SubmissionDate", "Day", "Month", "Year" });
 
                 return ValidationResult.Success;
             }
             catch
             {
-                message = "Date of birth must be a real date";
+                message = "Submission date must be a real date";
                 if (!errorFields.Contains("Day")) errorFields.Add("Day");
                 if (!errorFields.Contains("Month")) errorFields.Add("Month");
                 if (!errorFields.Contains("Year")) errorFields.Add("Year");
@@ -192,17 +195,5 @@ public class DobAttribute : ValidationAttribute
     private string GetPropertyStringValue(object model, string propertyName)
     {
         return model.GetType().GetProperty(propertyName)?.GetValue(model) as string;
-    }
-
-    private int? GetPropertyIntValue(object model, string propertyName)
-    {
-        return model.GetType().GetProperty(propertyName)?.GetValue(model) as int?;
-    }
-
-    private int CalculateAge(DateTime birthDate, DateTime now)
-    {
-        var age = now.Year - birthDate.Year;
-        if (now < birthDate.AddYears(age)) age--;
-        return age;
     }
 }

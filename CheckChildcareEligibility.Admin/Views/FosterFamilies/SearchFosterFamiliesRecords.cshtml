@@ -1,5 +1,5 @@
 ﻿@using CheckChildcareEligibility.Admin.ViewModels
-@model CheckChildcareEligibility.Admin.ViewModels.FosterFamilyViewModel
+@model CheckChildcareEligibility.Admin.ViewModels.SearchFosterFamiliesRecordsViewModel
 @{
     ViewData["Title"] = "Manage foster families";
 }
@@ -13,7 +13,7 @@
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
             <p>Manage foster families claiming Childcare for working families.</p>
 
-            @Html.ActionLink("Add family and create code", "Enter_Carer_Details", "FosterFamilies", new { clearData = true }, new { @class = "govuk-button govuk-!-margin-bottom-9" })
+            @Html.ActionLink("Add family and create code", "Enter_Foster_Carer_Details", "FosterFamilies", new { clearData = true }, new { @class = "govuk-button govuk-!-margin-bottom-9" })
              
             <h2 class="govuk-heading-m">Children and eligibility codes</h2>
             @if (Model.Data != null && Model.Data.Any())
@@ -28,13 +28,25 @@
                             <th scope="col" class="govuk-table__header">Eligibility confirmed on</th>
                             <th scope="col" class="govuk-table__header">Reconfirm between</th>
                             <th scope="col" class="govuk-table__header">Grace period ends</th>
-                            <th scope="col" class="govuk-table__header govuk-visually-hidden">Code status</th>
                             <th scope="col" class="govuk-table__header">Reconfirmation status</th>
 
                         </tr>
                     </thead>
                     <tbody class="govuk-table__body">
-                        @Html.DisplayFor(model => model.Data)
+                        @foreach(var item in Model.Data)
+                        {
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell"><a href="/childcare/dev/foster/code/expired">@item.ChildName</a> </td>
+                                <td class="govuk-table__cell">@item.ChildDateOfBirth.ToString("d MMMM yyyy")</td>
+                                <td class="govuk-table__cell">@item.EligibilityCode</td>
+                                <td class="govuk-table__cell"><a href="/childcare/dev/foster/family/live">@item.CarerName</a> </td>
+                                <td class="govuk-table__cell">@item.EligibilityConfirmedOn.ToString("d MMMM yyyy")</td>
+                                <td class="govuk-table__cell">@item.ReconfirmBetween</td>
+                                <td class="govuk-table__cell">@item.GracePeriodEnds.ToString("d MMMM yyyy")</td>
+                                <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--red">@item.ReconfirmationStatus</strong></td>
+                            </tr>
+                        }
+                        @* @Html.DisplayFor(model => model.Data) *@
                     </tbody>
                 </table>
             }

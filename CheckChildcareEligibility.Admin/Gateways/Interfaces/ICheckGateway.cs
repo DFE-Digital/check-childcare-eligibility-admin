@@ -23,4 +23,5 @@ public interface ICheckGateway
 
     //FosterFamilies
     Task<FosterFamiliesSearchResponse> GetFosterFamiliesSearchRecords(int pageNumber, int pageSize);
+    Task<FosterFamilyCreatedResponse> CreateFosterFamily(FosterFamilyRequest request);
 }

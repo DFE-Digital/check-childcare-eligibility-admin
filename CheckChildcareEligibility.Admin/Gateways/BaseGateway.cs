@@ -120,6 +120,10 @@ public class BaseGateway
             // Handle specific status codes differently
             switch (task.StatusCode)
             {
+                case HttpStatusCode.BadRequest:
+                    var errorBody = await task.Content.ReadAsStringAsync();
+                    var error = JsonConvert.DeserializeObject<ErrorResponse>(errorBody);
+                    throw new BadHttpRequestException(error.Errors.FirstOrDefault().Title, StatusCodes.Status400BadRequest);
                 case HttpStatusCode.ServiceUnavailable:
                     throw new HttpRequestException("Service temporarily unavailable", null, HttpStatusCode.ServiceUnavailable);
                 case HttpStatusCode.NotFound:

@@ -1,0 +1,152 @@
+﻿@using CheckChildcareEligibility.Admin.ViewModels
+@model FosterPartnerDetailsViewModel
+@{
+    ViewData["Title"] = "Enter the partner details";
+
+    var ninoInputClasses = "govuk-input govuk-!-width-one-third js-nino-input";
+    if (ViewData.ModelState["PartnerNationalInsuranceNumber"]?.Errors.Count > 0)
+    {
+        ninoInputClasses += " govuk-input--error";
+    }
+}
+
+<div class="govuk-grid-column-full">
+    <a class="govuk-back-link backLinkJS" href="@Url.Action("Index", "Home")">Back</a>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <partial name="_ValidationSummary" model="ViewData.ModelState" />
+    }
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
+            <form asp-controller="FosterFamilies" asp-action="Enter_Foster_Partner_Details" method="post">
+                <fieldset class="govuk-fieldset">
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--m" for="PartnerFirstName">
+                            First name
+                        </label>
+                        <p class="govuk-error-message">
+                            <span asp-validation-for="PartnerFirstName"></span>
+                        </p>
+                        <input class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["PartnerFirstName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                               asp-for="PartnerFirstName" type="text">
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--m" for="PartnerLastName">
+                            Last name
+                        </label>
+                        <p class="govuk-error-message">
+                            <span asp-validation-for="PartnerLastName"></span>
+                        </p>
+                        <input class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["PartnerLastName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                               asp-for="PartnerLastName" type="text">
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <fieldset class="govuk-fieldset">
+                            <h1 id="dob-heading" class="govuk-label-wrapper">
+                                <span class="govuk-label govuk-label--m">
+                                    Date of birth
+                                </span>
+                            </h1>
+
+                            <div id="dob-hint" class="govuk-hint">
+                                For example, 27 3 1980
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(TempData["DobError"]?.ToString())) //Hide whitespace if no error
+                            {
+                                <p class="govuk-error-message">
+                                    <span asp-validation-for="PartnerDateOfBirth.Day">@Html.Raw(TempData["DobError"])</span>
+                                </p>
+                            }
+
+                            <span id="dob-hint-day" class="govuk-visually-hidden">For example 27</span>
+                            <div class="govuk-date-input"
+                                 id="PartnerDateOfBirth"
+                                 role="group"
+                                 aria-labelledby="dob-heading"
+                                 aria-describedby="dob-hint dob-error">
+
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="PartnerDateOfBirth.Day">
+                                            Day
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["PartnerDateOfBirth.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                               asp-for="Day"
+                                               id="PartnerDateOfBirth.Day"
+                                               aria-describedby="dob-hint-day"
+                                               type="text"
+                                               inputmode="numeric"
+                                               maxlength="2" />
+                                    </div>
+                                </div>
+
+                                <span id="dob-hint-month" class="govuk-visually-hidden">For example 3</span>
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="PartnerDateOfBirth.Month">
+                                            Month
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["PartnerDateOfBirth.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                               asp-for="Month"
+                                               id="PartnerDateOfBirth.Month"
+                                               aria-describedby="dob-hint-month"
+                                               type="text"
+                                               inputmode="numeric"
+                                               maxlength="2" />
+                                    </div>
+                                </div>
+
+                                <span id="dob-hint-month" class="govuk-visually-hidden">For example 1980</span>
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="PartnerDateOfBirth.Year">
+                                            Year
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["PartnerDateOfBirth.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                               asp-for="Year"
+                                               id="PartnerDateOfBirth.Year"
+                                               aria-describedby="dob-hint-year"
+                                               type="text"
+                                               inputmode="numeric"
+                                               maxlength="4" />
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-fieldset__legend--m" for="PartnerNationalInsuranceNumber">
+                            National Insurance number
+                        </label>
+                        <div id="PartnerNationalInsuranceNumber-hint" class="govuk-hint">
+                            For example, ‘QQ 12 34 56 C’
+                        </div>
+                        <p class="govuk-error-message">
+                            <span asp-validation-for="PartnerNationalInsuranceNumber"></span>
+                        </p>
+                        <input class="@ninoInputClasses"
+                               asp-controller="Check"
+                               asp-for="PartnerNationalInsuranceNumber"
+                               type="text"
+                               spellcheck="false"
+                               autocomplete="text"
+                               maxlength="9">
+                    </div>
+                </fieldset>
+                <button type="submit" class="govuk-button" data-module="govuk-button">
+                    Continue
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/validationSummary.js"></script>

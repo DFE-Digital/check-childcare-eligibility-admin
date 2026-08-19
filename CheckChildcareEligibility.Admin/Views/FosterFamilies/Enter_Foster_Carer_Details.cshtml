@@ -1,0 +1,173 @@
+﻿@using CheckChildcareEligibility.Admin.ViewModels
+@model FosterCarerDetailsViewModel
+@{
+    ViewData["Title"] = "Enter the Carer Details";
+
+    var ninoInputClasses = "govuk-input govuk-!-width-one-third js-nino-input";
+    if (ViewData.ModelState["CarerNationalInsuranceNumber"]?.Errors.Count > 0)
+    {
+        ninoInputClasses += " govuk-input--error";
+    }
+}
+
+<div class="govuk-grid-column-two-thirds">
+    <a class="govuk-back-link backLinkJS" href="@Url.Action("Index", "Home")">Back</a>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <partial name="_ValidationSummary" model="ViewData.ModelState" />
+    }
+
+    <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
+    <form asp-controller="FosterFamilies" asp-action="Enter_Foster_Carer_Details" method="post">
+        <fieldset class="govuk-fieldset">
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-label--m" for="CarerFirstName">
+                    First name
+                </label>
+                <p class="govuk-error-message">
+                    <span asp-validation-for="CarerFirstName"></span>
+                </p>
+                <input class="govuk-input govuk-input--width-20 @(ViewData.ModelState["CarerFirstName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                       asp-for="CarerFirstName" type="text">
+            </div>
+
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-label--m" for="CarerLastName">
+                    Last name
+                </label>
+                <p class="govuk-error-message">
+                    <span asp-validation-for="CarerLastName"></span>
+                </p>
+                <input class="govuk-input govuk-input--width-20 @(ViewData.ModelState["CarerLastName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                       asp-for="CarerLastName" type="text">
+            </div>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <h1 id="dob-heading" class="govuk-label-wrapper">
+                        <span class="govuk-label govuk-label--m">
+                            Date of birth
+                        </span>
+                    </h1>
+
+                    <div id="dob-hint" class="govuk-hint">
+                        For example, 27 3 1980
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(TempData["DobError"]?.ToString())) //Hide whitespace if no error
+                    {
+                        <p class="govuk-error-message">
+                            <span asp-validation-for="CarerDateOfBirth.Day">@Html.Raw(TempData["DobError"])</span>
+                        </p>
+                    }
+
+                    <span id="dob-hint-day" class="govuk-visually-hidden">For example 27</span>
+                    <div class="govuk-date-input"
+                         id="CarerDateOfBirth"
+                         role="group"
+                         aria-labelledby="dob-heading"
+                         aria-describedby="dob-hint dob-error">
+
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-date-input__label" for="CarerDateOfBirth.Day">
+                                    Day
+                                </label>
+                                <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["CarerDateOfBirth.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                       asp-for="Day"
+                                       id="CarerDateOfBirth.Day"
+                                       aria-describedby="dob-hint-day"
+                                       type="text"
+                                       inputmode="numeric"
+                                       maxlength="2" />
+                            </div>
+                        </div>
+
+                        <span id="dob-hint-month" class="govuk-visually-hidden">For example 3</span>
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-date-input__label" for="CarerDateOfBirth.Month">
+                                    Month
+                                </label>
+                                <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["CarerDateOfBirth.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                       asp-for="Month"
+                                       id="CarerDateOfBirth.Month"
+                                       aria-describedby="dob-hint-month"
+                                       type="text"
+                                       inputmode="numeric"
+                                       maxlength="2" />
+                            </div>
+                        </div>
+
+                        <span id="dob-hint-month" class="govuk-visually-hidden">For example 1980</span>
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-date-input__label" for="CarerDateOfBirth.Year">
+                                    Year
+                                </label>
+                                <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["CarerDateOfBirth.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                       asp-for="Year"
+                                       id="CarerDateOfBirth.Year"
+                                       aria-describedby="dob-hint-year"
+                                       type="text"
+                                       inputmode="numeric"
+                                       maxlength="4" />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-fieldset__legend--m" for="CarerNationalInsuranceNumber">
+                    National Insurance number
+                </label>
+                <div id="CarerNationalInsuranceNumber-hint" class="govuk-hint">
+                    For example, ‘QQ 12 34 56 C’
+                </div>
+                <p class="govuk-error-message">
+                    <span asp-validation-for="CarerNationalInsuranceNumber"></span>
+                </p>
+                <input class="@ninoInputClasses"
+                       asp-controller="Check"
+                       asp-for="CarerNationalInsuranceNumber"
+                       type="text"
+                       spellcheck="false"
+                       autocomplete="text"
+                       maxlength="9">
+            </div>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        Does the carer have a partner?
+                    </legend>
+                    <p class="govuk-error-message">
+                        <span asp-validation-for="HasPartner"></span>
+                    </p>
+                    <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="HasPartner" name="HasPartner" type="radio" value="true">
+                            <label class="govuk-label govuk-radios__label" for="HasPartner">
+                                Yes
+                            </label>
+
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="HasPartner-2" name="HasPartner" type="radio" value="false">
+                            <label class="govuk-label govuk-radios__label" for="HasPartner-2">
+                                No
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </fieldset>
+        <button type="submit" class="govuk-button" data-module="govuk-button">
+            Continue
+        </button>
+    </form>
+</div>
+
+<script src="/js/validationSummary.js"></script>

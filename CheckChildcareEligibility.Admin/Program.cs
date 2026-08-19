@@ -51,6 +51,15 @@ builder.Services.AddScoped<IValidateParentAndChildDetailsUseCase, ValidateParent
 builder.Services.AddScoped<IParseBulkCheckFileUseCase, ParseBulkCheckFileUseCase>();
 builder.Services.AddScoped<IDeleteBulkCheckFileUseCase, DeleteBulkCheckFileUseCase>();
 builder.Services.AddScoped<ISearchFosterFamiliesRecordsUseCase, SearchFosterFamiliesRecordsUseCase>();
+builder.Services.AddScoped<ILoadFosterCarerDetailsUseCase, LoadFosterCarerDetailsUseCase>();
+builder.Services.AddScoped<IValidateFosterCarerDetailsUseCase, ValidateFosterCarerDetailsUseCase>();
+builder.Services.AddScoped<ILoadFosterPartnerDetailsUseCase, LoadFosterPartnerDetailsUseCase>();
+builder.Services.AddScoped<IValidateFosterPartnerDetailsUseCase, ValidateFosterPartnerDetailsUseCase>();
+builder.Services.AddScoped<ILoadFosterChildDetailsUseCase, LoadFosterChildDetailsUseCase>();
+builder.Services.AddScoped<IValidateFosterChildDetailsUseCase, ValidateFosterChildDetailsUseCase>();
+builder.Services.AddScoped<ILoadFosterApplicationSubmittedDateUseCase, LoadFosterApplicationSubmittedDateUseCase>();
+builder.Services.AddScoped<IValidateFosterApplicationSubmittedDateUseCase, ValidateFosterApplicationSubmittedDateUseCase>();
+builder.Services.AddScoped<ICreateFosterFamilyUseCase, CreateFosterFamilyUseCase>();
 builder.Services.AddScoped<IValidator<IEligibilityServiceType>, CheckEligibilityRequestDataValidator>();
 builder.Services.AddSession();
 
