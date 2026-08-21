@@ -60,6 +60,9 @@ builder.Services.AddScoped<IValidateFosterChildDetailsUseCase, ValidateFosterChi
 builder.Services.AddScoped<ILoadFosterApplicationSubmittedDateUseCase, LoadFosterApplicationSubmittedDateUseCase>();
 builder.Services.AddScoped<IValidateFosterApplicationSubmittedDateUseCase, ValidateFosterApplicationSubmittedDateUseCase>();
 builder.Services.AddScoped<ICreateFosterFamilyUseCase, CreateFosterFamilyUseCase>();
+builder.Services.AddScoped<IGetFosterFamilyUseCase, GetFosterFamilyUseCase>();
+builder.Services.AddScoped<IGetFosterChildUseCase, GetFosterChildUseCase>();
+builder.Services.AddScoped<IUpdateFosterCarerUseCase, UpdateFosterCarerUseCase>();
 builder.Services.AddScoped<IValidator<IEligibilityServiceType>, CheckEligibilityRequestDataValidator>();
 builder.Services.AddSession();
 

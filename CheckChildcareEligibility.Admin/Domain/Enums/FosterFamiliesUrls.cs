@@ -2,6 +2,9 @@
 {
     public enum FosterFamiliesUrls
     {
-        FosterFamilySearch
+        FosterFamilySearch,
+        GetFosterFamily,
+        GetFosterChild,
+        UpdateFosterCarer,
     }
 }

@@ -11,20 +11,20 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
     public class SearchFosterFamiliesRecordsUseCase : ISearchFosterFamiliesRecordsUseCase
     {
-        private readonly ICheckGateway _checkGateway;
+        private readonly IFosterFamiliesGateway _fosterFamiliesGateway;
         private readonly ILogger<SearchFosterFamiliesRecordsUseCase> _logger;
 
         public SearchFosterFamiliesRecordsUseCase(
             ILogger<SearchFosterFamiliesRecordsUseCase> logger,
-            ICheckGateway checkGateway)
+            IFosterFamiliesGateway fosterFamiliesGateway)
         {
             _logger = logger;
-            _checkGateway = checkGateway;
+            _fosterFamiliesGateway = fosterFamiliesGateway;
         }
 
         public async Task<FosterFamiliesSearchResponse> Execute(FosterFamiliesSearchRequest request)
         {
-            var response = await _checkGateway.GetFosterFamiliesSearchRecords(request.PageNumber, request.PageSize);
+            var response = await _fosterFamiliesGateway.GetFosterFamiliesSearchRecords(request.PageNumber, request.PageSize);
 
             if (response == null)
             {

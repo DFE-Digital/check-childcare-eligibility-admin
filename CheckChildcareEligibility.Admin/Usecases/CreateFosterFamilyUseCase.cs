@@ -12,15 +12,15 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
     public class CreateFosterFamilyUseCase : ICreateFosterFamilyUseCase
     {
-        private readonly ICheckGateway _checkGateway;
+        private readonly IFosterFamiliesGateway _fosterFamiliesGateway;
         private readonly ILogger<CreateFosterFamilyUseCase> _logger;
 
         public CreateFosterFamilyUseCase(
             ILogger<CreateFosterFamilyUseCase> logger,
-            ICheckGateway checkGateway)
+            IFosterFamiliesGateway fosterFamiliesGateway)
         {
             _logger = logger;
-            _checkGateway = checkGateway;
+            _fosterFamiliesGateway = fosterFamiliesGateway;
         }
 
         public async Task<FosterFamilyCreatedResponse> Execute(FosterFamilyRequest request, int localAuthorityId)
@@ -38,7 +38,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
             request.FosterCarer.LocalAuthorityID = localAuthorityId;
 
-            return await _checkGateway.CreateFosterFamily(request);
+            return await _fosterFamiliesGateway.CreateFosterFamily(request);
         }
     }
 }
