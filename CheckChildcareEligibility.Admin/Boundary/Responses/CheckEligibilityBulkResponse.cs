@@ -32,7 +32,7 @@ public class CheckEligibilityBulkResponse : CheckEligibilityBulkResponseBase
     }
     public override IEnumerable<IBulkExport> BulkDataMapper() {
 
-        return Data.Select(x => new BulkExport
+        return Data.OrderBy(x => x.Order).Select(x => new BulkExport
         {
             LastName = x.LastName,
             DOB = x.DateOfBirth,
@@ -67,7 +67,7 @@ public class CheckEligibilityBulkWorkingFamiliesResponse : CheckEligibilityBulkR
     public override IEnumerable<IBulkExport> BulkDataMapper()
     {
 
-        return Data.Select(x => new BulkExportWorkingFamilies
+        return Data.OrderBy(x => x.Order).Select(x => new BulkExportWorkingFamilies
         {
             EligibilityCode = x.EligibilityCode,
             ChildDOB = x.DateOfBirth,

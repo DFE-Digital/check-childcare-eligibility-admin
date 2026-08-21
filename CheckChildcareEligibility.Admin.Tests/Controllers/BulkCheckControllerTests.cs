@@ -182,7 +182,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
                 new CheckEligibilityRequestData() 
                 {
                     Type = CheckEligibilityType.TwoYearOffer,
-                    Sequence = 1, 
+                    Order = 1, 
                     DateOfBirth = "2017-01-01", 
                     LastName = "Test", 
                     NationalInsuranceNumber = "ab"
@@ -315,7 +315,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
                 new CheckEligibilityRequestData() {
 
                     Type = CheckEligibilityType.TwoYearOffer,
-                    Sequence = 1, 
+                    Order = 1, 
                     DateOfBirth = "2017-01-01", 
                     LastName = "Test", 
                     NationalInsuranceNumber = "ab" }
@@ -413,7 +413,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
                 new CheckEligibilityRequestData()
                 {
                     Type = CheckEligibilityType.TwoYearOffer,
-                    Sequence = 1,
+                    Order = 1,
                     DateOfBirth = "2017-01-01",
                     LastName = "Test",
                     NationalInsuranceNumber = "ab"
@@ -486,7 +486,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
             {
                 new CheckEligibilityRequestData() { 
                     Type = CheckEligibilityType.TwoYearOffer,
-                    Sequence = 1, 
+                    Order = 1, 
                     DateOfBirth = "2017-01-01", 
                     LastName = "Test", 
                     NationalInsuranceNumber = "ab" }

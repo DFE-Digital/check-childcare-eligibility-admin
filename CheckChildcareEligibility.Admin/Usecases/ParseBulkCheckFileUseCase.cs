@@ -144,7 +144,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                                 requestDataWF.DateOfBirth = workingFamilyRow.DOB;//must remain in original pre-parsed form to go through validator
                                 requestDataWF.NationalInsuranceNumber = workingFamilyRow.Ni.ToUpper().Replace(" ", "");
                                 requestDataWF.Type = eligibilityType;
-                                requestDataWF.Sequence = sequence;
+                                requestDataWF.Order = sequence;
                                 validationResults = _validator.Validate(requestDataWF);
                                 if (validationResults.IsValid) {
                                     //We know this passed parse earlier but it must be translated to correct format (yyyy-MM-dd) for Database to access
@@ -159,7 +159,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                                 requestData.DateOfBirth = row.DOB;//must remain in original pre-parsed form to go through validator
                                 requestData.NationalInsuranceNumber = row.Ni.ToUpper().Replace(" ", "");
                                 requestData.Type = eligibilityType;
-                                requestData.Sequence = sequence;
+                                requestData.Order = sequence;
                                 validationResults = _validator.Validate(requestData);
                                 if (validationResults.IsValid)
                                 {

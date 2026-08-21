@@ -276,7 +276,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
         }
 
         [Test]
-        public async Task Given_Bulk_Check_When_FileData_Contains_Valid_Data_Rows_Should_Return_Valid_Results_with_Sequence()
+        public async Task Given_Bulk_Check_When_FileData_Contains_Valid_Data_Rows_Should_Return_Valid_Results_with_Order()
         {
             // Arrange
             var errors = new List<CsvRowError>();
@@ -307,7 +307,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
             var sequence = 1;
             foreach (var request in result.ValidRequests)
             {
-                request.Sequence.Should().Be(sequence);
+                request.Order.Should().Be(sequence);
                 sequence++;
             }
         }
