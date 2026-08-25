@@ -12,6 +12,7 @@
     "cypress-plugin-api": "^2.11.1",
     "junit-report-merger": "^9.0.1",
     "otplib": "^12.0.1",
+    "test-nino": "^2.0.1",
     "typescript": "^5.4.5"
   },
   "scripts": {
@@ -20,8 +21,8 @@
     "combine:reports": "jrm results/combined-report.xml \"results/*.xml\""
   },
   "overrides": {
-  "jws@^4.0.0": "^4.0.1",
-  "jws@^3.2.2": "^3.2.3",
-  "qs": "6.15.0"
+    "jws@^4.0.0": "^4.0.1",
+    "jws@^3.2.2": "^3.2.3",
+    "qs": "6.15.0"
   }
 }
