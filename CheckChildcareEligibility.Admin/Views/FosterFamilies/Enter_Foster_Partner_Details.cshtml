@@ -21,7 +21,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
-            <form asp-controller="FosterFamilies" asp-action="Enter_Foster_Partner_Details" method="post">
+            <form asp-controller="FosterFamilies" asp-action="Partner" method="post">
                 <fieldset class="govuk-fieldset">
 
                     <div class="govuk-form-group">
@@ -58,10 +58,10 @@
                                 For example, 27 3 1980
                             </div>
 
-                            @if (!string.IsNullOrEmpty(TempData["DobError"]?.ToString())) //Hide whitespace if no error
+                            @if (!string.IsNullOrEmpty(TempData["DateError"]?.ToString())) //Hide whitespace if no error
                             {
                                 <p class="govuk-error-message">
-                                    <span asp-validation-for="PartnerDateOfBirth.Day">@Html.Raw(TempData["DobError"])</span>
+                                    <span asp-validation-for="PartnerDateOfBirth.Day">@Html.Raw(TempData["DateError"])</span>
                                 </p>
                             }
 

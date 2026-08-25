@@ -28,5 +28,9 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
         [Required(ErrorMessage = FosterFamilyValidationMessages.HasPartner)]
         public bool? HasPartner { get; set; }
+
+        //For Update Carer Details only
+        public bool IsUpdate { get; set; }
+        public Guid CarerId { get; set; }
     }
 }

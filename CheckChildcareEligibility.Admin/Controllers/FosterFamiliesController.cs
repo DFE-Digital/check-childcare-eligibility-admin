@@ -1,8 +1,6 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
-using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
-using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.Usecases;
 using CheckChildcareEligibility.Admin.UseCases;
 using CheckChildcareEligibility.Admin.ViewModels;
@@ -11,6 +9,7 @@ using Newtonsoft.Json;
 
 namespace CheckChildcareEligibility.Admin.Controllers
 {
+    [Route("[controller]")]
     public class FosterFamiliesController : BaseController
     {
         private readonly IMenuProvider _menuProvider;
@@ -23,6 +22,9 @@ namespace CheckChildcareEligibility.Admin.Controllers
         private readonly IValidateFosterChildDetailsUseCase _validateFosterChildDetailsUseCase;
         private readonly ILoadFosterApplicationSubmittedDateUseCase _loadFosterApplicationSubmittedDateUseCase;
         private readonly IValidateFosterApplicationSubmittedDateUseCase _validateFosterApplicationSubmittedDateUseCase;
+        private readonly IGetFosterFamilyUseCase _getFosterFamilyUseCase;
+        private readonly IGetFosterChildUseCase _getFosterChildUseCase;
+        private readonly IUpdateFosterCarerUseCase _updateFosterCarerUseCase;
         private readonly ICreateFosterFamilyUseCase _createFosterFamilyUseCase;
 
         public FosterFamiliesController(
@@ -37,6 +39,9 @@ namespace CheckChildcareEligibility.Admin.Controllers
             ILoadFosterApplicationSubmittedDateUseCase loadFosterApplicationSubmittedDateUseCase,
             IValidateFosterApplicationSubmittedDateUseCase validateFosterApplicationSubmittedDateUseCase,
             ICreateFosterFamilyUseCase createFosterFamilyUseCase,
+            IGetFosterFamilyUseCase getFosterFamilyUseCase,
+            IGetFosterChildUseCase getFosterChildUseCase,
+            IUpdateFosterCarerUseCase updateFosterCarerUseCase,
             IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService)
         {
             _menuProvider = menuProvider;
@@ -49,9 +54,13 @@ namespace CheckChildcareEligibility.Admin.Controllers
             _validateFosterChildDetailsUseCase = validateFosterChildDetailsUseCase;
             _loadFosterApplicationSubmittedDateUseCase = loadFosterApplicationSubmittedDateUseCase;
             _validateFosterApplicationSubmittedDateUseCase = validateFosterApplicationSubmittedDateUseCase;
+            _getFosterFamilyUseCase = getFosterFamilyUseCase;
+            _getFosterChildUseCase = getFosterChildUseCase;
+            _updateFosterCarerUseCase = updateFosterCarerUseCase;
             _createFosterFamilyUseCase = createFosterFamilyUseCase;
         }
 
+        [HttpGet("Search")]
         public async Task<IActionResult> SearchFosterFamiliesRecords(int pageNumber = 1)
         {
             var fosterFamiliesSearchRequest = new FosterFamiliesSearchRequest(pageNumber, 10);
@@ -67,6 +76,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             return View(vm);
         }
 
+        [HttpGet("Carer")]
         public async Task<IActionResult> Enter_Foster_Carer_Details(bool clearData = false)
         {
             if (clearData)
@@ -90,7 +100,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             return View(fosterCarerViewModel);
         }
 
-        [HttpPost]
+        [HttpPost("Carer")]
         public async Task<IActionResult> Enter_Foster_Carer_Details(FosterCarerDetailsViewModel request)
         {
             var validationResult = _validateFosterCarerDetailsUseCase.Execute(request, ModelState);
@@ -102,8 +112,11 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return RedirectToAction("Enter_Foster_Carer_Details");
             }
 
-            // Clear data when starting a new application
-            HttpContext.Session.Remove("FosterCarerApplication");
+            if (!request.IsUpdate)
+            {
+                // Clear data when starting a new application
+                HttpContext.Session.Remove("FosterCarerApplication");
+            }
 
             // Set DateOfBirth in request before serializing
             request.CarerDateOfBirth = new DateTime(
@@ -112,8 +125,37 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 int.Parse(request.Day));
 
             HttpContext.Session.SetString("FosterCarerDetails", JsonConvert.SerializeObject(request));
-            var TEST = HttpContext.Session.GetString("FosterCarerDetails");
+            if (request.IsUpdate)
+            {
+                var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
 
+                var response = await _getFosterFamilyUseCase.Execute(request.CarerId, laID, true);
+
+                UpdateFosterCarerRequest updateRequest = new UpdateFosterCarerRequest();
+                FosterCarerRequest fosterCarerRequest = new FosterCarerRequest
+                {
+                    CarerFirstName = response.CarerFirstName,
+                    CarerLastName = request.CarerLastName,
+                    CarerDateOfBirth = request.CarerDateOfBirth,
+                    CarerNationalInsuranceNumber = request.CarerNationalInsuranceNumber,
+                    HasPartner = request.HasPartner
+                };
+                updateRequest.FosterCarerRequest = fosterCarerRequest;
+                if (request.HasPartner == true)
+                {
+                    FosterPartnerRequest fosterPartnerRequest = new FosterPartnerRequest
+                    {
+                        PartnerFirstName = response.PartnerFirstName,
+                        PartnerLastName = response.PartnerLastName,
+                        PartnerDateOfBirth = response.PartnerDateOfBirth.Value,
+                        PartnerNationalInsuranceNumber = response.PartnerNationalInsuranceNumber
+                    };
+                    updateRequest.FosterPartnerRequest = fosterPartnerRequest;
+                }
+
+                await _updateFosterCarerUseCase.Execute(request.CarerId, laID, updateRequest);
+                return RedirectToAction("Family", new { request.CarerId, includeChildren = true });
+            }
             if (request.HasPartner == true)
             {
                 return RedirectToAction("Enter_Foster_Partner_Details");
@@ -121,6 +163,97 @@ namespace CheckChildcareEligibility.Admin.Controllers
             return RedirectToAction("Enter_Foster_Child_Details");
         }
 
+        [HttpGet("UpdateCarer")]
+        public async Task<IActionResult> Update_Foster_Carer_Details(Guid FosterCarerId, bool clearData = false)
+        {
+            var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
+            var request = await _getFosterFamilyUseCase.Execute(FosterCarerId, laID);
+
+            HttpContext.Session.SetString("FosterCarerDetails", JsonConvert.SerializeObject(request));
+
+            var (fosterCarerViewModel, validationErrors) = await _loadFosterCarerDetailsUseCase.Execute(
+                HttpContext.Session.GetString("FosterCarerDetails"),
+                TempData["Errors"]?.ToString()
+                );
+
+            // Set DateOfBirth in request before serializing
+            fosterCarerViewModel.Day = request.CarerDateOfBirth.Day.ToString();
+            fosterCarerViewModel.Month = request.CarerDateOfBirth.Month.ToString();
+            fosterCarerViewModel.Year = request.CarerDateOfBirth.Year.ToString();
+            fosterCarerViewModel.IsUpdate = true;
+            fosterCarerViewModel.CarerId = FosterCarerId;
+
+            if (validationErrors != null)
+                foreach (var (key, errorList) in validationErrors)
+                    foreach (var error in errorList)
+                        ModelState.AddModelError(key, error);
+            return View("Enter_Foster_Carer_Details", fosterCarerViewModel);
+        }
+
+        [HttpPost("UpdateCarer")]
+        public async Task<IActionResult> Update_Foster_Carer_Details(FosterCarerDetailsViewModel request)
+        {
+            var validationResult = _validateFosterCarerDetailsUseCase.Execute(request, ModelState);
+
+            if (validationResult == null || !validationResult.IsValid)
+            {
+                HttpContext.Session.SetString("FosterCarerDetails", JsonConvert.SerializeObject(request));
+                TempData["Errors"] = validationResult != null ? JsonConvert.SerializeObject(validationResult.Errors) : null;
+                return RedirectToAction("Enter_Foster_Carer_Details");
+            }
+
+            if (!request.IsUpdate)
+            {
+                // Clear data when starting a new application
+                HttpContext.Session.Remove("FosterCarerApplication");
+            }
+
+            // Set DateOfBirth in request before serializing
+            request.CarerDateOfBirth = new DateTime(
+                int.Parse(request.Year),
+                int.Parse(request.Month),
+                int.Parse(request.Day));
+
+            HttpContext.Session.SetString("FosterCarerDetails", JsonConvert.SerializeObject(request));
+            if (request.IsUpdate)
+            {
+                var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
+
+                var response = await _getFosterFamilyUseCase.Execute(request.CarerId, laID, true);
+
+                UpdateFosterCarerRequest updateRequest = new UpdateFosterCarerRequest();
+                FosterCarerRequest fosterCarerRequest = new FosterCarerRequest
+                {
+                    CarerFirstName = response.CarerFirstName,
+                    CarerLastName = request.CarerLastName,
+                    CarerDateOfBirth = request.CarerDateOfBirth,
+                    CarerNationalInsuranceNumber = request.CarerNationalInsuranceNumber,
+                    HasPartner = request.HasPartner
+                };
+                updateRequest.FosterCarerRequest = fosterCarerRequest;
+                if (request.HasPartner == true)
+                {
+                    FosterPartnerRequest fosterPartnerRequest = new FosterPartnerRequest
+                    {
+                        PartnerFirstName = response.PartnerFirstName,
+                        PartnerLastName = response.PartnerLastName,
+                        PartnerDateOfBirth = response.PartnerDateOfBirth.Value,
+                        PartnerNationalInsuranceNumber = response.PartnerNationalInsuranceNumber
+                    };
+                    updateRequest.FosterPartnerRequest = fosterPartnerRequest;
+                }
+
+                await _updateFosterCarerUseCase.Execute(request.CarerId, laID, updateRequest);
+                return RedirectToAction("Foster_Family_Record", new { request.CarerId, includeChildren = true });
+            }
+            if (request.HasPartner == true)
+            {
+                return RedirectToAction("Foster_Family_Record");
+            }
+            return RedirectToAction("Foster_Family_Record");
+        }
+
+        [HttpGet("Partner")]
         public async Task<IActionResult> Enter_Foster_Partner_Details(bool clearData = false)
         {
             var (fosterPartnerDetailsViewModel, validationErrors) = await _loadFosterPartnerDetailsUseCase.Execute(
@@ -135,7 +268,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             return View(fosterPartnerDetailsViewModel);
         }
 
-        [HttpPost]
+        [HttpPost("Partner")]
         public async Task<IActionResult> Enter_Foster_Partner_Details(FosterPartnerDetailsViewModel request)
         {
             var validationResult = _validateFosterPartnerDetailsUseCase.Execute(request, ModelState);
@@ -157,10 +290,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 int.Parse(request.Day));
 
             HttpContext.Session.SetString("FosterPartnerDetails", JsonConvert.SerializeObject(request));
-            var TEST = HttpContext.Session.GetString("FosterPartnerDetails");
             return RedirectToAction("Enter_Foster_Child_Details");
         }
 
+        [HttpGet("Child")]
         public async Task<IActionResult> Enter_Foster_Child_Details(bool clearData = false)
         {
             var (fosterChildDetailsViewModel, validationErrors) = await _loadFosterChildDetailsUseCase.Execute(
@@ -175,7 +308,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             return View(fosterChildDetailsViewModel);
         }
 
-        [HttpPost]
+        [HttpPost("Child")]
         public async Task<IActionResult> Enter_Foster_Child_Details(FosterChildDetailsViewModel request)
         {
             var validationResult = _validateFosterChildDetailsUseCase.Execute(request, ModelState);
@@ -198,6 +331,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             return RedirectToAction("Enter_Foster_Application_Submitted_Date_Form");
         }
 
+        [HttpGet("SubmittedDate")]
         public async Task<IActionResult> Enter_Foster_Application_Submitted_Date_Form(bool clearData = false)
         {
             var (fosterApplicationSubmittedDateViewModel, validationErrors) = await _loadFosterApplicationSubmittedDateUseCase.Execute(
@@ -212,6 +346,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             return View(fosterApplicationSubmittedDateViewModel);
         }
 
+        [HttpPost("SubmittedDate")]
         [HttpPost]
         public async Task<IActionResult> Enter_Foster_Application_Submitted_Date_Form(FosterApplicationSubmittedDateViewModel request)
         {
@@ -242,6 +377,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             return RedirectToAction("Foster_Application_Check_Details");
         }
 
+        [HttpGet("CheckDetails")]
         public async Task<IActionResult> Foster_Application_Check_Details()
         {
             var FosterCarerDetails = JsonConvert.DeserializeObject<FosterCarerDetailsViewModel>(HttpContext.Session.GetString("FosterCarerDetails"));
@@ -258,7 +394,8 @@ namespace CheckChildcareEligibility.Admin.Controllers
             return View("Foster_Application_Check_Details", FosterCarerApplication);
         }
 
-        [HttpPost]
+
+        [HttpPost("CheckDetails")]
         public async Task<IActionResult> Foster_Application_Check_Details(FosterApplicationCheckDetailsViewModel request)
         {
             var fosterFamilyRequest = new FosterFamilyRequest();
@@ -304,7 +441,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
                     ReconfirmBetween = response.ReconfirmBetween,
                     GracePeriodEndDate = response.GracePeriodEndDate
                 };
-                return View("Foster_Family_Code_Created", vm);
+                return RedirectToAction("CodeCreated", vm);
             }
             catch (BadHttpRequestException ex)
             {
@@ -315,6 +452,33 @@ namespace CheckChildcareEligibility.Admin.Controllers
             {
                 throw;
             }
+        }
+
+        [HttpGet("CodeCreated")]
+        public async Task<IActionResult> Foster_Family_Code_Created(FosterFamilyCreatedViewModel request)
+        {
+            return View(request);
+        }
+
+        [HttpGet("Family/{CarerId}")]
+        public async Task<IActionResult> Foster_Family_Record(Guid CarerId, bool includeChildren = false)
+        {
+            var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
+
+            var response = await _getFosterFamilyUseCase.Execute(CarerId, laID, includeChildren);
+
+            return View(response);
+        }
+
+        [HttpGet("Code/{CarerId}")]
+        public async Task<IActionResult> Foster_Family_Code_Record(Guid CarerId, bool includeFosterCarer = false)
+        {
+            var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
+            var familyResponse = await _getFosterFamilyUseCase.Execute(CarerId, laID, true);
+            var childId = familyResponse.FosterChildren[0].FosterChildId;
+            var childResponse = await _getFosterChildUseCase.Execute(childId, laID, includeFosterCarer);
+
+            return View(childResponse);
         }
     }
 }

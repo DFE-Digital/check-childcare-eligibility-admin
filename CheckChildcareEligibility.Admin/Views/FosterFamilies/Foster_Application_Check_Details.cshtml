@@ -57,7 +57,7 @@
                                 Date of birth
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @DateTime.Parse(Model.fosterCarerDetailsViewModel.CarerDateOfBirth.ToString("d MMMM yyyy"))
+                                @DateTime.Parse(Model.fosterCarerDetailsViewModel.CarerDateOfBirth.ToString()).ToString("d MMMM yyyy")
                             </dd>
                         </div>
 
@@ -82,7 +82,7 @@
                         </h2>
                         <ul class="govuk-summary-card__actions">
                             <li class="govuk-summary-card__action">
-                                <a class="govuk-link" href="@Url.Action("Enter_Foster_Partner_Details", "FosterFamilies")">Change<span class="govuk-visually-hidden">Carer details</span></a>
+                                <a class="govuk-link" href="@Url.Action("Enter_Foster_Partner_Details", "FosterFamilies")">Change<span class="govuk-visually-hidden">Partner details</span></a>
                             </li>
                         </ul>
                     </div>
@@ -127,7 +127,7 @@
                     </h2>
                     <ul class="govuk-summary-card__actions">
                         <li class="govuk-summary-card__action">
-                            <a class="govuk-link" href="@Url.Action("Enter_Foster_Child_Details", "FosterFamilies")">Change<span class="govuk-visually-hidden">Carer details</span></a>
+                            <a class="govuk-link" href="@Url.Action("Enter_Foster_Child_Details", "FosterFamilies")">Change<span class="govuk-visually-hidden">Child details</span></a>
                         </li>
                     </ul>
                 </div>
@@ -171,7 +171,7 @@
                     </h2>
                     <ul class="govuk-summary-card__actions">
                         <li class="govuk-summary-card__action">
-                            <a class="govuk-link" href="@Url.Action("Enter_Foster_Application_Submitted_Date_Form", "FosterFamilies")">Change<span class="govuk-visually-hidden">Carer details</span></a>
+                            <a class="govuk-link" href="@Url.Action("Enter_Foster_Application_Submitted_Date_Form", "FosterFamilies")">Change<span class="govuk-visually-hidden">Eligibility code date</span></a>
                         </li>
                     </ul>
                 </div>
@@ -255,7 +255,7 @@
                 <input type="hidden" asp-for="fosterApplicationSubmittedDateViewModel.SubmissionDate" value="@Model.fosterApplicationSubmittedDateViewModel.SubmissionDate" />
 
                 <button type="submit" class="govuk-button govuk-!-margin-top-5" data-module="govuk-button">
-                    Save details
+                    Add family and create code
                 </button>
             </form>
         </div>

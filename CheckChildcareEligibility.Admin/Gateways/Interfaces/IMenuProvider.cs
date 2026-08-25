@@ -62,7 +62,7 @@ public class MenuProvider : IMenuProvider
                         "Manage foster families",
                         "Manage foster families claiming Childcare for working families.",
                         "FosterFamilies",
-                        "SearchFosterFamiliesRecords"
+                        "Search"
                         ),
               /*      new MenuItem(
                         "Run reports",

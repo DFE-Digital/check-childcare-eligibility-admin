@@ -1,0 +1,180 @@
+﻿@using CheckChildcareEligibility.Admin.Boundary.Responses
+@using CheckChildcareEligibility.Admin.ViewModels
+@model FosterChildResponse
+@{
+    ViewData["Title"] = "Eligibility code for " + Model.ChildFullName;
+    var errorMessage = TempData["ErrorMessage"] as string;
+}
+
+<div class="govuk-grid-column-full">
+    <a class="govuk-back-link backLinkJS" href="@Url.Action("Index", "Home")">Back</a>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div id="error-summary" class="govuk-error-summary" data-module="govuk-error-summary">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">There is a problem</h2>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        <li>
+                            <p class="govuk-error-message">@errorMessage</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
+
+            <div class="govuk-summary-card">
+                <div class="govuk-summary-card__title-wrapper">
+                    <h2 class="govuk-summary-card__title">
+                        Eligibility code details
+                    </h2>
+                </div>
+                <div class="govuk-summary-card__content">
+                    <dl class="govuk-summary-list">
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Eligibility code
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @Model.EligibilityCode
+                            </dd>
+                        </div>
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Reconfirmation status
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @Model.ReconfirmationStatus
+                            </dd>
+                        </div>
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Code status
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @Model.CodeStatus
+                            </dd>
+                        </div>
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Eligibility confirmed on
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @Model.EligibilityConfirmedOn.ToString("d MMMM yyyy")
+                            </dd>
+                        </div>
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Reconfirm between
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @Model.ReconfirmFrom.ToString("d MMMM yyyy") and @Model.ReconfirmTo.ToString("d MMMM yyyy")
+                            </dd>
+                        </div>
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Grace period ends
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @Model.GracePeriodEnds.ToString("d MMMM yyyy")
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="govuk-summary-card">
+                <div class="govuk-summary-card__title-wrapper">
+                    <h2 class="govuk-summary-card__title">
+                        Child
+                    </h2>
+                    <ul class="govuk-summary-card__actions">
+                        <li class="govuk-summary-card__action">
+                            <a class="govuk-link" href="@Url.ActionLink("UpdateChild", "FosterFamilies", new { Model.FosterCarerId, ClearData = false, includeChildren = true })">Change<span class="govuk-visually-hidden">Child details</span></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="govuk-summary-card__content">
+                    <dl class="govuk-summary-list">
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Full name
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @Model.ChildFullName
+                            </dd>
+                        </div>
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Date of birth
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @Model.ChildDateOfBirth.ToString("d MMMM yyyy")
+                            </dd>
+                        </div>
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Postcode
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @Model.PostCode
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="govuk-summary-card">
+                <div class="govuk-summary-card__title-wrapper">
+                    <h2 class="govuk-summary-card__title">
+                        Foster familiy
+                    </h2>
+                    <ul class="govuk-summary-card__actions">
+                        <li class="govuk-summary-card__action">
+                            @* <p>@Html.ActionLink(Model.CarerName, "Foster_Family_Record", "FosterFamilies", new { CarerId = Model.FosterCarerId, includeChildren = true }, new { @class = "govuk-link" })</p> *@
+                            <a class="govuk-link" href=@Html.ActionLink("View", "Foster_Family_Record", "FosterFamilies", new { CarerId = Model.FosterCarerId, includeChildren = "true" })</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="govuk-summary-card__content">
+                    <dl class="govuk-summary-list">
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Carer
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @Model.CarerName
+                            </dd>
+                        </div>
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Partner
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @Model.PartnerName
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,13 +1,15 @@
 ﻿@using CheckChildcareEligibility.Admin.ViewModels
 @model FosterCarerDetailsViewModel
 @{
-    ViewData["Title"] = "Enter the Carer Details";
+    ViewData["Title"] = "Enter the carer details";
 
     var ninoInputClasses = "govuk-input govuk-!-width-one-third js-nino-input";
     if (ViewData.ModelState["CarerNationalInsuranceNumber"]?.Errors.Count > 0)
     {
         ninoInputClasses += " govuk-input--error";
     }
+
+    var actionName = Model != null && Model.IsUpdate ? "UpdateCarer" : "Carer";
 }
 
 <div class="govuk-grid-column-two-thirds">
@@ -19,7 +21,7 @@
     }
 
     <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
-    <form asp-controller="FosterFamilies" asp-action="Enter_Foster_Carer_Details" method="post">
+    <form asp-controller="FosterFamilies" asp-action=@actionName method="post">
         <fieldset class="govuk-fieldset">
             <div class="govuk-form-group">
                 <label class="govuk-label govuk-label--m" for="CarerFirstName">
@@ -55,10 +57,10 @@
                         For example, 27 3 1980
                     </div>
 
-                    @if (!string.IsNullOrEmpty(TempData["DobError"]?.ToString())) //Hide whitespace if no error
+                    @if (!string.IsNullOrEmpty(TempData["DateError"]?.ToString())) //Hide whitespace if no error
                     {
                         <p class="govuk-error-message">
-                            <span asp-validation-for="CarerDateOfBirth.Day">@Html.Raw(TempData["DobError"])</span>
+                            <span asp-validation-for="CarerDateOfBirth.Day">@Html.Raw(TempData["DateError"])</span>
                         </p>
                     }
 
@@ -148,14 +150,16 @@
                     </p>
                     <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
                         <div class="govuk-radios__item">
-                            <input class="govuk-radios__input" id="HasPartner" name="HasPartner" type="radio" value="true">
+                            @Html.RadioButtonFor(m => m.HasPartner, true,
+                            new { @class = "govuk-radios__input", id = "HasPartner" })
                             <label class="govuk-label govuk-radios__label" for="HasPartner">
                                 Yes
                             </label>
-
                         </div>
+
                         <div class="govuk-radios__item">
-                            <input class="govuk-radios__input" id="HasPartner-2" name="HasPartner" type="radio" value="false">
+                            @Html.RadioButtonFor(m => m.HasPartner, false,
+                                                        new { @class = "govuk-radios__input", id = "HasPartner-2" })
                             <label class="govuk-label govuk-radios__label" for="HasPartner-2">
                                 No
                             </label>
@@ -164,6 +168,11 @@
                 </fieldset>
             </div>
         </fieldset>
+        @if (Model != null && Model.IsUpdate)
+        {
+            <input asp-for="IsUpdate" type="hidden" />
+            <input asp-for="CarerId" type="hidden" />
+        }
         <button type="submit" class="govuk-button" data-module="govuk-button">
             Continue
         </button>
