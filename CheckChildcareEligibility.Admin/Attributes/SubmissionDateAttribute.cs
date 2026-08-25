@@ -130,7 +130,7 @@ public class SubmissionDateAttribute : ValidationAttribute
             if (errorFields.Count == 2) // One field missing (plus SubmissionDate)
             {
                 var missingField = errorFields[1]; // [0] is SubmissionDate
-                message = $"Submission Date must include a {missingField.ToLower()}";
+                message = $"Application submitted on date must include a {missingField.ToLower()}";
             }
             else if (errorFields.Count == 4) // All fields missing
             {
@@ -145,7 +145,7 @@ public class SubmissionDateAttribute : ValidationAttribute
             }
             else // Multiple but not all fields missing
             {
-                message = "Enter a complete submission date";
+                message = "Enter a complete application submitted on date";
             }
         }
         else if (errorFields.Any())
@@ -156,7 +156,7 @@ public class SubmissionDateAttribute : ValidationAttribute
             }
             else
             {
-                message = "Submission date must be a real date";
+                message = "Application submitted on date must be a real date";
             }
         }
         else
@@ -167,14 +167,14 @@ public class SubmissionDateAttribute : ValidationAttribute
                 var monthInt = int.Parse(monthString);
                 var dayInt = int.Parse(dayString);
 
-                var dob = new DateTime(yearInt, monthInt, dayInt);
+                var submissionDate = new DateTime(yearInt, monthInt, dayInt);
 
-                if (dob > DateTime.Now)
-                    return new ValidationResult("Submission date must be in the past",
+                if (submissionDate > DateTime.Now)
+                    return new ValidationResult("Application submitted on date must be in the past",
                         new[] { "SubmissionDate", "Day", "Month", "Year" });
 
                 DateTime backdateWindow = DateTime.Now.AddDays(-31);
-                if (dob < DateTime.Now.AddDays(-31))
+                if (submissionDate < DateTime.Now.AddDays(-31))
                     return new ValidationResult("The application submitted on date must be after " + @backdateWindow.ToString("d MMMM yyyy"),
                         new[] { "SubmissionDate", "Day", "Month", "Year" });
 
@@ -182,7 +182,7 @@ public class SubmissionDateAttribute : ValidationAttribute
             }
             catch
             {
-                message = "Submission date must be a real date";
+                message = "Application submitted on date must be a real date";
                 if (!errorFields.Contains("Day")) errorFields.Add("Day");
                 if (!errorFields.Contains("Month")) errorFields.Add("Month");
                 if (!errorFields.Contains("Year")) errorFields.Add("Year");
