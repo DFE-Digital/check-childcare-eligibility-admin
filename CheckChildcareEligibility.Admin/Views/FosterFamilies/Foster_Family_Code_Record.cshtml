@@ -30,6 +30,10 @@
 
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
 
+            <a href="#" role="button" draggable="false" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">
+                Reconfirm eligibility code (**ToDo**)
+            </a>
+
             <div class="govuk-summary-card">
                 <div class="govuk-summary-card__title-wrapper">
                     <h2 class="govuk-summary-card__title">
@@ -53,7 +57,7 @@
                                 Reconfirmation status
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @Model.ReconfirmationStatus
+                                <strong class="govuk-tag govuk-tag--red">@Model.ReconfirmationStatus (**API-ToDo**)</strong>
                             </dd>
                         </div>
 
@@ -62,7 +66,7 @@
                                 Code status
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @Model.CodeStatus
+                                @Model.CodeStatus (**API-ToDo**)
                             </dd>
                         </div>
 
@@ -103,7 +107,7 @@
                     </h2>
                     <ul class="govuk-summary-card__actions">
                         <li class="govuk-summary-card__action">
-                            <a class="govuk-link" href="@Url.ActionLink("UpdateChild", "FosterFamilies", new { Model.FosterCarerId, ClearData = false, includeChildren = true })">Change<span class="govuk-visually-hidden">Child details</span></a>
+                            <a class="govuk-link" href="@Url.ActionLink("UpdateChild", "FosterFamilies", new { Model.FosterCarerId, ClearData = false, includeChildren = true })">Change (*ToDo*) <span class="govuk-visually-hidden">Child details</span></a>
                         </li>
                     </ul>
                 </div>
@@ -147,8 +151,7 @@
                     </h2>
                     <ul class="govuk-summary-card__actions">
                         <li class="govuk-summary-card__action">
-                            @* <p>@Html.ActionLink(Model.CarerName, "Foster_Family_Record", "FosterFamilies", new { CarerId = Model.FosterCarerId, includeChildren = true }, new { @class = "govuk-link" })</p> *@
-                            <a class="govuk-link" href=@Html.ActionLink("View", "Foster_Family_Record", "FosterFamilies", new { CarerId = Model.FosterCarerId, includeChildren = "true" })</a>
+                            <a class="govuk-link" href="@Url.ActionLink("Foster_Family_Record", "FosterFamilies", new { CarerId = Model.FosterCarerId.ToString(), includeChildren = true })">View<span class="govuk-visually-hidden">family details</span></a>
                         </li>
                     </ul>
                 </div>

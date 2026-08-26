@@ -86,7 +86,7 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         try
         {
             var url = FosterFamiliesUrlsDict[FosterFamiliesUrls.GetFosterChild].Replace("{fosterChildId}", fosterChildId.ToString());
-            var response = await ApiDataGetAsynch($"{url}?includeCarer={includeFosterCarer}", new FosterChildResponse());
+            var response = await ApiDataGetAsynch($"{url}?includeFosterCarer={includeFosterCarer}", new FosterChildResponse());
 
             return response;
         }

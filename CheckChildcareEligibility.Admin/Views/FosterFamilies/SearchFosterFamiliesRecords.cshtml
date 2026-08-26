@@ -40,9 +40,9 @@
                                 <td class="govuk-table__cell">@item.EligibilityCode</td>
                                 <td class="govuk-table__cell">@Html.ActionLink(item.CarerName, "Foster_Family_Record", "FosterFamilies", new { CarerId = item.CarerId, includeChildren = true }, new { @class = "govuk-link" })</td>
                                 <td class="govuk-table__cell">@item.EligibilityConfirmedOn.ToString("d MMMM yyyy")</td>
-                                <td class="govuk-table__cell">@item.ReconfirmBetween</td>
+                                <td class="govuk-table__cell">@item.ReconfirmBetween (**API-ToDo**)</td>
                                 <td class="govuk-table__cell">@item.GracePeriodEnds.ToString("d MMMM yyyy")</td>
-                                <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--red">@item.ReconfirmationStatus</strong></td>
+                                <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--red">@item.ReconfirmationStatus (**API-ToDo**)</strong></td>
                             </tr>
                         }
                     </tbody>

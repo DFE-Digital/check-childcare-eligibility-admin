@@ -32,7 +32,7 @@
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
 
             <a href="/childcare/dev/foster/add-child/child-details" role="button" draggable="false" class="govuk-button govuk-button" data-module="govuk-button" data-govuk-button-init="">
-                Add child and create code
+                Add child and create code (**ToDo**)
             </a>
 
             <div class="govuk-summary-card">
@@ -88,10 +88,10 @@
                         </h2>
                         <ul class="govuk-summary-card__actions">
                             <li class="govuk-summary-card__action">
-                                <a class="govuk-link" href="@Url.Action("UpdatePartner", "FosterFamilies")">Change<span class="govuk-visually-hidden">Partner details</span></a>
+                                <a class="govuk-link" href="@Url.Action("UpdatePartner", "FosterFamilies")">Change (**ToDo**)<span class="govuk-visually-hidden">Partner details</span></a>
                             </li>
                             <li class="govuk-summary-card__action">
-                                <a class="govuk-link" href="@Url.Action("RemovePartner", "FosterFamilies")">Remove<span class="govuk-visually-hidden">Partner details</span></a>
+                                <a class="govuk-link" href="@Url.Action("RemovePartner", "FosterFamilies")">Remove (**ToDo**)<span class="govuk-visually-hidden">Partner details</span></a>
                             </li>
                         </ul>
                     </div>
@@ -150,7 +150,7 @@
                                     @child.FirstName @child.LastName
                                 </dd>
                                 <dd class="govuk-summary-list__actions">
-                                    <a class="govuk-link" href="#">View<span class="govuk-visually-hidden">child @index</span></a>
+                                    <a class="govuk-link" href="@Url.ActionLink("Foster_Family_Code_Record", "FosterFamilies", new { CarerId = Model.FosterCarerId.ToString(), includeFosterCarer = true })">View<span class="govuk-visually-hidden">child details</span></a>
                                 </dd>
                             </div>
                             index++;
