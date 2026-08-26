@@ -313,12 +313,18 @@ public class CheckControllerTests : TestBase
         model.EligibilityType.Should().Be("2YO");
     }
 
+    [Test]
     public async Task Given_Loader_When_Status_TechnicalError_Should_ReturnErrorCode()
     {
         // Arrange
         var response = new CheckEligibilityResponse
         {
-            Data = new StatusValue { Status = "error", ErrorCode = "TE21" }
+            Data = new StatusValue
+            {
+                Status = "error",
+                ErrorCode = "TE21",
+                CorrelationID = "TEST-CORRELATION-ID"
+            }
         };
         var responseJson = JsonConvert.SerializeObject(response);
         _sut.TempData["Response"] = responseJson;
@@ -332,7 +338,9 @@ public class CheckControllerTests : TestBase
 
         // Assert
         var viewResult = result as ViewResult;
+        viewResult.ViewName.Should().Be("Outcome/Technical_Error");
         viewResult.ViewData["ErrorCode"].Should().Be(response.Data.ErrorCode);
+        viewResult.ViewData["CorrelationID"].Should().Be(response.Data.CorrelationID);
     }
 
     [Test]

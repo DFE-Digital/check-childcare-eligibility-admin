@@ -164,7 +164,7 @@ public class CheckController : BaseController
                     return View("Loader", eligibilityOutcomeVm);
 
                 default:
-                    ViewData["CorellationID"] = outcome.CorrelationID;
+                    ViewData["CorrelationID"] = outcome.CorrelationID;
                     ViewData["ErrorCode"] = outcome.ErrorCode;
                     return View("Outcome/Technical_Error", eligibilityOutcomeVm);
             }
