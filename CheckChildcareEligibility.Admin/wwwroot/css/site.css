@@ -495,3 +495,16 @@ hr {
     opacity: 1;
 }
 /* END - Override bootstrap <hr> conflict with GOV.UK <hr> so the element is actually visible */
+
+/*BEGIN - Custom styling for Event_History.cshtml */
+.table-scroll {
+    overflow-x: scroll;
+}
+
+.min-width-120 {
+    min-width: 120px
+}
+.min-width-180 {
+    min-width: 180px
+}
+/*END - Custom styling for Event_History.cshtml */
