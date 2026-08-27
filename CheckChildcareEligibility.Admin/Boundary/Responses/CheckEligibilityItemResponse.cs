@@ -18,6 +18,8 @@ public class CheckEligibilityItem
     public string Status { get; set; }
 
     public DateTime Created { get; set; }
+
+    public int? Order { get; set; }
 }
 
 public class CheckEligibilityItemResponse : CheckEligibilityItemResponseBase
@@ -38,6 +40,7 @@ public class CheckEligibilityItemWorkingFamilies
     public string ValidityStartDate { get; set; }
     public string ValidityEndDate { get; set; }
     public string GracePeriodEndDate { get; set; }
+    public int? Order { get; set; }
 }
 public class CheckEligibilityItemWorkingFamiliesResponse : CheckEligibilityItemResponseBase
 {
