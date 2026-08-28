@@ -2,7 +2,6 @@
 using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeConstants;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Infrastructure;
-using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
 using CheckChildcareEligibility.Admin.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -126,7 +125,7 @@ public class WorkingFamiliesCheckController : BaseController
                     return View("Outcome/Not_Found_WF", parentAndChild);
                 default:
                     var responseItem = JsonConvert.DeserializeObject<CheckEligibilityResponse>(responseJson);
-                    var result = await _performWFEligibilityCheckUseCase.GetItemAsync(responseItem.Links.Get_EligibilityCheck);
+                    var result = await _performWFEligibilityCheckUseCase.GetItemAsync($"/internal/{responseItem.Links.Get_EligibilityCheck}");
                     WorkingFamiliesResponseViewModel viewModel = new WorkingFamiliesResponseViewModel()
                     {
                         Response = result.Data
