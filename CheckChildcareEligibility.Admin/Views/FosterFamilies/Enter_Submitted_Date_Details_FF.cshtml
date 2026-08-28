@@ -2,10 +2,20 @@
 @model FosterApplicationSubmittedDateViewModel
 @{
     ViewData["Title"] = "When was the application submitted?";
+
+    // var actionName = Model != null && Model.IsUpdate ? "UpdateSubmittedDate" : "SubmittedDate";
+    var actionName = "SubmittedDate";// use commented out line above once UpdateSubmittedDate functionality is added.
 }
 
 <div class="govuk-grid-column-full">
-    <a class="govuk-back-link backLinkJS" href="@Url.Action("Index", "Home")">Back</a>
+    @if (actionName.Equals("UpdatePartner"))
+    {
+        @* <a class="govuk-back-link backLinkJS" href="@Url.ActionLink("Code_Record_FF", "FosterFamilies", new { CarerId = Model.CarerId.ToString(), includeFosterCarer = true })">Back</a> *@
+    }
+    else
+    {
+        <a class="govuk-back-link backLinkJS" href="@Url.Action("Child", "FosterFamilies")">Back</a>
+    }
 
     @if (!ViewData.ModelState.IsValid)
     {

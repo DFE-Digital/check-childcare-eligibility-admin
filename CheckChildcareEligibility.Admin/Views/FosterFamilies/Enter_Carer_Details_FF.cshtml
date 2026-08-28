@@ -13,8 +13,14 @@
 }
 
 <div class="govuk-grid-column-two-thirds">
-    <a class="govuk-back-link backLinkJS" href="@Url.Action("Index", "Home")">Back</a>
-
+    @if (actionName.Equals("UpdateCarer"))
+    {
+        <a class="govuk-back-link backLinkJS" href="@Url.ActionLink("Family_Record_FF", "FosterFamilies", new { CarerId = Model.CarerId.ToString(), includeChildren = true })">Back</a>
+    }
+    else
+    {
+        <a class="govuk-back-link backLinkJS" href="@Url.Action("Search", "FosterFamilies")">Back</a>
+    }
     @if (!ViewData.ModelState.IsValid)
     {
         <partial name="_ValidationSummary" model="ViewData.ModelState" />

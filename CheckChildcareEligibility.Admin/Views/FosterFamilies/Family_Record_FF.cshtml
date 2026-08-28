@@ -8,7 +8,7 @@
 }
 
 <div class="govuk-grid-column-full">
-    <a class="govuk-back-link backLinkJS" href="@Url.Action("Index", "Home")">Back</a>
+    <a class="govuk-back-link backLinkJS" href="@Url.Action("Search", "FosterFamilies")">Back</a>
 
     @if (!string.IsNullOrEmpty(errorMessage))
     {
@@ -42,7 +42,7 @@
                     </h2>
                     <ul class="govuk-summary-card__actions">
                         <li class="govuk-summary-card__action">
-                            <a class="govuk-link" href="@Url.ActionLink("UpdateCarer", "FosterFamilies", new { Model.FosterCarerId, ClearData = false, includeChildren = true })">Change<span class="govuk-visually-hidden">Carer details</span></a>
+                            <a class="govuk-link" href="@Url.ActionLink("UpdateCarer", "FosterFamilies", new { Model.FosterCarerId, includeChildren = true })">Change<span class="govuk-visually-hidden">Carer details</span></a>
                         </li>
                     </ul>
                 </div>
@@ -150,7 +150,7 @@
                                     @child.FirstName @child.LastName
                                 </dd>
                                 <dd class="govuk-summary-list__actions">
-                                    <a class="govuk-link" href="@Url.ActionLink("Foster_Family_Code_Record", "FosterFamilies", new { CarerId = Model.FosterCarerId.ToString(), includeFosterCarer = true })">View<span class="govuk-visually-hidden">child details</span></a>
+                                    <a class="govuk-link" href="@Url.ActionLink("Code_Record_FF", "FosterFamilies", new { CarerId = Model.FosterCarerId.ToString(), includeFosterCarer = true })">View<span class="govuk-visually-hidden">child details</span></a>
                                 </dd>
                             </div>
                             index++;

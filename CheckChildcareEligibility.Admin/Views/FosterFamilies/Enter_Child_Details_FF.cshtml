@@ -1,11 +1,34 @@
 ﻿@using CheckChildcareEligibility.Admin.ViewModels
+@using Newtonsoft.Json
 @model FosterChildDetailsViewModel
 @{
     ViewData["Title"] = "Enter the child details";
+
+    // var actionName = Model != null && Model.IsUpdate ? "UpdateChild" : "Child";
+    var actionName = "Child";// use commented out line above once updateChild functionality is added.
+
+    var fosterCarerDetails = Context.Session.GetString("FosterCarerDetails");
+    var hasPartner = JsonConvert.DeserializeObject<FosterCarerDetailsViewModel>(fosterCarerDetails)?.HasPartner == true;
+    var backUrl = hasPartner ? "/Partner" : "/Carer";
 }
 
 <div class="govuk-grid-column-full">
-    <a class="govuk-back-link backLinkJS" href="@Url.Action("Index", "Home")">Back</a>
+    @if (actionName.Equals("UpdateChild"))
+    {
+        @* <a class="govuk-back-link backLinkJS" href="@Url.ActionLink("Code_Record_FF", "FosterFamilies", new { CarerId = Model.CarerId.ToString(), includeFosterCarer = true })">Back</a> *@
+    }
+    else
+    {
+        //Presume creating a foster family
+        if (hasPartner == true)
+        {
+            <a class="govuk-back-link backLinkJS" href="@Url.Action("Partner", "FosterFamilies")">Back</a>
+        }
+        else
+        {
+            <a class="govuk-back-link backLinkJS" href="@Url.Action("Carer", "FosterFamilies")">Back</a>
+        }
+    }
 
     @if (!ViewData.ModelState.IsValid)
     {
