@@ -1,3 +1,4 @@
+@inject IConfiguration Configuration
 @{
     ViewData["Title"] = "Start";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -44,7 +45,7 @@
 
             <h2 class="govuk-heading-m">Related content </h2>
 
-            <p><a href="http://check-free-school-meals-admin.education.gov.uk">Manage eligibility for free school meals</a></p>
+            <p><a href="@Configuration["FsmAdminUrl"]">Manage eligibility for free school meals</a></p>
 
             <p><a href="/Start/UserGuidance"> User guidance: Manage eligibility for childcare support</a></p>
         </div>
