@@ -29,7 +29,6 @@ public class ReportControllerTests : TestBase
     [SetUp]
     public void SetUp()
     {
-        _menuProviderMock = new Mock<IMenuProvider>();
         _performEligibilityCodeHistoryReportUseCaseMock =
         new Mock<IPerformEligibilityCodeHistoryReportUseCase>();
         _validateEligibilityCodeUseCaseMock =
@@ -38,7 +37,6 @@ public class ReportControllerTests : TestBase
         new Mock<IDfeSignInApiService>();
 
         _sut = new ReportController(
-        _menuProviderMock.Object,
         _performEligibilityCodeHistoryReportUseCaseMock.Object,
         _validateEligibilityCodeUseCaseMock.Object,
         _mockDfeSignInApiService.Object);
