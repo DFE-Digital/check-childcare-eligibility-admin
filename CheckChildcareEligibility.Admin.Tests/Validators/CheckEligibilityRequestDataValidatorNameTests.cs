@@ -84,8 +84,7 @@ public class CheckEligibilityRequestDataValidatorNameTests
             LastName = lastName,
             DateOfBirth = "1980-01-01",
             NationalInsuranceNumber = "AB124456A",
-            Type = eligibilityType,
-            Sequence = 1
+            Type = eligibilityType
         };
     }
 }
