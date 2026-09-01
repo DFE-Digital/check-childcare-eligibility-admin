@@ -101,14 +101,14 @@ public class WorkingFamiliesCheckController : BaseController
         try
         {
             var outcome = await _getCheckStatusUseCase.Execute(responseJson, HttpContext.Session);
-            CheckEligibilityStatus outcomeStatus = (CheckEligibilityStatus)Enum.Parse(typeof(CheckEligibilityStatus), outcome);
+            CheckEligibilityStatus outcomeStatus = (CheckEligibilityStatus)Enum.Parse(typeof(CheckEligibilityStatus), outcome.Status);
 
-            if (outcome == "queuedForProcessing")
+            if (outcome.Status == "queuedForProcessing")
             {
                 TempData["Response"] = responseJson;
             }
 
-            _logger.LogError(outcome);
+            _logger.LogError(outcome.Status);
 
             var parentAndChildDetailsJson = TempData["ParentAndChildDetails"]?.ToString();
             TempData["ParentAndChildDetails"] = parentAndChildDetailsJson;
