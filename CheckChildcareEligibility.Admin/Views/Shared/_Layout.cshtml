@@ -1,7 +1,4 @@
-﻿@using Azure.Core
-@using CheckChildcareEligibility.Admin.Infrastructure
-@using Microsoft.AspNetCore.Mvc.TagHelpers
-@using CheckChildcareEligibility.Admin.Gateways.Interfaces
+﻿@using CheckChildcareEligibility.Admin.Gateways.Interfaces
 @inject IConfiguration Configuration
 @inject IHttpContextAccessor _httpContext
 @inject IMenuProvider MenuProvider
@@ -9,7 +6,7 @@
 @{
     var claims = ViewBag.Claims;
     var clarityId = Configuration["Clarity"];
-    var menu = MenuProvider.GetMenuItemsFor(claims);
+    var menu = await MenuProvider.GetMenuItemsFor(claims);
     bool authenticatedUser = User.Identity?.IsAuthenticated ?? false;
     var homeLink = "/";//unauthenticated -> landing page
     if (authenticatedUser) homeLink = "/home";//authenticated -> dashboard
