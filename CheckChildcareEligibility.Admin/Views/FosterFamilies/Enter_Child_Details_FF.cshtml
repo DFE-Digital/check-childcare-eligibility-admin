@@ -1,0 +1,161 @@
+﻿@using CheckChildcareEligibility.Admin.ViewModels
+@using Newtonsoft.Json
+@model FosterChildDetailsViewModel
+@{
+    ViewData["Title"] = "Enter the child details";
+
+    // var actionName = Model != null && Model.IsUpdate ? "UpdateChild" : "Child";
+    var actionName = "Child";// use commented out line above once updateChild functionality is added.
+
+    var fosterCarerDetails = Context.Session.GetString("FosterCarerDetails");
+    var hasPartner = JsonConvert.DeserializeObject<FosterCarerDetailsViewModel>(fosterCarerDetails)?.HasPartner == true;
+    var backUrl = hasPartner ? "/Partner" : "/Carer";
+}
+
+<div class="govuk-grid-column-full">
+    @if (actionName.Equals("UpdateChild"))
+    {
+        @* <a class="govuk-back-link backLinkJS" href="@Url.ActionLink("Code_Record_FF", "FosterFamilies", new { CarerId = Model.CarerId.ToString(), includeFosterCarer = true })">Back</a> *@
+    }
+    else
+    {
+        //Presume creating a foster family
+        if (hasPartner == true)
+        {
+            <a class="govuk-back-link backLinkJS" href="@Url.Action("Partner", "FosterFamilies")">Back</a>
+        }
+        else
+        {
+            <a class="govuk-back-link backLinkJS" href="@Url.Action("Carer", "FosterFamilies")">Back</a>
+        }
+    }
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <partial name="_ValidationSummary" model="ViewData.ModelState" />
+    }
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
+            <form asp-controller="FosterFamilies" asp-action="Child" method="post">
+                <fieldset class="govuk-fieldset">
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--m" for="ChildFirstName">
+                            First name
+                        </label>
+                        <p class="govuk-error-message">
+                            <span asp-validation-for="ChildFirstName"></span>
+                        </p>
+                        <input class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["ChildFirstName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                               asp-for="ChildFirstName" type="text">
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--m" for="ChildLastName">
+                            Last name
+                        </label>
+                        <p class="govuk-error-message">
+                            <span asp-validation-for="ChildFirstName"></span>
+                        </p>
+                        <input class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["ChildLastName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                               asp-for="ChildLastName" type="text">
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <fieldset class="govuk-fieldset">
+                            <h1 id="dob-heading" class="govuk-label-wrapper">
+                                <span class="govuk-label govuk-label--m">
+                                    Date of birth
+                                </span>
+                            </h1>
+
+                            <div id="dob-hint" class="govuk-hint">
+                                For example, 27 3 1980
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(TempData["DateError"]?.ToString())) //Hide whitespace if no error
+                            {
+                                <p class="govuk-error-message">
+                                    <span asp-validation-for="ChildDateOfBirth.Day">@Html.Raw(TempData["DateError"])</span>
+                                </p>
+                            }
+
+                            <span id="dob-hint-day" class="govuk-visually-hidden">For example 27</span>
+                            <div class="govuk-date-input"
+                                 id="ChildDateOfBirth"
+                                 role="group"
+                                 aria-labelledby="dob-heading"
+                                 aria-describedby="dob-hint dob-error">
+
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="ChildDateOfBirth.Day">
+                                            Day
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["ChildDateOfBirth.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                               asp-for="Day"
+                                               id="ChildDateOfBirth.Day"
+                                               aria-describedby="dob-hint-day"
+                                               type="text"
+                                               inputmode="numeric"
+                                               maxlength="2" />
+                                    </div>
+                                </div>
+
+                                <span id="dob-hint-month" class="govuk-visually-hidden">For example 3</span>
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="ChildDateOfBirth.Month">
+                                            Month
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["ChildDateOfBirth.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                               asp-for="Month"
+                                               id="ChildDateOfBirth.Month"
+                                               aria-describedby="dob-hint-month"
+                                               type="text"
+                                               inputmode="numeric"
+                                               maxlength="2" />
+                                    </div>
+                                </div>
+
+                                <span id="dob-hint-month" class="govuk-visually-hidden">For example 1980</span>
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" for="ChildDateOfBirth.Year">
+                                            Year
+                                        </label>
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["ChildDateOfBirth.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                               asp-for="Year"
+                                               id="ChildDateOfBirth.Year"
+                                               aria-describedby="dob-hint-year"
+                                               type="text"
+                                               inputmode="numeric"
+                                               maxlength="4" />
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-fieldset__legend--m" for="ChildPostCode">
+                            Post Code
+                        </label>
+                        <p class="govuk-error-message">
+                            <span asp-validation-for="ChildPostCode"></span>
+                        </p>
+                        <input class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["ChildPostCode"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                               asp-for="ChildPostCode" type="text">
+                    </div>
+                </fieldset>
+                <button type="submit" class="govuk-button" data-module="govuk-button">
+                    Continue
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/validationSummary.js"></script>

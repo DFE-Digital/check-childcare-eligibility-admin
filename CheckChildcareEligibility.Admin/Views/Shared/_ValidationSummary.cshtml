@@ -27,7 +27,14 @@ foreach (var m in Model)
         {
             field = originalField.Replace("School.URN", "School");
         }
-
+        if (originalField.Equals("IsTodaySelected"))
+        {
+            field = originalField.Replace("IsTodaySelected", "submission-date-radios-Today");
+        }
+        if (originalField.StartsWith("SubmissionDate"))
+        {
+            field = "submission-date-radios-Today";
+        }
         errors.Add(new ValidationError
         {
             Field = field,
@@ -37,62 +44,105 @@ foreach (var m in Model)
     }
 }
 
-// Get DOB errors - need to handle separately as multi-field input -> single field output
-var dobErrors = new List<ValidationError>();
+// Get DOB or Date errors - need to handle separately as multi-field input -> single field output
+var dateErrors = new List<ValidationError>();
 foreach (var error in errors)
 {
     if (error.OriginalField.EndsWith("Day") ||
         error.OriginalField.EndsWith("Month") ||
         error.OriginalField.EndsWith("Year") ||
-        error.OriginalField.EndsWith("DateOfBirth"))
+        error.OriginalField.EndsWith("DateOfBirth") ||
+        error.OriginalField.EndsWith("SubmissionDate"))
     {
-        dobErrors.Add(error);
+        dateErrors.Add(error);
     }
 }
 
-// Only keep the highest-priority DOB error (the one we will report)
-string[] dobPriority = { "Day", "Month", "Year", "DateOfBirth" };
-ValidationError selectedDobError = null;
-foreach (var priority in dobPriority)
+// Only keep the highest-priority DOB or Date error (the one we will report)
+string[] datePriority = dateErrors.Any(e => e.OriginalField.EndsWith("SubmissionDate"))
+    ? new[] { "Day", "Month", "Year", "SubmissionDate" }
+    : new[] { "Day", "Month", "Year", "DateOfBirth" };
+ValidationError selectedDateError = null;
+foreach (var priority in datePriority)
 {
-    foreach (var e in dobErrors)
+    foreach (var e in dateErrors)
     {
         if (e.OriginalField.EndsWith(priority))
         {
-            selectedDobError = e;
+            selectedDateError = e;
             break;
         }
     }
-    if (selectedDobError != null)
+    if (selectedDateError != null)
         break;
 }
 
-// Get non-DOB errors
-var nonDobErrors = new List<ValidationError>();
+// Get non-DOB/Date errors
+var nonDateErrors = new List<ValidationError>();
 foreach (var error in errors)
 {
-    if (!dobErrors.Contains(error))
+    if (!dateErrors.Contains(error))
     {
-        nonDobErrors.Add(error);
+        nonDateErrors.Add(error);
     }
 }
 
-var finalErrors = nonDobErrors.ToList();
-if (selectedDobError != null)
+var finalErrors = nonDateErrors.ToList();
+if (selectedDateError != null)
 {
-    finalErrors.Add(selectedDobError);
+    finalErrors.Add(selectedDateError);
 }
 
 // Order the errors
 List<string> propertyOrder = new List<string>();
 
-if (Model.ContainsKey("LastName")) //Parent
+if (Model.ContainsKey("CarerLastName")) //fosterCarer
+{
+    propertyOrder = new List<string>
+        {
+            "CarerFirstName",
+            "CarerLastName",
+            "CarerDateOfBirth",
+            "CarerDateOfBirth.Day",
+            "CarerDateOfBirth.Month",
+            "CarerDateOfBirth.Year",
+            "CarerNationalInsuranceNumber",
+            "HasPartner",
+        };
+}
+if (Model.ContainsKey("PartnerLastName")) //fosterPartner
+{
+    propertyOrder = new List<string>
+        {
+            "PartnerFirstName",
+            "PartnerLastName",
+            "PartnerDateOfBirth",
+            "PartnerDateOfBirth.Day",
+            "PartnerDateOfBirth.Month",
+            "PartnerDateOfBirth.Year",
+            "PartnerNationalInsuranceNumber",
+        };
+}
+if (Model.ContainsKey("ChildPostCode")) //fosterChild
+{
+    propertyOrder = new List<string>
+        {
+            "ChildFirstName",
+            "ChildLastName",
+            "ChildDateOfBirth",
+            "ChildDateOfBirth.Day",
+            "ChildDateOfBirth.Month",
+            "ChildDateOfBirth.Year",
+            "ChildPostCode",
+        };
+}
+else if (Model.ContainsKey("LastName")) //Parent
 {
     foreach (var prop in typeof(ParentGuardian).GetProperties())
     {
         propertyOrder.Add(prop.Name);
     }
-    UpdateDobFields(propertyOrder);
+    UpdateDateFields(propertyOrder);
 }
 else if (Model.ContainsKey("EligibilityCode") || Model.ContainsKey("Child.EligibilityCode")) //ParentAndChild
 {
@@ -105,10 +155,10 @@ else if (Model.ContainsKey("EligibilityCode") || Model.ContainsKey("Child.Eligib
             "Child.ChildDateOfBirth.Month",
             "Child.ChildDateOfBirth.Year"
         };
-    // UpdateDobFields(propertyOrder);
+    // UpdateDateFields(propertyOrder);
 }
 
-void UpdateDobFields(List<string> propertyOrder)
+void UpdateDateFields(List<string> propertyOrder)
 {
     int index;
 
@@ -131,11 +181,15 @@ errors = finalErrors
     })
     .ToList();
 
-//Only way I can get Viewmodel error for DOB to show inline
-TempData["DobError"] = string.Empty;
-if (selectedDobError != null && selectedDobError.OriginalField.StartsWith("Child.ChildDateOfBirth"))
+//Only way I can get Viewmodel error for DOB or Date to show inline
+TempData["DateError"] = string.Empty;
+if (selectedDateError != null && selectedDateError.OriginalField.StartsWith("Child.ChildDateOfBirth")
+    || selectedDateError != null && selectedDateError.OriginalField.StartsWith("CarerDateOfBirth")
+    || selectedDateError != null && selectedDateError.OriginalField.StartsWith("PartnerDateOfBirth")
+    || selectedDateError != null && selectedDateError.OriginalField.StartsWith("ChildDateOfBirth")
+    || selectedDateError != null && selectedDateError.OriginalField.StartsWith("SubmissionDate"))
 {
-    TempData["DobError"] = selectedDobError.Error;
+    TempData["DateError"] = selectedDateError.Error;
 }
 }
 
@@ -153,7 +207,6 @@ if (selectedDobError != null && selectedDobError.OriginalField.StartsWith("Child
                         }
                         else
                         {
-
                             <a class="govuk-error-message" href="#@modelError.Field">@modelError.Error</a>
                         }
                     </li>

@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Metrics;
-using Child = CheckChildcareEligibility.Admin.Models;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public class DobAttribute : ValidationAttribute
@@ -128,9 +126,23 @@ public class DobAttribute : ValidationAttribute
                 }
                 else
                 {
-                    message = "Enter " +
-                        (model is CheckChildcareEligibility.Admin.Models.Child ? "child's" : "parent or guardian's") +
-                        " date of birth";
+                    message = model switch
+                    {
+                        CheckChildcareEligibility.Admin.Models.Child =>
+                            "Enter child's date of birth",
+
+                        CheckChildcareEligibility.Admin.Models.ParentGuardian =>
+                            "Enter parent or guardian's date of birth",
+
+                        CheckChildcareEligibility.Admin.ViewModels.FosterCarerDetailsViewModel =>
+                            "Enter carer's date of birth",
+                        CheckChildcareEligibility.Admin.ViewModels.FosterPartnerDetailsViewModel =>
+                            "Enter partner's date of birth",
+                        CheckChildcareEligibility.Admin.ViewModels.FosterChildDetailsViewModel =>
+                            "Enter child's date of birth",
+
+                        _ => "Enter date of birth"
+                    };
                 }
             }
             else // Multiple but not all fields missing

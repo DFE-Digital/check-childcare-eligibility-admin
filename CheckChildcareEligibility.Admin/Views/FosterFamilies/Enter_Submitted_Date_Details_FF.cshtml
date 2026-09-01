@@ -1,0 +1,124 @@
+﻿@using CheckChildcareEligibility.Admin.ViewModels
+@model FosterApplicationSubmittedDateViewModel
+@{
+    ViewData["Title"] = "When was the application submitted?";
+
+    // var actionName = Model != null && Model.IsUpdate ? "UpdateSubmittedDate" : "SubmittedDate";
+    var actionName = "SubmittedDate";// use commented out line above once UpdateSubmittedDate functionality is added.
+}
+
+<div class="govuk-grid-column-full">
+    @if (actionName.Equals("UpdatePartner"))
+    {
+        @* <a class="govuk-back-link backLinkJS" href="@Url.ActionLink("Code_Record_FF", "FosterFamilies", new { CarerId = Model.CarerId.ToString(), includeFosterCarer = true })">Back</a> *@
+    }
+    else
+    {
+        <a class="govuk-back-link backLinkJS" href="@Url.Action("Child", "FosterFamilies")">Back</a>
+    }
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <partial name="_ValidationSummary" model="ViewData.ModelState" />
+    }
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
+            <form asp-controller="FosterFamilies" asp-action="SubmittedDate" method="post">
+                <fieldset class="govuk-fieldset">
+
+                    <div class="govuk-form-group" data-type="SubmissionDate-form-group">
+                        <fieldset class="govuk-fieldset" role="group" aria-describedby="SubmissionDate-hint">
+
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                When was the application submitted?
+                            </legend>
+
+                            <div id="SubmissionDate-hint" class="govuk-hint">
+                                Select one option.
+                            </div>
+                            <p class="govuk-error-message">
+                                <span asp-validation-for="IsTodaySelected"></span>
+                            </p>
+
+                            <div class="govuk-radios" data-module="govuk-radios">
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="submission-date-radios-Today" asp-for="IsTodaySelected" type="radio"
+                                           value="true" aria-expanded="false" aria-label="Today">
+                                    <label class="govuk-label govuk-radios__label" for="submission-date-radios-Today">
+                                        Today
+                                    </label>
+                                </div>
+
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="submission-date-radios-AnotherDate" asp-for="IsTodaySelected" type="radio"
+                                           value="false" aria-controls="conditional-SubmissionDate" aria-expanded="false"
+                                           aria-label="Enter another date">
+                                    <label class="govuk-label govuk-radios__label" for="submission-date-radios-AnotherDate">
+                                        Enter another date
+                                    </label>
+                                </div>
+                                <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
+                                     id="conditional-SubmissionDate">
+                                    <div class="govuk-form-group">
+                                        <fieldset class="govuk-fieldset" role="group" aria-describedby="submissionDate-hint">
+                                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                                Application submitted on
+                                            </legend>
+
+                                            <div id="submissionDate-hint" class="govuk-hint">
+                                                Dates can be backdated by up to one month
+                                            </div>
+
+                                            <p class="govuk-error-message">
+                                                <span asp-validation-for="SubmissionDate" class="govuk-error-message"></span>
+                                            </p>
+
+                                            <div class="govuk-date-input" id="SubmissionDate">
+                                                <div class="govuk-date-input__item">
+                                                    <div class="govuk-form-group">
+                                                        <label class="govuk-label govuk-date-input__label" for="SubmissionDate.Day">
+                                                            Day
+                                                        </label>
+                                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["SubmissionDate.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                                               asp-for="Day" id="SubmissionDate.Day" type="text" inputmode="numeric" maxlength="2" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="govuk-date-input__item">
+                                                    <div class="govuk-form-group">
+                                                        <label class="govuk-label govuk-date-input__label" for="SubmissionDate.Month">
+                                                            Month
+                                                        </label>
+                                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["SubmissionDate.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                                               asp-for="Month" id="SubmissionDate.Month" type="text" inputmode="numeric" maxlength="2" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="govuk-date-input__item">
+                                                    <div class="govuk-form-group">
+                                                        <label class="govuk-label govuk-date-input__label" for="SubmissionDate.Year">
+                                                            Year
+                                                        </label>
+                                                        <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["SubmissionDate.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                                               asp-for="Year" id="SubmissionDate.Year" type="text" inputmode="numeric" maxlength="4" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </fieldset>
+                <button type="submit" class="govuk-button" data-module="govuk-button">
+                    Continue
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/validationSummary.js"></script>

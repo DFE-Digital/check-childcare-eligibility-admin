@@ -13,6 +13,12 @@
                 element = document.getElementById("Child.ChildDateOfBirth");
             } else if (targetId.startsWith("DateOfBirth")) {
                 element = document.getElementById("DateOfBirth");
+            } else if (targetId.startsWith("CarerDateOfBirth")) {
+                element = document.getElementById("CarerDateOfBirth");
+            } else if (targetId.startsWith("PartnerDateOfBirth")) {
+                element = document.getElementById("PartnerDateOfBirth");
+            } else if (targetId.startsWith("ChildDateOfBirth")) {
+                element = document.getElementById("ChildDateOfBirth");
             }
 
             if (element) {

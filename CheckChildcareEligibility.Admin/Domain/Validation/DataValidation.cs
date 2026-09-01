@@ -27,6 +27,11 @@ internal static class DataValidation
         return res.Success;
     }
 
+    internal static bool BeAPastDate(DateTime value)
+    {
+        return value.Date <= DateTime.Today;
+    }
+
     internal static bool BeAValidNi(string? value)
     {
         if (string.IsNullOrWhiteSpace(value)) return false;
@@ -36,5 +41,19 @@ internal static class DataValidation
         var res = rg.Match(value);
         return res.Success;
     }
-   
+
+    internal static bool BeAValidUkPostcode(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        const string regexString =
+            @"^(GIR\s?0AA|(?:[A-PR-UWYZ][0-9][0-9]?|[A-PR-UWYZ][A-HK-Y][0-9][0-9]?|[A-PR-UWYZ][0-9][A-HJKPSTUW]|[A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRVWXY])\s?[0-9][ABD-HJLNP-UW-Z]{2})$";
+
+        return Regex.IsMatch(
+            value.Trim().ToUpperInvariant(),
+            regexString,
+            RegexOptions.Compiled);
+    }
+
 }

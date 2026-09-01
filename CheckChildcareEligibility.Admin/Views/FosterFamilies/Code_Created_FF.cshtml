@@ -1,0 +1,53 @@
+﻿@using CheckChildcareEligibility.Admin.ViewModels
+@model FosterFamilyCreatedViewModel
+@{
+    ViewData["Title"] = "Family added and code created";
+}
+
+<div class="govuk-grid-column-full">
+    <a class="govuk-back-link backLinkJS" href="@Url.Action("CheckDetails", "FosterFamilies")">Back</a>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            <div class="govuk-panel govuk-panel--confirmation">
+                <h1 class="govuk-panel__title">
+                    @ViewData["Title"]
+                </h1>
+                <div class="govuk-panel__body">
+                    Eligibility code <br> <strong>@Model.EligibilityCode</strong>
+                </div>
+            </div>
+
+            <p class="govuk-!-margin-top-6">Send the eligibility code to the social worker. The foster family will need to  give the code to the childcare provider.</p>
+
+            <table class="govuk-table">
+                <caption class="govuk-table__caption govuk-table__caption--m"></caption>
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Child name</th>
+                        <th scope="col" class="govuk-table__header">Eligibility code</th>
+                        <th scope="col" class="govuk-table__header">Code status</th>
+                        <th scope="col" class="govuk-table__header">Eligibility confirmed on</th>
+                        <th scope="col" class="govuk-table__header">Reconfirm between</th>
+                        <th scope="col" class="govuk-table__header">Grace period ends</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">@Model.ChildName</td>
+                        <td class="govuk-table__cell">@Model.EligibilityCode</td>
+                        <td class="govuk-table__cell">@Model.Status</td>
+                        <td class="govuk-table__cell">@Model.EligibilityConfirmed.ToString("d MMMM yyyy")</td>
+                        <td class="govuk-table__cell">@Model.ReconfirmBetween</td>
+                        <td class="govuk-table__cell">@Model.GracePeriodEndDate.ToString("d MMMM yyyy")</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <button type="submit" class="govuk-button govuk-!-margin-top-5" data-module="govuk-button">
+                View code details
+            </button>
+        </div>
+    </div>
+</div>

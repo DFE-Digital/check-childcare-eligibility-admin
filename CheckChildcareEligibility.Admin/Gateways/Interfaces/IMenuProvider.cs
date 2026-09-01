@@ -58,11 +58,19 @@ public class MenuProvider : IMenuProvider
                         "MenuBulkCheck"
                         ),
                     new MenuItem(
+                        "Manage foster families",
+                        "Manage foster families",
+                        "Manage foster families claiming Childcare for working families.",
+                        "FosterFamilies",
+                        "Search"
+                        ),
+                    new MenuItem(
                         "Run reports",
                         "Run reports",
                         "Run and export reports on all applications for childcare.",
                         "Report",
-                        "Reports"),
+                        "Reports"
+                        ),
                     new MenuItem(
                         "Guidance",
                         "Guidance",
@@ -75,7 +83,7 @@ public class MenuProvider : IMenuProvider
         }
     }
     public IEnumerable<MenuItem> GetMenuItemsForReports()
-    { 
+    {
         return BuildMenuForRoleReports();
     }
     private IEnumerable<MenuItem> BuildMenuForRoleReports()
@@ -90,5 +98,5 @@ public class MenuProvider : IMenuProvider
             )
         };
     }
-    
+
 }

@@ -1,57 +1,54 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace CheckChildcareEligibility.Admin.Attributes;
 
-public class NinoAttribute : ValidationAttribute
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+public class NinValidatorAttribute : ValidationAttribute
 {
-    private static readonly string FirstLetterPattern = "[ABCEGHJKLMNOPRSTWXYZ]";
-    private static readonly string SecondLetterPattern = "[ABCEGHJKLMNPRSTWXYZ]";
-    private static readonly string DisallowedPrefixesPattern = "^(?!BG|GB|KN|NK|NT|TN|ZZ)";
-    private static readonly string NumericPattern = "[0-9]{6}";
-    private static readonly string LastLetterPattern = "[ABCD]";
+    private readonly Regex _regex;
 
-    private static readonly string Pattern = DisallowedPrefixesPattern + FirstLetterPattern + SecondLetterPattern +
-                                             NumericPattern + LastLetterPattern;
-
-    private static readonly Regex regex = new(Pattern);
+    public NinValidatorAttribute()
+    {
+        ErrorMessage = "Enter a National Insurance number in the correct format";
+        _regex = new Regex("^[A-Z0-9]{2}\\d{6}[A-D]$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    }
 
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
         var model = validationContext.ObjectInstance;
-        var modelType = model.GetType();
 
-        // Try to get the NationalInsuranceNumber property
-        var property = modelType.GetProperty("NationalInsuranceNumber", BindingFlags.Public | BindingFlags.Instance);
-
-        if (property == null)
-        {
-            return new ValidationResult("Model does not contain a NationalInsuranceNumber property");
-        }
-
-        // NINO not provided
         if (value == null)
         {
-            return new ValidationResult("Enter a National Insurance number");
+            if (model is ViewModels.FosterCarerDetailsViewModel ||
+                model is ViewModels.FosterPartnerDetailsViewModel)
+            {
+                return ValidationResult.Success; //Use the ViewModel Required message
+            }
+            else
+            {
+                return new ValidationResult("National Insurance number is required");
+            }
         }
-
-        // Clean and validate the NINO
-        var nino = value.ToString().ToUpper();
-        nino = string.Concat(nino.Where(char.IsLetterOrDigit));
-
-        if (nino.Length > 9)
+        else
         {
-            return new ValidationResult("National Insurance number should contain no more than 9 alphanumeric characters");
-        }
+            var nino = new string(value.ToString()
+                                   .ToUpperInvariant()
+                                   .Where(char.IsLetterOrDigit)
+                                   .ToArray());
 
-        if (!regex.IsMatch(nino))
-        {
-            return new ValidationResult("Enter a National Insurance number in the correct format");
-        }
+            if (nino.Length > 9)
+            {
+                return new ValidationResult(
+                    "National Insurance number should contain no more than 9 alphanumeric characters");
+            }
 
-        // Set the cleaned NINO back into the model
-        property.SetValue(model, nino);
+            if (!_regex.IsMatch(nino))
+            {
+                return new ValidationResult("Enter a National Insurance number in the correct format");
+            }
+        }
 
         return ValidationResult.Success;
     }
