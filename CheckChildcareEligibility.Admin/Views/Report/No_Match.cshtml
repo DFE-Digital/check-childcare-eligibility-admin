@@ -1,0 +1,42 @@
+﻿@model EligibilityCodeSearchViewModel
+@{
+    ViewData["Title"] = "No matching results";
+}
+<div class="govuk-grid-column-two-thirds">
+    <a class="govuk-back-link-nolink"></a>
+    <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner" data-govuk-notification-banner-init="">
+        <div class="govuk-notification-banner__header">
+            <h1 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                @ViewData["Title"]
+            </h1>
+        </div>
+        <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">No eligibility code history found</p>
+        </div>
+    </div>
+
+    <h2 class="govuk-heading-m">Code details you entered</h2>
+
+    <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                Eligibility code
+            </dt>
+            <dd class="govuk-summary-list__value">
+                @Model.EligibilityCode
+            </dd>
+        </div>
+
+    </dl>
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-8">What to do next</h2>
+
+
+    <p>Check that you entered the details correctly.</p>
+
+    <a href="@Url.Action("Code_Search", "Report")" role="button" draggable="false" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">
+        Try again
+    </a>
+
+
+</div>

@@ -1,0 +1,60 @@
+﻿@model EligibilityCodeSearchViewModel
+@{
+    ViewData["Title"] = "Event History";
+}
+<div class="govuk-grid-column-two-thirds">
+
+    <a class="govuk-back-link backLinkJS" href="@Url.Action("Report", "Reports")">Back</a>
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="govuk-error-summary" data-module="govuk-error-summary">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">
+                    There is a problem
+                </h2>
+
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+
+                        @if (ViewData.ModelState["EligibilityCode"]?.Errors.Any() == true)
+                        {
+                           <li>
+                                <a class="govuk-error-message" href="#EligibilityCode"> 
+                                    @ViewData.ModelState["EligibilityCode"].Errors.First().ErrorMessage</a>
+                           </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    }
+    <h1 class="govuk-heading-l">View eligibility code history</h1>
+
+    <form asp-controller="Report" asp-action="Code_Search" method="post">
+        <fieldset class="govuk-fieldset">
+            <div class="govuk-form-group @(ViewData.ModelState["EligibilityCode"]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
+                <label class="govuk-label govuk-label--m" for="EligibilityCode">
+                    Eligibility code
+                </label>
+                <div id="eligibility-code-hint" class="govuk-hint">
+                    Eligibility code must be 11 digits long
+                </div>
+                @if (ViewData.ModelState["EligibilityCode"]?.Errors.Any() == true)
+                {
+                    <p class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span>
+                        @ViewData.ModelState["EligibilityCode"].Errors.First().ErrorMessage
+                    </p>
+                }
+                <input asp-for="EligibilityCode"
+                       id="EligibilityCode"
+                       class="govuk-input govuk-input--width-20 @(ViewData.ModelState["EligibilityCode"]?.Errors.Any() == true ? "govuk-input--error" : "")"
+                       type="text" />
+            </div>
+        </fieldset>
+        <button class="govuk-button govuk-!-margin-top-5" data-module="govuk-button">
+            View code history
+        </button>
+    </form>
+</div>
+

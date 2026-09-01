@@ -57,13 +57,12 @@ public class MenuProvider : IMenuProvider
                         "Home",
                         "MenuBulkCheck"
                         ),
-              /*      new MenuItem(
+                    new MenuItem(
                         "Run reports",
                         "Run reports",
                         "Run and export reports on all applications for childcare.",
                         "Report",
                         "Reports"),
-              */
                     new MenuItem(
                         "Guidance",
                         "Guidance",
@@ -86,8 +85,8 @@ public class MenuProvider : IMenuProvider
             "View eligibility code history",
             "View eligibility code history",
             "View the event listing for a code, showing application and reconfirmation history",
-            "Reports",
-            "CodeHistory"
+            "Report",
+            "Code_Search"
             )
         };
     }

@@ -1,15 +1,7 @@
 ﻿@model CheckChildcareEligibility.Admin.ViewModels.WorkingFamiliesResponseViewModel
-@using CheckChildcareEligibility.Admin.Domain.Constants.Generic
 
 @{
-    DateTime startReconfirmDate = Model.ValidityEndDate.AddDays(-28);
-    string reconfirmBetween = $"{startReconfirmDate.ToString("d MMMM yyyy")} and {Model.ValidityEndDate.ToString("d MMMM yyyy")}";
     string[] reconfirmationStatus = Model.GetReconfirmationStatus();
-
-    if (Model.IsTemporaryCode || Model.ChildIsTooOld)
-    {
-        reconfirmBetween = WorkingFamiliesResponseDetails.StatusNotApplicable;
-    }
 }
 
 <h2 class="govuk-heading-m">Details checked</h2>
@@ -51,10 +43,10 @@
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-            Reconfirm between
+            @Model.ReconfirmationDateLabel
         </dt>
         <dd class="govuk-summary-list__value">
-            @reconfirmBetween
+            @Model.ReconfirmationDateDisplay
         </dd>
     </div>
     <div class="govuk-summary-list__row">

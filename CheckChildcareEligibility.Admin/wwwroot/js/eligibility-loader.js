@@ -1,22 +1,37 @@
 function checkStatus() {
-    let url = document.getElementById("content").getAttribute("data-url");
+    const currentContent = document.getElementById("content");
+    const url = currentContent?.getAttribute("data-url");
+
+    if (!currentContent || !url) {
+        clearInterval(loaderTimer);
+        return;
+    }
+
     fetch(url)
         .then(response => response.text())
         .then(html => {
-            // Parse the fetched HTML and extract the #content section
-            var parser = new DOMParser();
-            var doc = parser.parseFromString(html, 'text/html');
-            var newContent = doc.getElementById("content");
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const newContent = doc.getElementById("content");
+            const currentContainer = currentContent.parentElement;
+            const newContainer = newContent?.parentElement;
 
-            // Only update the content if the data-type has changed
-            if (newContent.getAttribute("data-type") !== document.getElementById("content").getAttribute("data-type")) {
-                document.getElementById("content").innerHTML = newContent.innerHTML;
-                document.getElementById("content").setAttribute("data-type", newContent.getAttribute("data-type"));
-                if (!newContent.getAttribute("data-url")) clearInterval(loaderTimer);
+            // Ignore an unexpected response or a poll superseded by another response.
+            if (!newContent || !currentContainer || !newContainer) {
+                return;
+            }
+
+            if (newContent.getAttribute("data-type") !== currentContent.getAttribute("data-type")) {
+                currentContainer.innerHTML = newContainer.innerHTML;
+                document.title = doc.title;
+
+                if (!newContent.getAttribute("data-url")) {
+                    clearInterval(loaderTimer);
+                }
             }
         })
         .catch(error => {
-            console.error('Error fetching status:', error);
+            console.error("Error fetching status:", error);
         });
 }
 
