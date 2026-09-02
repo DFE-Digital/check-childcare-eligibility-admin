@@ -5,7 +5,7 @@
 
 @{
     ViewData["Title"] = "Dashboard";
-    var menu = MenuProvider.GetMenuItemsFor(ViewBag.Claims);
+    var menu = await MenuProvider.GetMenuItemsFor(ViewBag.Claims);
 }
 
 @model CheckChildcareEligibility.Admin.Domain.DfeSignIn.DfeClaims;
