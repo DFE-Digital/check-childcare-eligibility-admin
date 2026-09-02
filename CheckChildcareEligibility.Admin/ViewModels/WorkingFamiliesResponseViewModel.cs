@@ -1,180 +1,81 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Constants.Generic;
 using CheckChildcareEligibility.Admin.Domain.Enums;
+using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies;
 
 namespace CheckChildcareEligibility.Admin.ViewModels
 {
     public class WorkingFamiliesResponseViewModel
     {
         public CheckEligibilityItemWorkingFamilies Response { get; set; }
-        public bool ChildIsTooYoung => ValidityStartDate < ChildDateOfBirth.AddMonths(9);
-        public bool ChildIsTooOld => HasReachedCompulsorySchoolAge(ChildDateOfBirth, DateTime.UtcNow);
+        public bool ChildIsTooYoung => Response.ValidityStartDate < ChildDateOfBirth.AddMonths(9);   
         public bool IsEligible => Response.Status == CheckEligibilityStatus.eligible.ToString();
-        public bool IsInGracePeriod => DateTime.UtcNow > ValidityEndDate && DateTime.UtcNow < GracePeriodEndDate;
-        public bool IsExpired => DateTime.UtcNow > GracePeriodEndDate;
-        public bool IsTemporaryCode => Response.EligibilityCode.StartsWith("1");
-        public bool IsFosterCode => Response.EligibilityCode.StartsWith("4");
-        public DateTime ValidityStartDate => DateTime.Parse(Response.ValidityStartDate);
-        public DateTime ValidityEndDate => DateTime.Parse(Response.ValidityEndDate);
-        public DateTime GracePeriodEndDate => DateTime.Parse(Response.GracePeriodEndDate);
-
+        public bool IsInGracePeriod => DateTime.UtcNow > Response.ValidityEndDate && DateTime.UtcNow < Response.GracePeriodEndDate;
+  
         public string GracePeriodEndDisplay =>
             (IsEligible && ChildIsTooYoung) || IsNotValidYet
                 ? WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable
-                : GracePeriodEndDate.ToString("d MMMM yyyy");
+                : Response.GracePeriodEndDate.ToString("d MMMM yyyy");
         public string ReconfirmationDateLabel =>
-            IsTemporaryCode
+            Response.EligibilityCodeType == EligibilityCodeType.Temporary
                 ? "Apply for a new code by"
                 : "Reconfirm between";
 
-        public string ReconfirmationDateDisplay
+        public string ReconfrimBetween
         {
             get
             {
-                if (IsTemporaryCode)
+                if (Response.EligibilityCodeType == EligibilityCodeType.Temporary)
                 {
-                    return ValidityEndDate.ToString("d MMMM yyyy");
+                    return Response.ValidityEndDate.ToString("d MMMM yyyy");
                 }
 
-                if (ChildIsTooOld)
+                if (Response.ReconfirmationProperties?.Status == ReconfirmationStatus.ChildTooOld)
                 {
                     return WorkingFamiliesResponseDetails.StatusNotApplicable;
                 }
 
-                return $"{StartReconfirmDate:d MMMM yyyy} and {ValidityEndDate:d MMMM yyyy}";
+                return $"{Response.ReconfirmationProperties?.StartDate:d MMMM yyyy} and {Response.ReconfirmationProperties?.EndDate:d MMMM yyyy}";
             }
         }
 
-        public DateTime ChildDateOfBirth => DateTime.Parse(Response.DateOfBirth);
-        private DateTime StartReconfirmDate => ValidityEndDate.AddDays(-28);
-        public int CurrentYear => DateTime.UtcNow.Year;
+        public DateTime ChildDateOfBirth => DateTime.Parse(Response.DateOfBirth);    
         public string CodeType = WorkingFamiliesResponseBanner.CodePermanent;
         public string CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
         public string BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
         public string TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor;
-
-
-
-        public string TermInfo => GetTermInfo(ValidityStartDate);
-        public string CurrentTerm => GetTermName(DateTime.Now);
-        public string NextTerm => GetTermName(GetNextTerm(GetTermStart(DateTime.Now)));
-
-        public string GetTermInfo(DateTime vsd)
-        {
-            DateTime nineMonthsDate = ChildDateOfBirth.AddMonths(9);
-
-            // Define term code will be eligible from if child is currently too young
-            if (ChildIsTooYoung && vsd < nineMonthsDate)
-            {
-                vsd = nineMonthsDate;
-            }
-
-            // Define when the code expires if in the grace period or has expired
-            if (DateTime.UtcNow > ValidityEndDate)
-            {
-                return $"{GracePeriodEndDate:dd MMMM yyyy}";
-            }
-            
-            // If code is already active return current term info
-            if (vsd < GetTermStart(DateTime.Now))
-            {
-                return CurrentTerm;
-            }
-
-            // Define term start dates for the given year
-            DateTime springStart = new DateTime(vsd.Year, 1, 1);
-            DateTime summerStart = new DateTime(vsd.Year, 4, 1);
-            DateTime autumnStart = new DateTime(vsd.Year, 9, 1);
-            
-            // If the code isn't yet active determine the next term that the code is valid from DSVD already returned from API
-            if (vsd >= autumnStart)
-            {
-                return $"{WorkingFamiliesResponseBanner.SpringTerm} {vsd.AddYears(1).Year}";
-            }
-            else if (vsd >= summerStart)
-            {
-                return $"{WorkingFamiliesResponseBanner.AutumnTerm} {vsd.Year}";
-            }
-            else // Validity start during spring term so valid from summer term
-            {
-                return $"{WorkingFamiliesResponseBanner.SummerTerm} {vsd.Year}";
-            }
-        }
-
-        public bool IsReconfirmed
-        {
-            get
-            {
-                string endTermName = GetTermName(GetTermStart(GracePeriodEndDate));
-                return IsEligible && !IsNotValidYet && !IsInGracePeriod && CurrentTerm != endTermName;
-            }
-        }
+        public string TermValidityDateRange = string.Empty;
+        public TermName? CurrentTerm => Response.TermValidity.Current;
+        public TermName? NextTerm => Response.TermValidity.Next;
 
         public bool IsNotValidYet
         {
             get
             {
-                // The VSD must be before the current term start to be valid for current term
-                return ValidityStartDate >= GetTermStart(DateTime.Now);
+                // If current term is None and next term is assigned
+                return CurrentTerm == TermName.None && NextTerm != TermName.None;
+            }
+        }
+        public bool IsReconfirmed
+        {
+            get
+            {
+                return IsEligible && !IsNotValidYet && !IsInGracePeriod && NextTerm != TermName.None;
             }
         }
 
-        private string GetTermName(DateTime date)
-        {
-            DateTime springStart = new DateTime(date.Year, 1, 1);
-            DateTime summerStart = new DateTime(date.Year, 4, 1);
-            DateTime autumnStart = new DateTime(date.Year, 9, 1);
-
-            if (date >= autumnStart)
-                return $"{WorkingFamiliesResponseBanner.AutumnTerm} {date.Year}";
-            else if (date >= summerStart)
-                return $"{WorkingFamiliesResponseBanner.SummerTerm} {date.Year}";
-            else
-                return $"{WorkingFamiliesResponseBanner.SpringTerm} {date.Year}";
-        }
-        public static DateTime GetTermStart(DateTime date)
-        {
-            int year = date.Year;
-
-            if (date >= new DateTime(year, 9, 1))
-                return new DateTime(year, 9, 1);
-            else if (date >= new DateTime(year, 4, 1))
-                return new DateTime(year, 4, 1);
-            else
-                return new DateTime(year, 1, 1);
-        }
-
-        public static DateTime GetNextTerm(DateTime termStart)
-        {
-            if (termStart.Month == 1)
-                return new DateTime(termStart.Year, 4, 1);
-            else if (termStart.Month == 4)
-                return new DateTime(termStart.Year, 9, 1);
-            else // September
-                return new DateTime(termStart.Year + 1, 1, 1);
-        }
-
-        private bool HasReachedCompulsorySchoolAge(DateTime dateOfBirth, DateTime currentCheckDate)
-        {
-            DateTime fifthBirthday = dateOfBirth.AddYears(5);
-            DateTime termChildTurnsFive = GetTermStart(fifthBirthday);
-            DateTime termAfterFive = GetNextTerm(termChildTurnsFive);
-        
-            return currentCheckDate >= termAfterFive;
-        }
-
-        public string GetBannerCodeType()
+        public string SetBannerCodeType()
         {
 
-            if (ChildIsTooOld)//child too old - Child has reached compulsory school age
+            if (Response.ReconfirmationProperties?.Status == ReconfirmationStatus.ChildTooOld)
             {
                 return WorkingFamiliesResponseBanner.ReconfirmationChildTooOld;
             }
-            else if (DateTime.Now >= StartReconfirmDate && DateTime.Now <= ValidityEndDate) //due now
+            else if (Response.ReconfirmationProperties?.Status == ReconfirmationStatus.Due)
             {
-                return $"{WorkingFamiliesResponseBanner.ReconfirmationBefore} {ValidityEndDate.ToString("d MMMM yyyy")}";
+                return $"{WorkingFamiliesResponseBanner.ReconfirmationBefore} {Response.ValidityEndDate.ToString("d MMMM yyyy")}";
             }
-            else if (DateTime.Now > ValidityEndDate) //overdue - Needs reconfirming now
+            else if (Response.ReconfirmationProperties?.Status == ReconfirmationStatus.Overdue) 
             {
                 return WorkingFamiliesResponseBanner.ReconfirmationOverdue;
             }
@@ -183,7 +84,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
         public void SetBannerValues()
         {
-            if (IsTemporaryCode)
+            if (Response.EligibilityCodeType == EligibilityCodeType.Temporary)
             {
                 CodeType = WorkingFamiliesResponseBanner.CodeTemporary;
 
@@ -192,90 +93,90 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                     TermValidityDetails = "Only "  + TermValidityDetails;
                 }
             }
-            else if (IsFosterCode)
+            else if (Response.EligibilityCodeType == EligibilityCodeType.Foster)
             {
                 CodeType = WorkingFamiliesResponseBanner.CodeFosterFamily;
             }
 
             if (IsEligible && ChildIsTooYoung) // Child too young
             {
+
+                DateTime nineMonthsDate = ChildDateOfBirth.AddMonths(9);
                 CodeStatus = WorkingFamiliesResponseBanner.CodeChildTooYoung;
                 BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
-                TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFrom;
-                CodeType = string.Empty;
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {NextTerm} {nineMonthsDate.Year}";
+
             }
             else if (IsNotValidYet) // Code cannot be used yet
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeNotValidYet;
                 BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
-                TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFrom;
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {NextTerm.ToString()} {Response.GracePeriodEndDate.Year}";
+
             }
-            else if (IsExpired) // Expired
-            {
-                CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
-                BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
-                TermValidityDetails = WorkingFamiliesResponseBanner.TermExpiredOn;
-            }
-            else if (IsInGracePeriod) // Code is in grace period
-            {
-                CodeStatus = WorkingFamiliesResponseBanner.CodeInGracePeriod;
-                BannerColour = WorkingFamiliesResponseBanner.ColourYellow;
-                TermValidityDetails = WorkingFamiliesResponseBanner.TermExpiresOn;
-            }
+            // is Valid and reconfirmation has happened
             else if (IsReconfirmed)
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
                 BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
-                TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor + " " + CurrentTerm + " and " + NextTerm;
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFor} {CurrentTerm} {DateTime.UtcNow.Year} and {NextTerm} {Response.GracePeriodEndDate.Year}";
             }
+
+            else if (Response.Status == CheckEligibilityStatus.notEligible.ToString()) // Expired
+            {
+                CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
+                BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermExpiredOn} {Response.GracePeriodEndDate:dd MMMM yyyy}";
+            }
+            else if (IsInGracePeriod)
+            {
+                CodeStatus = WorkingFamiliesResponseBanner.CodeInGracePeriod;
+                BannerColour = WorkingFamiliesResponseBanner.ColourYellow;
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermExpiresOn} {Response.GracePeriodEndDate:dd MMMM yyyy}";
+            }
+           
         }
 
-        public string GetBannerReconfirmationMessage()
+        public string SetBannerReconfirmationMessage()
         {
-            if ((IsTemporaryCode && CodeStatus == WorkingFamiliesResponseBanner.CodeValid)
-                || (IsTemporaryCode && CodeStatus == WorkingFamiliesResponseBanner.CodeInGracePeriod)
-                || (IsTemporaryCode && CodeStatus == WorkingFamiliesResponseBanner.CodeExpired))
+             if (Response.ReconfirmationProperties?.Status == ReconfirmationStatus.Due)
             {
-                return string.Empty;
+                return $"{WorkingFamiliesResponseBanner.ReconfirmationBefore} {Response.ReconfirmationProperties.EndDate?.ToString("d MMMM yyyy")}";
             }
-            else if (HasReachedCompulsorySchoolAge(ChildDateOfBirth, DateTime.Now))//child too old - Child has reached compulsory school age
-            {
-                return WorkingFamiliesResponseBanner.ReconfirmationChildTooOld;
-            }
-            else if (DateTime.Now >= StartReconfirmDate && DateTime.Now <= ValidityEndDate) //due now
-            {
-                return $"{WorkingFamiliesResponseBanner.ReconfirmationBefore} {ValidityEndDate.ToString("d MMMM yyyy")}";
-            }
-            else if (DateTime.Now > ValidityEndDate) //overdue - Needs reconfirming now
+            else if (Response.ReconfirmationProperties?.Status == ReconfirmationStatus.Overdue)
             {
                 return WorkingFamiliesResponseBanner.ReconfirmationOverdue;
+            }
+            else if (Response.ReconfirmationProperties?.Status == ReconfirmationStatus.ChildTooOld)
+            {
+                return WorkingFamiliesResponseBanner.ReconfirmationChildTooOld;
             }
             return string.Empty;
         }
 
-        public string[] GetReconfirmationStatus()
+        public string[] SetReconfirmationStatus()
         {
-            if (IsTemporaryCode) //Temp code
-            {
-                return WorkingFamiliesResponseDetails.ReconfirmationStatusNotApplicable;
-            }
-            else if (ChildIsTooOld)//child too old
-            {
-                return WorkingFamiliesResponseDetails.ReconfirmationStatusChildTooOld;
-            }
-            else if (DateTime.Now < StartReconfirmDate)
-            {
-                return WorkingFamiliesResponseDetails.ReconfirmationStatusNotDueYet;
-            }
-            else if (DateTime.Now >= StartReconfirmDate && DateTime.Now <= ValidityEndDate) //due now
+            if (Response.ReconfirmationProperties.Status == ReconfirmationStatus.Due)
             {
                 return WorkingFamiliesResponseDetails.ReconfirmationStatusDueNow;
             }
-            else if (DateTime.Now > ValidityEndDate) //overdue - Needs reconfirming now
+            if (Response.ReconfirmationProperties.Status == ReconfirmationStatus.NotDueYet)
+            {
+                return WorkingFamiliesResponseDetails.ReconfirmationStatusNotDueYet;
+            }
+            if (Response.ReconfirmationProperties.Status == ReconfirmationStatus.Overdue)
             {
                 return WorkingFamiliesResponseDetails.ReconfirmationStatusOverdue;
             }
-            return ["Not set", "purple"]; // Should not reach this
+            if (Response.ReconfirmationProperties.Status == ReconfirmationStatus.NotApplicable)
+            {
+                return WorkingFamiliesResponseDetails.ReconfirmationStatusNotApplicable;
+            }
+             if (Response.ReconfirmationProperties.Status == ReconfirmationStatus.ChildTooOld)
+            {
+                return WorkingFamiliesResponseDetails.ReconfirmationStatusChildTooOld;
+            }                           
+            return Array.Empty<string>();
         }
 
     }

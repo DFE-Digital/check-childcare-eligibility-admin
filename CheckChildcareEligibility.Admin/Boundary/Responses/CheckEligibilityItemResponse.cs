@@ -43,9 +43,9 @@ public class CheckEligibilityItemWorkingFamilies
     public string Status { get; set; }
     public DateTime Created { get; set; }
     public string EligibilityCode { get; set; }
-    public string ValidityStartDate { get; set; }
-    public string ValidityEndDate { get; set; }
-    public string GracePeriodEndDate { get; set; }
+    public DateTime ValidityStartDate { get; set; }
+    public DateTime ValidityEndDate { get; set; }
+    public DateTime GracePeriodEndDate { get; set; }
     public int? Order { get; set; }
 }
 public class TermValidity
@@ -54,19 +54,14 @@ public class TermValidity
     public TermName? Current { get; set; }
     public TermName? Next { get; set; }
 
-    public TermValidity(TermName? current, TermName? next)
-    {
-        Current = current ?? TermName.None;
-        Next = next ?? TermName.None;
-    }
 }
 
 public class ReconfirmationProperties
 {
 
-    public string? StartDate { get; set; }
+    public DateTime? StartDate { get; set; }
 
-    public string? EndDate { get; set; }
+    public DateTime? EndDate { get; set; }
 
     public ReconfirmationStatus Status { get; set; }
 
