@@ -104,7 +104,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 DateTime nineMonthsDate = ChildDateOfBirth.AddMonths(9);
                 CodeStatus = WorkingFamiliesResponseBanner.CodeChildTooYoung;
                 BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
-                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {NextTerm} {nineMonthsDate.Year}";
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {NextTerm.ToString()} {nineMonthsDate.Year}";
 
             }
             else if (IsNotValidYet) // Code cannot be used yet
@@ -119,7 +119,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
                 BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
-                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFor} {CurrentTerm} {DateTime.UtcNow.Year} and {NextTerm} {Response.GracePeriodEndDate.Year}";
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFor} {CurrentTerm.ToString()} {DateTime.UtcNow.Year} and {NextTerm.ToString()} {Response.GracePeriodEndDate.Year}";
             }
 
             else if (Response.Status == CheckEligibilityStatus.notEligible.ToString()) // Expired
@@ -133,6 +133,9 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 CodeStatus = WorkingFamiliesResponseBanner.CodeInGracePeriod;
                 BannerColour = WorkingFamiliesResponseBanner.ColourYellow;
                 TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermExpiresOn} {Response.GracePeriodEndDate:dd MMMM yyyy}";
+            }
+            else {
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFor} {CurrentTerm.ToString()} {DateTime.UtcNow.Year}";
             }
            
         }
