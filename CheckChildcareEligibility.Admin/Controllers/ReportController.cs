@@ -10,25 +10,23 @@ using CheckChildcareEligibility.Admin.UseCases;
 using CheckChildcareEligibility.Admin.ViewModels;
 using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.FeatureManagement.Mvc;
 using Newtonsoft.Json;
 using System.Globalization;
-using System.Reflection;
 using System.Text;
 
 namespace CheckChildcareEligibility.Admin.Controllers
 {
+    [FeatureGate("Reports")]
     public class ReportController : BaseController
     {
-        private readonly IMenuProvider _menuProvider;
         private readonly IPerformEligibilityCodeHistoryReportUseCase _performEligibilityCodeHistoryReportUseCase;
         private readonly IValidateEligibilityCodeUseCase _validateEligibilityCodeUseCase;
         public ReportController(
-             IMenuProvider menuProvider,
              IPerformEligibilityCodeHistoryReportUseCase performEligibilityCodeHistoryReportUse,
              IValidateEligibilityCodeUseCase validateEligibilityCodeUseCase,
             IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService)
         {
-            _menuProvider = menuProvider;
             _performEligibilityCodeHistoryReportUseCase = performEligibilityCodeHistoryReportUse;
             _validateEligibilityCodeUseCase = validateEligibilityCodeUseCase;
         }
@@ -66,9 +64,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             if (!validationResult.IsValid)
             {
                 TempData["EligibilityCode"] = EligibilityCode;
-                TempData["Errors"] =
-                JsonConvert.SerializeObject(validationResult.Errors);
-
+                TempData["Errors"] = JsonConvert.SerializeObject(validationResult.Errors);
                 return RedirectToAction("Code_Search");
             }
             var response = await _performEligibilityCodeHistoryReportUseCase.Execute(EligibilityCode);

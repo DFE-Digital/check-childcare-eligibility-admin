@@ -1,5 +1,5 @@
-﻿using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using CheckChildcareEligibility.Admin.Attributes;
 
 namespace CheckYourEligibility.API.Domain.Validation;
 
@@ -7,12 +7,10 @@ internal static class DataValidation
 {
     internal static bool BeAValidName(string? value)
     {
-        if (string.IsNullOrWhiteSpace(value)) return false;
-        var regexString =
-            @"^[^\d]*$";
-        var rg = new Regex(regexString);
-        var res = rg.Match(value);
-        return res.Success;
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        return Regex.IsMatch(value, NameAttribute.NameValidationRegex);
     }
 
     internal static bool BeAValidDate(string value)

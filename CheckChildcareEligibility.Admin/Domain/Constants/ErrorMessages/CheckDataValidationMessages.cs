@@ -5,7 +5,7 @@ public static class ValidationMessages
     public const string RequiredLastName = "Enter parent or guardian's last name";
     public const string RequiredDOB = "Enter parent or guardian's date of birth";
     public const string RequiredNI = "Enter parent or guardian's National Insurance number";
-    public const string ValidLastName = "Parent or guardian's last name should not contain numbers";
+    public const string ValidLastName = "Parent or guardian's last name contains an invalid character";
     public const string ValidDOB = "The date of birth must be in yyyy-mm-dd or dd-mm-yyyy format";
     public const string ValidNI = "Enter a National Insurance number in the correct format";
     public const string ChildDOB = "Child Date of birth is required:- (yyyy-mm-dd)";

@@ -10,6 +10,7 @@ using CheckChildcareEligibility.Admin.Usecases;
 using CheckChildcareEligibility.Admin.UseCases;
 using FluentValidation;
 using System.Globalization;
+using Microsoft.FeatureManagement;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,6 +81,8 @@ builder.Services.AddDfeSignInAuthentication(dfeSignInConfiguration);
 builder.Services.AddHealthChecks();
 
 builder.Services.AddSingleton<IMenuProvider, MenuProvider>();
+
+builder.Services.AddFeatureManagement();
 
 var app = builder.Build();
 
