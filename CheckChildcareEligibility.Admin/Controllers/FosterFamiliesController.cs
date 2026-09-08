@@ -1,15 +1,18 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
+using CheckChildcareEligibility.Admin.Domain.Constants;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Usecases;
 using CheckChildcareEligibility.Admin.UseCases;
 using CheckChildcareEligibility.Admin.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.FeatureManagement.Mvc;
 using Newtonsoft.Json;
 
 namespace CheckChildcareEligibility.Admin.Controllers
 {
     [Route("[controller]")]
+    [FeatureGate(Features.FosterFamilies)]
     public class FosterFamiliesController : BaseController
     {
         private readonly IMenuProvider _menuProvider;

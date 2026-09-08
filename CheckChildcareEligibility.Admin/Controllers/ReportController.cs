@@ -1,9 +1,6 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Controllers.Constants;
-using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeConstants;
-using CheckChildcareEligibility.Admin.Domain.Enums;
-using CheckChildcareEligibility.Admin.Gateways;
-using CheckChildcareEligibility.Admin.Gateways.Interfaces;
+using CheckChildcareEligibility.Admin.Domain.Constants;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
@@ -17,7 +14,7 @@ using System.Text;
 
 namespace CheckChildcareEligibility.Admin.Controllers
 {
-    [FeatureGate("Reports")]
+    [FeatureGate(Features.Reports)]
     public class ReportController : BaseController
     {
         private readonly IPerformEligibilityCodeHistoryReportUseCase _performEligibilityCodeHistoryReportUseCase;

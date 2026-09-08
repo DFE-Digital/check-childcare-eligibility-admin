@@ -1,4 +1,5 @@
-﻿using CheckChildcareEligibility.Admin.Domain.DfeSignIn;
+﻿using CheckChildcareEligibility.Admin.Domain.Constants;
+using CheckChildcareEligibility.Admin.Domain.DfeSignIn;
 using CheckChildcareEligibility.Admin.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.FeatureManagement;
@@ -90,7 +91,8 @@ public class MenuProvider : IMenuProvider
                         "Manage foster families",
                         "Manage foster families claiming Childcare for working families.",
                         "FosterFamilies",
-                        "Search"
+                        "Search",
+                        featureName: Features.FosterFamilies
                         ),
                     new MenuItem(
                         "Run reports",
@@ -98,7 +100,7 @@ public class MenuProvider : IMenuProvider
                         "Run and export reports on all applications for childcare.",
                         "Report",
                         "Reports",
-                        featureName: "Reports"
+                        featureName: Features.Reports
                         ),
                     new MenuItem(
                         "Guidance",
