@@ -8,7 +8,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
     public class WorkingFamiliesResponseViewModel
     {
         public CheckEligibilityItemWorkingFamilies Response { get; set; }
-        public bool ChildIsTooYoung => Response.ValidityStartDate < ChildDateOfBirth.AddMonths(9);   
+        public bool ChildIsTooYoung => Response.ChildTooYoung;   
         public bool IsEligible => Response.Status == CheckEligibilityStatus.eligible.ToString();
         public bool IsInGracePeriod => DateTime.UtcNow > Response.ValidityEndDate && DateTime.UtcNow < Response.GracePeriodEndDate;
   
@@ -45,8 +45,8 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public string BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
         public string TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor;
         public string TermValidityDateRange = string.Empty;
-        public TermName? CurrentTerm => Response.TermValidity.Current;
-        public TermName? NextTerm => Response.TermValidity.Next;
+        public TermName CurrentTerm => Response.TermValidity.Current;
+        public TermName NextTerm => Response.TermValidity.Next;
 
         public bool IsNotValidYet
         {
@@ -84,6 +84,9 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
         public void SetBannerValues()
         {
+            var nextTermView = WorkingFamiliesResponseBanner.TermNamesInView.GetValueOrDefault(NextTerm, string.Empty);
+            var currentTermView = WorkingFamiliesResponseBanner.TermNamesInView.GetValueOrDefault(CurrentTerm, string.Empty);
+
             if (Response.EligibilityCodeType == EligibilityCodeType.Temporary)
             {
                 CodeType = WorkingFamiliesResponseBanner.CodeTemporary;
@@ -104,14 +107,14 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 DateTime nineMonthsDate = ChildDateOfBirth.AddMonths(9);
                 CodeStatus = WorkingFamiliesResponseBanner.CodeChildTooYoung;
                 BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
-                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {NextTerm.ToString()} {nineMonthsDate.Year}";
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {nextTermView} {nineMonthsDate.Year}";
 
             }
             else if (IsNotValidYet) // Code cannot be used yet
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeNotValidYet;
                 BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
-                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {NextTerm.ToString()} {Response.GracePeriodEndDate.Year}";
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {nextTermView} {Response.GracePeriodEndDate.Year}";
 
             }
             // is Valid and reconfirmation has happened
@@ -119,7 +122,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
                 BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
-                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFor} {CurrentTerm.ToString()} {DateTime.UtcNow.Year} and {NextTerm.ToString()} {Response.GracePeriodEndDate.Year}";
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFor} {currentTermView} {DateTime.UtcNow.Year} and {nextTermView} {Response.GracePeriodEndDate.Year}";
             }
 
             else if (Response.Status == CheckEligibilityStatus.notEligible.ToString()) // Expired
@@ -135,7 +138,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermExpiresOn} {Response.GracePeriodEndDate:dd MMMM yyyy}";
             }
             else {
-                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFor} {CurrentTerm.ToString()} {DateTime.UtcNow.Year}";
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFor} {currentTermView} {DateTime.UtcNow.Year}";
             }
            
         }
