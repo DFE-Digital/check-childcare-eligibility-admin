@@ -125,6 +125,7 @@ function formatDateOfBirth(dateOfBirth: {
 function assertResponseDetails(
   code: string,
   nino: string,
+  gracePeriodLabel: string,
   gped: string | undefined,
   reconfirmationLabel: string,
   reconfirmationDetails: string | undefined,
@@ -172,7 +173,7 @@ function assertResponseDetails(
             );
           }
         });
-      cy.contains(".govuk-summary-list__key", "Grace period ends")
+      cy.contains(".govuk-summary-list__key", gracePeriodLabel)
         .siblings(".govuk-summary-list__value")
         .invoke("text")
         .then((text) => {
@@ -238,7 +239,8 @@ describe("Single check Working Families response views", () => {
     assertResponseDetails(
       code,
       "AA123456B",
-      "Date will appear here when the code can be used",
+      "Grace period ends",
+      "Date will appear here when the code can be used",  
       "Reconfirm between",
       undefined,
       "Not due yet",
@@ -254,13 +256,14 @@ describe("Single check Working Families response views", () => {
     assertResponseDetails(
       code,
       "AA123456B",
+      "Grace period ends",
       undefined,
       "Reconfirm between",
       undefined,
       "Not due yet",
     );
   });
-
+  
   it("shows a child too young response when the code starts before the child is nine months old", () => {
     const code = buildEligibilityCode(eligibilityCodePrefixes.validForThisTerm);
     runWorkingFamiliesCheck(code, "AA123456B", childTooYoungDateOfBirth);
@@ -274,6 +277,7 @@ describe("Single check Working Families response views", () => {
     assertResponseDetails(
       code,
       "AA123456B",
+      "Grace period ends",
       "Date will appear here when the code can be used",
       "Reconfirm between",
       undefined,
@@ -295,7 +299,8 @@ describe("Single check Working Families response views", () => {
     assertResponseDetails(
       code,
       "AA123456B",
-      undefined,
+      "Grace period ended",
+       undefined,
       "Reconfirm between",
       "Not applicable",
       "Child too old",
@@ -317,6 +322,7 @@ describe("Single check Working Families response views", () => {
     assertResponseDetails(
       code,
       "AA123456B",
+      "Grace period ends",
       undefined,
       "Reconfirm between",
       undefined,
@@ -339,6 +345,7 @@ describe("Single check Working Families response views", () => {
     assertResponseDetails(
       code,
       "AA123456B",
+      "Grace period ends",
       undefined,
       "Reconfirm between",
       undefined,
@@ -363,6 +370,7 @@ describe("Single check Working Families response views", () => {
     assertResponseDetails(
       code,
       "AA123456B",
+      "Grace period ends",
       undefined,
       "Apply for a new code by",
       undefined,
@@ -381,6 +389,7 @@ describe("Single check Working Families response views", () => {
     assertResponseDetails(
       code,
       "AA123456B",
+      "Grace period ends",
       undefined,
       "Reconfirm between",
       undefined,
@@ -404,6 +413,7 @@ describe("Single check Working Families response views", () => {
     assertResponseDetails(
       code,
       "AA123456B",
+      "Grace period ends",
       undefined,
       "Apply for a new code by",
       undefined,
@@ -427,6 +437,7 @@ describe("Single check Working Families response views", () => {
     assertResponseDetails(
       code,
       "AA123456B",
+      "Grace period ends",
       undefined,
       "Reconfirm between",
       undefined,
@@ -447,6 +458,7 @@ describe("Single check Working Families response views", () => {
     assertResponseDetails(
       code,
       nino,
+      "Grace period ends",
       undefined,
       "Reconfirm between",
       undefined,
