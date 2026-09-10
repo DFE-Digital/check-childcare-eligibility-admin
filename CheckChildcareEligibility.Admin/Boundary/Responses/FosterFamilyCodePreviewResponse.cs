@@ -4,7 +4,7 @@ namespace CheckChildcareEligibility.Admin.Boundary.Responses
     {
         public DateTime ValidityStartDate { get; init; }
 
-        public string ValidFromTerm { get; init; } = string.Empty;
+        public Term ValidFromTerm { get; init; }
 
         public DateTime EligibilityConfirmed { get; init; }
 

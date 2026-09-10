@@ -32,8 +32,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
             if (!validationResult.IsValid)
             {
-                throw new FluentValidation.ValidationException(
-                    validationResult.Errors);
+                throw new FluentValidation.ValidationException(validationResult.Errors);
             }
 
             request.FosterCarer.LocalAuthorityID = localAuthorityId;

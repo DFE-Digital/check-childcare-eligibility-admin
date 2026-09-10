@@ -4,11 +4,13 @@
     {
         // Eligibility Code Details
 
+        public Term ValidFromTerm { get; set; }
+        
         public string EligibilityCode { get; set; } = string.Empty;
 
         public string ReconfirmationStatus { get; set; } = string.Empty;
 
-        public DateTime EligibilityConfirmedOn { get; set; }
+        public DateTime ValidityStartDate { get; set; }
 
         public DateTime ReconfirmBetweenStart { get; set; }
         

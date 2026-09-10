@@ -30,10 +30,17 @@
 
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
 
-            <a href="/childcare/dev/foster/add-child/child-details" role="button" draggable="false"
+            <a href="@Url.ActionLink("AddChild", "FosterFamilies", new { Model.FosterCarerId })" role="button" draggable="false"
                class="govuk-button govuk-button" data-module="govuk-button" data-govuk-button-init="">
                 Add child and create code (**ToDo**)
             </a>
+            @if (!Model.HasPartner)
+            {
+                <a href="@Url.ActionLink("AddPartner", "FosterFamilies", new { Model.FosterCarerId })" role="button" draggable="false"
+                   class="govuk-button govuk-button--secondary" data-module="govuk-button" data-govuk-button-init="">
+                    Add partner
+                </a>
+            }
 
             <div class="govuk-summary-card">
                 <div class="govuk-summary-card__title-wrapper">

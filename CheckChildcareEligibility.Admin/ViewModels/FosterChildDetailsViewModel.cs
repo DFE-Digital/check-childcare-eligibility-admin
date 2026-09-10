@@ -1,4 +1,5 @@
 ﻿using CheckChildcareEligibility.Admin.Attributes;
+using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -24,9 +25,20 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         [PostCode]
         [Required(ErrorMessage = FosterFamilyValidationMessages.ChildPostCodeEmpty)]
         public string ChildPostCode { get; set; }
-        
+
         public string? ContextId { get; set; }
 
         public bool HasPartner { get; set; }
+
+        public FosterChildRequest BuildRequest()
+        {
+            return new FosterChildRequest
+            {
+                ChildFirstName = ChildFirstName,
+                ChildLastName = ChildLastName,
+                ChildDateOfBirth = ChildDateOfBirth,
+                ChildPostCode = ChildPostCode
+            };
+        }
     }
 }

@@ -1,3 +1,4 @@
+using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.ViewModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -23,8 +24,29 @@ public class ValidateFosterPartnerDetailsUseCase : IValidateFosterPartnerDetails
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public FosterPartnerDetailsValidationResult Execute(FosterPartnerDetailsViewModel request, ModelStateDictionary modelState)
+    public FosterPartnerDetailsValidationResult Execute(FosterPartnerDetailsViewModel viewModel, ModelStateDictionary modelState)
     {
+        // If model passes form validation construct date fields then perform additional validation using FluentValidation
+        if (modelState.IsValid)
+        {
+            // Set DateOfBirth in request before serializing
+            viewModel.PartnerDateOfBirth = new DateTime(
+                int.Parse(viewModel.Year),
+                int.Parse(viewModel.Month),
+                int.Parse(viewModel.Day));
+
+            var request = viewModel.BuildRequest();
+            var validator = new FosterPartnerRequestValidator();
+            var validationResult = validator.Validate(request);
+            if (!validationResult.IsValid)
+            {
+                foreach (var error in validationResult.Errors)
+                {
+                    modelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+            }
+        }
+
         if (!modelState.IsValid)
         {
             var errors = ProcessModelStateErrors(modelState);

@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using CheckChildcareEligibility.Admin.Attributes;
+using CheckChildcareEligibility.Admin.Helpers;
 
 namespace CheckYourEligibility.API.Domain.Validation;
 
@@ -54,4 +55,10 @@ internal static class DataValidation
             RegexOptions.Compiled);
     }
 
+        internal static bool BeAValidChildAge(DateTime value)
+        {
+            DateTime fifthBirthday = value.AddYears(5);
+            var (_, termAfterBirthday) = WorkingFamiliesCheckHelper.GetTerms(fifthBirthday);
+            return DateTime.Today < termAfterBirthday.StartDate;
+        }
 }

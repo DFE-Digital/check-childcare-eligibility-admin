@@ -1,4 +1,5 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Services;
 using CheckChildcareEligibility.Admin.ViewModels;
 using FluentAssertions;
 
@@ -11,7 +12,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
         public void GracePeriodEndDisplay_WhenChildIsTooYoung_ShouldReturnPlaceholder()
         {
             // Arrange
-            var currentTermStart = WorkingFamiliesResponseViewModel.GetTermStart(DateTime.Now);
+            var currentTermStart = WorkingFamiliesHelper.GetTermStart(DateTime.Now);
             var childDateOfBirth = currentTermStart.AddMonths(-1);
             var validityStartDate = currentTermStart.AddDays(-1);
             var sut = CreateViewModel(childDateOfBirth, validityStartDate);
@@ -29,7 +30,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
         public void GracePeriodEndDisplay_WhenCodeIsNotValidYet_ShouldReturnPlaceholder()
         {
             // Arrange
-            var currentTermStart = WorkingFamiliesResponseViewModel.GetTermStart(DateTime.Now);
+            var currentTermStart = WorkingFamiliesHelper.GetTermStart(DateTime.Now);
             var childDateOfBirth = currentTermStart.AddYears(-3);
             var validityStartDate = currentTermStart;
             var sut = CreateViewModel(childDateOfBirth, validityStartDate);
@@ -47,7 +48,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
         public void GracePeriodEndDisplay_WhenCodeIsValid_ShouldReturnFormattedGracePeriodEndDate()
         {
             // Arrange
-            var currentTermStart = WorkingFamiliesResponseViewModel.GetTermStart(DateTime.Now);
+            var currentTermStart = WorkingFamiliesHelper.GetTermStart(DateTime.Now);
             var childDateOfBirth = currentTermStart.AddYears(-3);
             var validityStartDate = currentTermStart.AddDays(-1);
             var gracePeriodEndDate = DateTime.Today.AddMonths(6);
@@ -69,7 +70,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
         public void GracePeriodEndDisplay_WhenChildIsTooOld_ShouldReturnFormattedGracePeriodEndDate()
         {
             // Arrange
-            var currentTermStart = WorkingFamiliesResponseViewModel.GetTermStart(DateTime.Now);
+            var currentTermStart = WorkingFamiliesHelper.GetTermStart(DateTime.Now);
             var childDateOfBirth = currentTermStart.AddYears(-6);
             var validityStartDate = currentTermStart.AddDays(-1);
             var gracePeriodEndDate = DateTime.Today.AddMonths(6);
@@ -132,7 +133,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
         public void ReconfirmationDetails_WhenChildIsTooOld_ShouldRemainNotApplicable()
         {
             // Arrange
-            var currentTermStart = WorkingFamiliesResponseViewModel.GetTermStart(DateTime.Now);
+            var currentTermStart = WorkingFamiliesHelper.GetTermStart(DateTime.Now);
             var sut = CreateViewModel(
                 currentTermStart.AddYears(-6),
                 currentTermStart.AddDays(-1));

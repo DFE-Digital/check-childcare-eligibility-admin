@@ -30,5 +30,7 @@
         public const string ChildLastNameInvalid = "Child's last name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes";
         public const string ChildPostCodeEmpty = "Enter postcode";
         public const string ChildPostCodeInvalid = "Enter a full UK postcode";
+
+        public const string ChildIsTooOld = "Child must be under 5 years old on the date of application";
     }
 }

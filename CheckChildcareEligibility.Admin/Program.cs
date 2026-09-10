@@ -61,7 +61,6 @@ builder.Services.AddScoped<ILoadFosterPartnerDetailsUseCase, LoadFosterPartnerDe
 builder.Services.AddScoped<IValidateFosterPartnerDetailsUseCase, ValidateFosterPartnerDetailsUseCase>();
 builder.Services.AddScoped<ILoadFosterChildDetailsUseCase, LoadFosterChildDetailsUseCase>();
 builder.Services.AddScoped<IValidateFosterChildDetailsUseCase, ValidateFosterChildDetailsUseCase>();
-builder.Services.AddScoped<ILoadFosterApplicationSubmittedDateUseCase, LoadFosterApplicationSubmittedDateUseCase>();
 builder.Services.AddScoped<IValidateFosterApplicationSubmittedDateUseCase, ValidateFosterApplicationSubmittedDateUseCase>();
 builder.Services.AddScoped<ICreateFosterFamilyUseCase, CreateFosterFamilyUseCase>();
 builder.Services.AddScoped<IGetFosterFamilyUseCase, GetFosterFamilyUseCase>();
@@ -72,8 +71,6 @@ builder.Services.AddScoped<IPerformEligibilityCodeHistoryReportUseCase, PerformE
 builder.Services.AddScoped <IValidateEligibilityCodeUseCase,ValidateEligibilityCodeUseCase>();
 builder.Services.AddScoped<IPreviewFosterFamilyCodeUseCase, PreviewFosterFamilyCodeUseCase>();
 builder.Services.AddSession();
-
-
 
 var dfeSignInConfiguration = new DfeSignInConfiguration();
 builder.Configuration.GetSection("DfeSignIn").Bind(dfeSignInConfiguration);

@@ -39,7 +39,7 @@
                                 <td class="govuk-table__cell">@item.ChildDateOfBirth.ToString("d MMMM yyyy")</td>
                                 <td class="govuk-table__cell">@item.EligibilityCode</td>
                                 <td class="govuk-table__cell">@Html.ActionLink(item.CarerName, "Family_Record_FF", "FosterFamilies", new { FosterCarerId = item.FosterCarerId }, new { @class = "govuk-link" })</td>
-                                <td class="govuk-table__cell">@item.EligibilityConfirmedOn.ToString("d MMMM yyyy")</td>
+                                <td class="govuk-table__cell">@item.ValidityStartDate.ToString("d MMMM yyyy")</td>
                                 <td class="govuk-table__cell">@item.ReconfirmBetweenStart.ToString("d MMMM yyyy")
                             and @item.ReconfirmBetweenEnd.ToString("d MMMM yyyy"))</td>
                                 <td class="govuk-table__cell">@item.GracePeriodEndDate.ToString("d MMMM yyyy")</td>

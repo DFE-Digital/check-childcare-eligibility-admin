@@ -1,4 +1,5 @@
 ﻿using CheckChildcareEligibility.Admin.Attributes;
+using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -34,5 +35,17 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
         // For creation journey only
         public string? ContextId { get; set; }
+
+        public FosterCarerRequest BuildRequest()
+        {
+            return new FosterCarerRequest
+            {
+                CarerFirstName = CarerFirstName,
+                CarerLastName = CarerLastName,
+                CarerDateOfBirth = CarerDateOfBirth,
+                CarerNationalInsuranceNumber = CarerNationalInsuranceNumber,
+                HasPartner = HasPartner
+            };
+        }
     }
 }

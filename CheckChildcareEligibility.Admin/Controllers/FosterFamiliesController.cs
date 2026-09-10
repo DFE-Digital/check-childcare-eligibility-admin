@@ -1,15 +1,15 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Domain.Constants;
-using CheckChildcareEligibility.Admin.Gateways.Interfaces;
-using CheckChildcareEligibility.Admin.Services;
+using CheckChildcareEligibility.Admin.Helpers;
 using CheckChildcareEligibility.Admin.Infrastructure;
+using CheckChildcareEligibility.Admin.Models;
+using CheckChildcareEligibility.Admin.Services;
 using CheckChildcareEligibility.Admin.Usecases;
 using CheckChildcareEligibility.Admin.UseCases;
 using CheckChildcareEligibility.Admin.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.FeatureManagement.Mvc;
 using Newtonsoft.Json;
-using CheckChildcareEligibility.Admin.Boundary.Responses;
 
 namespace CheckChildcareEligibility.Admin.Controllers
 {
@@ -24,7 +24,6 @@ namespace CheckChildcareEligibility.Admin.Controllers
         private readonly IValidateFosterCarerDetailsUseCase _validateFosterCarerDetailsUseCase;
         private readonly IValidateFosterPartnerDetailsUseCase _validateFosterPartnerDetailsUseCase;
         private readonly IValidateFosterChildDetailsUseCase _validateFosterChildDetailsUseCase;
-        private readonly ILoadFosterApplicationSubmittedDateUseCase _loadFosterApplicationSubmittedDateUseCase;
         private readonly IValidateFosterApplicationSubmittedDateUseCase _validateFosterApplicationSubmittedDateUseCase;
         private readonly IGetFosterFamilyUseCase _getFosterFamilyUseCase;
         private readonly IGetFosterChildUseCase _getFosterChildUseCase;
@@ -39,7 +38,6 @@ namespace CheckChildcareEligibility.Admin.Controllers
             IValidateFosterCarerDetailsUseCase validateFosterCarerDetailsUseCase,
             IValidateFosterPartnerDetailsUseCase validateFosterPartnerDetailsUseCase,
             IValidateFosterChildDetailsUseCase validateFosterChildDetailsUseCase,
-            ILoadFosterApplicationSubmittedDateUseCase loadFosterApplicationSubmittedDateUseCase,
             IValidateFosterApplicationSubmittedDateUseCase validateFosterApplicationSubmittedDateUseCase,
             ICreateFosterFamilyUseCase createFosterFamilyUseCase,
             IGetFosterFamilyUseCase getFosterFamilyUseCase,
@@ -54,7 +52,6 @@ namespace CheckChildcareEligibility.Admin.Controllers
             _validateFosterCarerDetailsUseCase = validateFosterCarerDetailsUseCase;
             _validateFosterPartnerDetailsUseCase = validateFosterPartnerDetailsUseCase;
             _validateFosterChildDetailsUseCase = validateFosterChildDetailsUseCase;
-            _loadFosterApplicationSubmittedDateUseCase = loadFosterApplicationSubmittedDateUseCase;
             _validateFosterApplicationSubmittedDateUseCase = validateFosterApplicationSubmittedDateUseCase;
             _getFosterFamilyUseCase = getFosterFamilyUseCase;
             _getFosterChildUseCase = getFosterChildUseCase;
@@ -80,8 +77,8 @@ namespace CheckChildcareEligibility.Admin.Controllers
             return View(vm);
         }
 
-        [HttpGet("EnterCarer")]
-        public async Task<IActionResult> Enter_Carer_Details_FF(string contextId = null)
+        [HttpGet("EnterCarer/{contextId?}")]
+        public async Task<IActionResult> Enter_Carer_Details_FF(string? contextId)
         {
             FosterCarerDetailsViewModel viewModel;
 
@@ -111,11 +108,6 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return View(request);
             }
 
-            request.CarerDateOfBirth = new DateTime( // Set DateOfBirth in request before serializing
-                int.Parse(request.Year),
-                int.Parse(request.Month),
-                int.Parse(request.Day));
-
             // Populate session context with the FosterCarerDetailsViewModel
             _sessionContextService.SetSessionData(request.ContextId, "FosterCarerDetails", request);
 
@@ -123,7 +115,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
             {
                 return RedirectToAction("Enter_Partner_Details_FF", new { request.ContextId });
             }
-            return RedirectToAction("Enter_Child_Details_FF", new { request.ContextId });
+            else
+            {
+                return RedirectToAction("Enter_Child_Details_FF", new { request.ContextId });
+            }
         }
 
         [HttpGet("UpdateCarer/{FosterCarerId}")]
@@ -187,17 +182,14 @@ namespace CheckChildcareEligibility.Admin.Controllers
             return RedirectToAction("Family_Record_FF", new { FosterCarerId = request.CarerId });
         }
 
-        [HttpGet("EnterPartner")]
+        [HttpGet("EnterPartner/{contextId}")]
         public async Task<IActionResult> Enter_Partner_Details_FF(string contextId)
         {
             // Pull the FosterCarerDetailsViewModel from session if it exists
             var fosterCarerDetails = _sessionContextService.GetSessionData<FosterCarerDetailsViewModel>(contextId, "FosterCarerDetails");
 
             // If fosterCarerDetails is null, redirect to enter carer to restart the journey
-            if (fosterCarerDetails == null)
-            {
-                return RedirectToAction("Enter_Carer_Details_FF");
-            }
+            if (fosterCarerDetails == null) { return RedirectToAction("Enter_Carer_Details_FF"); }
 
             // Pull the FosterPartnerDetailsViewModel from session if it exists, otherwise initialise with contextId
             var fosterPartnerDetails = _sessionContextService.GetSessionData<FosterPartnerDetailsViewModel>(contextId, "FosterPartnerDetails");
@@ -215,29 +207,20 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return View(request);
             }
 
-            // Set DateOfBirth in request before serializing
-            request.PartnerDateOfBirth = new DateTime(
-                int.Parse(request.Year),
-                int.Parse(request.Month),
-                int.Parse(request.Day));
-
             // Populate session context with the FosterCarerDetailsViewModel
             _sessionContextService.SetSessionData(request.ContextId, "FosterPartnerDetails", request);
 
             return RedirectToAction("Enter_Child_Details_FF", new { request.ContextId });
         }
 
-        [HttpGet("EnterChild")]
+        [HttpGet("EnterChild/{contextId}")]
         public async Task<IActionResult> Enter_Child_Details_FF(string contextId)
         {
             // Pull the FosterCarerDetailsViewModel from session if it exists
             var fosterCarerDetails = _sessionContextService.GetSessionData<FosterCarerDetailsViewModel>(contextId, "FosterCarerDetails");
 
             // If fosterCarerDetails is null, redirect to enter carer to restart the journey
-            if (fosterCarerDetails == null)
-            {
-                return RedirectToAction("Enter_Carer_Details_FF");
-            }
+            if (fosterCarerDetails == null) { return RedirectToAction("Enter_Carer_Details_FF"); }
 
             // Pull the fosterChildDetailsViewModel from session if it exists, otherwise initialise with contextId
             var fosterChildDetails = _sessionContextService.GetSessionData<FosterChildDetailsViewModel>(contextId, "FosterChildDetails");
@@ -259,19 +242,13 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return View(request);
             }
 
-            // Set DateOfBirth in request before serializing
-            request.ChildDateOfBirth = new DateTime(
-                int.Parse(request.Year),
-                int.Parse(request.Month),
-                int.Parse(request.Day));
-
             // Populate session context with the FosterCarerDetailsViewModel
             _sessionContextService.SetSessionData(request.ContextId, "FosterChildDetails", request);
 
             return RedirectToAction("Enter_Submitted_Date_Details_FF", new { request.ContextId });
         }
 
-        [HttpGet("SubmittedDate")]
+        [HttpGet("SubmittedDate/{contextId}")]
         public async Task<IActionResult> Enter_Submitted_Date_Details_FF(string contextId)
         {
             // Pull the FosterCarerDetailsViewModel from session if it exists
@@ -294,7 +271,6 @@ namespace CheckChildcareEligibility.Admin.Controllers
         }
 
         [HttpPost("SubmittedDate")]
-        [HttpPost]
         public async Task<IActionResult> Enter_Submitted_Date_Details_FF(FosterApplicationSubmittedDateViewModel request)
         {
             var validationResult = _validateFosterApplicationSubmittedDateUseCase.Execute(request, ModelState);
@@ -303,26 +279,13 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return View(request);
             }
 
-            if (request.IsTodaySelected == true)
-            {
-                request.SubmissionDate = DateTime.Now.Date;
-            }
-            else
-            {
-                // Set DateOfBirth in request before serializing
-                request.SubmissionDate = new DateTime(
-                int.Parse(request.Year),
-                int.Parse(request.Month),
-                int.Parse(request.Day));
-            }
-
             // Populate session context with the FosterCarerDetailsViewModel
             _sessionContextService.SetSessionData(request.ContextId, "FosterApplicationSubmittedDate", request);
 
             return RedirectToAction("Check_Details_FF", new { request.ContextId });
         }
 
-        [HttpGet("CheckDetails")]
+        [HttpGet("CheckDetails/{contextId}")]
         public async Task<IActionResult> Check_Details_FF(string contextId)
         {
             // Pull the FosterCarerDetailsViewModel from session if it exists
@@ -351,21 +314,9 @@ namespace CheckChildcareEligibility.Admin.Controllers
 
             var fosterCodePreview = await _previewFosterCodeUseCase.Execute(new FosterFamilyRequest
             {
-                FosterCarer = new FosterCarerRequest
-                {
-                    CarerFirstName = fosterCarerDetails.CarerFirstName,
-                    CarerLastName = fosterCarerDetails.CarerLastName,
-                    CarerDateOfBirth = fosterCarerDetails.CarerDateOfBirth,
-                    CarerNationalInsuranceNumber = fosterCarerDetails.CarerNationalInsuranceNumber,
-                    HasPartner = fosterCarerDetails.HasPartner
-                },
-                FosterChild = new FosterChildRequest
-                {
-                    ChildFirstName = fosterChildDetails.ChildFirstName,
-                    ChildLastName = fosterChildDetails.ChildLastName,
-                    ChildDateOfBirth = fosterChildDetails.ChildDateOfBirth,
-                    ChildPostCode = fosterChildDetails.ChildPostCode
-                },
+                FosterCarer = fosterCarerDetails.BuildRequest(),
+                FosterChild = fosterChildDetails.BuildRequest(),
+                Partner = fosterPartnerDetails?.BuildRequest(),
                 SubmissionDate = fosterApplicationSubmittedDate.SubmissionDate
             }, int.Parse(_Claims.Organisation.EstablishmentNumber));
 
@@ -388,36 +339,16 @@ namespace CheckChildcareEligibility.Admin.Controllers
         {
             var fosterFamilyRequest = new FosterFamilyRequest();
             var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
-            FosterCarerRequest fosterCarerRequest = new();
-            foreach (var item in request.FosterCarerDetailsViewModel.GetType().GetProperties())
-            {
-                var value = item.GetValue(request.FosterCarerDetailsViewModel);
-                fosterCarerRequest.GetType().GetProperty(item.Name)?.SetValue(fosterCarerRequest, value);
-            }
-            fosterCarerRequest.LocalAuthorityID = laID;
 
-            FosterPartnerRequest fosterPartnerRequest = null;
+
+            fosterFamilyRequest.FosterCarer = request.FosterCarerDetailsViewModel.BuildRequest();
+            fosterFamilyRequest.FosterCarer.LocalAuthorityID = laID;
             if (request.FosterPartnerDetailsViewModel != null && request.FosterCarerDetailsViewModel?.HasPartner == true)
             {
-                fosterPartnerRequest = new FosterPartnerRequest();
-                foreach (var item in request.FosterPartnerDetailsViewModel.GetType().GetProperties())
-                {
-                    var value = item.GetValue(request.FosterPartnerDetailsViewModel);
-                    fosterPartnerRequest.GetType().GetProperty(item.Name)?.SetValue(fosterPartnerRequest, value);
-                }
+                fosterFamilyRequest.Partner = request.FosterPartnerDetailsViewModel.BuildRequest();
             }
-
-            var fosterChildRequest = new FosterChildRequest();
-            foreach (var item in request.FosterChildDetailsViewModel.GetType().GetProperties())
-            {
-                var value = item.GetValue(request.FosterChildDetailsViewModel);
-                fosterChildRequest.GetType().GetProperty(item.Name)?.SetValue(fosterChildRequest, value);
-            }
-
-            fosterFamilyRequest.FosterCarer = fosterCarerRequest;
-            fosterFamilyRequest.HasPartner = fosterCarerRequest.HasPartner == true;
-            fosterFamilyRequest.Partner = fosterPartnerRequest;
-            fosterFamilyRequest.FosterChild = fosterChildRequest;
+            fosterFamilyRequest.HasPartner = fosterFamilyRequest.Partner != null;
+            fosterFamilyRequest.FosterChild = request.FosterChildDetailsViewModel.BuildRequest();
             fosterFamilyRequest.SubmissionDate = request.FosterApplicationSubmittedDateViewModel.SubmissionDate;
 
             try
@@ -443,14 +374,15 @@ namespace CheckChildcareEligibility.Admin.Controllers
             var request = await _getFosterChildUseCase.Execute(FosterChildId, laID, true);
             var viewModel = new FosterFamilyCreatedViewModel
             {
+                FosterChildId = request.FosterChildId,
                 FosterCarerId = request.FosterCarerId,
                 ChildName = request.ChildFullName,
                 EligibilityCode = request.EligibilityCode,
-                EligibilityConfirmed = request.EligibilityConfirmedOn,
+                ValidityStartDate = request.ValidityStartDate,
                 ReconfirmBetweenStart = request.ReconfirmBetweenStart,
                 ReconfirmBetweenEnd = request.ReconfirmBetweenEnd,
                 GracePeriodEndDate = request.GracePeriodEndDate,
-                CodeStatus = request.CodeStatus
+                ValidFromTerm = request.ValidFromTerm
             };
             return View(viewModel);
         }
@@ -468,7 +400,11 @@ namespace CheckChildcareEligibility.Admin.Controllers
         {
             var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
             var childResponse = await _getFosterChildUseCase.Execute(FosterChildId, laID, true);
-            return View(childResponse);
+            var viewModel = new FosterFamiliesCodeResponseViewModel()
+            {
+                 Response  = childResponse
+            };
+            return View(viewModel);
         }
     }
 }

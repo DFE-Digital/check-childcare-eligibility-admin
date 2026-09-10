@@ -102,6 +102,10 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
             RuleFor(x => x.ChildPostCode)
                 .Must(DataValidation.BeAValidUkPostcode)
                 .WithMessage(FosterFamilyValidationMessages.ChildPostCodeInvalid);
+
+            RuleFor(x => x.ChildDateOfBirth)
+                .Must(DataValidation.BeAValidChildAge)
+                .WithMessage(FosterFamilyValidationMessages.ChildIsTooOld);
         }
     }
 }

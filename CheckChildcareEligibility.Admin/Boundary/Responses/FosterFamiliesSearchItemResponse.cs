@@ -14,7 +14,7 @@
 
         public Guid FosterChildId { get; set; }
 
-        public DateTime EligibilityConfirmedOn { get; set; }
+        public DateTime ValidityStartDate { get; set; }
 
         public DateTime ReconfirmBetweenStart { get; set; }
 

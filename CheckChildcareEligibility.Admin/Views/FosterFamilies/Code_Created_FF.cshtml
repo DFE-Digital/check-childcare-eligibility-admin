@@ -37,8 +37,8 @@
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell">@Model.ChildName</td>
                         <td class="govuk-table__cell">@Model.EligibilityCode</td>
-                        <td class="govuk-table__cell">@Model.CodeStatus</td>
-                        <td class="govuk-table__cell">@Model.EligibilityConfirmed.ToString("d MMMM yyyy")</td>
+                        <td class="govuk-table__cell">Valid from @Model.ValidFromTerm.Name.ToString().ToLower() term @Model.ValidFromTerm.StartDate.Year</td>
+                        <td class="govuk-table__cell">@Model.ValidityStartDate.ToString("d MMMM yyyy")</td>
                         <td class="govuk-table__cell">@Model.ReconfirmBetweenStart.ToString("d MMMM yyyy")
                             and @Model.ReconfirmBetweenEnd.ToString("d MMMM yyyy")
                         </td>
@@ -46,10 +46,10 @@
                     </tr>
                 </tbody>
             </table>
-
-            <button type="submit" class="govuk-button govuk-!-margin-top-5" data-module="govuk-button">
+            
+            <a href="@Url.Action("Code_Record_FF", "FosterFamilies", new { Model.FosterChildId })" role="button" draggable="false" class="govuk-button" data-module="govuk-button" data-govuk-button-init=""">
                 View code details
-            </button>
+            </a>
         </div>
     </div>
 </div>

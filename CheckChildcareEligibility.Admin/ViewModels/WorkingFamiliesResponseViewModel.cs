@@ -1,22 +1,25 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Constants.Generic;
 using CheckChildcareEligibility.Admin.Domain.Enums;
+using CheckChildcareEligibility.Admin.Helpers;
 
 namespace CheckChildcareEligibility.Admin.ViewModels
 {
     public class WorkingFamiliesResponseViewModel
     {
+
         public CheckEligibilityItemWorkingFamilies Response { get; set; }
-        public bool ChildIsTooYoung => ValidityStartDate < ChildDateOfBirth.AddMonths(9);
-        public bool ChildIsTooOld => HasReachedCompulsorySchoolAge(ChildDateOfBirth, DateTime.UtcNow);
+        public bool ChildIsTooYoung => WorkingFamiliesCheckHelper.ChildIsTooYoung(Response, DateTime.UtcNow);
+        public bool ChildIsTooOld => WorkingFamiliesCheckHelper.ChildIsTooOld(Response, DateTime.UtcNow);
         public bool IsEligible => Response.Status == CheckEligibilityStatus.eligible.ToString();
-        public bool IsInGracePeriod => DateTime.UtcNow > ValidityEndDate && DateTime.UtcNow < GracePeriodEndDate;
-        public bool IsExpired => DateTime.UtcNow > GracePeriodEndDate;
-        public bool IsTemporaryCode => Response.EligibilityCode.StartsWith("1");
-        public bool IsFosterCode => Response.EligibilityCode.StartsWith("4");
+        public bool IsInGracePeriod => WorkingFamiliesCheckHelper.IsInGracePeriod(Response, DateTime.UtcNow);
+        public bool IsExpired => WorkingFamiliesCheckHelper.IsExpired(Response, DateTime.UtcNow);
+        public bool IsTemporaryCode => WorkingFamiliesCheckHelper.IsTemporaryCode(Response);
+        public bool IsFosterCode => WorkingFamiliesCheckHelper.IsFosterCode(Response);
         public DateTime ValidityStartDate => DateTime.Parse(Response.ValidityStartDate);
         public DateTime ValidityEndDate => DateTime.Parse(Response.ValidityEndDate);
         public DateTime GracePeriodEndDate => DateTime.Parse(Response.GracePeriodEndDate);
+        public DateTime GetTermStart(DateTime date) => WorkingFamiliesCheckHelper.GetTermStart(date);
 
         public string GracePeriodEndDisplay =>
             (IsEligible && ChildIsTooYoung) || IsNotValidYet
@@ -52,60 +55,21 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public string CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
         public string BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
         public string TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor;
-
-
-
         public string TermInfo => GetTermInfo(ValidityStartDate);
-        public string CurrentTerm => GetTermName(DateTime.Now);
-        public string NextTerm => GetTermName(GetNextTerm(GetTermStart(DateTime.Now)));
+        public string CurrentTerm => WorkingFamiliesCheckHelper.GetTermName(DateTime.UtcNow);
+        public string NextTerm => WorkingFamiliesCheckHelper.GetTermName(
+            WorkingFamiliesCheckHelper.GetNextTerm(WorkingFamiliesCheckHelper.GetTermStart(DateTime.UtcNow)));
 
         public string GetTermInfo(DateTime vsd)
         {
-            DateTime nineMonthsDate = ChildDateOfBirth.AddMonths(9);
-
-            // Define term code will be eligible from if child is currently too young
-            if (ChildIsTooYoung && vsd < nineMonthsDate)
-            {
-                vsd = nineMonthsDate;
-            }
-
-            // Define when the code expires if in the grace period or has expired
-            if (DateTime.UtcNow > ValidityEndDate)
-            {
-                return $"{GracePeriodEndDate:dd MMMM yyyy}";
-            }
-            
-            // If code is already active return current term info
-            if (vsd < GetTermStart(DateTime.Now))
-            {
-                return CurrentTerm;
-            }
-
-            // Define term start dates for the given year
-            DateTime springStart = new DateTime(vsd.Year, 1, 1);
-            DateTime summerStart = new DateTime(vsd.Year, 4, 1);
-            DateTime autumnStart = new DateTime(vsd.Year, 9, 1);
-            
-            // If the code isn't yet active determine the next term that the code is valid from DSVD already returned from API
-            if (vsd >= autumnStart)
-            {
-                return $"{WorkingFamiliesResponseBanner.SpringTerm} {vsd.AddYears(1).Year}";
-            }
-            else if (vsd >= summerStart)
-            {
-                return $"{WorkingFamiliesResponseBanner.AutumnTerm} {vsd.Year}";
-            }
-            else // Validity start during spring term so valid from summer term
-            {
-                return $"{WorkingFamiliesResponseBanner.SummerTerm} {vsd.Year}";
-            }
+            return WorkingFamiliesCheckHelper.GetTermInfo(Response, vsd, DateTime.UtcNow);
         }
 
         public bool IsReconfirmed
         {
             get
             {
-                string endTermName = GetTermName(GetTermStart(GracePeriodEndDate));
+                string endTermName = WorkingFamiliesCheckHelper.GetTermName(WorkingFamiliesCheckHelper.GetTermStart(GracePeriodEndDate));
                 return IsEligible && !IsNotValidYet && !IsInGracePeriod && CurrentTerm != endTermName;
             }
         }
@@ -114,53 +78,8 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         {
             get
             {
-                // The VSD must be before the current term start to be valid for current term
-                return ValidityStartDate >= GetTermStart(DateTime.Now);
+                return WorkingFamiliesCheckHelper.IsNotValidYet(Response, DateTime.UtcNow);
             }
-        }
-
-        private string GetTermName(DateTime date)
-        {
-            DateTime springStart = new DateTime(date.Year, 1, 1);
-            DateTime summerStart = new DateTime(date.Year, 4, 1);
-            DateTime autumnStart = new DateTime(date.Year, 9, 1);
-
-            if (date >= autumnStart)
-                return $"{WorkingFamiliesResponseBanner.AutumnTerm} {date.Year}";
-            else if (date >= summerStart)
-                return $"{WorkingFamiliesResponseBanner.SummerTerm} {date.Year}";
-            else
-                return $"{WorkingFamiliesResponseBanner.SpringTerm} {date.Year}";
-        }
-        public static DateTime GetTermStart(DateTime date)
-        {
-            int year = date.Year;
-
-            if (date >= new DateTime(year, 9, 1))
-                return new DateTime(year, 9, 1);
-            else if (date >= new DateTime(year, 4, 1))
-                return new DateTime(year, 4, 1);
-            else
-                return new DateTime(year, 1, 1);
-        }
-
-        public static DateTime GetNextTerm(DateTime termStart)
-        {
-            if (termStart.Month == 1)
-                return new DateTime(termStart.Year, 4, 1);
-            else if (termStart.Month == 4)
-                return new DateTime(termStart.Year, 9, 1);
-            else // September
-                return new DateTime(termStart.Year + 1, 1, 1);
-        }
-
-        private bool HasReachedCompulsorySchoolAge(DateTime dateOfBirth, DateTime currentCheckDate)
-        {
-            DateTime fifthBirthday = dateOfBirth.AddYears(5);
-            DateTime termChildTurnsFive = GetTermStart(fifthBirthday);
-            DateTime termAfterFive = GetNextTerm(termChildTurnsFive);
-        
-            return currentCheckDate >= termAfterFive;
         }
 
         public string GetBannerCodeType()
@@ -238,7 +157,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             {
                 return string.Empty;
             }
-            else if (HasReachedCompulsorySchoolAge(ChildDateOfBirth, DateTime.Now))//child too old - Child has reached compulsory school age
+            else if (WorkingFamiliesCheckHelper.HasReachedCompulsorySchoolAge(ChildDateOfBirth, DateTime.Now))//child too old - Child has reached compulsory school age
             {
                 return WorkingFamiliesResponseBanner.ReconfirmationChildTooOld;
             }

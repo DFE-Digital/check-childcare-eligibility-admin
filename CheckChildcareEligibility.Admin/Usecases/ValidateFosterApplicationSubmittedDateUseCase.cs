@@ -23,8 +23,25 @@ public class ValidateFosterApplicationSubmittedDateUseCase : IValidateFosterAppl
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public FosterApplicationSubmittedDateValidationResult Execute(FosterApplicationSubmittedDateViewModel request, ModelStateDictionary modelState)
+    public FosterApplicationSubmittedDateValidationResult Execute(FosterApplicationSubmittedDateViewModel viewModel, ModelStateDictionary modelState)
     {
+        // If model passes form validation construct date fields then perform additional validation using FluentValidation
+        if (modelState.IsValid)
+        {
+            if (viewModel.IsTodaySelected == true)
+            {
+                viewModel.SubmissionDate = DateTime.Now.Date;
+            }
+            else
+            {
+                // Set DateOfBirth in request before serializing
+                viewModel.SubmissionDate = new DateTime(
+                int.Parse(viewModel.Year),
+                int.Parse(viewModel.Month),
+                int.Parse(viewModel.Day));
+            }
+        }
+
         if (!modelState.IsValid)
         {
             var errors = ProcessModelStateErrors(modelState);
