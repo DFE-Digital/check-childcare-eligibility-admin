@@ -117,6 +117,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {nextTermView} {Response.GracePeriodEndDate.Year}";
 
             }
+
             // is Valid and reconfirmation has happened
             else if (IsReconfirmed)
             {
@@ -125,7 +126,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFor} {currentTermView} {DateTime.UtcNow.Year} and {nextTermView} {Response.GracePeriodEndDate.Year}";
             }
 
-            else if (Response.Status == CheckEligibilityStatus.notEligible.ToString()) // Expired
+            else if (Response.Status == CheckEligibilityStatus.notEligible.ToString() || Response.ReconfirmationProperties?.Status is ReconfirmationStatus.ChildTooOld) // Expired or too Old
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
                 BannerColour = WorkingFamiliesResponseBanner.ColourOrange;

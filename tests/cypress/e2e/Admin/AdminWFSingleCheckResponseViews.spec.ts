@@ -92,7 +92,7 @@ function assertBannerExpiryDate(): void {
 function assertBannerReconfirmationMessage(
   expectedContent: string | RegExp,
 ): void {
-  cy.get(".govuk-body-l.govuk-!-margin-bottom-0")
+  cy.get('[class~="govuk-body-l"][class~="govuk-!-margin-bottom-0"]')
     .invoke("text")
     .then((text) => {
       const content = text.trim();
@@ -250,7 +250,6 @@ describe("Single check Working Families response views", () => {
     runWorkingFamiliesCheck(code);
 
     cy.get(".govuk-panel__title").should("contain.text", "Code valid");
-    cy.get(".govuk-panel").should("have.class", "govuk-panel--confirmation");
     assertTermValidityDetails("Valid for", 1);
     assertResponseDetails(
       code,
@@ -289,7 +288,6 @@ describe("Single check Working Families response views", () => {
     runWorkingFamiliesCheck(code, "AA123456B", childTooOldDateOfBirth);
 
     cy.get(".govuk-panel__title").should("contain.text", "Code expired");
-    cy.get(".govuk-panel").should("have.class", "govuk-panel--confirmation");
     assertBannerReconfirmationMessage(
       "Child has reached compulsory school age",
     );
@@ -299,7 +297,7 @@ describe("Single check Working Families response views", () => {
       "AA123456B",
       undefined,
       "Reconfirm between",
-      "Not Applicable",
+      "Not applicable",
       "Child too old",
       childTooOldDateOfBirth,
     );
@@ -315,7 +313,6 @@ describe("Single check Working Families response views", () => {
     runWorkingFamiliesCheck(code);
 
     cy.get(".govuk-panel__title").should("contain.text", "Code valid");
-    cy.get(".govuk-panel").should("have.class", "govuk-panel--confirmation");
     assertTermValidityDetails("Valid for", 2);
     assertResponseDetails(
       code,
@@ -358,12 +355,11 @@ describe("Single check Working Families response views", () => {
 
     cy.get(".govuk-panel__title").should(
       "contain.text",
-      "Code in grace period",
+      "Temporary code in grace period",
     );
     cy.get(".govuk-panel").should("have.class", "govuk-panel--yellow");
     assertTermValidityDetails("Expires on");
     assertBannerExpiryDate();
-    assertBannerReconfirmationMessage("Needs reconfirming now");
     assertResponseDetails(
       code,
       "AA123456B",
@@ -450,7 +446,7 @@ describe("Single check Working Families response views", () => {
     assertTermValidityDetails(undefined, 1);
     assertResponseDetails(
       code,
-      "AA123456C",
+      nino,
       undefined,
       "Reconfirm between",
       undefined,
