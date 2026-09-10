@@ -18,5 +18,8 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public string? Day { get; set; }
         public string? Month { get; set; }
         public string? Year { get; set; }
+        
+        // For creation journey only
+        public string? ContextId { get; set; }
     }
 }

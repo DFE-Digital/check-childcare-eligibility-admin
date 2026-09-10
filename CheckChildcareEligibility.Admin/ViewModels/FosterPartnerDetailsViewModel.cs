@@ -25,5 +25,10 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         [NinValidator]
         [MaxLength(13)]
         public string PartnerNationalInsuranceNumber { get; set; }
+
+
+        public Guid? CarerId { get; set; }
+
+        public string? ContextId { get; set; }
     }
 }

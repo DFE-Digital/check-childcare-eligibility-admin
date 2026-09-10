@@ -13,7 +13,7 @@
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
             <p>Manage foster families claiming Childcare for working families.</p>
 
-            @Html.ActionLink("Add family and create code", "Carer", "FosterFamilies", null, new { @class = "govuk-button govuk-!-margin-bottom-9" })
+            @Html.ActionLink("Add foster family", actionName: "EnterCarer", "FosterFamilies", null, new { @class = "govuk-button govuk-!-margin-bottom-9" })
 
             <h2 class="govuk-heading-m">Children and eligibility codes</h2>
             @if (Model.Data != null && Model.Data.Any())
@@ -35,13 +35,14 @@
                         @foreach (var item in Model.Data)
                         {
                             <tr class="govuk-table__row">
-                                <td class="govuk-table__cell">@Html.ActionLink(item.ChildName, "Code_Record_FF", "FosterFamilies", new { CarerId = item.CarerId, includeFosterCarer = true }, new { @class = "govuk-link" })</td>
+                                <td class="govuk-table__cell">@Html.ActionLink(item.ChildName, "Code_Record_FF", "FosterFamilies", new { FosterChildId = item.FosterChildId }, new { @class = "govuk-link" })</td>
                                 <td class="govuk-table__cell">@item.ChildDateOfBirth.ToString("d MMMM yyyy")</td>
                                 <td class="govuk-table__cell">@item.EligibilityCode</td>
-                                <td class="govuk-table__cell">@Html.ActionLink(item.CarerName, "Family_Record_FF", "FosterFamilies", new { CarerId = item.CarerId, includeChildren = true }, new { @class = "govuk-link" })</td>
+                                <td class="govuk-table__cell">@Html.ActionLink(item.CarerName, "Family_Record_FF", "FosterFamilies", new { FosterCarerId = item.FosterCarerId }, new { @class = "govuk-link" })</td>
                                 <td class="govuk-table__cell">@item.EligibilityConfirmedOn.ToString("d MMMM yyyy")</td>
-                                <td class="govuk-table__cell">@item.ReconfirmBetween (**API-ToDo**)</td>
-                                <td class="govuk-table__cell">@item.GracePeriodEnds.ToString("d MMMM yyyy")</td>
+                                <td class="govuk-table__cell">@item.ReconfirmBetweenStart.ToString("d MMMM yyyy")
+                            and @item.ReconfirmBetweenEnd.ToString("d MMMM yyyy"))</td>
+                                <td class="govuk-table__cell">@item.GracePeriodEndDate.ToString("d MMMM yyyy")</td>
                                 <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--red">@item.ReconfirmationStatus (**API-ToDo**)</strong></td>
                             </tr>
                         }

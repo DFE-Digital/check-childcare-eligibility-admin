@@ -3,6 +3,7 @@
     public class FosterFamilyCreatedResponse : EligibilityCodeResponse
     {
         public Guid FosterCarerId { get; init; }
-        public string ChildName { get; init; }
+        
+        public Guid FosterChildId { get; init; }
     }
 }

@@ -62,6 +62,21 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
             throw;
         }
     }
+    
+    public async Task<FosterFamilyCodePreviewResponse> PreviewFosterFamilyCode(FosterFamilyRequest request, int localAuthorityId)
+    {
+        try
+        {
+            var result = await ApiDataPostAsynch("foster-family/preview", request, new FosterFamilyCodePreviewResponse());
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                $"Post PreviewFosterFamilyCode failed. uri:-{_httpClient.BaseAddress}foster-family/preview content:-{JsonConvert.SerializeObject(request)}");
+            throw;
+        }
+    }
 
     public async Task<FosterFamilyResponse> GetFosterFamily(Guid fosterCarerId, int localAuthorityId, bool includeChildren = false)
     {

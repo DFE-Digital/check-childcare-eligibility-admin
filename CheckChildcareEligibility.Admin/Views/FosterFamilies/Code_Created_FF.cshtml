@@ -37,9 +37,11 @@
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell">@Model.ChildName</td>
                         <td class="govuk-table__cell">@Model.EligibilityCode</td>
-                        <td class="govuk-table__cell">@Model.Status</td>
+                        <td class="govuk-table__cell">@Model.CodeStatus</td>
                         <td class="govuk-table__cell">@Model.EligibilityConfirmed.ToString("d MMMM yyyy")</td>
-                        <td class="govuk-table__cell">@Model.ReconfirmBetween</td>
+                        <td class="govuk-table__cell">@Model.ReconfirmBetweenStart.ToString("d MMMM yyyy")
+                            and @Model.ReconfirmBetweenEnd.ToString("d MMMM yyyy")
+                        </td>
                         <td class="govuk-table__cell">@Model.GracePeriodEndDate.ToString("d MMMM yyyy")</td>
                     </tr>
                 </tbody>

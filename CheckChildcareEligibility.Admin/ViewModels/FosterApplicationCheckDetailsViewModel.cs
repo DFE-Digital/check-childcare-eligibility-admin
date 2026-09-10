@@ -1,11 +1,14 @@
-﻿namespace CheckChildcareEligibility.Admin.ViewModels
+﻿using CheckChildcareEligibility.Admin.Boundary.Responses;
+
+namespace CheckChildcareEligibility.Admin.ViewModels
 {
     public class FosterApplicationCheckDetailsViewModel
     {
-
-        public FosterCarerDetailsViewModel fosterCarerDetailsViewModel { get; set; } = new();
-        public FosterPartnerDetailsViewModel fosterPartnerDetailsViewModel { get; set; } = new();
-        public FosterChildDetailsViewModel fosterChildDetailsViewModel { get; set; } = new();
-        public FosterApplicationSubmittedDateViewModel fosterApplicationSubmittedDateViewModel { get; set; } = new();
+        public string? ContextId { get; set; }
+        public FosterCarerDetailsViewModel FosterCarerDetailsViewModel { get; set; } = new();
+        public FosterPartnerDetailsViewModel? FosterPartnerDetailsViewModel { get; set; }
+        public FosterChildDetailsViewModel FosterChildDetailsViewModel { get; set; } = new();
+        public FosterApplicationSubmittedDateViewModel FosterApplicationSubmittedDateViewModel { get; set; } = new();
+        public FosterFamilyCodePreviewResponse FosterCodePreview { get; set; } = new();
     }
 }

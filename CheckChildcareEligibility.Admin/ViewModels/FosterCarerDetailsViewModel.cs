@@ -27,10 +27,12 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public string CarerNationalInsuranceNumber { get; set; }
 
         [Required(ErrorMessage = FosterFamilyValidationMessages.HasPartner)]
-        public bool? HasPartner { get; set; }
+        public bool HasPartner { get; set; }
 
         //For Update Carer Details only
-        public bool IsUpdate { get; set; }
         public Guid CarerId { get; set; }
+
+        // For creation journey only
+        public string? ContextId { get; set; }
     }
 }

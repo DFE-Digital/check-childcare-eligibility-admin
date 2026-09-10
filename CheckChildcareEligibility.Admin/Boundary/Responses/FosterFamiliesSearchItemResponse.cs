@@ -9,13 +9,18 @@
         public string EligibilityCode { get; set; } = string.Empty;
 
         public string CarerName { get; set; } = string.Empty;
-        public Guid CarerId { get; set; }
+
+        public Guid FosterCarerId { get; set; }
+
+        public Guid FosterChildId { get; set; }
 
         public DateTime EligibilityConfirmedOn { get; set; }
 
-        public string ReconfirmBetween { get; set; } = string.Empty;
+        public DateTime ReconfirmBetweenStart { get; set; }
 
-        public DateTime GracePeriodEnds { get; set; }
+        public DateTime ReconfirmBetweenEnd { get; set; }
+
+        public DateTime GracePeriodEndDate { get; set; }
 
         public string ReconfirmationStatus { get; set; } = string.Empty;
     }

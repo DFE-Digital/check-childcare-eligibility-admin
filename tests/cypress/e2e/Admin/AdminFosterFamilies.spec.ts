@@ -77,7 +77,7 @@ describe('Foster Families search records and add Family', () => {
         cy.visit('FosterFamilies/Search');
 
         // -- Add Foster Family journey
-        cy.contains('Add family and create code').click();
+        cy.contains('Add foster family').click();
         //CARER FORM ----------------------------------------------------------------------------
         //Carer form validation tests
         cy.get('h1').should('include.text', 'Enter the carer details');
@@ -498,7 +498,7 @@ describe('Foster Families search records and add Family', () => {
                     .siblings('.govuk-summary-list__value')
                     .should('contain.text', submittedDate.displayedSubmittedDate)
             })
-        cy.contains('button', 'Add family and create code').click();
+        cy.contains('button', 'Add foster family').click();
 
         //Family added page
         cy.get('.govuk-panel--confirmation', { timeout: 10000 }).should('be.visible');

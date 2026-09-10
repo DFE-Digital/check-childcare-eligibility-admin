@@ -11,6 +11,7 @@ using CheckChildcareEligibility.Admin.UseCases;
 using FluentValidation;
 using System.Globalization;
 using Microsoft.FeatureManagement;
+using CheckChildcareEligibility.Admin.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,8 @@ builder.WebHost.ConfigureKestrel(options =>
 builder.Services.AddServices(builder.Configuration);
 builder.Services.AddSession();
 
+builder.Services.AddScoped<ISessionContextService, SessionContextService>();
+
 builder.Services.AddScoped<ILoadParentDetailsUseCase, LoadParentDetailsUseCase>();
 builder.Services.AddScoped<ILoadParentAndChildDetailsUseCase, LoadParentAndChildDetailsUseCase>();
 builder.Services.AddScoped<IPerformWFEligibilityCheckUseCase, PerformWFEligibilityCheckUseCase>();
@@ -67,6 +70,7 @@ builder.Services.AddScoped<IUpdateFosterCarerUseCase, UpdateFosterCarerUseCase>(
 builder.Services.AddScoped<IValidator<IEligibilityServiceType>, CheckEligibilityRequestDataValidator>();
 builder.Services.AddScoped<IPerformEligibilityCodeHistoryReportUseCase, PerformEligibilityCodeHistoryReportUseCase > ();
 builder.Services.AddScoped <IValidateEligibilityCodeUseCase,ValidateEligibilityCodeUseCase>();
+builder.Services.AddScoped<IPreviewFosterFamilyCodeUseCase, PreviewFosterFamilyCodeUseCase>();
 builder.Services.AddSession();
 
 

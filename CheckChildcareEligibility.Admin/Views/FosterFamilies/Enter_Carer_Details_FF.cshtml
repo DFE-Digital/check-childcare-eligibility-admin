@@ -1,21 +1,22 @@
 ﻿@using CheckChildcareEligibility.Admin.ViewModels
 @model FosterCarerDetailsViewModel
 @{
-    ViewData["Title"] = "Enter the carer details";
-
     var ninoInputClasses = "govuk-input govuk-!-width-one-third js-nino-input";
     if (ViewData.ModelState["CarerNationalInsuranceNumber"]?.Errors.Count > 0)
     {
         ninoInputClasses += " govuk-input--error";
     }
 
-    var actionName = Model != null && Model.IsUpdate ? "UpdateCarer" : "Carer";
+    bool isUpdate = Model != null && string.IsNullOrEmpty(Model.ContextId);
+    var actionName = isUpdate ? "UpdateCarer" : "EnterCarer";
+    ViewData["Title"] = isUpdate ? "Edit the carer details" : "Enter the carer details";
 }
 
 <div class="govuk-grid-column-two-thirds">
     @if (actionName.Equals("UpdateCarer"))
     {
-        <a class="govuk-back-link backLinkJS" href="@Url.ActionLink("Family_Record_FF", "FosterFamilies", new { CarerId = Model.CarerId.ToString(), includeChildren = true })">Back</a>
+        <a class="govuk-back-link backLinkJS"
+           href="@Url.ActionLink("Family_Record_FF", "FosterFamilies", new { CarerId = Model.CarerId.ToString() })">Back</a>
     }
     else
     {
@@ -28,6 +29,11 @@
 
     <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
     <form asp-controller="FosterFamilies" asp-action=@actionName method="post">
+        @if (Model != null)
+        {
+            <input asp-for="ContextId" type="hidden" />
+            <input asp-for="CarerId" type="hidden" />
+        }
         <fieldset class="govuk-fieldset">
             <div class="govuk-form-group">
                 <label class="govuk-label govuk-label--m" for="CarerFirstName">
@@ -36,8 +42,9 @@
                 <p class="govuk-error-message">
                     <span asp-validation-for="CarerFirstName"></span>
                 </p>
-                <input class="govuk-input govuk-input--width-20 @(ViewData.ModelState["CarerFirstName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                       asp-for="CarerFirstName" type="text">
+                <input
+                class="govuk-input govuk-input--width-20 @(ViewData.ModelState["CarerFirstName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                asp-for="CarerFirstName" type="text">
             </div>
 
             <div class="govuk-form-group">
@@ -47,8 +54,9 @@
                 <p class="govuk-error-message">
                     <span asp-validation-for="CarerLastName"></span>
                 </p>
-                <input class="govuk-input govuk-input--width-20 @(ViewData.ModelState["CarerLastName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                       asp-for="CarerLastName" type="text">
+                <input
+                class="govuk-input govuk-input--width-20 @(ViewData.ModelState["CarerLastName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                asp-for="CarerLastName" type="text">
             </div>
 
             <div class="govuk-form-group">
@@ -71,10 +79,7 @@
                     }
 
                     <span id="dob-hint-day" class="govuk-visually-hidden">For example 27</span>
-                    <div class="govuk-date-input"
-                         id="CarerDateOfBirth"
-                         role="group"
-                         aria-labelledby="dob-heading"
+                    <div class="govuk-date-input" id="CarerDateOfBirth" role="group" aria-labelledby="dob-heading"
                          aria-describedby="dob-hint dob-error">
 
                         <div class="govuk-date-input__item">
@@ -82,13 +87,10 @@
                                 <label class="govuk-label govuk-date-input__label" for="CarerDateOfBirth.Day">
                                     Day
                                 </label>
-                                <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["CarerDateOfBirth.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                       asp-for="Day"
-                                       id="CarerDateOfBirth.Day"
-                                       aria-describedby="dob-hint-day"
-                                       type="text"
-                                       inputmode="numeric"
-                                       maxlength="2" />
+                                <input
+                                class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["CarerDateOfBirth.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                asp-for="Day" id="CarerDateOfBirth.Day" aria-describedby="dob-hint-day" type="text"
+                                inputmode="numeric" maxlength="2" />
                             </div>
                         </div>
 
@@ -98,13 +100,10 @@
                                 <label class="govuk-label govuk-date-input__label" for="CarerDateOfBirth.Month">
                                     Month
                                 </label>
-                                <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["CarerDateOfBirth.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                       asp-for="Month"
-                                       id="CarerDateOfBirth.Month"
-                                       aria-describedby="dob-hint-month"
-                                       type="text"
-                                       inputmode="numeric"
-                                       maxlength="2" />
+                                <input
+                                class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["CarerDateOfBirth.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                asp-for="Month" id="CarerDateOfBirth.Month" aria-describedby="dob-hint-month"
+                                type="text" inputmode="numeric" maxlength="2" />
                             </div>
                         </div>
 
@@ -114,13 +113,10 @@
                                 <label class="govuk-label govuk-date-input__label" for="CarerDateOfBirth.Year">
                                     Year
                                 </label>
-                                <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["CarerDateOfBirth.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                       asp-for="Year"
-                                       id="CarerDateOfBirth.Year"
-                                       aria-describedby="dob-hint-year"
-                                       type="text"
-                                       inputmode="numeric"
-                                       maxlength="4" />
+                                <input
+                                class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["CarerDateOfBirth.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                asp-for="Year" id="CarerDateOfBirth.Year" aria-describedby="dob-hint-year"
+                                type="text" inputmode="numeric" maxlength="4" />
                             </div>
                         </div>
                     </div>
@@ -137,48 +133,42 @@
                 <p class="govuk-error-message">
                     <span asp-validation-for="CarerNationalInsuranceNumber"></span>
                 </p>
-                <input class="@ninoInputClasses"
-                       asp-controller="Check"
-                       asp-for="CarerNationalInsuranceNumber"
-                       type="text"
-                       spellcheck="false"
-                       autocomplete="text"
-                       maxlength="9">
+                <input class="@ninoInputClasses" asp-controller="Check" asp-for="CarerNationalInsuranceNumber"
+                       type="text" spellcheck="false" autocomplete="text" maxlength="9">
             </div>
+            @if (!isUpdate)
+            {
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            Does the carer have a partner?
+                        </legend>
+                        <p class="govuk-error-message">
+                            <span asp-validation-for="HasPartner"></span>
+                        </p>
+                        <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+                            <div class="govuk-radios__item">
+                                @Html.RadioButtonFor(m => m.HasPartner, true,
+                                new { @class = "govuk-radios__input", id = "HasPartner" })
+                                <label class="govuk-label govuk-radios__label" for="HasPartner">
+                                    Yes
+                                </label>
+                            </div>
 
-            <div class="govuk-form-group">
-                <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                        Does the carer have a partner?
-                    </legend>
-                    <p class="govuk-error-message">
-                        <span asp-validation-for="HasPartner"></span>
-                    </p>
-                    <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
-                        <div class="govuk-radios__item">
-                            @Html.RadioButtonFor(m => m.HasPartner, true,
-                            new { @class = "govuk-radios__input", id = "HasPartner" })
-                            <label class="govuk-label govuk-radios__label" for="HasPartner">
-                                Yes
-                            </label>
+                            <div class="govuk-radios__item">
+                                @Html.RadioButtonFor(m => m.HasPartner, false,
+                                                            new { @class = "govuk-radios__input", id = "HasPartner-2" })
+                                <label class="govuk-label govuk-radios__label" for="HasPartner-2">
+                                    No
+                                </label>
+                            </div>
                         </div>
-
-                        <div class="govuk-radios__item">
-                            @Html.RadioButtonFor(m => m.HasPartner, false,
-                                                        new { @class = "govuk-radios__input", id = "HasPartner-2" })
-                            <label class="govuk-label govuk-radios__label" for="HasPartner-2">
-                                No
-                            </label>
-                        </div>
-                    </div>
-                </fieldset>
-            </div>
+                    </fieldset>
+                </div>
+            }else{
+                <input asp-for="HasPartner" type="hidden" />
+            }
         </fieldset>
-        @if (Model != null && Model.IsUpdate)
-        {
-            <input asp-for="IsUpdate" type="hidden" />
-            <input asp-for="CarerId" type="hidden" />
-        }
         <button type="submit" class="govuk-button" data-module="govuk-button">
             Continue
         </button>

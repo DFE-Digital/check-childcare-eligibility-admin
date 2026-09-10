@@ -48,7 +48,7 @@
                                 Full name
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @Model.fosterCarerDetailsViewModel.CarerFirstName @Model.fosterCarerDetailsViewModel.CarerLastName
+                                @Model.FosterCarerDetailsViewModel.CarerFirstName @Model.FosterCarerDetailsViewModel.CarerLastName
                             </dd>
                         </div>
 
@@ -57,7 +57,7 @@
                                 Date of birth
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @DateTime.Parse(Model.fosterCarerDetailsViewModel.CarerDateOfBirth.ToString()).ToString("d MMMM yyyy")
+                                @DateTime.Parse(Model.FosterCarerDetailsViewModel.CarerDateOfBirth.ToString()).ToString("d MMMM yyyy")
                             </dd>
                         </div>
 
@@ -66,14 +66,14 @@
                                 National Insurance number
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @Model.fosterCarerDetailsViewModel.CarerNationalInsuranceNumber
+                                @Model.FosterCarerDetailsViewModel.CarerNationalInsuranceNumber
                             </dd>
                         </div>
                     </dl>
                 </div>
             </div>
 
-            @if (Model.fosterCarerDetailsViewModel.HasPartner == true)
+            @if (Model.FosterCarerDetailsViewModel.HasPartner == true)
             {
                 <div class="govuk-summary-card">
                     <div class="govuk-summary-card__title-wrapper">
@@ -94,7 +94,7 @@
                                     Full name
                                 </dt>
                                 <dd class="govuk-summary-list__value">
-                                    @Model.fosterPartnerDetailsViewModel.PartnerFirstName @Model.fosterPartnerDetailsViewModel.PartnerLastName
+                                    @Model.FosterPartnerDetailsViewModel.PartnerFirstName @Model.FosterPartnerDetailsViewModel.PartnerLastName
                                 </dd>
                             </div>
 
@@ -103,7 +103,7 @@
                                     Date of birth
                                 </dt>
                                 <dd class="govuk-summary-list__value">
-                                    @DateTime.Parse(Model.fosterPartnerDetailsViewModel.PartnerDateOfBirth.ToString()).ToString("d MMMM yyyy")
+                                    @DateTime.Parse(Model.FosterPartnerDetailsViewModel.PartnerDateOfBirth.ToString()).ToString("d MMMM yyyy")
                                 </dd>
                             </div>
 
@@ -112,7 +112,7 @@
                                     National Insurance number
                                 </dt>
                                 <dd class="govuk-summary-list__value">
-                                    @Model.fosterPartnerDetailsViewModel.PartnerNationalInsuranceNumber
+                                    @Model.FosterPartnerDetailsViewModel.PartnerNationalInsuranceNumber
                                 </dd>
                             </div>
                         </dl>
@@ -139,7 +139,7 @@
                                 Full name
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @Model.fosterChildDetailsViewModel.ChildFirstName @Model.fosterChildDetailsViewModel.ChildLastName
+                                @Model.FosterChildDetailsViewModel.ChildFirstName @Model.FosterChildDetailsViewModel.ChildLastName
                             </dd>
                         </div>
 
@@ -148,7 +148,7 @@
                                 Date of birth
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @DateTime.Parse(Model.fosterChildDetailsViewModel.ChildDateOfBirth.ToString()).ToString("d MMMM yyyy")
+                                @DateTime.Parse(Model.FosterChildDetailsViewModel.ChildDateOfBirth.ToString()).ToString("d MMMM yyyy")
                             </dd>
                         </div>
 
@@ -157,7 +157,7 @@
                                 Postcode
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @Model.fosterChildDetailsViewModel.ChildPostCode
+                                @Model.FosterChildDetailsViewModel.ChildPostCode
                             </dd>
                         </div>
                     </dl>
@@ -183,7 +183,7 @@
                                 Application submitted on
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @DateTime.Parse(Model.fosterApplicationSubmittedDateViewModel.SubmissionDate.ToString()).ToString("d MMMM yyyy")
+                                @Model.FosterApplicationSubmittedDateViewModel.SubmissionDate.ToString("d MMMM yyyy")
                             </dd>
                         </div>
 
@@ -192,7 +192,7 @@
                                 Eligibility confirmed on
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                Populate when linked to API
+                                @Model.FosterCodePreview.EligibilityConfirmed.ToString("d MMMM yyyy")
                             </dd>
                         </div>
 
@@ -201,7 +201,7 @@
                                 Code valid from
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                Populate when linked to API
+                                @Model.FosterCodePreview.ValidityStartDate.ToString("d MMMM yyyy")
                             </dd>
                         </div>
 
@@ -210,7 +210,8 @@
                                 Reconfirm between
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                Populate when linked to API
+                                @Model.FosterCodePreview.ReconfirmBetweenStart.ToString("d MMMM yyyy") 
+                                and @Model.FosterCodePreview.ReconfirmBetweenEnd.ToString("d MMMM yyyy")
                             </dd>
                         </div>
 
@@ -219,7 +220,7 @@
                                 Grace period ends
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                Populate when linked to API
+                                @Model.FosterCodePreview.GracePeriodEndDate.ToString("d MMMM yyyy")
                             </dd>
                         </div>
                     </dl>
@@ -236,26 +237,28 @@
 
             <form asp-controller="FosterFamilies" asp-action="Check_Details_FF" method="post">
                 <!-- Carer Details -->
-                <input type="hidden" asp-for="fosterCarerDetailsViewModel.CarerFirstName" value="@Model.fosterCarerDetailsViewModel.CarerFirstName" />
-                <input type="hidden" asp-for="fosterCarerDetailsViewModel.CarerLastName" value="@Model.fosterCarerDetailsViewModel.CarerLastName" />
-                <input type="hidden" asp-for="fosterCarerDetailsViewModel.CarerDateOfBirth" value="@Model.fosterCarerDetailsViewModel.CarerDateOfBirth" />
-                <input type="hidden" asp-for="fosterCarerDetailsViewModel.CarerNationalInsuranceNumber" value="@Model.fosterCarerDetailsViewModel.CarerNationalInsuranceNumber" />
-                <input type="hidden" asp-for="fosterCarerDetailsViewModel.HasPartner" value="@Model.fosterCarerDetailsViewModel.HasPartner" />
+                <input type="hidden" asp-for="FosterCarerDetailsViewModel.CarerFirstName" value="@Model.FosterCarerDetailsViewModel.CarerFirstName" />
+                <input type="hidden" asp-for="FosterCarerDetailsViewModel.CarerLastName" value="@Model.FosterCarerDetailsViewModel.CarerLastName" />
+                <input type="hidden" asp-for="FosterCarerDetailsViewModel.CarerDateOfBirth" value="@Model.FosterCarerDetailsViewModel.CarerDateOfBirth" />
+                <input type="hidden" asp-for="FosterCarerDetailsViewModel.CarerNationalInsuranceNumber" value="@Model.FosterCarerDetailsViewModel.CarerNationalInsuranceNumber" />
+                <input type="hidden" asp-for="FosterCarerDetailsViewModel.HasPartner" value="@Model.FosterCarerDetailsViewModel.HasPartner" />
                 <!-- Partner Details -->
-                <input type="hidden" asp-for="fosterPartnerDetailsViewModel.PartnerFirstName" value="@Model.fosterPartnerDetailsViewModel.PartnerFirstName" />
-                <input type="hidden" asp-for="fosterPartnerDetailsViewModel.PartnerLastName" value="@Model.fosterPartnerDetailsViewModel.PartnerLastName" />
-                <input type="hidden" asp-for="fosterPartnerDetailsViewModel.PartnerDateOfBirth" value="@Model.fosterPartnerDetailsViewModel.PartnerDateOfBirth" />
-                <input type="hidden" asp-for="fosterPartnerDetailsViewModel.PartnerNationalInsuranceNumber" value="@Model.fosterPartnerDetailsViewModel.PartnerNationalInsuranceNumber" />
+                @if(Model.FosterPartnerDetailsViewModel!=null){
+                    <input type="hidden" asp-for="FosterPartnerDetailsViewModel.PartnerFirstName" value="@Model.FosterPartnerDetailsViewModel.PartnerFirstName" />
+                    <input type="hidden" asp-for="FosterPartnerDetailsViewModel.PartnerLastName" value="@Model.FosterPartnerDetailsViewModel.PartnerLastName" />
+                    <input type="hidden" asp-for="FosterPartnerDetailsViewModel.PartnerDateOfBirth" value="@Model.FosterPartnerDetailsViewModel.PartnerDateOfBirth" />
+                    <input type="hidden" asp-for="FosterPartnerDetailsViewModel.PartnerNationalInsuranceNumber" value="@Model.FosterPartnerDetailsViewModel.PartnerNationalInsuranceNumber" />
+                }
                 <!-- Child details -->
-                <input type="hidden" asp-for="fosterChildDetailsViewModel.ChildFirstName" value="@Model.fosterChildDetailsViewModel.ChildFirstName" />
-                <input type="hidden" asp-for="fosterChildDetailsViewModel.ChildLastName" value="@Model.fosterChildDetailsViewModel.ChildLastName" />
-                <input type="hidden" asp-for="fosterChildDetailsViewModel.ChildDateOfBirth" value="@Model.fosterChildDetailsViewModel.ChildDateOfBirth" />
-                <input type="hidden" asp-for="fosterChildDetailsViewModel.ChildPostCode" value="@Model.fosterChildDetailsViewModel.ChildPostCode" />
+                <input type="hidden" asp-for="FosterChildDetailsViewModel.ChildFirstName" value="@Model.FosterChildDetailsViewModel.ChildFirstName" />
+                <input type="hidden" asp-for="FosterChildDetailsViewModel.ChildLastName" value="@Model.FosterChildDetailsViewModel.ChildLastName" />
+                <input type="hidden" asp-for="FosterChildDetailsViewModel.ChildDateOfBirth" value="@Model.FosterChildDetailsViewModel.ChildDateOfBirth" />
+                <input type="hidden" asp-for="FosterChildDetailsViewModel.ChildPostCode" value="@Model.FosterChildDetailsViewModel.ChildPostCode" />
                 <!-- Application submitted date -->
-                <input type="hidden" asp-for="fosterApplicationSubmittedDateViewModel.SubmissionDate" value="@Model.fosterApplicationSubmittedDateViewModel.SubmissionDate" />
+                <input type="hidden" asp-for="FosterApplicationSubmittedDateViewModel.SubmissionDate" value="@Model.FosterApplicationSubmittedDateViewModel.SubmissionDate" />
 
                 <button type="submit" class="govuk-button govuk-!-margin-top-5" data-module="govuk-button">
-                    Add family and create code
+                    Add foster family
                 </button>
             </form>
         </div>
