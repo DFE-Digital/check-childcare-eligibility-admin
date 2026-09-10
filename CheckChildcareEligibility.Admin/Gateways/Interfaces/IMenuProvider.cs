@@ -1,33 +1,61 @@
 ﻿using CheckChildcareEligibility.Admin.Domain.DfeSignIn;
 using CheckChildcareEligibility.Admin.Models;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.FeatureManagement;
 
 namespace CheckChildcareEligibility.Admin.Gateways.Interfaces;
 
 public interface IMenuProvider
 {
-    IEnumerable<MenuItem> GetMenuItemsFor(DfeClaims claims);
+    Task<IEnumerable<MenuItem>> GetMenuItemsFor(DfeClaims claims);
     IEnumerable<MenuItem> GetMenuItemsForReports();
 }
 
 public class MenuProvider : IMenuProvider
 {
     private readonly IMemoryCache _cache;
-    public MenuProvider(IMemoryCache cache) => _cache = cache;
+    private readonly IFeatureManager _featureManager;
 
-    public IEnumerable<MenuItem> GetMenuItemsFor(DfeClaims claims)
+    public MenuProvider(IMemoryCache cache, IFeatureManager featureManager)
+    {
+        _cache = cache;
+        _featureManager = featureManager;
+    }
+
+    public async Task<IEnumerable<MenuItem>> GetMenuItemsFor(DfeClaims claims)
     {
         if (claims == null || !claims.Roles.Any())
         {
             return Array.Empty<MenuItem>();
         }
         var role = claims.Roles[0].Code;
-
-        return _cache.GetOrCreate($"Menu_{role}", entry =>
+        var cacheKey = $"Menu_{role}";
+        var cacheHit = _cache.TryGetValue(cacheKey, out List<MenuItem>? cachedMenu);
+        if (cacheHit && cachedMenu is not null)
         {
-            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1);
-            return BuildMenuForRole(role);
-        });
+            return cachedMenu;
+        }
+         var menu = await FilterTilesAsync(BuildMenuForRole(role));
+        _cache.Set(cacheKey, menu, TimeSpan.FromMinutes(5));
+        return menu;
+    }
+
+    private async Task<List<MenuItem>> FilterTilesAsync(IEnumerable<MenuItem> items)
+    {
+        var result = new List<MenuItem>();
+
+        foreach (var item in items)
+        {
+            if (!string.IsNullOrEmpty(item.FeatureName))
+            {
+                if (!await _featureManager.IsEnabledAsync(item.FeatureName))
+                    continue; // hide tile
+            }
+
+            result.Add(item);
+        }
+
+        return result;
     }
 
     private IEnumerable<MenuItem> BuildMenuForRole(string role)
@@ -62,7 +90,9 @@ public class MenuProvider : IMenuProvider
                         "Run reports",
                         "Run and export reports on all applications for childcare.",
                         "Report",
-                        "Reports"),
+                        "Reports",
+                        featureName: "Reports"
+                        ),
                     new MenuItem(
                         "Guidance",
                         "Guidance",
@@ -75,7 +105,7 @@ public class MenuProvider : IMenuProvider
         }
     }
     public IEnumerable<MenuItem> GetMenuItemsForReports()
-    { 
+    {
         return BuildMenuForRoleReports();
     }
     private IEnumerable<MenuItem> BuildMenuForRoleReports()
@@ -90,5 +120,5 @@ public class MenuProvider : IMenuProvider
             )
         };
     }
-    
+
 }

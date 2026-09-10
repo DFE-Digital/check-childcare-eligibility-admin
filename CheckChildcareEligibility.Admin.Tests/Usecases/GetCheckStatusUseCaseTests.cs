@@ -32,17 +32,17 @@ public class GetCheckStatusUseCaseTests
 
     public static object[] StatusTestCases =
     {
-        new object[] { "eligible", "eligible" },
-        new object[] { "notEligible", "notEligible" },
-        new object[] { "parentNotFound", "parentNotFound" },
-        new object[] { "error", "error" },
-        new object[] { "queuedForProcessing", "queuedForProcessing" }
+    new object[] { "eligible", new StatusValue { Status = "eligible", CorrelationID = null, ErrorCode = null } },
+    new object[] { "notEligible", new StatusValue { Status = "notEligible", CorrelationID = null, ErrorCode = null } },
+    new object[] { "parentNotFound", new StatusValue { Status = "parentNotFound", CorrelationID = null, ErrorCode = null } },
+    new object[] { "error", new StatusValue { Status = "error", CorrelationID = null, ErrorCode = null } },
+    new object[] { "queuedForProcessing", new StatusValue { Status = "queuedForProcessing", CorrelationID = null, ErrorCode = null } }
     };
 
     [TestCaseSource(nameof(StatusTestCases))]
     public async Task Execute_WithValidStatus_ShouldReturnCorrectViewAndModel(
-        string status,
-        string expectedOutcome)
+            string status,
+            StatusValue expectedOutcome)
     {
         // Arrange
         var response = new CheckEligibilityResponse
@@ -63,7 +63,7 @@ public class GetCheckStatusUseCaseTests
         var outcome = await _sut.Execute(responseJson, _sessionMock.Object);
 
         // Assert
-        outcome.Should().Be(expectedOutcome);
+        outcome.Status.Should().Be(expectedOutcome.Status);
         _sessionMock.Verify(s =>
                 s.Set("CheckResult", It.Is<byte[]>(b =>
                     Encoding.UTF8.GetString(b) == status)),

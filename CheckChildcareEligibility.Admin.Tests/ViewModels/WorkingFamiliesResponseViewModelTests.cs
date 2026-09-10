@@ -1,4 +1,4 @@
-﻿using Azure;
+using Azure;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Constants.Generic;
 using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies;
@@ -17,7 +17,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             var currenttermStart = new DateTime(DateTime.Today.Year, 1, 1); // simulate spring term
             var validityStartDate = currenttermStart.AddDays(-1);
             var childDateOfBirth = validityStartDate.AddMonths(-5);
-            var sut = CreateViewModel(childDateOfBirth, validityStartDate, currentTerm: TermName.None, nextTerm: TermName.Summer, status: "eligible");
+            var sut = CreateViewModel(childDateOfBirth, validityStartDate, currentTerm: TermName.None, nextTerm: TermName.Summer, status: "eligible" , ChildTooYoung: true);
 
             // Act
             var result = sut.GracePeriodEndDisplay;
@@ -35,7 +35,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             var sut = CreateViewModel(
                 childDateOfBirth:childDateOfBirth,    
                 currentTerm: TermName.None,
-                nextTerm: TermName.Spring);
+                nextTerm: TermName.Spring );
 
             // Act
             var result = sut.GracePeriodEndDisplay;
@@ -58,8 +58,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
                 childDateOfBirth,
                 validityStartDate,
                 gracePeriodEndDate: gracePeriodEndDate,
-                currentTerm: TermName.Spring,
-                nextTerm: TermName.Summer);
+                currentTerm: TermName.Spring);
 
             // Act
             var result = sut.GracePeriodEndDisplay;
@@ -71,7 +70,77 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
         }
 
         [Test]
-        public void ReconfirmationDateLabel_WhenTemporaryCode_ShouldReturnApplyForNewCodeBy()
+        public void GracePeriodEndDisplay_WhenChildIsTooOld_ShouldReturnFormattedValidityEndDate()
+        {
+            // Arrange
+            var currentTermStart = new DateTime(DateTime.Today.Year, 1, 1); //simulate spring term;
+            var childDateOfBirth = currentTermStart.AddYears(-6);
+            var validityStartDate = currentTermStart.AddDays(-1);
+            var gracePeriodEndDate = DateTime.Today.AddMonths(6);
+            var sut = CreateViewModel(
+                childDateOfBirth,
+                validityStartDate,
+                gracePeriodEndDate,
+                reconfirmationStatus: ReconfirmationStatus.ChildTooOld);
+
+            // Act
+            var result = sut.GracePeriodEndDisplay;
+
+            // Assert
+            sut.ChildIsTooOld.Should().BeTrue();
+            result.Should().Be(sut.Response.ValidityEndDate.ToString("d MMMM yyyy"));
+            result.Should().NotBe(gracePeriodEndDate.ToString("d MMMM yyyy"));
+            sut.GracePeriodEndLabel.Should().Be("Grace period ended");
+        }
+
+        [Test]
+        public void SetBannerValues_WhenChildIsTooOldAndCodeIsNotValidYet_ShouldSetExpiredBanner()
+        {
+            // Arrange
+            var currentTermStart = new DateTime(DateTime.Today.Year, 1, 1);
+            var childDateOfBirth = currentTermStart.AddYears(-6);
+            var validityStartDate = currentTermStart.AddDays(1);
+            var sut = CreateViewModel(childDateOfBirth, validityStartDate, 
+                currentTerm: TermName.None,
+                nextTerm : TermName.Summer,
+                reconfirmationStatus: ReconfirmationStatus.ChildTooOld);
+
+            // Act
+            sut.SetBannerValues();
+
+            // Assert
+            sut.ChildIsTooOld.Should().BeTrue();
+            sut.IsNotValidYet.Should().BeTrue();
+            sut.CodeStatus.Should().Be(WorkingFamiliesResponseBanner.CodeExpired);
+            sut.BannerColour.Should().Be(WorkingFamiliesResponseBanner.ColourOrange);
+            sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermExpiredOn} {sut.Response.ValidityEndDate:dd MMMM yyyy}");
+            sut.GracePeriodEndDisplay.Should().Be(sut.Response.ValidityEndDate.ToString("d MMMM yyyy"));
+            sut.GracePeriodEndLabel.Should().Be("Grace period ended");
+        }
+
+        [Test]
+        public void SetBannerValues_WhenChildIsTooYoungAndCodeIsNotValidYet_ShouldSetChildTooYoungBanner()
+        {
+            // Arrange
+            var currentTermStart = new DateTime(DateTime.Today.Year, 1, 1);
+            var childDateOfBirth = currentTermStart.AddMonths(-1);
+            var validityStartDate = currentTermStart.AddDays(1);
+            var sut = CreateViewModel(childDateOfBirth, validityStartDate, currentTerm: TermName.None , nextTerm: TermName.Summer, ChildTooYoung: true);
+
+            // Act
+            sut.SetBannerValues();
+
+            // Assert
+            sut.ChildIsTooYoung.Should().BeTrue();
+            sut.IsNotValidYet.Should().BeTrue();
+            sut.CodeStatus.Should().Be(WorkingFamiliesResponseBanner.CodeChildTooYoung);
+            sut.BannerColour.Should().Be(WorkingFamiliesResponseBanner.ColourBlue);
+            sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermValidFrom} summer term {DateTime.Today.Year}");
+            sut.GracePeriodEndLabel.Should().Be("Grace period ends");
+        }
+
+        [Test]
+        public void ReconfirmationDetails_WhenTemporaryCode_ShouldShowValidityEndDate()
         {
             // Arrange
             var validityEndDate = DateTime.Today.AddMonths(3);
@@ -152,9 +221,10 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             var sut = CreateViewModel(
                 childDateOfBirth:childDateOfBirth,
                 validityStartDate:DateTime.Today.AddDays(-1),
-                currentTerm: null,
+                currentTerm: TermName.None,
                 nextTerm: TermName.Spring,
-                status: "eligible");
+                status: "eligible",
+                ChildTooYoung: true);
 
             // Act
             sut.SetBannerValues();
@@ -162,7 +232,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             // Assert
             sut.CodeStatus.Should().Be(WorkingFamiliesResponseBanner.CodeChildTooYoung);
             sut.BannerColour.Should().Be(WorkingFamiliesResponseBanner.ColourBlue);
-            sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermValidFrom} {TermName.Spring} {childDateOfBirth.AddMonths(9).Year}");
+            sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermValidFrom} spring term {childDateOfBirth.AddMonths(9).Year}");
         }
 
         [Test]
@@ -184,7 +254,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             // Assert
             sut.CodeStatus.Should().Be(WorkingFamiliesResponseBanner.CodeNotValidYet);
             sut.BannerColour.Should().Be(WorkingFamiliesResponseBanner.ColourBlue);
-            sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermValidFrom} {TermName.Spring} {gracePerionEndDate.Year}");
+            sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermValidFrom} spring term {gracePerionEndDate.Year}");
         }
 
         [Test]
@@ -332,12 +402,13 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             DateTime? validityEndDate = null,
             EligibilityCodeType codeType = EligibilityCodeType.Standard,
             string eligibilityCode = "50000000000",
-            TermName? currentTerm = null,
-            TermName? nextTerm = null,
-            ReconfirmationStatus? reconfirmationStatus = null,
+            TermName currentTerm = TermName.None,
+            TermName nextTerm = TermName.None,
+            ReconfirmationStatus? reconfirmationStatus = ReconfirmationStatus.NotDueYet,
             DateTime? reconfirmationStartDate = null,
             DateTime? reconfirmationEndDate = null,
-            string status = "eligible")
+            string status = "eligible",
+            bool ChildTooYoung = false)
         {
             var response = new CheckEligibilityItemWorkingFamilies
             {
@@ -349,6 +420,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
                 ValidityStartDate = validityStartDate ?? DateTime.Today.AddDays(-1),
                 ValidityEndDate = validityEndDate ?? DateTime.Today.AddMonths(3),
                 GracePeriodEndDate = gracePeriodEndDate ?? DateTime.Today.AddMonths(6),
+                ChildTooYoung = ChildTooYoung,
                 TermValidity = new TermValidity
                 {
                     Current = currentTerm,

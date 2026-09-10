@@ -8,14 +8,23 @@ namespace CheckChildcareEligibility.Admin.ViewModels
     public class WorkingFamiliesResponseViewModel
     {
         public CheckEligibilityItemWorkingFamilies Response { get; set; }
-        public bool ChildIsTooYoung => Response.ChildTooYoung;   
+        public bool ChildIsTooYoung => Response.ChildTooYoung;
+        public bool ChildIsTooOld => Response.ReconfirmationProperties.Status == ReconfirmationStatus.ChildTooOld;
         public bool IsEligible => Response.Status == CheckEligibilityStatus.eligible.ToString();
         public bool IsInGracePeriod => DateTime.UtcNow > Response.ValidityEndDate && DateTime.UtcNow < Response.GracePeriodEndDate;
   
         public string GracePeriodEndDisplay =>
-            (IsEligible && ChildIsTooYoung) || IsNotValidYet
-                ? WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable
-                : Response.GracePeriodEndDate.ToString("d MMMM yyyy");
+            ChildIsTooOld
+                ? Response.ValidityEndDate.ToString("d MMMM yyyy")
+                : (IsEligible && ChildIsTooYoung) || IsNotValidYet
+                    ? WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable
+                    : Response.GracePeriodEndDate.ToString("d MMMM yyyy");
+      
+        public string GracePeriodEndLabel =>
+            ChildIsTooOld
+                ? "Grace period ended"
+                : "Grace period ends";
+      
         public string ReconfirmationDateLabel =>
             Response.EligibilityCodeType == EligibilityCodeType.Temporary
                 ? "Apply for a new code by"
@@ -110,6 +119,19 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {nextTermView} {nineMonthsDate.Year}";
 
             }
+            else if (ChildIsTooOld) {
+
+                CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
+                BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermExpiredOn} {Response.ValidityEndDate:dd MMMM yyyy}";
+
+            }
+            else if (Response.Status == CheckEligibilityStatus.notEligible.ToString()) // Expired or too Old
+            {
+                CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
+                BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermExpiredOn} {Response.GracePeriodEndDate:dd MMMM yyyy}";
+            }
             else if (IsNotValidYet) // Code cannot be used yet
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeNotValidYet;
@@ -117,7 +139,6 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {nextTermView} {Response.GracePeriodEndDate.Year}";
 
             }
-
             // is Valid and reconfirmation has happened
             else if (IsReconfirmed)
             {
@@ -126,19 +147,14 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFor} {currentTermView} {DateTime.UtcNow.Year} and {nextTermView} {Response.GracePeriodEndDate.Year}";
             }
 
-            else if (Response.Status == CheckEligibilityStatus.notEligible.ToString() || Response.ReconfirmationProperties?.Status is ReconfirmationStatus.ChildTooOld) // Expired or too Old
-            {
-                CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
-                BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
-                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermExpiredOn} {Response.GracePeriodEndDate:dd MMMM yyyy}";
-            }
             else if (IsInGracePeriod)
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeInGracePeriod;
                 BannerColour = WorkingFamiliesResponseBanner.ColourYellow;
                 TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermExpiresOn} {Response.GracePeriodEndDate:dd MMMM yyyy}";
             }
-            else {
+            else
+            {
                 TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFor} {currentTermView} {DateTime.UtcNow.Year}";
             }
            
