@@ -50,13 +50,13 @@ public class CheckEligibilityBulkResponseTests
                 {
                     Order = 2,
                     EligibilityCode = "SECOND",
-                    Status = "eligible",
+                    Status = "eligible"
                 },
                 new CheckEligibilityItemWorkingFamilies
                 {
                     Order = 1,
                     EligibilityCode = "FIRST",
-                    Status = "eligible",
+                    Status = "eligible"
                 }
             ]
         };

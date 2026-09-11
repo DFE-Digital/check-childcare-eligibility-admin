@@ -280,10 +280,10 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermExpiresOn} {gracePeriodEndDate:dd MMMM yyyy}");
         }
 
-        [TestCase(1, true)]
-        [TestCase(0, true)]
-        [TestCase(-1, false)]
-        public void IsInGracePeriod_GracePeriodEndDateRelativeToToday_ReturnsExpectedResult(int dateFromToday , bool isInGracePeriod)
+       [TestCase(1, true)]
+       [TestCase(0, true)]
+       [TestCase(-1, false)]
+       public void IsInGracePeriod_GracePeriodEndDateRelativeToToday_ReturnsExpectedResult(int dateFromToday , bool isInGracePeriod)
         {
             // Arrange
             var validityEndDate = DateTime.Today.AddDays(-1);
