@@ -34,7 +34,7 @@ public class CheckEligibilityItemResponse : CheckEligibilityItemResponseBase
 public class CheckEligibilityItemWorkingFamilies
 {
     public TermValidity? TermValidity { get; set; }
-    public ReconfirmationProperties? ReconfirmationProperties { get; set; }
+    public ReconfirmationProperties ReconfirmationProperties { get; set; }
     public bool? IsDiscretionaryValidityStartDateApplied { get; set; }
     public EligibilityCodeType? EligibilityCodeType { get; set; }
     public string NationalInsuranceNumber { get; set; }

@@ -12,7 +12,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public bool ChildIsTooOld => Response.ReconfirmationProperties.Status == ReconfirmationStatus.ChildTooOld;
         public bool IsEligible => Response.Status == CheckEligibilityStatus.eligible.ToString();
         public bool IsExpired => Response.GracePeriodEndDate < DateTime.UtcNow.Date;
-        public bool IsInGracePeriod => DateTime.UtcNow.Date > Response.ValidityEndDate && DateTime.UtcNow.Date < Response.GracePeriodEndDate;
+        public bool IsInGracePeriod => DateTime.UtcNow.Date > Response.ValidityEndDate && DateTime.UtcNow.Date <= Response.GracePeriodEndDate;
   
         public string GracePeriodEndDisplay =>
             ChildIsTooOld
