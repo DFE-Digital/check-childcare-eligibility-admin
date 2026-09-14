@@ -1,7 +1,7 @@
 ﻿@model CheckChildcareEligibility.Admin.ViewModels.WorkingFamiliesResponseViewModel
 
 @{
-    string[] reconfirmationStatus = Model.GetReconfirmationStatus();
+    string[] reconfirmationStatus = Model.SetReconfirmationStatus();
 }
 
 <h2 class="govuk-heading-m">Details checked</h2>
@@ -38,7 +38,7 @@
             Eligibility confirmed on
         </dt>
         <dd class="govuk-summary-list__value">
-            @Model.ValidityStartDate.ToString("d MMMM yyyy")
+            @Model.Response.ValidityStartDate.ToString("d MMMM yyyy")
         </dd>
     </div>
     <div class="govuk-summary-list__row">
@@ -46,7 +46,7 @@
             @Model.ReconfirmationDateLabel
         </dt>
         <dd class="govuk-summary-list__value">
-            @Model.ReconfirmationDateDisplay
+            @Model.ReconfrimBetween
         </dd>
     </div>
     <div class="govuk-summary-list__row">
