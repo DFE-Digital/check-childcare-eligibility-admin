@@ -328,7 +328,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
                 status: "eligible");
 
             // Act
-            var result = sut.SetBannerCodeType();
+            var result = sut.SetBannerReconfirmationMessage();
 
             // Assert
             result.Should().Be($"Needs reconfirming before {validityEndDate:d MMMM yyyy}");
@@ -345,7 +345,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
                 status: "eligible");
 
             // Act
-            var result = sut.SetBannerCodeType();
+            var result = sut.SetBannerReconfirmationMessage();
 
             // Assert
             result.Should().Be(WorkingFamiliesResponseBanner.ReconfirmationChildTooOld);

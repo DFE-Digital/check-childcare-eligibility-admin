@@ -1,5 +1,6 @@
 const eligibilityCodePrefixes = {
   cannotBeUsedYet: "700",
+  notValidYet: "700",
   validForThisTerm: "701",
   validForThisTermAndNextTerm: "702",
   inGracePeriod: "703",
@@ -264,27 +265,33 @@ describe("Single check Working Families response views", () => {
     );
   });
   
-  it("shows a child too young response when the code starts before the child is nine months old", () => {
-    const code = buildEligibilityCode(eligibilityCodePrefixes.validForThisTerm);
-    runWorkingFamiliesCheck(code, "AA123456B", childTooYoungDateOfBirth);
+  [
+    eligibilityCodePrefixes.validForThisTerm,
+    eligibilityCodePrefixes.notValidYet,
+  ].forEach((prefix) => {
+    it("shows a child too young response when the code starts before the child is nine months old", () => {
+      const code = buildEligibilityCode(prefix);
 
-    cy.get(".govuk-panel__title").should(
-      "contain.text",
-      "Code Child is too young",
-    );
-    cy.get(".govuk-panel").should("have.class", "govuk-panel--blue");
-    assertTermValidityDetails("Valid from", 1);
-    assertResponseDetails(
-      code,
-      "AA123456B",
-      "Grace period ends",
-      "Date will appear here when the code can be used",
-      "Reconfirm between",
-      undefined,
-      "Not due yet",
-      childTooYoungDateOfBirth,
-    );
-    assertValidityStartsBeforeChildIsNineMonthsOld(childTooYoungDateOfBirth);
+      runWorkingFamiliesCheck(code, "AA123456B", childTooYoungDateOfBirth);
+
+      cy.get(".govuk-panel__title").should(
+        "contain.text",
+        "Child is too young",
+      );
+      cy.get(".govuk-panel").should("have.class", "govuk-panel--blue");
+      assertTermValidityDetails("Valid from", 1);
+      assertResponseDetails(
+        code,
+        "AA123456B",
+        "Grace period ends",
+        "Date will appear here when the code can be used",
+        "Reconfirm between",
+        undefined,
+        "Not due yet",
+        childTooYoungDateOfBirth,
+      );
+      assertValidityStartsBeforeChildIsNineMonthsOld(childTooYoungDateOfBirth);
+    });
   });
 
   it("shows a child too old reconfirmation status", () => {
