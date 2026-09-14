@@ -1,7 +1,9 @@
-﻿using CheckChildcareEligibility.Admin.Boundary.Responses;
+﻿using AspNetCoreGeneratedDocument;
+using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Constants.Generic;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies;
+using CsvHelper.Configuration.Attributes;
 
 namespace CheckChildcareEligibility.Admin.ViewModels
 {
@@ -50,7 +52,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         }
 
         public DateTime ChildDateOfBirth => DateTime.Parse(Response.DateOfBirth);    
-        public string CodeType = WorkingFamiliesResponseBanner.CodePermanent;
+        public string CodeType = string.Empty;
         public string CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
         public string BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
         public string TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor;
@@ -74,44 +76,37 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             }
         }
 
-        public string SetBannerCodeType()
-        {
 
-            if (Response.ReconfirmationProperties?.Status == ReconfirmationStatus.ChildTooOld)
-            {
-                return WorkingFamiliesResponseBanner.ReconfirmationChildTooOld;
-            }
-            else if (Response.ReconfirmationProperties?.Status == ReconfirmationStatus.Due)
-            {
-                return $"{WorkingFamiliesResponseBanner.ReconfirmationBefore} {Response.ValidityEndDate.ToString("d MMMM yyyy")}";
-            }
-            else if (Response.ReconfirmationProperties?.Status == ReconfirmationStatus.Overdue) 
-            {
-                return WorkingFamiliesResponseBanner.ReconfirmationOverdue;
-            }
-            return string.Empty;
-        }
-
-        public void SetBannerValues()
-        {
-            var nextTermView = WorkingFamiliesResponseBanner.TermNamesInView.GetValueOrDefault(NextTerm, string.Empty);
-            var currentTermView = WorkingFamiliesResponseBanner.TermNamesInView.GetValueOrDefault(CurrentTerm, string.Empty);
-
+        // if child is to young to not set code type
+        // else apply correct content for code type
+        private void SetBannerCodeType() {
+            if (ChildIsTooYoung) return;
             if (Response.EligibilityCodeType == EligibilityCodeType.Temporary)
             {
                 CodeType = WorkingFamiliesResponseBanner.CodeTemporary;
 
                 if (IsEligible)
                 {
-                    TermValidityDetails = "Only "  + TermValidityDetails;
+                    TermValidityDetails = "Only " + TermValidityDetails;
                 }
             }
             else if (Response.EligibilityCodeType == EligibilityCodeType.Foster)
             {
                 CodeType = WorkingFamiliesResponseBanner.CodeFosterFamily;
             }
+            else {
+                CodeType = WorkingFamiliesResponseBanner.CodePermanent;
+            }
+        }
 
-            if (IsEligible && ChildIsTooYoung) // Child too young
+        public void SetBannerValues()
+        {
+            var nextTermView = WorkingFamiliesResponseBanner.TermNamesInView.GetValueOrDefault(NextTerm, string.Empty);
+            var currentTermView = WorkingFamiliesResponseBanner.TermNamesInView.GetValueOrDefault(CurrentTerm, string.Empty);
+           
+            SetBannerCodeType();
+           
+            if ((IsEligible && ChildIsTooYoung) || (IsNotValidYet && ChildIsTooYoung)) // Child too young
             {
 
                 DateTime nineMonthsDate = ChildDateOfBirth.AddMonths(9);
@@ -121,8 +116,9 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
             }
 
-            else if (ChildIsTooOld || IsExpired) // Expired or too Old
+            else if (ChildIsTooOld || IsExpired) // Expired or too old
             {
+
                 CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
                 BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
                 TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermExpiredOn} {GracePeriodEndDisplay}";
