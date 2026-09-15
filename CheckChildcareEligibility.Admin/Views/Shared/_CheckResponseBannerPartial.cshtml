@@ -2,7 +2,7 @@
 @model CheckChildcareEligibility.Admin.ViewModels.WorkingFamiliesResponseViewModel
 
 @{
-    string bannerReconfirmationMessage = Model.GetBannerReconfirmationMessage();
+    string bannerReconfirmationMessage = Model.SetBannerReconfirmationMessage();
 }
 
 <div class="govuk-panel govuk-panel--@Model.BannerColour govuk-!-margin-bottom-7">
@@ -10,10 +10,7 @@
         @Model.CodeType @Model.CodeStatus
     </h1>
     <div class="govuk-panel__body govuk-!-margin-bottom-5">
-        @Model.TermValidityDetails 
-        @{
-           if(!Model.IsReconfirmed) {@Model.TermInfo}
-        }
+        @Model.TermValidityDetails   
     </div>
     <div class="govuk-body-l govuk-!-margin-bottom-0">
         @bannerReconfirmationMessage

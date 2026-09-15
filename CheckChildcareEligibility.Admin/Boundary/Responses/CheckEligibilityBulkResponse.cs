@@ -74,9 +74,9 @@ public class CheckEligibilityBulkWorkingFamiliesResponse : CheckEligibilityBulkR
             EligibilityCode = x.EligibilityCode,
             ChildDOB = x.DateOfBirth,
             NI = x.NationalInsuranceNumber,
-            ValidityStartDate = x.ValidityStartDate,
-            GracePeriodEnds = x.GracePeriodEndDate,
-            ValidityEndDate = x.ValidityEndDate,
+            ValidityStartDate = x.ValidityStartDate.ToString("yyyy-MM-dd"),
+            GracePeriodEnds = x.GracePeriodEndDate.ToString("yyyy-MM-dd"),
+            ValidityEndDate = x.ValidityEndDate.ToString("yyyy-MM-dd"),
             Outcome = GetStatusDescription(x.Status),
 
         });

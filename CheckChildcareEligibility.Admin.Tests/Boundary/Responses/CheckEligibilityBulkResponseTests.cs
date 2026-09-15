@@ -69,4 +69,29 @@ public class CheckEligibilityBulkResponseTests
             .Should()
             .Equal("FIRST", "SECOND");
     }
+
+    [Test]
+    public void BulkDataMapper_WorkingFamiliesResults_FormatsDatesAsYearMonthDay()
+    {
+        var response = new CheckEligibilityBulkWorkingFamiliesResponse
+        {
+            Data =
+            [
+                new CheckEligibilityItemWorkingFamilies
+                {
+                    ValidityStartDate = new DateTime(2027, 7, 1),
+                    ValidityEndDate = new DateTime(2027, 9, 30),
+                    GracePeriodEndDate = new DateTime(2027, 11, 30)
+                }
+            ]
+        };
+
+        var result = response.BulkDataMapper()
+            .Cast<BulkExportWorkingFamilies>()
+            .Single();
+
+        result.ValidityStartDate.Should().Be("2027-07-01");
+        result.ValidityEndDate.Should().Be("2027-09-30");
+        result.GracePeriodEnds.Should().Be("2027-11-30");
+    }
 }

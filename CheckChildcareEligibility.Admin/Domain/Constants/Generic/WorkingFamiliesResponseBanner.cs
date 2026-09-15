@@ -1,7 +1,16 @@
-﻿namespace CheckChildcareEligibility.Admin.Domain.Constants.Generic
+﻿using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies;
+
+namespace CheckChildcareEligibility.Admin.Domain.Constants.Generic
 {
     public static class WorkingFamiliesResponseBanner
     {
+        public static Dictionary<TermName, string> TermNamesInView = new() {
+            { TermName.Summer, "summer term" },
+            { TermName.Autumn, "autumn term"},
+            { TermName.Spring, "spring term"},
+            { TermName.None, ""}
+        };
+
         public const string ColourYellow = "yellow";
         public const string ColourGreen = "confirmation";
         public const string ColourBlue = "blue";
@@ -21,10 +30,6 @@
         public const string TermValidFor = "Valid for";
         public const string TermExpiresOn = "Expires on";
         public const string TermExpiredOn = "Expired on";
-
-        public const string SummerTerm = "summer term";
-        public const string AutumnTerm = "autumn term";
-        public const string SpringTerm = "spring term";
 
         public const string ReconfirmationBefore = "Needs reconfirming before";
         public const string ReconfirmationOverdue = "Needs reconfirming now";

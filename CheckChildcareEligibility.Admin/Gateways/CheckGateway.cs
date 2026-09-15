@@ -28,7 +28,6 @@ public class CheckGateway : BaseGateway, ICheckGateway
         [CheckEligibilityType.EarlyYearPupilPremium] = "bulk-check/early-year-pupil-premium",
         [CheckEligibilityType.WorkingFamilies] = "bulk-check/working-families",
     };
-
     public CheckGateway(ILoggerFactory logger, HttpClient httpClient, IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : base("EcsService",
         logger, httpClient, configuration, httpContextAccessor)
     {
