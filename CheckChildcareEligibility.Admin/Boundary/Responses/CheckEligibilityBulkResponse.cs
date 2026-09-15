@@ -3,7 +3,8 @@ using CheckChildcareEligibility.Admin.Models;
 
 namespace CheckChildcareEligibility.Admin.Boundary.Responses;
 
-public abstract class CheckEligibilityBulkResponseBase {
+public abstract class CheckEligibilityBulkResponseBase
+{
 
     public abstract IEnumerable<IBulkExport> BulkDataMapper();
 }
@@ -13,7 +14,7 @@ public class CheckEligibilityBulkResponse : CheckEligibilityBulkResponseBase
 
     private string GetStatusDescription(string status)
     {
-        
+
         Enum.TryParse(status, out CheckEligibilityStatus statusEnum);
 
         switch (statusEnum)
@@ -30,7 +31,8 @@ public class CheckEligibilityBulkResponse : CheckEligibilityBulkResponseBase
                 return status;
         }
     }
-    public override IEnumerable<IBulkExport> BulkDataMapper() {
+    public override IEnumerable<IBulkExport> BulkDataMapper()
+    {
 
         return Data.OrderBy(x => x.Order).Select(x => new BulkExport
         {

@@ -243,20 +243,6 @@ internal class HomeControllerTests : TestBase
     }
 
     [Test]
-    public void Given_ManageFosterFamilies_Get_ReturnsView()
-    {
-        // Arrange
-
-        // Act
-        var result = _sut.ManageFosterFamilies();
-
-        // Assert
-        var viewResult = result as ViewResult;
-        viewResult.Should().NotBeNull();
-        viewResult.ViewName.Should().Be("ManageFosterFamilies");
-    }
-
-    [Test]
     public void Given_Guidance_ReturnsView()
     {
         // Act

@@ -9,6 +9,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 {
     public class WorkingFamiliesResponseViewModel
     {
+
         public CheckEligibilityItemWorkingFamilies Response { get; set; }
         public bool ChildIsTooYoung => Response.ChildTooYoung;
         public bool ChildIsTooOld => Response.ReconfirmationProperties.Status == ReconfirmationStatus.ChildTooOld;
