@@ -77,10 +77,10 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         }
 
 
-        // if child is to young to not set code type
+        // If child is too young and the code has not expired do not set code type
         // else apply correct content for code type
         private void SetBannerCodeType() {
-            if (ChildIsTooYoung) return;
+            if (ChildIsTooYoung && !IsExpired) return;
             if (Response.EligibilityCodeType == EligibilityCodeType.Temporary)
             {
                 CodeType = WorkingFamiliesResponseBanner.CodeTemporary;
