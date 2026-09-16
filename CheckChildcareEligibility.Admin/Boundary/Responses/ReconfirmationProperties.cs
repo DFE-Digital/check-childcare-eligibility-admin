@@ -5,9 +5,9 @@ namespace CheckChildcareEligibility.Admin.Boundary.Responses;
 public class ReconfirmationProperties
 {
 
-    public DateTime StartDate { get; set; }
+    public DateTime? StartDate { get; set; }
 
-    public DateTime EndDate { get; set; }
+    public DateTime? EndDate { get; set; }
 
     public ReconfirmationStatus Status { get; set; }
 
