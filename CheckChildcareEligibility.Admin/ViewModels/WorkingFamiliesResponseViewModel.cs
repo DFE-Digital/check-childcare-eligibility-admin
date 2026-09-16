@@ -15,7 +15,12 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public bool IsEligible => Response.Status == CheckEligibilityStatus.eligible.ToString();
         public bool IsExpired => Response.GracePeriodEndDate < DateTime.UtcNow.Date;
         public bool IsInGracePeriod => DateTime.UtcNow.Date > Response.ValidityEndDate && DateTime.UtcNow.Date <= Response.GracePeriodEndDate;
-  
+        public string EligibilityConfirmedOnDisplay =>
+            $"{Response.ValidityStartDate:d MMMM yyyy}" +
+            (Response.IsDiscretionaryValidityStartDateApplied == true
+                ? " (discretionary start date applied)"
+                : string.Empty);
+
         public string GracePeriodEndDisplay =>
             ChildIsTooOld
                 ? Response.ValidityEndDate.ToString("d MMMM yyyy")
