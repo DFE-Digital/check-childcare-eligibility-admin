@@ -448,7 +448,9 @@ caption {
     position: sticky;
     top: 0;
 }
-
+.contents-list-item {
+    list-style-type: none;
+}
 .userGuidanceAnchorMenu {
     position: sticky;
     top: 10px;
