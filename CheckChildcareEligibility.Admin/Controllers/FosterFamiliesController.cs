@@ -179,30 +179,30 @@ namespace CheckChildcareEligibility.Admin.Controllers
 
             var response = await _getFosterFamilyUseCase.Execute(request.CarerId, laID, true);
 
-            UpdateFosterCarerRequest updateRequest = new UpdateFosterCarerRequest();
-            FosterCarerRequest fosterCarerRequest = new FosterCarerRequest
+            UpdateFosterCarerRequest updateRequest = new()
             {
-                CarerFirstName = request.CarerFirstName,
-                CarerLastName = request.CarerLastName,
-                CarerDateOfBirth = request.CarerDateOfBirth,
-                CarerNationalInsuranceNumber = request.CarerNationalInsuranceNumber,
-                HasPartner = request.HasPartner
+                FosterCarerRequest = new FosterCarerRequest
+                {
+                    CarerFirstName = request.CarerFirstName,
+                    CarerLastName = request.CarerLastName,
+                    CarerDateOfBirth = request.CarerDateOfBirth,
+                    CarerNationalInsuranceNumber = request.CarerNationalInsuranceNumber,
+                    HasPartner = request.HasPartner
+                }
             };
-            updateRequest.FosterCarerRequest = fosterCarerRequest;
             if (request.HasPartner == true)
             {
-                FosterPartnerRequest fosterPartnerRequest = new FosterPartnerRequest
+                updateRequest.FosterPartnerRequest = new FosterPartnerRequest
                 {
                     PartnerFirstName = response.PartnerFirstName,
                     PartnerLastName = response.PartnerLastName,
                     PartnerDateOfBirth = response.PartnerDateOfBirth.Value,
                     PartnerNationalInsuranceNumber = response.PartnerNationalInsuranceNumber
                 };
-                updateRequest.FosterPartnerRequest = fosterPartnerRequest;
             }
 
             await _updateFosterCarerUseCase.Execute(request.CarerId, laID, updateRequest);
-            return RedirectToAction("Family_Record_FF", new { FosterCarerId = request.CarerId });
+            return RedirectToAction("Family_Record_FF", new { FosterCarerId = request.CarerId, CarerUpdated = true });
         }
 
         [HttpGet("EnterPartner/{contextId}")]
@@ -420,11 +420,22 @@ namespace CheckChildcareEligibility.Admin.Controllers
         }
 
         [HttpGet("Family/{FosterCarerId}")]
-        public async Task<IActionResult> Family_Record_FF(Guid FosterCarerId)
+        public async Task<IActionResult> Family_Record_FF(Guid FosterCarerId,
+            bool carerUpdated = false,
+            bool partnerUpdated = false,
+            bool childUpdated = false
+        )
         {
             var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
             var response = await _getFosterFamilyUseCase.Execute(FosterCarerId, laID, true);
-            return View(response);
+            var viewModel = new FosterFamilyViewModel()
+            {
+                Response = response,
+                CarerUpdated = carerUpdated,
+                PartnerUpdated = partnerUpdated,
+                ChildUpdated = childUpdated
+            };
+            return View(viewModel);
         }
 
         [HttpGet("Code/{FosterChildId}")]

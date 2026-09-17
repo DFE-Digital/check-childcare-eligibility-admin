@@ -1,7 +1,7 @@
 ﻿@using CheckChildcareEligibility.Admin.Boundary.Responses
-@model FosterFamilyResponse
+@model FosterFamilyViewModel
 @{
-    string carerFullName = @Model.CarerFirstName + " " + @Model.CarerLastName;
+    string carerFullName = @Model.Response.CarerFirstName + " " + @Model.Response.CarerLastName;
     ViewData["Title"] = "Foster family of " + @carerFullName;
     var errorMessage = TempData["ErrorMessage"] as string;
 }
@@ -25,19 +25,40 @@
         </div>
     }
 
+    @if (Model.CarerUpdated || Model.PartnerUpdated || Model.ChildUpdated)
+    {
+        string message = "Changes to carer saved.";
+        if (Model.PartnerUpdated) { message = "Changes to partner saved."; }
+        if (Model.ChildUpdated) { message = "Changes to child saved."; }
+
+        <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title"
+             data-module="govuk-notification-banner">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                    Success
+                </h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p>@message</p>
+            </div>
+        </div>
+    }
+
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
 
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
 
-            <a href="@Url.ActionLink("AddChild", "FosterFamilies", new { Model.FosterCarerId })" role="button" draggable="false"
-               class="govuk-button govuk-button" data-module="govuk-button" data-govuk-button-init="">
+            <a href="@Url.ActionLink("Add_Child_FF", "FosterFamilies", new { Model.Response.FosterCarerId })"
+               role="button" draggable="false" class="govuk-button govuk-button" data-module="govuk-button"
+               data-govuk-button-init="">
                 Add child and create code (**ToDo**)
             </a>
-            @if (!Model.HasPartner)
+            @if (!Model.Response.HasPartner)
             {
-                <a href="@Url.ActionLink("AddPartner", "FosterFamilies", new { Model.FosterCarerId })" role="button" draggable="false"
-                   class="govuk-button govuk-button--secondary" data-module="govuk-button" data-govuk-button-init="">
+                <a href="@Url.ActionLink("Add_Partner_FF", "FosterFamilies", new { Model.Response.FosterCarerId })"
+                   role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                   data-govuk-button-init="">
                     Add partner
                 </a>
             }
@@ -50,7 +71,7 @@
                     <ul class="govuk-summary-card__actions">
                         <li class="govuk-summary-card__action">
                             <a class="govuk-link"
-                               href="@Url.ActionLink("Update_Carer_Details_FF", "FosterFamilies", new { FosterCarerId = Model.FosterCarerId })">Change<span
+                               href="@Url.ActionLink("Update_Carer_Details_FF", "FosterFamilies", new { FosterCarerId = Model.Response.FosterCarerId })">Change<span
                                 class="govuk-visually-hidden">Carer details</span></a>
                             </li>
                         </ul>
@@ -63,7 +84,7 @@
                                     Full name
                                 </dt>
                                 <dd class="govuk-summary-list__value">
-                                    @Model.CarerFirstName @Model.CarerLastName
+                                    @Model.Response.CarerFirstName @Model.Response.CarerLastName
                                 </dd>
                             </div>
 
@@ -72,7 +93,7 @@
                                     Date of birth
                                 </dt>
                                 <dd class="govuk-summary-list__value">
-                                    @Model.CarerDateOfBirth.ToString("d MMMM yyyy")
+                                    @Model.Response.CarerDateOfBirth.ToString("d MMMM yyyy")
                                 </dd>
                             </div>
 
@@ -81,14 +102,14 @@
                                     National Insurance number
                                 </dt>
                                 <dd class="govuk-summary-list__value">
-                                    @Model.CarerNationalInsuranceNumber
+                                    @Model.Response.CarerNationalInsuranceNumber
                                 </dd>
                             </div>
                         </dl>
                     </div>
                 </div>
 
-                @if (Model.HasPartner == true)
+                @if (Model.Response.HasPartner == true)
                 {
                     <div class="govuk-summary-card">
                         <div class="govuk-summary-card__title-wrapper">
@@ -114,7 +135,7 @@
                                                 Full name
                                             </dt>
                                             <dd class="govuk-summary-list__value">
-                                                @Model.PartnerFirstName @Model.PartnerLastName
+                                                @Model.Response.PartnerFirstName @Model.Response.PartnerLastName
                                             </dd>
                                         </div>
 
@@ -123,7 +144,7 @@
                                                 Date of birth
                                             </dt>
                                             <dd class="govuk-summary-list__value">
-                                                @Model.PartnerDateOfBirth?.ToString("d MMMM yyyy")
+                                                @Model.Response.PartnerDateOfBirth?.ToString("d MMMM yyyy")
                                             </dd>
                                         </div>
 
@@ -132,7 +153,7 @@
                                                 National Insurance number
                                             </dt>
                                             <dd class="govuk-summary-list__value">
-                                                @Model.PartnerNationalInsuranceNumber
+                                                @Model.Response.PartnerNationalInsuranceNumber
                                             </dd>
                                         </div>
                                     </dl>
@@ -151,7 +172,7 @@
                                     @{
                                         var index = 1;
                                     }
-                                    @foreach (var child in Model.FosterChildren)
+                                    @foreach (var child in Model.Response.FosterChildren)
                                     {
                                         <div class="govuk-summary-list__row">
                                             <dt class="govuk-summary-list__key">
