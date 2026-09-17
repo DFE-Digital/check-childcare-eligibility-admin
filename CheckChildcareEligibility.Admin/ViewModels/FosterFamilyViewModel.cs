@@ -5,10 +5,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
     {
         public FosterFamilyResponse Response { get; set; }
 
-        public bool CarerUpdated { get; set; }
+        public string? Confirmation { get; set; }
         
-        public bool PartnerUpdated { get; set; }
-
-        public bool ChildUpdated { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿@using CheckChildcareEligibility.Admin.Boundary.Responses
+@using Microsoft.FeatureManagement
 @model FosterFamilyViewModel
 @{
     string carerFullName = @Model.Response.CarerFirstName + " " + @Model.Response.CarerLastName;
@@ -25,23 +26,10 @@
         </div>
     }
 
-    @if (Model.CarerUpdated || Model.PartnerUpdated || Model.ChildUpdated)
+    @if (!string.IsNullOrEmpty(Model.Confirmation))
     {
-        string message = "Changes to carer saved.";
-        if (Model.PartnerUpdated) { message = "Changes to partner saved."; }
-        if (Model.ChildUpdated) { message = "Changes to child saved."; }
-
-        <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title"
-             data-module="govuk-notification-banner">
-            <div class="govuk-notification-banner__header">
-                <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
-                    Success
-                </h2>
-            </div>
-            <div class="govuk-notification-banner__content">
-                <p>@message</p>
-            </div>
-        </div>
+        var data = new { Title = "Success", Message = Model.Confirmation };
+        <partial name="_NotificationBannerPartial" model="data" />
     }
 
     <div class="govuk-grid-row">
@@ -124,7 +112,7 @@
                                 </li>
                                 <li class="govuk-summary-card__action">
                                     <a class="govuk-link" href="@Url.Action("Remove_Partner_Details_FF", "FosterFamilies", new { FosterCarerId = Model.Response.FosterCarerId })">Remove
-                                        (**ToDo**)<span class="govuk-visually-hidden">Partner details</span></a>
+                                        <span class="govuk-visually-hidden">Partner details</span></a>
                                     </li>
                                 </ul>
                             </div>

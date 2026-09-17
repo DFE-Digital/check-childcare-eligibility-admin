@@ -28,9 +28,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
             if (request.FosterCarerRequest is not null)
             {
-                var validationResult =
-                    new FosterCarerRequestValidator()
-                        .Validate(request.FosterCarerRequest);
+                var validationResult = new FosterCarerRequestValidator().Validate(request.FosterCarerRequest);
 
                 if (!validationResult.IsValid)
                 {

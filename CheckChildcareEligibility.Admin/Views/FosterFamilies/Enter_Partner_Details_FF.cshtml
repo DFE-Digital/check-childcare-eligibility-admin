@@ -10,7 +10,8 @@
 
     bool isUpdate = Model != null && string.IsNullOrEmpty(Model.ContextId);
     var actionName = isUpdate ? "UpdatePartner" : "EnterPartner";
-    ViewData["Title"] = isUpdate ? "Edit the partner details" : "Enter the partner details";
+    ViewData["Title"] = isUpdate && !string.IsNullOrEmpty(Model.PartnerFirstName) ? 
+        "Edit the partner details" : "Enter the partner details";
 }
 
 <div class="govuk-grid-column-two-thirds">
