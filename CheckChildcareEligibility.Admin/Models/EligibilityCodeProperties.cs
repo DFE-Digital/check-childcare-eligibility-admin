@@ -27,7 +27,7 @@ namespace CheckChildcareEligibility.Admin.Models
             Status = Enum.Parse<CheckEligibilityStatus>(workingFamiliesResponse.Status);
             EligibilityCode = workingFamiliesResponse.EligibilityCode;
             ValidityStartDate = workingFamiliesResponse.ValidityStartDate;
-            ValidityEndDate = workingFamiliesResponse.ValidityStartDate;
+            ValidityEndDate = workingFamiliesResponse.ValidityEndDate;
             GracePeriodEndDate = workingFamiliesResponse.GracePeriodEndDate;
             ChildDateOfBirth = DateTime.Parse(workingFamiliesResponse.DateOfBirth);
             TermValidity = workingFamiliesResponse.TermValidity;

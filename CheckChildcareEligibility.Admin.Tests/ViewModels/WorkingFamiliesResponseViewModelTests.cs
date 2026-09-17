@@ -119,7 +119,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             sut.Properties.IsNotValidYet.Should().BeTrue();
             sut.CodeStatus.Should().Be(WorkingFamiliesResponseBanner.CodeExpired);
             sut.BannerColour.Should().Be(WorkingFamiliesResponseBanner.ColourOrange);
-            sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermExpiredOn} {sut.Properties.ValidityEndDate:dd MMMM yyyy}");
+            sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermExpiredOn} {sut.Properties.ValidityEndDate:d MMMM yyyy}");
             sut.GracePeriodEndDisplay.Should().Be(sut.Properties.ValidityEndDate.ToString("d MMMM yyyy"));
             sut.GracePeriodEndLabel.Should().Be("Grace period ended");
         }
@@ -165,7 +165,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
         }
 
         [Test]
-        public void ReconfrimBetween_WhenTemporaryCode_ShouldReturnValidityEndDate()
+        public void ReconfirmBetween_WhenTemporaryCode_ShouldReturnValidityEndDate()
         {
             // Arrange
             var validityEndDate = DateTime.Today.AddMonths(3);
@@ -184,7 +184,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
         }
 
         [Test]
-        public void ReconfrimBetween_WhenPermanentCode_ShouldReturnReconfirmationWindow()
+        public void ReconfirmBetween_WhenPermanentCode_ShouldReturnReconfirmationWindow()
         {
             // Arrange
             var validityEndDate = DateTime.Today.AddMonths(3);
@@ -204,7 +204,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
         }
 
         [Test]
-        public void ReconfrimBetween_WhenChildTooOld_ShouldReturnNotApplicable()
+        public void ReconfirmBetween_WhenChildTooOld_ShouldReturnNotApplicable()
         {
             // Arrange
             var sut = CreateViewModel(
