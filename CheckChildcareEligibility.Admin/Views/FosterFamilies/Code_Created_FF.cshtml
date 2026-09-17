@@ -1,4 +1,6 @@
-﻿@using CheckChildcareEligibility.Admin.ViewModels
+﻿@using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies
+@using CheckChildcareEligibility.Admin.Helpers
+@using CheckChildcareEligibility.Admin.ViewModels
 @model FosterFamilyCreatedViewModel
 @{
     ViewData["Title"] = "Family added and code created";
@@ -15,7 +17,7 @@
                     @ViewData["Title"]
                 </h1>
                 <div class="govuk-panel__body">
-                    Eligibility code <br> <strong>@Model.EligibilityCode</strong>
+                    Eligibility code <br> <strong>@Model.Response.EligibilityCode</strong>
                 </div>
             </div>
 
@@ -35,19 +37,17 @@
                 </thead>
                 <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__cell">@Model.ChildName</td>
-                        <td class="govuk-table__cell">@Model.EligibilityCode</td>
+                        <td class="govuk-table__cell">@Model.Response.ChildFullName</td>
+                        <td class="govuk-table__cell">@Model.Response.EligibilityCode</td>
                         <td class="govuk-table__cell">Valid from @Model.ValidFromTerm.Name.ToString().ToLower() term @Model.ValidFromTerm.StartDate.Year</td>
-                        <td class="govuk-table__cell">@Model.ValidityStartDate.ToString("d MMMM yyyy")</td>
-                        <td class="govuk-table__cell">@Model.ReconfirmBetweenStart.ToString("d MMMM yyyy")
-                            and @Model.ReconfirmBetweenEnd.ToString("d MMMM yyyy")
-                        </td>
-                        <td class="govuk-table__cell">@Model.GracePeriodEndDate.ToString("d MMMM yyyy")</td>
+                        <td class="govuk-table__cell">@Model.Response.ValidityStartDate.ToString("d MMMM yyyy")</td>
+                        <td class="govuk-table__cell">@WorkingFamiliesCheckHelper.GetReconfirmBetween(EligibilityCodeType.Foster, Model.Response.ReconfirmationProperties)</td>
+                        <td class="govuk-table__cell">@Model.Response.GracePeriodEndDate.ToString("d MMMM yyyy")</td>
                     </tr>
                 </tbody>
             </table>
             
-            <a href="@Url.Action("Code_Record_FF", "FosterFamilies", new { Model.FosterChildId })" role="button" draggable="false" class="govuk-button" data-module="govuk-button" data-govuk-button-init=""">
+            <a href="@Url.Action("Code_Record_FF", "FosterFamilies", new { Model.Response.FosterChildId })" role="button" draggable="false" class="govuk-button" data-module="govuk-button" data-govuk-button-init=""">
                 View code details
             </a>
         </div>

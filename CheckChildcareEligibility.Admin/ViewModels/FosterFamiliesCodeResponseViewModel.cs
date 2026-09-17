@@ -1,6 +1,7 @@
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Constants.Generic;
-using CheckChildcareEligibility.Admin.Helpers;
+using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies;
+using CheckChildcareEligibility.Admin.Models;
 
 namespace CheckChildcareEligibility.Admin.ViewModels;
 
@@ -8,24 +9,25 @@ public class FosterFamiliesCodeResponseViewModel
 {
     public FosterChildResponse Response { get; set; }
 
-    public bool ChildIsTooYoung => WorkingFamiliesCheckHelper.ChildIsTooYoung(Response.ChildDateOfBirth, Response.ValidityStartDate);
-    public bool ChildIsTooOld => WorkingFamiliesCheckHelper.ChildIsTooOld(Response.ChildDateOfBirth, DateTime.UtcNow.Date);
+    public EligibilityCodeProperties CodeProperties {get; set;}
+  
+    public Term ValidFromTerm => CodeProperties.CurrentTerm.Name != TermName.None ? CodeProperties.CurrentTerm : CodeProperties.NextTerm;
 
     public string[] GetReconfirmationStatus()
     {
-        if (ChildIsTooOld)
+        if (CodeProperties.ChildIsTooOld)
         {
             return WorkingFamiliesResponseDetails.ReconfirmationStatusChildTooOld;
         }
-        else if (DateTime.Now < Response.ReconfirmBetweenStart)
+        else if (DateTime.Now < Response.ReconfirmationProperties.StartDate)
         {
             return WorkingFamiliesResponseDetails.ReconfirmationStatusNotDueYet;
         }
-        else if (DateTime.Now >= Response.ReconfirmBetweenStart && DateTime.Now <= Response.ReconfirmBetweenEnd) //due now
+        else if (DateTime.Now >= Response.ReconfirmationProperties.StartDate && DateTime.Now <= Response.ReconfirmationProperties.EndDate) //due now
         {
             return WorkingFamiliesResponseDetails.ReconfirmationStatusDueNow;
         }
-        else if (DateTime.Now > Response.ReconfirmBetweenEnd) //overdue - Needs reconfirming now
+        else if (DateTime.Now > Response.ReconfirmationProperties.EndDate) //overdue - Needs reconfirming now
         {
             return WorkingFamiliesResponseDetails.ReconfirmationStatusOverdue;
         }

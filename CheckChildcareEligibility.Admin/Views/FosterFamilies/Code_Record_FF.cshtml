@@ -1,11 +1,10 @@
 ﻿@using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies
+@using CheckChildcareEligibility.Admin.Helpers
 @model FosterFamiliesCodeResponseViewModel
 @{
     ViewData["Title"] = "Eligibility code for " + Model.Response.ChildFullName;
     var errorMessage = TempData["ErrorMessage"] as string;
-
     string[] reconfirmationStatus = Model.GetReconfirmationStatus();
-
 }
 
 <div class="govuk-grid-column-full">
@@ -72,7 +71,7 @@
                             </dt>
                             <dd class="govuk-summary-list__value">
                                 <td class="govuk-table__cell">
-                                    @if (Model.Response.ValidFromTerm.Name == TermName.None)
+                                    @if (Model.ValidFromTerm.Name == TermName.None)
                                     {
                                         <span>Expired</span>
                                     }
@@ -98,8 +97,7 @@
                                 Reconfirm between
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @Model.Response.ReconfirmBetweenStart.ToString("d MMMM yyyy") and
-                                @Model.Response.ReconfirmBetweenEnd.ToString("d MMMM yyyy")
+                                @WorkingFamiliesCheckHelper.GetReconfirmBetween(EligibilityCodeType.Foster, Model.Response.ReconfirmationProperties)
                             </dd>
                         </div>
 

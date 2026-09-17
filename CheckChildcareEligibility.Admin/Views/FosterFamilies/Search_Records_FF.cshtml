@@ -1,4 +1,6 @@
-﻿@using CheckChildcareEligibility.Admin.ViewModels
+﻿@using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies
+@using CheckChildcareEligibility.Admin.Helpers
+@using CheckChildcareEligibility.Admin.ViewModels
 @model CheckChildcareEligibility.Admin.ViewModels.SearchFosterFamiliesRecordsViewModel
 @{
     ViewData["Title"] = "Manage foster families";
@@ -34,16 +36,20 @@
                     <tbody class="govuk-table__body">
                         @foreach (var item in Model.Data)
                         {
+                            string[] reconfirmationStatus = WorkingFamiliesCheckHelper.GetReconfirmStatus(item.ReconfirmationProperties);
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell">@Html.ActionLink(item.ChildName, "Code_Record_FF", "FosterFamilies", new { FosterChildId = item.FosterChildId }, new { @class = "govuk-link" })</td>
                                 <td class="govuk-table__cell">@item.ChildDateOfBirth.ToString("d MMMM yyyy")</td>
                                 <td class="govuk-table__cell">@item.EligibilityCode</td>
                                 <td class="govuk-table__cell">@Html.ActionLink(item.CarerName, "Family_Record_FF", "FosterFamilies", new { FosterCarerId = item.FosterCarerId }, new { @class = "govuk-link" })</td>
-                                <td class="govuk-table__cell">@item.ValidityStartDate.ToString("d MMMM yyyy")</td>
-                                <td class="govuk-table__cell">@item.ReconfirmBetweenStart.ToString("d MMMM yyyy")
-                            and @item.ReconfirmBetweenEnd.ToString("d MMMM yyyy"))</td>
+                                <td class="govuk-table__cell">@item.ValidityStartDate.ToString(format: "d MMMM yyyy")</td>
+                                <td class="govuk-table__cell">@WorkingFamiliesCheckHelper.GetReconfirmBetween(EligibilityCodeType.Foster, item.ReconfirmationProperties)</td>
                                 <td class="govuk-table__cell">@item.GracePeriodEndDate.ToString("d MMMM yyyy")</td>
-                                <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--red">@item.ReconfirmationStatus (**API-ToDo**)</strong></td>
+                                <td class="govuk-table__cell">
+                                    <strong class="govuk-tag govuk-tag--@reconfirmationStatus[1]" style="max-width:100%;">
+                                        @reconfirmationStatus[0]
+                                    </strong>
+                                </td>
                             </tr>
                         }
                     </tbody>

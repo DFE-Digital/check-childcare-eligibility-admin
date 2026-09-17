@@ -371,19 +371,8 @@ namespace CheckChildcareEligibility.Admin.Controllers
         public async Task<IActionResult> Code_Created_FF(Guid FosterChildId)
         {
             var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
-            var request = await _getFosterChildUseCase.Execute(FosterChildId, laID, true);
-            var viewModel = new FosterFamilyCreatedViewModel
-            {
-                FosterChildId = request.FosterChildId,
-                FosterCarerId = request.FosterCarerId,
-                ChildName = request.ChildFullName,
-                EligibilityCode = request.EligibilityCode,
-                ValidityStartDate = request.ValidityStartDate,
-                ReconfirmBetweenStart = request.ReconfirmBetweenStart,
-                ReconfirmBetweenEnd = request.ReconfirmBetweenEnd,
-                GracePeriodEndDate = request.GracePeriodEndDate,
-                ValidFromTerm = request.ValidFromTerm
-            };
+            var response = await _getFosterChildUseCase.Execute(FosterChildId, laID, true);
+            var viewModel = new FosterFamilyCreatedViewModel { Response = response };
             return View(viewModel);
         }
 
@@ -402,7 +391,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             var childResponse = await _getFosterChildUseCase.Execute(FosterChildId, laID, true);
             var viewModel = new FosterFamiliesCodeResponseViewModel()
             {
-                 Response  = childResponse
+                Response = childResponse
             };
             return View(viewModel);
         }

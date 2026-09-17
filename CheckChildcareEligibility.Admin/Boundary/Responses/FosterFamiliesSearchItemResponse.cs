@@ -16,12 +16,10 @@
 
         public DateTime ValidityStartDate { get; set; }
 
-        public DateTime ReconfirmBetweenStart { get; set; }
-
-        public DateTime ReconfirmBetweenEnd { get; set; }
+        public ReconfirmationProperties ReconfirmationProperties { get; set; }
 
         public DateTime GracePeriodEndDate { get; set; }
 
-        public string ReconfirmationStatus { get; set; } = string.Empty;
+
     }
 }
