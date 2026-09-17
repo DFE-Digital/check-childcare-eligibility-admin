@@ -13,15 +13,16 @@
     ViewData["Title"] = isUpdate ? "Edit the partner details" : "Enter the partner details";
 }
 
-<div class="govuk-grid-column-full">
+<div class="govuk-grid-column-two-thirds">
     @if (isUpdate)
     {
         <a class="govuk-back-link backLinkJS"
-           href="@Url.ActionLink("Family_Record_FF", "FosterFamilies", new { CarerId = Model.CarerId.ToString() })">Back</a>
+           href="@Url.ActionLink("Family_Record_FF", "FosterFamilies", new { CarerId = Model.FosterCarerId.ToString() })">Back</a>
     }
     else
     {
-        <a class="govuk-back-link backLinkJS" href="@Url.Action("Enter_Carer_Details_FF", "FosterFamilies", new { Model.ContextId })">Back</a>
+        <a class="govuk-back-link backLinkJS"
+           href="@Url.Action("Enter_Carer_Details_FF", "FosterFamilies", new { Model.ContextId })">Back</a>
     }
 
     @if (!ViewData.ModelState.IsValid)
@@ -36,6 +37,7 @@
                 @if (Model != null)
                 {
                     <input asp-for="ContextId" type="hidden" />
+                    <input asp-for="FosterCarerId" type="hidden" />
                 }
                 <fieldset class="govuk-fieldset">
 
@@ -47,7 +49,7 @@
                             <span asp-validation-for="PartnerFirstName"></span>
                         </p>
                         <input
-                        class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["PartnerFirstName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                        class="govuk-input govuk-input--width-20 @(ViewData.ModelState["PartnerFirstName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
                         asp-for="PartnerFirstName" type="text">
                     </div>
 
@@ -59,7 +61,7 @@
                             <span asp-validation-for="PartnerLastName"></span>
                         </p>
                         <input
-                        class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["PartnerLastName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                        class="govuk-input govuk-input--width-20 @(ViewData.ModelState["PartnerLastName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
                         asp-for="PartnerLastName" type="text">
                     </div>
 
@@ -145,9 +147,23 @@
                                type="text" spellcheck="false" autocomplete="text" maxlength="9">
                     </div>
                 </fieldset>
-                <button type="submit" class="govuk-button" data-module="govuk-button">
-                    Continue
-                </button>
+                @if (!isUpdate)
+                {
+                    <button type="submit" class="govuk-button" data-module="govuk-button">
+                        Continue
+                    </button>
+                }
+                else
+                {
+                    <div class="govuk-inset-text">
+                        After an eligibility code has been issued, you can correct mistakes to a partner’s name, date of
+                        birth or National Insurance number. If the carer’s partner changes, you should remove the partner
+                        and add a new one. You cannot swap the identity of a partner to that of the carer.
+                    </div>
+                    <button type="submit" class="govuk-button" data-module="govuk-button">
+                        Save
+                    </button>
+                }
             </form>
         </div>
     </div>

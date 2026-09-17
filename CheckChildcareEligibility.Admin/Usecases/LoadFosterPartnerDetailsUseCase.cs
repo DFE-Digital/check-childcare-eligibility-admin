@@ -1,56 +1,33 @@
+using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.ViewModels;
-using Newtonsoft.Json;
 
 namespace CheckChildcareEligibility.Admin.UseCases;
 
 public interface ILoadFosterPartnerDetailsUseCase
 {
-    Task<(FosterPartnerDetailsViewModel fosterPartnerDetails, Dictionary<string, List<string>> ValidationErrors)> Execute(
-        string fosterPartnerDetailsJson = null,
-        string validationErrorsJson = null
-    );
+    Task<FosterPartnerDetailsViewModel> Execute(FosterFamilyResponse response = null);
 }
 
 public class LoadFosterPartnerDetailsUseCase : ILoadFosterPartnerDetailsUseCase
 {
-    private readonly ILogger<LoadFosterPartnerDetailsUseCase> _logger;
 
-    public LoadFosterPartnerDetailsUseCase(ILogger<LoadFosterPartnerDetailsUseCase> logger)
+    public async Task<FosterPartnerDetailsViewModel?> Execute(FosterFamilyResponse response = null)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+        FosterPartnerDetailsViewModel viewModel = null;
 
-    public async Task<(FosterPartnerDetailsViewModel fosterPartnerDetails, Dictionary<string, List<string>> ValidationErrors)> Execute(
-        string fosterPartnerDetailsJson = null,
-        string validationErrorsJson = null)
-    {
-        FosterPartnerDetailsViewModel fosterPartnerDetailsViewModel = null;
-        Dictionary<string, List<string>> errors = null;
-
-
-        if (!string.IsNullOrEmpty(fosterPartnerDetailsJson))
-            try
-            {
-                fosterPartnerDetailsViewModel = JsonConvert.DeserializeObject<FosterPartnerDetailsViewModel>(fosterPartnerDetailsJson);
-            }
-            catch (JsonException ex)
-            {
-                _logger.LogWarning(ex, "Error deserializing fosterPartner details JSON");
-            }
-
-
-        if (!string.IsNullOrEmpty(validationErrorsJson))
+        if (response != null)
         {
-            try
+            viewModel = new FosterPartnerDetailsViewModel
             {
-                errors = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(validationErrorsJson);
-            }
-            catch (JsonException ex)
-            {
-                _logger.LogWarning(ex, "Error deserializing validation errors JSON");
-            }
+                FosterCarerId = response.FosterCarerId,
+                PartnerFirstName = response?.PartnerFirstName,
+                PartnerLastName = response?.PartnerLastName,
+                PartnerNationalInsuranceNumber = response?.PartnerNationalInsuranceNumber,
+                Day = response.PartnerDateOfBirth?.Day.ToString(),
+                Month = response.PartnerDateOfBirth?.Month.ToString(),
+                Year = response.PartnerDateOfBirth?.Year.ToString()
+            };
         }
-
-        return (fosterPartnerDetailsViewModel, errors);
+        return viewModel;
     }
 }

@@ -16,7 +16,7 @@
     @if (actionName.Equals("UpdateCarer"))
     {
         <a class="govuk-back-link backLinkJS"
-           href="@Url.ActionLink("Family_Record_FF", "FosterFamilies", new { CarerId = Model.CarerId.ToString() })">Back</a>
+           href="@Url.ActionLink("Family_Record_FF", "FosterFamilies", new { CarerId = Model.FosterCarerId.ToString() })">Back</a>
     }
     else
     {
@@ -32,7 +32,7 @@
         @if (Model != null)
         {
             <input asp-for="ContextId" type="hidden" />
-            <input asp-for="CarerId" type="hidden" />
+            <input asp-for="FosterCarerId" type="hidden" />
         }
         <fieldset class="govuk-fieldset">
             <div class="govuk-form-group">
@@ -165,13 +165,29 @@
                         </div>
                     </fieldset>
                 </div>
-            }else{
+            }
+            else
+            {
                 <input asp-for="HasPartner" type="hidden" />
             }
         </fieldset>
-        <button type="submit" class="govuk-button" data-module="govuk-button">
-            Continue
-        </button>
+        @if (!isUpdate)
+        {
+            <button type="submit" class="govuk-button" data-module="govuk-button">
+                Continue
+            </button>
+        }
+        else
+        {
+            <div class="govuk-inset-text">
+                After an eligibility code has been issued, you can correct mistakes to a carer’s name, date of birth or
+                National Insurance number. You cannot change or swap the identity of a carer to that of a different
+                person.
+            </div>
+            <button type="submit" class="govuk-button" data-module="govuk-button">
+                Save
+            </button>
+        }
     </form>
 </div>
 

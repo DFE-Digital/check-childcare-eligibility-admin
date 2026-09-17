@@ -28,7 +28,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public string PartnerNationalInsuranceNumber { get; set; }
 
 
-        public Guid? CarerId { get; set; }
+        public Guid FosterCarerId { get; set; }
 
         public string? ContextId { get; set; }
 

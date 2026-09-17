@@ -31,7 +31,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public bool HasPartner { get; set; }
 
         //For Update Carer Details only
-        public Guid CarerId { get; set; }
+        public Guid FosterCarerId { get; set; }
 
         // For creation journey only
         public string? ContextId { get; set; }

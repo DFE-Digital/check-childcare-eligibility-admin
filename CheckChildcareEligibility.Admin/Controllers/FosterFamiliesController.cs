@@ -21,6 +21,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
         private readonly ISessionContextService _sessionContextService;
         private readonly ISearchFosterFamiliesRecordsUseCase _searchFosterFamiliesRecordsUseCase;
         private readonly ILoadFosterCarerDetailsUseCase _loadFosterCarerDetailsUseCase;
+        private readonly ILoadFosterPartnerDetailsUseCase _loadFosterPartnerDetailsUseCase;
         private readonly IValidateFosterCarerDetailsUseCase _validateFosterCarerDetailsUseCase;
         private readonly IValidateFosterPartnerDetailsUseCase _validateFosterPartnerDetailsUseCase;
         private readonly IValidateFosterChildDetailsUseCase _validateFosterChildDetailsUseCase;
@@ -35,6 +36,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             ISessionContextService sessionContextService,
             ISearchFosterFamiliesRecordsUseCase searchFosterFamiliesRecordsUseCase,
             ILoadFosterCarerDetailsUseCase loadFosterCarerDetailsUseCase,
+            ILoadFosterPartnerDetailsUseCase loadFosterPartnerDetailsUseCase,
             IValidateFosterCarerDetailsUseCase validateFosterCarerDetailsUseCase,
             IValidateFosterPartnerDetailsUseCase validateFosterPartnerDetailsUseCase,
             IValidateFosterChildDetailsUseCase validateFosterChildDetailsUseCase,
@@ -49,6 +51,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             _sessionContextService = sessionContextService;
             _searchFosterFamiliesRecordsUseCase = searchFosterFamiliesRecordsUseCase;
             _loadFosterCarerDetailsUseCase = loadFosterCarerDetailsUseCase;
+            _loadFosterPartnerDetailsUseCase = loadFosterPartnerDetailsUseCase;
             _validateFosterCarerDetailsUseCase = validateFosterCarerDetailsUseCase;
             _validateFosterPartnerDetailsUseCase = validateFosterPartnerDetailsUseCase;
             _validateFosterChildDetailsUseCase = validateFosterChildDetailsUseCase;
@@ -150,13 +153,6 @@ namespace CheckChildcareEligibility.Admin.Controllers
             var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
             var request = await _getFosterFamilyUseCase.Execute(FosterCarerId, laID);
             var fosterCarerViewModel = await _loadFosterCarerDetailsUseCase.Execute(request);
-
-            // Set DateOfBirth in request before serializing
-            fosterCarerViewModel.Day = request.CarerDateOfBirth.Day.ToString();
-            fosterCarerViewModel.Month = request.CarerDateOfBirth.Month.ToString();
-            fosterCarerViewModel.Year = request.CarerDateOfBirth.Year.ToString();
-            fosterCarerViewModel.CarerId = FosterCarerId;
-
             return View("Enter_Carer_Details_FF", fosterCarerViewModel);
         }
 
@@ -173,11 +169,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 int.Parse(request.Year),
                 int.Parse(request.Month),
                 int.Parse(request.Day));
-            HttpContext.Session.SetString("FosterCarerDetails", JsonConvert.SerializeObject(request));
 
             var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
 
-            var response = await _getFosterFamilyUseCase.Execute(request.CarerId, laID, true);
+            var response = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, laID, true);
 
             UpdateFosterCarerRequest updateRequest = new()
             {
@@ -201,8 +196,8 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 };
             }
 
-            await _updateFosterCarerUseCase.Execute(request.CarerId, laID, updateRequest);
-            return RedirectToAction("Family_Record_FF", new { FosterCarerId = request.CarerId, CarerUpdated = true });
+            await _updateFosterCarerUseCase.Execute(request.FosterCarerId, laID, updateRequest);
+            return RedirectToAction("Family_Record_FF", new { request.FosterCarerId, CarerUpdated = true });
         }
 
         [HttpGet("EnterPartner/{contextId}")]
@@ -244,6 +239,56 @@ namespace CheckChildcareEligibility.Admin.Controllers
             {
                 return RedirectToAction("Check_Details_FF", new { request.ContextId });
             }
+        }
+
+
+        [HttpGet("UpdatePartner/{FosterCarerId}")]
+        public async Task<IActionResult> Update_Partner_Details_FF(Guid FosterCarerId)
+        {
+            var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
+            var request = await _getFosterFamilyUseCase.Execute(FosterCarerId, laID);
+            var viewModel = await _loadFosterPartnerDetailsUseCase.Execute(request);
+            return View("Enter_Partner_Details_FF", viewModel);
+        }
+
+        [HttpPost("UpdatePartner")]
+        public async Task<IActionResult> Update_Partner_Details_FF(FosterPartnerDetailsViewModel request)
+        {
+            var validationResult = _validateFosterPartnerDetailsUseCase.Execute(request, ModelState);
+            if (validationResult == null || !validationResult.IsValid)
+            {
+                return View("Enter_Partner_Details_FF", request);
+            }
+
+            request.PartnerDateOfBirth = new DateTime( // Set DateOfBirth in request before serializing
+                int.Parse(request.Year),
+                int.Parse(request.Month),
+                int.Parse(request.Day));
+
+            var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
+            var response = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, laID, true);
+
+            UpdateFosterCarerRequest updateRequest = new()
+            {
+                FosterCarerRequest = new FosterCarerRequest
+                {
+                    CarerFirstName = response.CarerFirstName,
+                    CarerLastName = response.CarerLastName,
+                    CarerDateOfBirth = response.CarerDateOfBirth,
+                    CarerNationalInsuranceNumber = response.CarerNationalInsuranceNumber,
+                    HasPartner = true
+                },
+                FosterPartnerRequest = new FosterPartnerRequest
+                {
+                    PartnerFirstName = request.PartnerFirstName,
+                    PartnerLastName = request.PartnerLastName,
+                    PartnerDateOfBirth = request.PartnerDateOfBirth,
+                    PartnerNationalInsuranceNumber = request.PartnerNationalInsuranceNumber
+                }
+            };
+
+            await _updateFosterCarerUseCase.Execute(request.FosterCarerId, laID, updateRequest);
+            return RedirectToAction("Family_Record_FF", new { request.FosterCarerId, PartnerUpdated = true });
         }
 
         [HttpGet("EnterChild/{contextId}")]

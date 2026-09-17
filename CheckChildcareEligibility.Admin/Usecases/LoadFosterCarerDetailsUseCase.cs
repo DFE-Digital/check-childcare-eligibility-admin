@@ -1,32 +1,34 @@
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.ViewModels;
-using Newtonsoft.Json;
 
 namespace CheckChildcareEligibility.Admin.UseCases;
 
 public interface ILoadFosterCarerDetailsUseCase
 {
-    Task<FosterCarerDetailsViewModel> Execute(FosterFamilyResponse fosterFamilyResponse = null);
+    Task<FosterCarerDetailsViewModel> Execute(FosterFamilyResponse response = null);
 }
 
 public class LoadFosterCarerDetailsUseCase : ILoadFosterCarerDetailsUseCase
 {
 
-    public async Task<FosterCarerDetailsViewModel?> Execute(FosterFamilyResponse fosterFamilyResponse = null)
+    public async Task<FosterCarerDetailsViewModel?> Execute(FosterFamilyResponse response = null)
     {
-        FosterCarerDetailsViewModel fosterCarerDetailsViewModel = null;
-
-        if (fosterFamilyResponse != null)
+        FosterCarerDetailsViewModel viewModel = null;
+        if (response != null)
         {
-            fosterCarerDetailsViewModel = new FosterCarerDetailsViewModel
+            viewModel = new FosterCarerDetailsViewModel
             {
-                CarerFirstName = fosterFamilyResponse.CarerFirstName,
-                CarerLastName = fosterFamilyResponse.CarerLastName,
-                CarerDateOfBirth = fosterFamilyResponse.CarerDateOfBirth,
-                CarerNationalInsuranceNumber = fosterFamilyResponse.CarerNationalInsuranceNumber,
-                HasPartner = fosterFamilyResponse.HasPartner
+                FosterCarerId = response.FosterCarerId,
+                CarerFirstName = response.CarerFirstName,
+                CarerLastName = response.CarerLastName,
+                CarerDateOfBirth = response.CarerDateOfBirth,
+                CarerNationalInsuranceNumber = response.CarerNationalInsuranceNumber,
+                HasPartner = response.HasPartner,
+                Day = response.CarerDateOfBirth.Day.ToString(),
+                Month = response.CarerDateOfBirth.Month.ToString(),
+                Year = response.CarerDateOfBirth.Year.ToString()
             };
         }
-        return fosterCarerDetailsViewModel;
+        return viewModel;
     }
 }
