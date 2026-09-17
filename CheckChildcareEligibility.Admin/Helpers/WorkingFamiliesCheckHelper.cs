@@ -91,11 +91,11 @@ public static class WorkingFamiliesCheckHelper
         }
         else if (isExpired)
         {
-            result = WorkingFamiliesResponseBanner.CodeExpired;
+            result = $"Code {WorkingFamiliesResponseBanner.CodeExpired}";
         }
         else if (properties.IsNotValidYet) // Code cannot be used yet
         {
-            result = WorkingFamiliesResponseBanner.CodeNotValidYet;
+            result = $"Code {WorkingFamiliesResponseBanner.CodeNotValidYet}";
         }
         // Is valid and reconfirmation has happened
         else if (properties.IsReconfirmed)

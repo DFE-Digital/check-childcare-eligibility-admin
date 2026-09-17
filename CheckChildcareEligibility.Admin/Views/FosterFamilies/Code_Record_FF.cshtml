@@ -71,14 +71,7 @@
                             </dt>
                             <dd class="govuk-summary-list__value">
                                 <td class="govuk-table__cell">
-                                    @if (Model.ValidFromTerm.Name == TermName.None)
-                                    {
-                                        <span>Expired</span>
-                                    }
-                                    else
-                                    {
-                                        <span>PENDING ANOTHER PR</span>
-                                    }
+                                    @Model.CodeStatus
                                 </td>
                             </dd>
                         </div>

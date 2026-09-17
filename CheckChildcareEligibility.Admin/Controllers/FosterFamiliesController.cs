@@ -113,11 +113,34 @@ namespace CheckChildcareEligibility.Admin.Controllers
 
             if (request.HasPartner == true)
             {
-                return RedirectToAction("Enter_Partner_Details_FF", new { request.ContextId });
+                // Redirect to enter partner details if they do not yet exist
+                var fosterPartnerDetails = _sessionContextService.GetSessionData<FosterPartnerDetailsViewModel>(request.ContextId, "FosterPartnerDetails");
+                if (fosterPartnerDetails == null)
+                {
+                    return RedirectToAction("Enter_Partner_Details_FF", new { request.ContextId });
+                }
+                // Otherwise redirect back to check details page as this is a change action
+                else
+                {
+                    return RedirectToAction("Check_Details_FF", new { request.ContextId });
+                }
             }
             else
             {
-                return RedirectToAction("Enter_Child_Details_FF", new { request.ContextId });
+                // Clear partner details
+                _sessionContextService.ClearSessionData(request.ContextId, "FosterPartnerDetails");
+
+                // Redirect to enter child details if they do not yet exist
+                var fosterChildDetails = _sessionContextService.GetSessionData<FosterChildDetailsViewModel>(request.ContextId, "FosterChildDetails");
+                if (fosterChildDetails == null)
+                {
+                    return RedirectToAction("Enter_Child_Details_FF", new { request.ContextId });
+                }
+                // Otherwise redirect back to check details page as this is a change action
+                else
+                {
+                    return RedirectToAction("Check_Details_FF", new { request.ContextId });
+                }
             }
         }
 
@@ -210,7 +233,17 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // Populate session context with the FosterCarerDetailsViewModel
             _sessionContextService.SetSessionData(request.ContextId, "FosterPartnerDetails", request);
 
-            return RedirectToAction("Enter_Child_Details_FF", new { request.ContextId });
+            // Redirect to enter child details if they do not yet exist
+            var fosterChildDetails = _sessionContextService.GetSessionData<FosterChildDetailsViewModel>(request.ContextId, "FosterChildDetails");
+            if (fosterChildDetails == null)
+            {
+                return RedirectToAction("Enter_Child_Details_FF", new { request.ContextId });
+            }
+            // Otherwise redirect back to check details page as this is a change action
+            else
+            {
+                return RedirectToAction("Check_Details_FF", new { request.ContextId });
+            }
         }
 
         [HttpGet("EnterChild/{contextId}")]
@@ -245,7 +278,17 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // Populate session context with the FosterCarerDetailsViewModel
             _sessionContextService.SetSessionData(request.ContextId, "FosterChildDetails", request);
 
-            return RedirectToAction("Enter_Submitted_Date_Details_FF", new { request.ContextId });
+            // Redirect to enter submitted date details if they do not yet exist
+            var submittedDateDetails = _sessionContextService.GetSessionData<FosterApplicationSubmittedDateViewModel>(request.ContextId, "FosterChildDetails");
+            if (submittedDateDetails == null)
+            {
+                return RedirectToAction("Enter_Submitted_Date_Details_FF", new { request.ContextId });
+            }
+            // Otherwise redirect back to check details page as this is a change action
+            else
+            {
+                return RedirectToAction("Check_Details_FF", new { request.ContextId });
+            }
         }
 
         [HttpGet("SubmittedDate/{contextId}")]
@@ -391,7 +434,8 @@ namespace CheckChildcareEligibility.Admin.Controllers
             var childResponse = await _getFosterChildUseCase.Execute(FosterChildId, laID, true);
             var viewModel = new FosterFamiliesCodeResponseViewModel()
             {
-                Response = childResponse
+                Response = childResponse,
+                CodeProperties = new EligibilityCodeProperties(childResponse)
             };
             return View(viewModel);
         }

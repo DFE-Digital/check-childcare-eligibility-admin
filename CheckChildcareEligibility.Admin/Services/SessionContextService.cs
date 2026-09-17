@@ -6,6 +6,8 @@ public interface ISessionContextService
 {
     public T? GetSessionData<T>(string contextId, string key);
 
+    public void ClearSessionData(string contextId, string key);
+
     public void SetSessionData<T>(string contextId, string key, T value);
 }
 
@@ -42,5 +44,10 @@ public class SessionContextService : ISessionContextService
     {
         string sessionKey = $"{contextId}:{key}";
         _httpContextAccessor?.HttpContext?.Session.SetString(sessionKey, JsonConvert.SerializeObject(value));
+    }
+    public void ClearSessionData(string contextId, string key)
+    {
+        string sessionKey = $"{contextId}:{key}";
+        _httpContextAccessor?.HttpContext?.Session.SetString(sessionKey, string.Empty);
     }
 }
