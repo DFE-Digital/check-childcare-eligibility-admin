@@ -11,6 +11,7 @@ using CheckChildcareEligibility.Admin.UseCases;
 using FluentValidation;
 using System.Globalization;
 using Microsoft.FeatureManagement;
+using CheckChildcareEligibility.Admin.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,8 @@ builder.WebHost.ConfigureKestrel(options =>
 builder.Services.AddServices(builder.Configuration);
 builder.Services.AddSession();
 
+builder.Services.AddScoped<ISessionContextService, SessionContextService>();
+
 builder.Services.AddScoped<ILoadParentDetailsUseCase, LoadParentDetailsUseCase>();
 builder.Services.AddScoped<ILoadParentAndChildDetailsUseCase, LoadParentAndChildDetailsUseCase>();
 builder.Services.AddScoped<IPerformWFEligibilityCheckUseCase, PerformWFEligibilityCheckUseCase>();
@@ -51,12 +54,23 @@ builder.Services.AddScoped<IValidateParentDetailsUseCase, ValidateParentDetailsU
 builder.Services.AddScoped<IValidateParentAndChildDetailsUseCase, ValidateParentAndChildDetailsUseCase>();
 builder.Services.AddScoped<IParseBulkCheckFileUseCase, ParseBulkCheckFileUseCase>();
 builder.Services.AddScoped<IDeleteBulkCheckFileUseCase, DeleteBulkCheckFileUseCase>();
+builder.Services.AddScoped<ISearchFosterFamiliesRecordsUseCase, SearchFosterFamiliesRecordsUseCase>();
+builder.Services.AddScoped<ILoadFosterCarerDetailsUseCase, LoadFosterCarerDetailsUseCase>();
+builder.Services.AddScoped<IValidateFosterCarerDetailsUseCase, ValidateFosterCarerDetailsUseCase>();
+builder.Services.AddScoped<ILoadFosterPartnerDetailsUseCase, LoadFosterPartnerDetailsUseCase>();
+builder.Services.AddScoped<IValidateFosterPartnerDetailsUseCase, ValidateFosterPartnerDetailsUseCase>();
+builder.Services.AddScoped<ILoadFosterChildDetailsUseCase, LoadFosterChildDetailsUseCase>();
+builder.Services.AddScoped<IValidateFosterChildDetailsUseCase, ValidateFosterChildDetailsUseCase>();
+builder.Services.AddScoped<IValidateFosterApplicationSubmittedDateUseCase, ValidateFosterApplicationSubmittedDateUseCase>();
+builder.Services.AddScoped<ICreateFosterFamilyUseCase, CreateFosterFamilyUseCase>();
+builder.Services.AddScoped<IGetFosterFamilyUseCase, GetFosterFamilyUseCase>();
+builder.Services.AddScoped<IGetFosterChildUseCase, GetFosterChildUseCase>();
+builder.Services.AddScoped<IUpdateFosterCarerUseCase, UpdateFosterCarerUseCase>();
 builder.Services.AddScoped<IValidator<IEligibilityServiceType>, CheckEligibilityRequestDataValidator>();
 builder.Services.AddScoped<IPerformEligibilityCodeHistoryReportUseCase, PerformEligibilityCodeHistoryReportUseCase > ();
 builder.Services.AddScoped <IValidateEligibilityCodeUseCase,ValidateEligibilityCodeUseCase>();
+builder.Services.AddScoped<IPreviewFosterFamilyCodeUseCase, PreviewFosterFamilyCodeUseCase>();
 builder.Services.AddSession();
-
-
 
 var dfeSignInConfiguration = new DfeSignInConfiguration();
 builder.Configuration.GetSection("DfeSignIn").Bind(dfeSignInConfiguration);

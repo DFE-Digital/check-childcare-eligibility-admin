@@ -22,6 +22,7 @@ namespace CheckChildcareEligibility.Admin.Domain.Constants.Generic
 
         public const string CodeValid = "valid";
         public const string CodeChildTooYoung = "Child is too young";
+        public const string CodeChildTooOld = "Child is too old";
         public const string CodeNotValidYet = "cannot be used yet";
         public const string CodeInGracePeriod = "in grace period";
         public const string CodeExpired = "expired";

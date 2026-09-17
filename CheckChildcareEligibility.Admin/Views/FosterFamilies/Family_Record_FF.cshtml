@@ -1,0 +1,186 @@
+﻿@using CheckChildcareEligibility.Admin.Boundary.Responses
+@using Microsoft.FeatureManagement
+@model FosterFamilyViewModel
+@{
+    string carerFullName = @Model.Response.CarerFirstName + " " + @Model.Response.CarerLastName;
+    ViewData["Title"] = "Foster family of " + @carerFullName;
+    var errorMessage = TempData["ErrorMessage"] as string;
+}
+
+<div class="govuk-grid-column-full">
+    <a class="govuk-back-link backLinkJS" href="@Url.Action("Search", "FosterFamilies")">Back</a>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div id="error-summary" class="govuk-error-summary" data-module="govuk-error-summary">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">There is a problem</h2>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        <li>
+                            <p class="govuk-error-message">@errorMessage</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.Confirmation))
+    {
+        var data = new { Title = "Success", Message = Model.Confirmation };
+        <partial name="_NotificationBannerPartial" model="data" />
+    }
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
+
+            <a href="@Url.ActionLink("Add_Child_FF", "FosterFamilies", new { Model.Response.FosterCarerId })"
+               role="button" draggable="false" class="govuk-button govuk-button" data-module="govuk-button"
+               data-govuk-button-init="">
+                Add child and create code (**ToDo**)
+            </a>
+            @if (!Model.Response.HasPartner)
+            {
+                <a href="@Url.ActionLink("Update_Partner_Details_FF", "FosterFamilies", new { Model.Response.FosterCarerId })"
+                   role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                   data-govuk-button-init="">
+                    Add partner
+                </a>
+            }
+
+            <div class="govuk-summary-card">
+                <div class="govuk-summary-card__title-wrapper">
+                    <h2 class="govuk-summary-card__title">
+                        Carer
+                    </h2>
+                    <ul class="govuk-summary-card__actions">
+                        <li class="govuk-summary-card__action">
+                            <a class="govuk-link"
+                               href="@Url.ActionLink("Update_Carer_Details_FF", "FosterFamilies", new { FosterCarerId = Model.Response.FosterCarerId })">Change
+                                <span class="govuk-visually-hidden">Carer details</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="govuk-summary-card__content">
+                    <dl class="govuk-summary-list">
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Full name
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @Model.Response.CarerFirstName @Model.Response.CarerLastName
+                            </dd>
+                        </div>
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Date of birth
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @Model.Response.CarerDateOfBirth.ToString("d MMMM yyyy")
+                            </dd>
+                        </div>
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                National Insurance number
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @Model.Response.CarerNationalInsuranceNumber
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            @if (Model.Response.HasPartner == true)
+            {
+                <div class="govuk-summary-card">
+                    <div class="govuk-summary-card__title-wrapper">
+                        <h2 class="govuk-summary-card__title">
+                            Partner
+                        </h2>
+                        <ul class="govuk-summary-card__actions">
+                            <li class="govuk-summary-card__action">
+                                <a class="govuk-link" href="@Url.Action("Update_Partner_Details_FF", "FosterFamilies", new { FosterCarerId = Model.Response.FosterCarerId })">Change
+                                    <span class="govuk-visually-hidden">Partner details</span></a>
+                                </li>
+                                <li class="govuk-summary-card__action">
+                                    <a class="govuk-link" href="@Url.Action("Remove_Partner_Details_FF", "FosterFamilies", new { FosterCarerId = Model.Response.FosterCarerId })">Remove
+                                        <span class="govuk-visually-hidden">Partner details</span></a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="govuk-summary-card__content">
+                                <dl class="govuk-summary-list">
+
+                                    <div class="govuk-summary-list__row">
+                                        <dt class="govuk-summary-list__key">
+                                            Full name
+                                        </dt>
+                                        <dd class="govuk-summary-list__value">
+                                            @Model.Response.PartnerFirstName @Model.Response.PartnerLastName
+                                        </dd>
+                                    </div>
+
+                                    <div class="govuk-summary-list__row">
+                                        <dt class="govuk-summary-list__key">
+                                            Date of birth
+                                        </dt>
+                                        <dd class="govuk-summary-list__value">
+                                            @Model.Response.PartnerDateOfBirth?.ToString("d MMMM yyyy")
+                                        </dd>
+                                    </div>
+
+                                    <div class="govuk-summary-list__row">
+                                        <dt class="govuk-summary-list__key">
+                                            National Insurance number
+                                        </dt>
+                                        <dd class="govuk-summary-list__value">
+                                            @Model.Response.PartnerNationalInsuranceNumber
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="govuk-summary-card">
+                        <div class="govuk-summary-card__title-wrapper">
+                            <h2 class="govuk-summary-card__title">
+                                Children
+                            </h2>
+                        </div>
+                        <div class="govuk-summary-card__content">
+                            <dl class="govuk-summary-list">
+                                @{
+                                    var index = 1;
+                                }
+                                @foreach (var child in Model.Response.FosterChildren)
+                                {
+                                    <div class="govuk-summary-list__row">
+                                        <dt class="govuk-summary-list__key">
+                                            Child @index
+                                        </dt>
+                                        <dd class="govuk-summary-list__value">
+                                            @child.FirstName @child.LastName
+                                        </dd>
+                                        <dd class="govuk-summary-list__actions">
+                                            <a class="govuk-link"
+                                               href="@Url.ActionLink("Code_Record_FF", "FosterFamilies", new { child.FosterChildId })">View<span
+                                                class="govuk-visually-hidden">child details</span></a>
+                                            </dd>
+                                        </div>
+                                        index++;
+                                    }
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>

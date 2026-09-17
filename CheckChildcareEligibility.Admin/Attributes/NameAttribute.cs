@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
+using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
 namespace CheckChildcareEligibility.Admin.Attributes;
@@ -26,7 +27,33 @@ public class NameAttribute : ValidationAttribute
     {
         var model = validationContext.ObjectInstance;
 
-        var lastName = model.GetType().GetProperty("LastName").GetValue(model);
+        var firstNameProperty = model.GetType()
+                            .GetProperties()
+                            .FirstOrDefault(p => p.Name.Contains("FirstName"));
+        var lastNameProperty = model.GetType()
+                            .GetProperties()
+                            .FirstOrDefault(p => p.Name.Contains("LastName"));
+
+        var firstName = firstNameProperty?.GetValue(model)?.ToString() ?? string.Empty;
+        var lastName = lastNameProperty?.GetValue(model)?.ToString() ?? string.Empty;
+
+        if (firstName == value)
+        {
+            if (value == null || value == "")
+                return ValidationResult.Success;
+
+            if (!regex.IsMatch(value.ToString()))
+            {
+                var constantName = $"{firstNameProperty.Name}Invalid";
+                var field = typeof(FosterFamilyValidationMessages).GetField(constantName);
+                if (field != null)
+                {
+                    var message = field?.GetValue(null)?.ToString();
+                    return new ValidationResult(message);
+                }
+                return new ValidationResult("First Name field contains an invalid character");
+            }
+        }
 
         if (lastName == value)
         {
@@ -34,7 +61,16 @@ public class NameAttribute : ValidationAttribute
                 return ValidationResult.Success;
 
             if (!regex.IsMatch(value.ToString()))
-                return new ValidationResult("Enter a last name with valid characters");
+            {
+                var constantName = $"{lastNameProperty.Name}Invalid";
+                var field = typeof(FosterFamilyValidationMessages).GetField(constantName);
+                if (field != null)
+                {
+                    var message = field?.GetValue(null)?.ToString();
+                    return new ValidationResult(message);
+                }
+                return new ValidationResult("Last Name field contains an invalid character");
+            }
         }
 
         return ValidationResult.Success;

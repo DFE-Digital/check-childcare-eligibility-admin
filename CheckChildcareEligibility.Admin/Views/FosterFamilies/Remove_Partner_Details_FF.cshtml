@@ -1,0 +1,38 @@
+﻿@using CheckChildcareEligibility.Admin.ViewModels
+@model FosterPartnerDetailsViewModel
+@{
+    ViewData["Title"] = "Remove partner";
+}
+
+<div class="govuk-grid-column-two-thirds">
+    <a class="govuk-back-link backLinkJS"
+       href="@Url.ActionLink("Family_Record_FF", "FosterFamilies", new { CarerId = Model.FosterCarerId.ToString() })">Back</a>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">Remove @Model.PartnerFirstName @Model.PartnerLastName as a partner?</h1>
+            <form asp-controller="FosterFamilies" asp-action="RemovePartner" method="post">
+                @if (Model != null)
+                {
+                    <input asp-for="FosterCarerId" type="hidden" />
+                }
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-two-thirds">
+                        <div class="govuk-warning-text">
+                            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                            <strong class="govuk-warning-text__text">
+                                <span class="govuk-visually-hidden">Warning</span>
+                                New or reconfirmed eligibility codes will no longer be linked to this partner.
+                            </strong>
+                        </div>
+                        <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button">
+                            Remove partner
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/validationSummary.js"></script>

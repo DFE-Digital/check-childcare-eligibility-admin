@@ -42,7 +42,7 @@ public class NameAttributeTests
         var result = _sut.GetValidationResult(model.LastName, context);
 
         result.Should().NotBeNull();
-        result!.ErrorMessage.Should().Be("Enter a last name with valid characters");
+        result!.ErrorMessage.Should().Be("Last Name field contains an invalid character");
     }
 }
 

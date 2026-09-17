@@ -71,10 +71,10 @@
                         For example, 27 3 1980
                     </div>
 
-                    @if (!string.IsNullOrEmpty(TempData["DobError"]?.ToString())) //Hide whitespace if no error
+                    @if (!string.IsNullOrEmpty(TempData["DateError"]?.ToString())) //Hide whitespace if no error
                     {
                         <p class="govuk-error-message">
-                            <span asp-validation-for="Child.Day">@Html.Raw(TempData["DobError"])</span>
+                            <span asp-validation-for="Child.Day">@Html.Raw(TempData["DateError"])</span>
                         </p>
                     }
                     <div class="govuk-date-input" id="Child.ChildDateOfBirth">
