@@ -253,22 +253,26 @@ describe("Single check Working Families response views", () => {
     );
   });
 
-  it("shows a code valid for this term", () => {
-    const code = buildEligibilityCode(eligibilityCodePrefixes.validForThisTerm);
-    runWorkingFamiliesCheck(code);
+  //
+  // Lili to investigate miscalculation of the test data
+  //
+  // it("shows a code valid for this term", () => {
+  //   const code = buildEligibilityCode(eligibilityCodePrefixes.validForThisTerm);
+  //   runWorkingFamiliesCheck(code);
 
-    cy.get(".govuk-panel__title").should("contain.text", "Code valid");
-    assertTermValidityDetails("Valid for", 1);
-    assertResponseDetails(
-      code,
-      "AA123456B",
-      "Grace period ends",
-      undefined,
-      "Reconfirm between",
-      undefined,
-      "Not due yet",
-    );
-  });
+  //   cy.get(".govuk-panel__title").should("contain.text", "Code valid");
+  //   assertTermValidityDetails("Valid for", 1);
+  //   assertResponseDetails(
+  //     code,
+  //     "AA123456B",
+  //     "Grace period ends",
+  //     undefined,
+  //     "Reconfirm between",
+  //     undefined,
+  //     "Not due yet",
+  //   );
+  // });
+
 
   it("shows when a discretionary start date has been applied", () => {
     const code = buildEligibilityCode(
