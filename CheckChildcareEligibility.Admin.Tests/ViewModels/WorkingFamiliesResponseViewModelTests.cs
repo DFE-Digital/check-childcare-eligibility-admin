@@ -396,6 +396,25 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             result.Should().BeEquivalentTo(WorkingFamiliesResponseDetails.ReconfirmationStatusChildTooOld);
         }
 
+        [TestCase(true, "8 August 2026 (discretionary start date applied)")]
+        [TestCase(false, "8 August 2026")]
+        [TestCase(null, "8 August 2026")]
+        public void EligibilityConfirmedOnDisplay_ShouldReturnExpectedValue(
+            bool? isDiscretionaryValidityStartDateApplied,
+            string expected)
+        {
+            // Arrange
+            var sut = CreateViewModel(
+                validityStartDate: new DateTime(2026, 8, 8),
+                isDiscretionaryValidityStartDateApplied: isDiscretionaryValidityStartDateApplied);
+
+            // Act
+            var result = sut.EligibilityConfirmedOnDisplay;
+
+            // Assert
+            result.Should().Be(expected);
+        }
+
         #region Private
         private static WorkingFamiliesResponseViewModel CreateViewModel(
             DateTime? childDateOfBirth = null,
@@ -410,7 +429,8 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             DateTime? reconfirmationStartDate = null,
             DateTime? reconfirmationEndDate = null,
             string status = "eligible",
-            bool ChildTooYoung = false)
+            bool ChildTooYoung = false,
+            bool? isDiscretionaryValidityStartDateApplied = null)
         {
             var response = new CheckEligibilityItemWorkingFamilies
             {
@@ -423,6 +443,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
                 ValidityEndDate = validityEndDate ?? DateTime.Today.AddMonths(3),
                 GracePeriodEndDate = gracePeriodEndDate ?? DateTime.Today.AddMonths(6),
                 ChildTooYoung = ChildTooYoung,
+                IsDiscretionaryValidityStartDateApplied = isDiscretionaryValidityStartDateApplied,
                 TermValidity = new TermValidity
                 {
                     Current = currentTerm,
