@@ -13,6 +13,13 @@
                 <div class="govuk-grid-column-two-thirds">
                     <partial name="_CheckResponseBannerPartial" model="Model" />
                     <partial name="_CheckResponseDetailsPartial" model="Model" />
+
+                    <div class="govuk-button-group govuk-!-margin-top-7">
+                        <a class="govuk-button govuk-button" href="@Url.Action("MenuSingleCheck", "Home")">
+                            Run another check
+                        </a>
+                    </div>
+
                     <p>You can <a href="#" id="print-link" class="govuk-link">print this page</a> for the parent or guardian to keep.</p>
 
                     <h2 class="govuk-heading-m">Guidance</h2>
