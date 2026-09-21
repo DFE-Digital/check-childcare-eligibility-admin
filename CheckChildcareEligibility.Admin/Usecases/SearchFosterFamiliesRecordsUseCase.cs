@@ -1,4 +1,5 @@
-﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
+﻿using Azure;
+using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 
@@ -25,12 +26,10 @@ namespace CheckChildcareEligibility.Admin.Usecases
         public async Task<FosterFamiliesSearchResponse> Execute(FosterFamiliesSearchRequest request)
         {
             var response = await _fosterFamiliesGateway.GetFosterFamiliesSearchRecords(request.PageNumber, request.PageSize);
-
             if (response == null)
             {
-                return new FosterFamiliesSearchResponse();
+                throw new ApplicationException($"Failed to load foster families search results");
             }
-
             return response;
         }
     }
