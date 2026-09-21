@@ -24,6 +24,8 @@ public class GetFosterFamilyUseCase : IGetFosterFamilyUseCase
         if (fosterCarerId == Guid.Empty) throw new ValidationException(FosterFamilyValidationMessages.FosterCarerId);
 
         var result = await _fosterFamiliesGateway.GetFosterFamily(fosterCarerId, localAuthorityId, includeChildren);
+        if (result == null) throw new KeyNotFoundException($"Foster carer {fosterCarerId} not found");
+
         return result;
     }
 }
