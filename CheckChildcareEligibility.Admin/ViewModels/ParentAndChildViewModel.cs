@@ -6,7 +6,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 {
     public class ParentAndChildViewModel
     {
-        [NinValidator]
+        [Nino]
         [MaxLength(13)]
         public string? NationalInsuranceNumber { get; set; }
         public Child Child { get; set; } = new Child();

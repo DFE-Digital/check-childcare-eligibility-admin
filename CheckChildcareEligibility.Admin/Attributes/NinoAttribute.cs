@@ -1,18 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace CheckChildcareEligibility.Admin.Attributes;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-public class NinValidatorAttribute : ValidationAttribute
+public class NinoAttribute : ValidationAttribute
 {
-    private readonly Regex _regex;
+    const string validNinoRegex = @"^(?!BG)(?!GB)(?!NK)(?!KN)(?!TN)(?!NT)(?!ZZ)(?:[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z])(?:\s*\d\s*){6}([A-D]|\s)$";
 
-    public NinValidatorAttribute()
+    private readonly Regex _regex;
+    
+    public NinoAttribute()
     {
         ErrorMessage = "Enter a National Insurance number in the correct format";
-        _regex = new Regex("^[A-Z0-9]{2}\\d{6}[A-D]$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        _regex = new Regex(validNinoRegex, RegexOptions.Compiled);
     }
 
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)

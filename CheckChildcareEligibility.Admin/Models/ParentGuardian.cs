@@ -20,6 +20,6 @@ public class ParentGuardian
 
     public string? Year { get; set; }
 
-    [NinValidator]
+    [Nino]
     [MaxLength(13)] public string? NationalInsuranceNumber { get; set; }
 }

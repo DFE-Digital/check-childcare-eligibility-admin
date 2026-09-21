@@ -23,7 +23,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public string? Year { get; set; }
 
         [Required(ErrorMessage = FosterFamilyValidationMessages.CarerNationalInsuranceNumberEmpty)]
-        [NinValidator]
+        [Nino]
         [MaxLength(13)]
         public string CarerNationalInsuranceNumber { get; set; }
 
