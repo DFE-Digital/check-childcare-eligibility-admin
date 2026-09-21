@@ -13,7 +13,7 @@ namespace CheckChildcareEligibility.Admin.Models
             Status = CheckEligibilityStatus.eligible;
             EligibilityCode = fosterChild.EligibilityCode;
             ValidityStartDate = fosterChild.ValidityStartDate;
-            ValidityEndDate = fosterChild.ValidityStartDate;
+            ValidityEndDate = fosterChild.ValidityEndDate;
             GracePeriodEndDate = fosterChild.GracePeriodEndDate;
             ChildDateOfBirth = fosterChild.ChildDateOfBirth;
             TermValidity = fosterChild.TermValidity;
