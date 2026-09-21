@@ -18,7 +18,10 @@ public class NinoAttributeTests
     {
         _ninoAttribute = new TestableNinoAttribute();
         var parentGuardian = new ParentGuardian();
-        _validationContext = new ValidationContext(parentGuardian);
+        _validationContext = new ValidationContext(parentGuardian)
+        {
+            DisplayName = nameof(parentGuardian.NationalInsuranceNumber)
+        };
     }
 
     [TestCase(null, NINOMissingErrorMessage)]
