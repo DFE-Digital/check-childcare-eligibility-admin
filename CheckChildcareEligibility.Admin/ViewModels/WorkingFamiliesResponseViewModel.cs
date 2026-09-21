@@ -20,6 +20,11 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public EligibilityCodeProperties Properties { get; set; }
 
         public string NationalInsuranceNumber => Response.NationalInsuranceNumber;
+        public string EligibilityConfirmedOnDisplay =>
+            $"{Response.ValidityStartDate:d MMMM yyyy}" +
+            (Response.IsDiscretionaryValidityStartDateApplied == true
+                ? " (discretionary start date applied)"
+                : string.Empty);
 
         public string GracePeriodEndDisplay =>
             Properties.ChildIsTooOld
