@@ -288,10 +288,13 @@ namespace CheckChildcareEligibility.Admin.Controllers
             };
 
             await _updateFosterCarerUseCase.Execute(request.FosterCarerId, laID, updateRequest);
-            return RedirectToAction("Family_Record_FF", new { request.FosterCarerId, 
-                Confirmation = response.HasPartner ? 
+            return RedirectToAction("Family_Record_FF", new
+            {
+                request.FosterCarerId,
+                Confirmation = response.HasPartner ?
                     "Changes to partner saved" :
-                    "Partner added" });
+                    "Partner added"
+            });
         }
 
         [HttpGet("RemovePartner/{FosterCarerId}")]
@@ -303,7 +306,6 @@ namespace CheckChildcareEligibility.Admin.Controllers
             return View("Remove_Partner_Details_FF", viewModel);
         }
 
-        
         [HttpPost("RemovePartner")]
         public async Task<IActionResult> Remove_Partner_Details_FF(FosterPartnerDetailsViewModel request)
         {
@@ -435,13 +437,17 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // If fosterApplicationSubmittedDate is null, redirect to submission date to complete required details
             if (fosterApplicationSubmittedDate == null) { return RedirectToAction("Enter_Submitted_Date_Details_FF", new { contextId }); }
 
-            var fosterCodePreview = await _previewFosterCodeUseCase.Execute(new FosterFamilyRequest
-            {
-                FosterCarer = fosterCarerDetails.BuildRequest(),
-                FosterChild = fosterChildDetails.BuildRequest(),
-                Partner = fosterPartnerDetails?.BuildRequest(),
-                SubmissionDate = fosterApplicationSubmittedDate.SubmissionDate
-            }, int.Parse(_Claims.Organisation.EstablishmentNumber));
+
+            var fosterCodePreview = await _previewFosterCodeUseCase.Execute(
+                new FosterFamilyRequest
+                {
+                    FosterCarer = fosterCarerDetails.BuildRequest(),
+                    FosterChild = fosterChildDetails.BuildRequest(),
+                    Partner = fosterPartnerDetails?.BuildRequest(),
+                    HasPartner = fosterCarerDetails.HasPartner,
+                    SubmissionDate = fosterApplicationSubmittedDate.SubmissionDate
+                }, int.Parse(_Claims.Organisation.EstablishmentNumber)
+            );
 
             FosterApplicationCheckDetailsViewModel fosterCarerApplication = new()
             {
