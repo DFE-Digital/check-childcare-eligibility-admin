@@ -51,7 +51,7 @@ public class NameAttribute : ValidationAttribute
                     var message = field?.GetValue(null)?.ToString();
                     return new ValidationResult(message);
                 }
-                return new ValidationResult("First Name field contains an invalid character");
+                return new ValidationResult("Enter a first name with valid characters");
             }
         }
 
@@ -69,7 +69,7 @@ public class NameAttribute : ValidationAttribute
                     var message = field?.GetValue(null)?.ToString();
                     return new ValidationResult(message);
                 }
-                return new ValidationResult("Last Name field contains an invalid character");
+                return new ValidationResult("Enter a last name with valid characters");
             }
         }
 

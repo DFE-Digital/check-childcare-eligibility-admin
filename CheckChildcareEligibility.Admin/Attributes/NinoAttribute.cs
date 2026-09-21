@@ -32,7 +32,7 @@ public class NinoAttribute : ValidationAttribute
             }
             else
             {
-                return new ValidationResult("National Insurance number is required");
+                return new ValidationResult("Enter a National Insurance number");
             }
         }
 

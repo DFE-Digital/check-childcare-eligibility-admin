@@ -7,7 +7,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Attributes;
 
 public class NinoAttributeTests
 {
-    private const string NINOMissingErrorMessage = "National Insurance number is required";
+    private const string NINOMissingErrorMessage = "Enter a National Insurance number";
     private const string NINOFormatErrorMessage = "Enter a National Insurance number in the correct format";
 
     private TestableNinoAttribute _ninoAttribute { get; set; }

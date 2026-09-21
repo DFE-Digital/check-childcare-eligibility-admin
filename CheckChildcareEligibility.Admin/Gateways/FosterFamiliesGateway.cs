@@ -57,12 +57,12 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex,
-                $"Post CreateFosterFamily failed. uri:-{_httpClient.BaseAddress}foster-family content:-{JsonConvert.SerializeObject(request)}");
+            _logger.LogError(ex, $"Post CreateFosterFamily failed. uri:-{_httpClient.BaseAddress}");
+            _logger.LogTrace(ex, $"Post CreateFosterFamily failed. uri:-{_httpClient.BaseAddress}foster-family content:-{JsonConvert.SerializeObject(request)}");
             throw;
         }
     }
-    
+
     public async Task<FosterFamilyCodePreviewResponse> PreviewFosterFamilyCode(FosterFamilyRequest request, int localAuthorityId)
     {
         try
