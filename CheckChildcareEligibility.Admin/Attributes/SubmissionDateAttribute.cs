@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public class SubmissionDateAttribute : ValidationAttribute
@@ -41,7 +42,7 @@ public class SubmissionDateAttribute : ValidationAttribute
         }
         else if (isTodaySelected == null)
         {
-            return ValidationResult.Success; 
+            return ValidationResult.Success;
         }
 
         var dayString = GetPropertyStringValue(model, _dayPropertyName);
@@ -140,7 +141,7 @@ public class SubmissionDateAttribute : ValidationAttribute
                 }
                 else
                 {
-                    message = "Enter application submitted on date";
+                    message = FosterFamilyValidationMessages.DateMustNotBeNull;
                 }
             }
             else // Multiple but not all fields missing
@@ -156,7 +157,7 @@ public class SubmissionDateAttribute : ValidationAttribute
             }
             else
             {
-                message = "Application submitted on date must be a real date";
+                message = FosterFamilyValidationMessages.DateMustBeARealDate;
             }
         }
         else
@@ -166,23 +167,24 @@ public class SubmissionDateAttribute : ValidationAttribute
                 var yearInt = int.Parse(yearString);
                 var monthInt = int.Parse(monthString);
                 var dayInt = int.Parse(dayString);
-
                 var submissionDate = new DateTime(yearInt, monthInt, dayInt);
-
                 if (submissionDate > DateTime.Now)
-                    return new ValidationResult("Application submitted on date must be in the past",
+                {
+                    return new ValidationResult(FosterFamilyValidationMessages.DateMustBeInPast,
                         new[] { "SubmissionDate", "Day", "Month", "Year" });
+                }
 
                 DateTime backdateWindow = DateTime.Now.AddDays(-31);
-                if (submissionDate < DateTime.Now.AddDays(-31))
-                    return new ValidationResult("The application submitted on date must be after " + @backdateWindow.ToString("d MMMM yyyy"),
+                if (submissionDate < backdateWindow)
+                {
+                    return new ValidationResult(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, backdateWindow.ToString("d MMMM yyyy")),
                         new[] { "SubmissionDate", "Day", "Month", "Year" });
-
+                }
                 return ValidationResult.Success;
             }
             catch
             {
-                message = "Application submitted on date must be a real date";
+                message = FosterFamilyValidationMessages.DateMustBeARealDate;
                 if (!errorFields.Contains("Day")) errorFields.Add("Day");
                 if (!errorFields.Contains("Month")) errorFields.Add("Month");
                 if (!errorFields.Contains("Year")) errorFields.Add("Year");

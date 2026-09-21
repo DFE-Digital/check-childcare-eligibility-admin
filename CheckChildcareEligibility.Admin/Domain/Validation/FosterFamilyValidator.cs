@@ -25,11 +25,19 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
             {
                 RuleFor(x => x.Partner)
                     .NotNull()
-                    .WithMessage("Partner details are required.");
+                    .WithMessage(FosterFamilyValidationMessages.PartnerIsRequired);
 
                 RuleFor(x => x.Partner!)
                     .SetValidator(new FosterPartnerRequestValidator());
             });
+
+            RuleFor(x => x.SubmissionDate)
+                .Must(DataValidation.BeAPastDate)
+                .WithMessage(FosterFamilyValidationMessages.DateMustBeInPast);
+
+            RuleFor(x => x.SubmissionDate)
+                .Must(DataValidation.BeWithin31Days)
+                .WithMessage(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, DateTime.Today.AddDays(-31)));
         }
     }
 
@@ -108,4 +116,5 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
                 .WithMessage(FosterFamilyValidationMessages.ChildIsTooOld);
         }
     }
+
 }

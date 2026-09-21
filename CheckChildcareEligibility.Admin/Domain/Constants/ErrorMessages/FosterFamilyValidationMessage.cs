@@ -17,6 +17,7 @@
         public const string HasPartner = "Select yes if the carer has a partner";
 
         //Partner
+        public const string PartnerIsRequired = "Partner details are required.";
         public const string PartnerFirstNameEmpty = "Enter partner's first name";
         public const string PartnerFirstNameInvalid = "Partner's first name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes";
         public const string PartnerLastNameEmpty = "Enter partner's last name";
@@ -32,5 +33,14 @@
         public const string ChildPostCodeInvalid = "Enter a full UK postcode";
 
         public const string ChildIsTooOld = "Child must be under 5 years old on the date of application";
+
+        // Submission date
+        public const string DateMustBeInPast = "Application submitted on date must be in the past";
+
+        public const string DateMustBeAfter = "The application submitted on date must be after {0}";
+
+        public const string DateMustNotBeNull = "Enter application submitted on date";
+
+        public const string DateMustBeARealDate = "Application submitted on date must be a real date";
     }
 }

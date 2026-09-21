@@ -1,6 +1,5 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Domain.Constants;
-using CheckChildcareEligibility.Admin.Helpers;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.Services;
@@ -9,7 +8,6 @@ using CheckChildcareEligibility.Admin.UseCases;
 using CheckChildcareEligibility.Admin.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.FeatureManagement.Mvc;
-using Newtonsoft.Json;
 
 namespace CheckChildcareEligibility.Admin.Controllers
 {
@@ -172,7 +170,8 @@ namespace CheckChildcareEligibility.Admin.Controllers
 
             var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
 
-            var response = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, laID, true);
+            var existingCarer = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, laID, true);
+            if (existingCarer == null) { return RedirectToAction("Search_Records_FF"); }
 
             UpdateFosterCarerRequest updateRequest = new()
             {
@@ -182,17 +181,17 @@ namespace CheckChildcareEligibility.Admin.Controllers
                     CarerLastName = request.CarerLastName,
                     CarerDateOfBirth = request.CarerDateOfBirth,
                     CarerNationalInsuranceNumber = request.CarerNationalInsuranceNumber,
-                    HasPartner = request.HasPartner
+                    HasPartner = existingCarer.HasPartner
                 }
             };
-            if (request.HasPartner == true)
+            if (existingCarer.HasPartner)
             {
                 updateRequest.FosterPartnerRequest = new FosterPartnerRequest
                 {
-                    PartnerFirstName = response.PartnerFirstName,
-                    PartnerLastName = response.PartnerLastName,
-                    PartnerDateOfBirth = response.PartnerDateOfBirth.Value,
-                    PartnerNationalInsuranceNumber = response.PartnerNationalInsuranceNumber
+                    PartnerFirstName = existingCarer.PartnerFirstName,
+                    PartnerLastName = existingCarer.PartnerLastName,
+                    PartnerDateOfBirth = existingCarer.PartnerDateOfBirth.Value,
+                    PartnerNationalInsuranceNumber = existingCarer.PartnerNationalInsuranceNumber
                 };
             }
 
@@ -488,7 +487,11 @@ namespace CheckChildcareEligibility.Admin.Controllers
             catch (BadHttpRequestException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
-                return RedirectToAction("Check_Details_FF", new { request.FosterCarerDetailsViewModel.ContextId });
+                return RedirectToAction("Check_Details_FF", new { request.ContextId });
+            }
+            catch (FluentValidation.ValidationException ex)
+            {
+                return RedirectToAction("Check_Details_FF", new { request.ContextId });
             }
             catch (Exception)
             {

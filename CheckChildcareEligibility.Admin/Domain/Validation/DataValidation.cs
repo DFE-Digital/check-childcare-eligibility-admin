@@ -31,6 +31,12 @@ internal static class DataValidation
         return value.Date <= DateTime.Today;
     }
 
+    internal static bool BeWithin31Days(DateTime value)
+    {
+        DateTime backdateWindow = DateTime.Now.AddDays(-31);
+        return value >= backdateWindow;
+    }
+
     internal static bool BeAValidNi(string? value)
     {
         if (string.IsNullOrWhiteSpace(value)) return false;
@@ -55,10 +61,10 @@ internal static class DataValidation
             RegexOptions.Compiled);
     }
 
-        internal static bool BeAValidChildAge(DateTime value)
-        {
-            DateTime fifthBirthday = value.AddYears(5);
-            var (_, termAfterBirthday) = WorkingFamiliesCheckHelper.GetTerms(fifthBirthday);
-            return DateTime.Today < termAfterBirthday.StartDate;
-        }
+    internal static bool BeAValidChildAge(DateTime value)
+    {
+        DateTime fifthBirthday = value.AddYears(5);
+        var (_, termAfterBirthday) = WorkingFamiliesCheckHelper.GetTerms(fifthBirthday);
+        return DateTime.Today < termAfterBirthday.StartDate;
+    }
 }
