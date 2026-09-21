@@ -381,7 +381,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
                 status: "eligible");
 
             // Act
-            var result = sut.SetReconfirmationStatus;
+            var result = sut.ReconfirmStatus;
 
             // Assert
             result.Should().BeEquivalentTo(WorkingFamiliesResponseDetails.ReconfirmationStatusDueNow);
@@ -396,7 +396,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
                 status: "eligible");
 
             // Act
-            var result = sut.SetReconfirmationStatus;
+            var result = sut.ReconfirmStatus;
 
             // Assert
             result.Should().BeEquivalentTo(WorkingFamiliesResponseDetails.ReconfirmationStatusChildTooOld);

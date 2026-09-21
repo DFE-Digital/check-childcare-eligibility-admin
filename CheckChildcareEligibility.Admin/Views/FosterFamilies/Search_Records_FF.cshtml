@@ -36,7 +36,7 @@
                     <tbody class="govuk-table__body">
                         @foreach (var item in Model.Data)
                         {
-                            string[] reconfirmationStatus = WorkingFamiliesCheckHelper.GetReconfirmStatus(item.ReconfirmationProperties);
+                            string[] reconfirmStatus = WorkingFamiliesCheckHelper.GetReconfirmStatus(item.ReconfirmationProperties);
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell">@Html.ActionLink(item.ChildName, "Code_Record_FF", "FosterFamilies", new { FosterChildId = item.FosterChildId }, new { @class = "govuk-link" })</td>
                                 <td class="govuk-table__cell">@item.ChildDateOfBirth.ToString("d MMMM yyyy")</td>
@@ -46,8 +46,8 @@
                                 <td class="govuk-table__cell">@WorkingFamiliesCheckHelper.GetReconfirmBetween(EligibilityCodeType.Foster, item.ReconfirmationProperties)</td>
                                 <td class="govuk-table__cell">@item.GracePeriodEndDate.ToString("d MMMM yyyy")</td>
                                 <td class="govuk-table__cell">
-                                    <strong class="govuk-tag govuk-tag--@reconfirmationStatus[1]" style="max-width:100%;">
-                                        @reconfirmationStatus[0]
+                                    <strong class="govuk-tag govuk-tag--@reconfirmStatus[1]" style="max-width:100%;">
+                                        @reconfirmStatus[0]
                                     </strong>
                                 </td>
                             </tr>

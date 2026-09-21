@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Eligibility code for " + Model.Response.ChildFullName;
     var errorMessage = TempData["ErrorMessage"] as string;
-    string[] reconfirmationStatus = Model.GetReconfirmationStatus();
+    string[] reconfirmationStatus = Model.ReconfirmStatus;
 }
 
 <div class="govuk-grid-column-full">

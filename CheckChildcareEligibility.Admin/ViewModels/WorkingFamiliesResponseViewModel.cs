@@ -144,7 +144,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             return string.Empty;
         }
 
-        public string[] SetReconfirmationStatus => WorkingFamiliesCheckHelper.GetReconfirmStatus(Properties.ReconfirmationProperties);
+        public string[] ReconfirmStatus => WorkingFamiliesCheckHelper.GetReconfirmStatus(Properties.ReconfirmationProperties);
 
     }
 }
