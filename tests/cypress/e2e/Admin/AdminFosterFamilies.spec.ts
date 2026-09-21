@@ -81,7 +81,7 @@ describe('Foster Families search records and add Family', () => {
         //CARER FORM ----------------------------------------------------------------------------
         //Carer form validation tests
         cy.get('h1').should('include.text', 'Enter the carer details');
-        cy.url().should('include', 'FosterFamilies/Carer');
+        cy.url().should('include', 'FosterFamilies/EnterCarer');
         carer.nin = testNino.random(); // Returns a valid UK National Insurance number e.g. AA000000A
 
         // //Submit empty form to check for 'required' validation messages
@@ -164,7 +164,7 @@ describe('Foster Families search records and add Family', () => {
 
         //Add legit Carer details
         cy.get('h1').should('include.text', 'Enter the carer details');
-        cy.url().should('include', 'FosterFamilies/Carer');
+        cy.url().should('include', 'FosterFamilies/EnterCarer');
         cy.get('#CarerFirstName').clear().type(carer.firstName);
         cy.get('#CarerLastName').clear().type(carer.lastName);
         cy.get('#CarerDateOfBirth\\.Day').clear().type(carer.dobDay);
@@ -178,7 +178,7 @@ describe('Foster Families search records and add Family', () => {
         //PARTNER FORM ----------------------------------------------------------------------------
         //Partner form validation tests
         cy.get('h1').should('include.text', 'Enter the partner details');
-        cy.url().should('include', 'FosterFamilies/Partner');
+        cy.url().should('include', 'FosterFamilies/EnterPartner');
 
         // //Submit empty form to check for 'required' validation messages
         // cy.contains('button', 'Continue').click();
@@ -258,7 +258,7 @@ describe('Foster Families search records and add Family', () => {
 
         // Add legit Partner details
         cy.get('h1').should('include.text', 'Enter the partner details');
-        cy.url().should('include', 'FosterFamilies/Partner');
+        cy.url().should('include', 'FosterFamilies/EnterPartner');
         cy.get('#PartnerFirstName').clear().type(partner.firstName);
         cy.get('#PartnerLastName').clear().type(partner.lastName);
         cy.get('#PartnerDateOfBirth\\.Day').clear().type(partner.dobDay);
@@ -270,7 +270,7 @@ describe('Foster Families search records and add Family', () => {
         //CHILD FORM ----------------------------------------------------------------------------
         //Child form validation tests
         cy.get('h1').should('include.text', 'Enter the child details');
-        cy.url().should('include', 'FosterFamilies/Child');
+        cy.url().should('include', 'FosterFamilies/EnterChild');
 
         // //Submit empty form to check for 'required' validation messages
         // cy.contains('button', 'Continue').click();
@@ -350,7 +350,7 @@ describe('Foster Families search records and add Family', () => {
 
         // Add legit Child details
         cy.get('h1').should('include.text', 'Enter the child details');
-        cy.url().should('include', 'FosterFamilies/Child');
+        cy.url().should('include', 'FosterFamilies/EnterChild');
         cy.get('#ChildFirstName').clear().type(child.firstName);
         cy.get('#ChildLastName').clear().type(child.lastName);
         cy.get('#ChildDateOfBirth\\.Day').clear().type(child.dobDay);

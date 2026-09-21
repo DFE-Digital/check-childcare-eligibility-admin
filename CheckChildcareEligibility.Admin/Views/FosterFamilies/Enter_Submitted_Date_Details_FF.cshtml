@@ -3,7 +3,7 @@
 @{
     bool isUpdate = Model != null && string.IsNullOrEmpty(Model.ContextId);
     var actionName = isUpdate ? "SubmittedDate" : "SubmittedDate";
-    ViewData["Title"] = isUpdate ? "When was the application submitted" : "When was the application submitted";
+    ViewData["Title"] = "When was the application submitted?";
 }
 
 <div class="govuk-grid-column-full">
