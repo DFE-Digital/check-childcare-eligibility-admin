@@ -33,7 +33,7 @@ internal static class DataValidation
 
     internal static bool BeWithin31Days(DateTime value)
     {
-        DateTime backdateWindow = DateTime.Now.AddDays(-31);
+        DateTime backdateWindow = DateTime.Today.AddDays(-31);
         return value >= backdateWindow;
     }
 
