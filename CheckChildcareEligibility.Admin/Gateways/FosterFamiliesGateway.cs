@@ -73,7 +73,7 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Post PreviewFosterFamilyCode failed. uri:-{_httpClient.BaseAddress}foster-family/preview");
-            _logger.LogTrace(ex, $"Post CreateFosterFamily failed. uri:-{_httpClient.BaseAddress}foster-family/preview content:-{JsonConvert.SerializeObject(request)}");
+            _logger.LogTrace(ex, $"Post PreviewFosterFamilyCode failed. uri:-{_httpClient.BaseAddress}foster-family/preview content:-{JsonConvert.SerializeObject(request)}");
             throw;
         }
     }
