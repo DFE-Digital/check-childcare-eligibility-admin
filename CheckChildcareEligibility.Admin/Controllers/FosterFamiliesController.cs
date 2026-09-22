@@ -465,20 +465,46 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpPost("CheckDetails")]
         public async Task<IActionResult> Check_Details_FF(FosterApplicationCheckDetailsViewModel request)
         {
-            var fosterFamilyRequest = new FosterFamilyRequest();
+            // If session context is not valid redirect to enter carer to restart the journey
+            if (request == null || string.IsNullOrEmpty(request.ContextId)) { return RedirectToAction("Enter_Carer_Details_FF"); }
+
+            // Pull the FosterCarerDetailsViewModel from session if it exists
+            var fosterCarerDetails = _sessionContextService.GetSessionData<FosterCarerDetailsViewModel>(request.ContextId, "FosterCarerDetails");
+            // If fosterCarerDetails is null, redirect to enter carer to restart the journey
+            if (fosterCarerDetails == null) { return RedirectToAction("Enter_Carer_Details_FF"); }
+
+            FosterPartnerDetailsViewModel fosterPartnerDetails = null;
+            if (fosterCarerDetails.HasPartner == true)
+            {
+                // Pull the FosterPartnerDetailsViewModel from session if it exists
+                fosterPartnerDetails = _sessionContextService.GetSessionData<FosterPartnerDetailsViewModel>(request.ContextId, "FosterPartnerDetails");
+                // If fosterPartnerDetails is null, redirect to enter partner to complete required details
+                if (fosterPartnerDetails == null) { return RedirectToAction("Enter_Partner_Details_FF", new { request.ContextId }); }
+            }
+
+            // Pull the FosterChildDetailsViewModel from session if it exists
+            var fosterChildDetails = _sessionContextService.GetSessionData<FosterChildDetailsViewModel>(request.ContextId, "FosterChildDetails");
+            // If fosterChildDetails is null, redirect to enter child to complete required details
+            if (fosterChildDetails == null) { return RedirectToAction("Enter_Child_Details_FF", new { request.ContextId }); }
+
+            // Pull the FosterApplicationSubmittedDateViewModel from session if it exists
+            var fosterApplicationSubmittedDate = _sessionContextService.GetSessionData<FosterApplicationSubmittedDateViewModel>(request.ContextId, "FosterApplicationSubmittedDate");
+            // If fosterApplicationSubmittedDate is null, redirect to submission date to complete required details
+            if (fosterApplicationSubmittedDate == null) { return RedirectToAction("Enter_Submitted_Date_Details_FF", new { request.ContextId }); }
+
             var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
 
-
-            fosterFamilyRequest.FosterCarer = request.FosterCarerDetailsViewModel.BuildRequest();
-            fosterFamilyRequest.FosterCarer.LocalAuthorityID = laID;
-            if (request.FosterPartnerDetailsViewModel != null && request.FosterCarerDetailsViewModel?.HasPartner == true)
+            // Prepare request
+            var fosterFamilyRequest = new FosterFamilyRequest
             {
-                fosterFamilyRequest.Partner = request.FosterPartnerDetailsViewModel.BuildRequest();
-            }
-            fosterFamilyRequest.HasPartner = fosterFamilyRequest.Partner != null;
-            fosterFamilyRequest.FosterChild = request.FosterChildDetailsViewModel.BuildRequest();
-            fosterFamilyRequest.SubmissionDate = request.FosterApplicationSubmittedDateViewModel.SubmissionDate;
+                FosterCarer = fosterCarerDetails.BuildRequest(),
+                FosterChild = fosterChildDetails.BuildRequest(),
+                Partner = fosterPartnerDetails?.BuildRequest(),
+                HasPartner = fosterCarerDetails.HasPartner,
+                SubmissionDate = fosterApplicationSubmittedDate.SubmissionDate,
+            };
 
+            fosterFamilyRequest.FosterCarer.LocalAuthorityID = laID;
             try
             {
                 var response = await _createFosterFamilyUseCase.Execute(fosterFamilyRequest, laID);
