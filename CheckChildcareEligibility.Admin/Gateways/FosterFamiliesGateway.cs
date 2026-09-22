@@ -57,7 +57,7 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Post CreateFosterFamily failed. uri:-{_httpClient.BaseAddress}");
+            _logger.LogError(ex, $"Post CreateFosterFamily failed. uri:-{_httpClient.BaseAddress}foster-family");
             _logger.LogTrace(ex, $"Post CreateFosterFamily failed. uri:-{_httpClient.BaseAddress}foster-family content:-{JsonConvert.SerializeObject(request)}");
             throw;
         }
@@ -72,8 +72,8 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex,
-                $"Post PreviewFosterFamilyCode failed. uri:-{_httpClient.BaseAddress}foster-family/preview content:-{JsonConvert.SerializeObject(request)}");
+            _logger.LogError(ex, $"Post PreviewFosterFamilyCode failed. uri:-{_httpClient.BaseAddress}foster-family/preview");
+            _logger.LogTrace(ex, $"Post CreateFosterFamily failed. uri:-{_httpClient.BaseAddress}foster-family/preview content:-{JsonConvert.SerializeObject(request)}");
             throw;
         }
     }
@@ -124,8 +124,8 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex,
-                $"Patch UpdateFosterCarer failed. uri:-{_httpClient.BaseAddress}{url} content:-{JsonConvert.SerializeObject(request)}");
+            _logger.LogError(ex, $"Patch UpdateFosterCarer failed. uri:-{_httpClient.BaseAddress}{url}");
+            _logger.LogTrace(ex, $"Patch UpdateFosterCarer failed. uri:-{_httpClient.BaseAddress}{url} content:-{JsonConvert.SerializeObject(request)}");
             throw;
         }
     }
