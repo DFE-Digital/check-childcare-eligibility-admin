@@ -1,7 +1,7 @@
 ﻿@model CheckChildcareEligibility.Admin.ViewModels.WorkingFamiliesResponseViewModel
 
 @{
-    string[] reconfirmationStatus = Model.SetReconfirmationStatus();
+    string[] reconfirmationStatus = Model.ReconfirmStatus;
 }
 
 <h2 class="govuk-heading-m">Details checked</h2>
@@ -11,7 +11,7 @@
             Eligibility code
         </dt>
         <dd class="govuk-summary-list__value">
-            @Model.Response.EligibilityCode
+            @Model.Properties.EligibilityCode
         </dd>
     </div>
     <div class="govuk-summary-list__row">
@@ -19,7 +19,7 @@
             National Insurance number
         </dt>
         <dd class="govuk-summary-list__value">
-            @Model.Response.NationalInsuranceNumber
+            @Model.NationalInsuranceNumber
         </dd>
     </div>
     <div class="govuk-summary-list__row">
@@ -27,7 +27,7 @@
             Child date of birth
         </dt>
         <dd class="govuk-summary-list__value">
-            @Model.ChildDateOfBirth.ToString("d MMMM yyyy")
+            @Model.Properties.ChildDateOfBirth.ToString("d MMMM yyyy")
         </dd>
     </div>
 </dl>
@@ -46,7 +46,7 @@
             @Model.ReconfirmationDateLabel
         </dt>
         <dd class="govuk-summary-list__value">
-            @Model.ReconfrimBetween
+            @Model.ReconfirmBetween
         </dd>
     </div>
     <div class="govuk-summary-list__row">

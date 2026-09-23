@@ -1,7 +1,4 @@
-﻿using CheckChildcareEligibility.Admin.Models;
-using System.Security.Policy;
-
-namespace CheckChildcareEligibility.Admin.Domain.Constants.Generic
+﻿namespace CheckChildcareEligibility.Admin.Domain.Constants.Generic
 {
     public static class WorkingFamiliesResponseDetails
     {

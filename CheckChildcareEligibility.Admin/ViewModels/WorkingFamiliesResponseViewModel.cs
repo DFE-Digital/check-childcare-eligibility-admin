@@ -1,20 +1,25 @@
-﻿using AspNetCoreGeneratedDocument;
-using CheckChildcareEligibility.Admin.Boundary.Responses;
+﻿using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Constants.Generic;
-using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies;
-using CsvHelper.Configuration.Attributes;
+using CheckChildcareEligibility.Admin.Helpers;
+using CheckChildcareEligibility.Admin.Models;
 
 namespace CheckChildcareEligibility.Admin.ViewModels
 {
     public class WorkingFamiliesResponseViewModel
     {
-        public CheckEligibilityItemWorkingFamilies Response { get; set; }
-        public bool ChildIsTooYoung => Response.ChildTooYoung;
-        public bool ChildIsTooOld => Response.ReconfirmationProperties.Status == ReconfirmationStatus.ChildTooOld;
-        public bool IsEligible => Response.Status == CheckEligibilityStatus.eligible.ToString();
-        public bool IsExpired => Response.GracePeriodEndDate < DateTime.UtcNow.Date;
-        public bool IsInGracePeriod => DateTime.UtcNow.Date > Response.ValidityEndDate && DateTime.UtcNow.Date <= Response.GracePeriodEndDate;
+
+        public WorkingFamiliesResponseViewModel(CheckEligibilityItemWorkingFamilies response, EligibilityCodeProperties properties)
+        {
+            Response = response;
+            Properties = properties;
+        }
+
+        private CheckEligibilityItemWorkingFamilies Response { get; set; }
+
+        public EligibilityCodeProperties Properties { get; set; }
+
+        public string NationalInsuranceNumber => Response.NationalInsuranceNumber;
         public string EligibilityConfirmedOnDisplay =>
             $"{Response.ValidityStartDate:d MMMM yyyy}" +
             (Response.IsDiscretionaryValidityStartDateApplied == true
@@ -22,181 +27,124 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 : string.Empty);
 
         public string GracePeriodEndDisplay =>
-            ChildIsTooOld
-                ? Response.ValidityEndDate.ToString("d MMMM yyyy")
-                : (IsEligible && ChildIsTooYoung) || IsNotValidYet
+            Properties.ChildIsTooOld
+                ? Properties.ValidityEndDate.ToString("d MMMM yyyy")
+                : (Properties.IsEligible && Properties.ChildIsTooYoung) || Properties.IsNotValidYet
                     ? WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable
-                    : Response.GracePeriodEndDate.ToString("d MMMM yyyy");
-      
+                    : Properties.GracePeriodEndDate.ToString("d MMMM yyyy");
+
         public string GracePeriodEndLabel =>
-            ChildIsTooOld
+            Properties.ChildIsTooOld
                 ? "Grace period ended"
                 : "Grace period ends";
-      
+
         public string ReconfirmationDateLabel =>
-            Response.EligibilityCodeType == EligibilityCodeType.Temporary
+            Properties.Type == EligibilityCodeType.Temporary
                 ? "Apply for a new code by"
                 : "Reconfirm between";
 
-        public string ReconfrimBetween
-        {
-            get
-            {
-                if (Response.EligibilityCodeType == EligibilityCodeType.Temporary)
-                {
-                    return Response.ValidityEndDate.ToString("d MMMM yyyy");
-                }
+        public string ReconfirmBetween => WorkingFamiliesCheckHelper.GetReconfirmBetween(
+             Properties.Type,
+             Properties.ReconfirmationProperties,
+             Properties.ValidityEndDate
+        );
 
-                if (Response.ReconfirmationProperties?.Status == ReconfirmationStatus.ChildTooOld)
-                {
-                    return WorkingFamiliesResponseDetails.StatusNotApplicable;
-                }
-
-                return $"{Response.ReconfirmationProperties?.StartDate:d MMMM yyyy} and {Response.ReconfirmationProperties?.EndDate:d MMMM yyyy}";
-            }
-        }
-
-        public DateTime ChildDateOfBirth => DateTime.Parse(Response.DateOfBirth);    
         public string CodeType = string.Empty;
         public string CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
         public string BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
         public string TermValidityDetails = WorkingFamiliesResponseBanner.TermValidFor;
-        public string TermValidityDateRange = string.Empty;
-        public TermName CurrentTerm => Response.TermValidity.Current;
-        public TermName NextTerm => Response.TermValidity.Next;
 
-        public bool IsNotValidYet
-        {
-            get
-            {
-                // If current term is None and next term is assigned
-                return CurrentTerm == TermName.None && NextTerm != TermName.None;
-            }
-        }
-        public bool IsReconfirmed
-        {
-            get
-            {
-                return IsEligible && !IsNotValidYet && !IsInGracePeriod && NextTerm != TermName.None;
-            }
-        }
-
+        public TermName NextTermName => (Properties.NextTerm?.Name ?? TermName.None);
 
         // If child is too young and the code has not expired do not set code type
         // else apply correct content for code type
-        private void SetBannerCodeType() {
-            if (ChildIsTooYoung && !IsExpired) return;
-            if (Response.EligibilityCodeType == EligibilityCodeType.Temporary)
+        private void SetBannerCodeType()
+        {
+            if (Properties.ChildIsTooYoung && !Properties.IsExpired) return;
+            if (Properties.Type == EligibilityCodeType.Temporary)
             {
                 CodeType = WorkingFamiliesResponseBanner.CodeTemporary;
 
-                if (IsEligible)
+                if (Properties.IsEligible)
                 {
                     TermValidityDetails = "Only " + TermValidityDetails;
                 }
             }
-            else if (Response.EligibilityCodeType == EligibilityCodeType.Foster)
+            else if (Properties.Type == EligibilityCodeType.Foster)
             {
                 CodeType = WorkingFamiliesResponseBanner.CodeFosterFamily;
             }
-            else {
+            else
+            {
                 CodeType = WorkingFamiliesResponseBanner.CodePermanent;
             }
         }
 
         public void SetBannerValues()
         {
-            var nextTermView = WorkingFamiliesResponseBanner.TermNamesInView.GetValueOrDefault(NextTerm, string.Empty);
-            var currentTermView = WorkingFamiliesResponseBanner.TermNamesInView.GetValueOrDefault(CurrentTerm, string.Empty);
-           
-            SetBannerCodeType();
-           
-            if ((IsEligible && ChildIsTooYoung) || (IsNotValidYet && ChildIsTooYoung)) // Child too young
-            {
+            var nextTermView = WorkingFamiliesResponseBanner.TermNamesInView.GetValueOrDefault(Properties.NextTerm.Name, string.Empty);
+            var currentTermView = WorkingFamiliesResponseBanner.TermNamesInView.GetValueOrDefault(Properties.CurrentTerm.Name, string.Empty);
 
-                DateTime nineMonthsDate = ChildDateOfBirth.AddMonths(9);
+            SetBannerCodeType();
+
+            if ((Properties.IsEligible && Properties.ChildIsTooYoung) || (Properties.IsNotValidYet && Properties.ChildIsTooYoung)) // Child too young
+            {
+                DateTime nineMonthsDate = Properties.ChildDateOfBirth.AddMonths(9);
                 CodeStatus = WorkingFamiliesResponseBanner.CodeChildTooYoung;
                 BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
                 TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {nextTermView} {nineMonthsDate.Year}";
-
             }
-
-            else if (ChildIsTooOld || IsExpired) // Expired or too old
+            else if (Properties.ChildIsTooOld || Properties.IsExpired) // Expired or too old
             {
-
                 CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
                 BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
                 TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermExpiredOn} {GracePeriodEndDisplay}";
             }
-            else if (IsNotValidYet) // Code cannot be used yet
+            else if (Properties.IsNotValidYet) // Code cannot be used yet
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeNotValidYet;
                 BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
-                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {nextTermView} {Response.GracePeriodEndDate.Year}";
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {nextTermView} {Properties.GracePeriodEndDate.Year}";
 
             }
 
             // is Valid and reconfirmation has happened
-            else if (IsReconfirmed)
+            else if (Properties.IsReconfirmed)
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
                 BannerColour = WorkingFamiliesResponseBanner.ColourGreen;
-                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFor} {currentTermView} {DateTime.UtcNow.Year} and {nextTermView} {Response.GracePeriodEndDate.Year}";
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFor} {currentTermView} {DateTime.UtcNow.Year} and {nextTermView} {Properties.GracePeriodEndDate.Year}";
             }
-        
-            else if (IsInGracePeriod)
+            else if (Properties.IsInGracePeriod)
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeInGracePeriod;
                 BannerColour = WorkingFamiliesResponseBanner.ColourYellow;
-                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermExpiresOn} {Response.GracePeriodEndDate:dd MMMM yyyy}";
+                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermExpiresOn} {Properties.GracePeriodEndDate:dd MMMM yyyy}";
             }
-            else {
+            else
+            {
                 TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFor} {currentTermView} {DateTime.UtcNow.Year}";
             }
-           
         }
 
         public string SetBannerReconfirmationMessage()
         {
-             if (Response.ReconfirmationProperties?.Status == ReconfirmationStatus.Due)
+            if (Properties.ReconfirmationProperties?.Status == ReconfirmationStatus.Due)
             {
-                return $"{WorkingFamiliesResponseBanner.ReconfirmationBefore} {Response.ReconfirmationProperties.EndDate?.ToString("d MMMM yyyy")}";
+                return $"{WorkingFamiliesResponseBanner.ReconfirmationBefore} {Properties.ReconfirmationProperties.EndDate?.ToString("d MMMM yyyy")}";
             }
-            else if (Response.ReconfirmationProperties?.Status == ReconfirmationStatus.Overdue)
+            else if (Properties.ReconfirmationProperties?.Status == ReconfirmationStatus.Overdue)
             {
                 return WorkingFamiliesResponseBanner.ReconfirmationOverdue;
             }
-            else if (Response.ReconfirmationProperties?.Status == ReconfirmationStatus.ChildTooOld)
+            else if (Properties.ReconfirmationProperties?.Status == ReconfirmationStatus.ChildTooOld)
             {
                 return WorkingFamiliesResponseBanner.ReconfirmationChildTooOld;
             }
             return string.Empty;
         }
 
-        public string[] SetReconfirmationStatus()
-        {
-            if (Response.ReconfirmationProperties.Status == ReconfirmationStatus.Due)
-            {
-                return WorkingFamiliesResponseDetails.ReconfirmationStatusDueNow;
-            }
-            if (Response.ReconfirmationProperties.Status == ReconfirmationStatus.NotDueYet)
-            {
-                return WorkingFamiliesResponseDetails.ReconfirmationStatusNotDueYet;
-            }
-            if (Response.ReconfirmationProperties.Status == ReconfirmationStatus.Overdue)
-            {
-                return WorkingFamiliesResponseDetails.ReconfirmationStatusOverdue;
-            }
-            if (Response.ReconfirmationProperties.Status == ReconfirmationStatus.NotApplicable)
-            {
-                return WorkingFamiliesResponseDetails.ReconfirmationStatusNotApplicable;
-            }
-             if (Response.ReconfirmationProperties.Status == ReconfirmationStatus.ChildTooOld)
-            {
-                return WorkingFamiliesResponseDetails.ReconfirmationStatusChildTooOld;
-            }                           
-            return Array.Empty<string>();
-        }
+        public string[] ReconfirmStatus => WorkingFamiliesCheckHelper.GetReconfirmStatus(Properties.ReconfirmationProperties);
 
     }
 }

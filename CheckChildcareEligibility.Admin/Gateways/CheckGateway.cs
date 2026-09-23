@@ -1,10 +1,12 @@
-﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
+﻿using Azure.Core;
+using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Drawing.Printing;
 
 namespace CheckChildcareEligibility.Admin.Gateways;
 
@@ -14,7 +16,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
     private readonly ILogger _logger;
 
     private static readonly Dictionary<CheckEligibilityType, string> CheckUrls = new()
-    {        
+    {
         [CheckEligibilityType.TwoYearOffer] = "check/two-year-offer",
         [CheckEligibilityType.EarlyYearPupilPremium] = "check/early-year-pupil-premium",
         [CheckEligibilityType.WorkingFamilies] = "check/working-families",
@@ -27,7 +29,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
         [CheckEligibilityType.WorkingFamilies] = "bulk-check/working-families",
     };
     public CheckGateway(ILoggerFactory logger, HttpClient httpClient, IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : base("EcsService",
-        logger, httpClient, configuration, httpContextAccessor )
+        logger, httpClient, configuration, httpContextAccessor)
     {
         _logger = logger.CreateLogger("EcsService");
         _httpClient = httpClient;
@@ -44,7 +46,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
     private string BulkCheckUrl(CheckEligibilityRequestBulk checkEligibilityRequest)
     {
         if (checkEligibilityRequest.Data == null || !checkEligibilityRequest.Data.Any())
-            return "error";        
+            return "error";
 
         return BulkCheckUrls[checkEligibilityRequest.Data.First().Type];
     }
@@ -130,7 +132,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
     public async Task<IEnumerable<IBulkExport>> LoadBulkCheckResults(string bulkCheckId, CheckEligibilityType eligibilityType)
     {
         CheckEligibilityBulkResponseBase bulkResult;
-      
+
         switch (eligibilityType)
         {
             case CheckEligibilityType.WorkingFamilies:
@@ -141,7 +143,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
                 break;
 
         }
-       return bulkResult.BulkDataMapper();
+        return bulkResult.BulkDataMapper();
     }
 
     public async Task<CheckEligibilityResponseBulk> PostBulkCheck(CheckEligibilityRequestBulk requestBody)
@@ -184,7 +186,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
         try
         {
             var response = await ApiDataDeleteAsynch($"{bulkCheckDeleteUrl}", new CheckEligiblityBulkDeleteResponse());
- 
+
             return response;
         }
         catch (Exception ex)

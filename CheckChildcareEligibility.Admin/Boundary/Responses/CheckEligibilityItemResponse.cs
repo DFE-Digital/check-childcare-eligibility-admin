@@ -49,24 +49,7 @@ public class CheckEligibilityItemWorkingFamilies
     public bool ChildTooYoung { get; set; }
     public int? Order { get; set; }
 }
-public class TermValidity
-{
 
-    public TermName Current { get; set; }
-    public TermName Next { get; set; }
-
-}
-
-public class ReconfirmationProperties
-{
-
-    public DateTime? StartDate { get; set; }
-
-    public DateTime? EndDate { get; set; }
-
-    public ReconfirmationStatus Status { get; set; }
-
-}
 public class CheckEligibilityItemWorkingFamiliesResponse : CheckEligibilityItemResponseBase
 {
     public CheckEligibilityItemWorkingFamilies Data { get; set; }
