@@ -6,7 +6,9 @@
 }
 
 <div class="govuk-grid-column-full">
-    <a class="govuk-back-link backLinkJS" href="@Url.Action("Enter_Submitted_Date_Details_FF", "FosterFamilies", new { Model.ContextId} )">Back</a>
+    <a class="govuk-back-link backLinkJS"
+       href="@Url.Action("Enter_Submitted_Date_Details_FF", "FosterFamilies", new { Model.ContextId })">Back
+    </a>
 
     @if (!string.IsNullOrEmpty(errorMessage))
     {
@@ -244,14 +246,14 @@
 
             <p class="govuk-body">By submitting this information, you confirm you have worked with the designated person
                 (for example, a social worker) to establish that:
-        </p>
+            </p>
             <ul class="govuk-list govuk-list--bullet">
                 <li>the foster carer works outside of their foster role</li>
                 <li>providing an eligibility code is consistent with the child's care plan</li>
             </ul>
 
             <form asp-controller="FosterFamilies" asp-action="CheckDetails" method="post">
-                <input asp-for="FosterCarerDetailsViewModel.ContextId" type="hidden" />
+                <input asp-for="ContextId" type="hidden" />
                 <!-- Carer Details -->
                 <input type="hidden" asp-for="FosterCarerDetailsViewModel.CarerFirstName" />
                 <input type="hidden" asp-for="FosterCarerDetailsViewModel.CarerLastName" />
