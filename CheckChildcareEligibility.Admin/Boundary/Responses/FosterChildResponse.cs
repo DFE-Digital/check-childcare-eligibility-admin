@@ -19,18 +19,18 @@
         public bool ChildTooYoung { get; set; }
 
         // Child
-
         public Guid FosterChildId { get; set; }
 
-        public string ChildFullName { get; set; }
+        public string ChildFirstName { get; set; }
+
+        public string ChildLastName { get; set; }
 
         public DateTime ChildDateOfBirth { get; set; }
 
-        public string PostCode { get; set; }
+        public string ChildPostCode { get; set; }
 
 
         // Foster Family
-
         public Guid FosterCarerId { get; set; }
 
         public string? CarerName { get; set; }

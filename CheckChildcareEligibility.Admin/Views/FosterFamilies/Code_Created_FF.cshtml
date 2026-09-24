@@ -35,7 +35,7 @@
                 </thead>
                 <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__cell">@Model.Response.ChildFullName</td>
+                        <td class="govuk-table__cell">@Model.Response.ChildFirstName @Model.Response.ChildLastName</td>
                         <td class="govuk-table__cell">@Model.Response.EligibilityCode</td>
                         <td class="govuk-table__cell">Valid from @Model.ValidFromTerm.Name.ToString().ToLower() term @Model.ValidFromTerm.StartDate.Year</td>
                         <td class="govuk-table__cell">@Model.Response.ValidityStartDate.ToString("d MMMM yyyy")</td>

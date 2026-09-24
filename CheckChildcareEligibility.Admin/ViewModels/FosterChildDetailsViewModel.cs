@@ -26,6 +26,10 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         [Required(ErrorMessage = FosterFamilyValidationMessages.ChildPostCodeEmpty)]
         public string ChildPostCode { get; set; }
 
+        //For Update Child Details only
+        public Guid FosterChildId { get; set; }
+
+        // For creation journey only
         public string? ContextId { get; set; }
 
         public bool HasPartner { get; set; }
