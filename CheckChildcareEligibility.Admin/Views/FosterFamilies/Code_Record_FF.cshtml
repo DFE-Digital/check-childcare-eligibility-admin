@@ -2,7 +2,7 @@
 @using CheckChildcareEligibility.Admin.Helpers
 @model FosterFamiliesCodeResponseViewModel
 @{
-    ViewData["Title"] = "Eligibility code for " + Model.Response.ChildFullName;
+    ViewData["Title"] = "Eligibility code for " + Model.Response.ChildFirstName + " " + Model.Response.ChildLastName;
     var errorMessage = TempData["ErrorMessage"] as string;
     string[] reconfirmationStatus = Model.ReconfirmStatus;
 }
@@ -114,8 +114,8 @@
                     <ul class="govuk-summary-card__actions">
                         <li class="govuk-summary-card__action">
                             <a class="govuk-link"
-                               href="@Url.ActionLink("UpdateChild", "FosterFamilies", new { Model.Response.FosterChildId })">Change
-                                (*ToDo*) <span class="govuk-visually-hidden">Child details</span>
+                               href="@Url.ActionLink("Update_Child_Details_FF", "FosterFamilies", new { Model.Response.FosterChildId })">Change
+                               <span class="govuk-visually-hidden">Child details</span>
                             </a>
                         </li>
                     </ul>
@@ -128,7 +128,7 @@
                                 Full name
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @Model.Response.ChildFullName
+                                @Model.Response.ChildFirstName @Model.Response.ChildLastName
                             </dd>
                         </div>
 
@@ -146,7 +146,7 @@
                                 Postcode
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @Model.Response.PostCode
+                                @Model.Response.ChildPostCode
                             </dd>
                         </div>
                     </dl>
