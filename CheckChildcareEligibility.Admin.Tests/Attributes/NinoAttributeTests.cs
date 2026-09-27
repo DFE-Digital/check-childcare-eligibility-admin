@@ -104,6 +104,7 @@ public class NinoAttributeTests
     [TestCase("ab 12 34 56 c")]
     [TestCase("ab-12.34/56c")]
     [TestCase("ab\t12\r\n3456c")]
+    [TestCase("A B 1 2 3 4 5 6 C")]
     public void Given_Valid_Nino_Model_Attributes_Should_Accept_Without_Mutation(
     string input)
     {
