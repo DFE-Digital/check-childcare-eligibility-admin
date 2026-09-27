@@ -38,6 +38,7 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
             RuleFor(x => x.SubmissionDate)
                 .Must(DataValidation.BeWithin31Days)
                 .WithMessage(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, DateTime.Today.AddDays(-31)));
+
         }
     }
 
@@ -60,6 +61,13 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
             RuleFor(x => x.CarerLastName)
                 .Must(DataValidation.BeAValidName)
                 .WithMessage(FosterFamilyValidationMessages.CarerLastNameInvalid);
+
+            RuleFor(x => x.CarerNationalInsuranceNumber)
+                .Cascade(CascadeMode.Stop)
+                .NotEmpty()
+                .WithMessage(FosterFamilyValidationMessages.CarerNationalInsuranceNumberEmpty)
+                .Must(DataValidation.BeAValidNi)
+                .WithMessage("Enter a National Insurance number in the correct format");
         }
     }
 
@@ -83,6 +91,13 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
             RuleFor(x => x.PartnerLastName)
                 .Must(DataValidation.BeAValidName)
                 .WithMessage(FosterFamilyValidationMessages.PartnerLastNameInvalid);
+
+            RuleFor(x => x.PartnerNationalInsuranceNumber)
+                .Cascade(CascadeMode.Stop)
+                .NotEmpty()
+                .WithMessage(FosterFamilyValidationMessages.PartnerNationalInsuranceNumberEmpty)
+                .Must(DataValidation.BeAValidNi)
+                .WithMessage("Enter a National Insurance number in the correct format");
         }
     }
 
