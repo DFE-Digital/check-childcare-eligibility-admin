@@ -86,6 +86,42 @@ public class Perform2YoEligibilityCheckUseCaseTests
         Encoding.UTF8.GetString(ninoBytes).Should().Be("AB123456C");
     }
 
+    [TestCase("ab 12 34 56 c")]
+    [TestCase("ab-12.34/56c")]
+    [TestCase("ab\t12\r\n3456c")]
+    public async Task Execute_Should_Canonicalise_Nino_Without_Changing_Submitted_Model(
+    string input)
+    {
+        _parent.NationalInsuranceNumber = input;
+        _sessionStorage.Clear();
+
+        CheckEligibilityRequest? capturedRequest = null;
+
+        _checkGatewayMock
+            .Setup(g => g.PostCheck(It.IsAny<CheckEligibilityRequest>()))
+            .Callback<CheckEligibilityRequest>(request => capturedRequest = request)
+            .ReturnsAsync(_eligibilityResponse);
+
+        await _sut.Execute(_parent, _sessionMock.Object);
+
+        capturedRequest.Should().NotBeNull();
+        var data = capturedRequest!.Data.Should()
+            .BeOfType<CheckEligibilityRequestData>().Subject;
+
+        data.Type.Should().Be(CheckEligibilityType.TwoYearOffer);
+        data.NationalInsuranceNumber.Should().Be("AB123456C");
+
+        _sessionStorage.Should().ContainKey("ParentNINO");
+        Encoding.UTF8.GetString(_sessionStorage["ParentNINO"])
+            .Should().Be("AB123456C");
+
+        _parent.NationalInsuranceNumber.Should().Be(input);
+
+        _checkGatewayMock.Verify(
+            g => g.PostCheck(It.IsAny<CheckEligibilityRequest>()),
+            Times.Once);
+    }
+
     [Test]
     public async Task Execute_WhenApiThrowsException_ShouldThrow()
     {
