@@ -47,6 +47,9 @@ public class NinoAttributeTests
     [TestCase("ZZ123456C", NINOFormatErrorMessage)]
     [TestCase("ZZ123456C", NINOFormatErrorMessage)]
     [TestCase("AB123456E", NINOFormatErrorMessage)]
+    [TestCase("AB\u0661\u0662\u0663\u0664\u0665\u0666C", NINOFormatErrorMessage)]
+    [TestCase("AB\uFF11\uFF12\uFF13\uFF14\uFF15\uFF16C", NINOFormatErrorMessage)]
+    [TestCase("---", NINOFormatErrorMessage)]
     public void Given_Nino_When_Invalid_Should_ReturnErrorMessage(string? nino, string? errorMessage)
     {
         // Act
@@ -62,6 +65,9 @@ public class NinoAttributeTests
     [TestCase("AB123456B")]
     [TestCase("AB123456C")]
     [TestCase("AB123456D")]
+    [TestCase("ab 12 34 56 c")]
+    [TestCase("ab-12.34/56c")]
+    [TestCase("ab\t12\r\n3456c")]
     public void Given_Nino_When_Valid_Should_ReturnNull(string? nino)
     {
         // Act

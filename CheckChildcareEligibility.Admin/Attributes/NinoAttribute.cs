@@ -1,20 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using System.Text.RegularExpressions;
+using CheckChildcareEligibility.Admin.Domain.Validation;
 
 namespace CheckChildcareEligibility.Admin.Attributes;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public class NinoAttribute : ValidationAttribute
 {
-    const string validNinoRegex = @"^(?!BG)(?!GB)(?!NK)(?!KN)(?!TN)(?!NT)(?!ZZ)(?:[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z])(?:\s*\d\s*){6}([A-D]|\s)$";
-
-    private readonly Regex _regex;
-
     public NinoAttribute()
     {
         ErrorMessage = "Enter a National Insurance number in the correct format";
-        _regex = new Regex(validNinoRegex, RegexOptions.Compiled);
     }
 
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
@@ -36,10 +31,7 @@ public class NinoAttribute : ValidationAttribute
             }
         }
 
-        var nino = new string(value.ToString()
-                               .ToUpperInvariant()
-                               .Where(char.IsLetterOrDigit)
-                               .ToArray());
+        var nino = NinoValidation.Normalize(value.ToString())!;
 
         if (nino.Length > 9)
         {
@@ -47,7 +39,7 @@ public class NinoAttribute : ValidationAttribute
                 "National Insurance number should contain no more than 9 alphanumeric characters");
         }
 
-        if (!_regex.IsMatch(nino))
+        if (!NinoValidation.IsValidCanonical(nino))
         {
             return new ValidationResult("Enter a National Insurance number in the correct format");
         }
