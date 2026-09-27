@@ -70,6 +70,41 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
         }
 
         [Test]
+        public async Task Execute_WithRealValidator_Should_Reject_Invalid_Ninos(
+            [Values(
+                CheckEligibilityType.TwoYearOffer,
+                CheckEligibilityType.EarlyYearPupilPremium,
+                CheckEligibilityType.WorkingFamilies)] CheckEligibilityType eligibilityType,
+            [Values(
+                "AB123456E",
+                "AB123456",
+                "AB12345C",
+                "AB123456CD",
+                "AB\u0661\u0662\u0663\u0664\u0665\u0666C",
+                "---")] string nino)
+        {
+            var parser = new ParseBulkCheckFileUseCase(
+                new CheckEligibilityRequestDataValidator(),
+                _config.Object);
+
+            var csv = eligibilityType == CheckEligibilityType.WorkingFamilies
+                ? "Eligibility code,National Insurance number,Child date of birth\r\n"
+                  + $"50173110190,{nino},2022-01-01\r\n"
+                : "Parent Last Name,Parent Date of Birth,Parent National Insurance number\r\n"
+                  + $"Smith,1980-01-01,{nino}\r\n";
+
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(csv));
+
+            var result = await parser.Execute(stream, eligibilityType);
+
+            result.ErrorMessage.Should().BeEmpty();
+            result.ValidRequests.Should().BeEmpty();
+            result.Errors.Should().ContainSingle();
+            result.Errors[0].LineNumber.Should().Be(2);
+            result.Errors[0].Message.Should().Be(ValidationMessages.ValidNI);
+        }
+
+        [Test]
         public async Task Given_Bulk_Check_When_FileHasInvalidHeaders_2YO()
         {
             // Arrange
