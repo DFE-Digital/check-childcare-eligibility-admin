@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.Tests.Attributes.Derived;
+using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
+using CheckChildcareEligibility.Admin.ViewModels;
 using FluentAssertions;
 
 namespace CheckChildcareEligibility.Admin.Tests.Attributes;
@@ -75,5 +77,101 @@ public class NinoAttributeTests
 
         // Assert
         result.Should().BeNull(nino);
+    }
+
+    [TestCase("ab 12 34 56 c")]
+    [TestCase("ab-12.34/56c")]
+    [TestCase("ab\t12\r\n3456c")]
+    public void Given_Valid_Nino_Should_Not_Change_Submitted_Model(string input)
+    {
+        var parent = new ParentGuardian
+        {
+            NationalInsuranceNumber = input
+        };
+
+        var context = new ValidationContext(parent)
+        {
+            MemberName = nameof(ParentGuardian.NationalInsuranceNumber),
+            DisplayName = "National Insurance number"
+        };
+
+        var result = _ninoAttribute.NinoIsValid(input, context);
+
+        result.Should().BeNull();
+        parent.NationalInsuranceNumber.Should().Be(input);
+    }
+
+    [TestCase("ab 12 34 56 c")]
+    [TestCase("ab-12.34/56c")]
+    [TestCase("ab\t12\r\n3456c")]
+    public void Given_Valid_Nino_Model_Attributes_Should_Accept_Without_Mutation(
+    string input)
+    {
+        var parent = new ParentGuardian
+        {
+            NationalInsuranceNumber = input
+        };
+
+        var context = new ValidationContext(parent)
+        {
+            MemberName = nameof(ParentGuardian.NationalInsuranceNumber)
+        };
+        var errors = new List<ValidationResult>();
+
+        var valid = Validator.TryValidateProperty(input, context, errors);
+
+        valid.Should().BeTrue();
+        errors.Should().BeEmpty();
+        parent.NationalInsuranceNumber.Should().Be(input);
+    }
+
+    [TestCase(false, null)]
+    [TestCase(false, "")]
+    [TestCase(false, "   ")]
+    [TestCase(true, null)]
+    [TestCase(true, "")]
+    [TestCase(true, "   ")]
+    public void Given_Missing_Foster_Nino_Should_Return_Required_Message(
+        bool partner,
+        string? input)
+    {
+        object model;
+        string propertyName;
+        string expectedMessage;
+
+        if (partner)
+        {
+            model = new FosterPartnerDetailsViewModel
+            {
+                PartnerNationalInsuranceNumber = input!
+            };
+            propertyName = nameof(
+                FosterPartnerDetailsViewModel.PartnerNationalInsuranceNumber);
+            expectedMessage =
+                FosterFamilyValidationMessages.PartnerNationalInsuranceNumberEmpty;
+        }
+        else
+        {
+            model = new FosterCarerDetailsViewModel
+            {
+                CarerNationalInsuranceNumber = input!
+            };
+            propertyName = nameof(
+                FosterCarerDetailsViewModel.CarerNationalInsuranceNumber);
+            expectedMessage =
+                FosterFamilyValidationMessages.CarerNationalInsuranceNumberEmpty;
+        }
+
+        var context = new ValidationContext(model)
+        {
+            MemberName = propertyName
+        };
+        var errors = new List<ValidationResult>();
+
+        var valid = Validator.TryValidateProperty(input, context, errors);
+
+        valid.Should().BeFalse();
+        errors.Should().ContainSingle()
+            .Which.ErrorMessage.Should().Be(expectedMessage);
     }
 }
