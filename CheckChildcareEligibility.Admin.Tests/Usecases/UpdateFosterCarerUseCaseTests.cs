@@ -9,12 +9,8 @@ namespace CheckChildcareEligibility.Admin.Tests.UseCases;
 [TestFixture]
 public class UpdateFosterCarerUseCaseTests
 {
-    [TestCase(false, "ab 12 34 56 c")]
-    [TestCase(true, "ab 12 34 56 c")]
-    [TestCase(false, "ab-12.34/56c")]
-    [TestCase(true, "ab-12.34/56c")]
-    [TestCase(false, "ab\t12\r\n3456c")]
-    [TestCase(true, "ab\t12\r\n3456c")]
+    [TestCase(true, "ab123456c")]
+    [TestCase(false, "ab123456c")]
     public async Task Execute_Should_Forward_Canonical_Nino(
         bool partner,
         string input)

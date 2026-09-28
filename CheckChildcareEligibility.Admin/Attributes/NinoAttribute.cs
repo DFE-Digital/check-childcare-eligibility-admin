@@ -27,15 +27,16 @@ public class NinoAttribute : ValidationAttribute
             }
         }
 
-        var nino = NinoValidation.Normalize(value.ToString())!;
+        var nino = value.ToString()!;
+        var normalizedNino = NinoValidation.Normalize(nino)!;
 
-        if (nino.Length > 9)
+        if (normalizedNino.Length > 9)
         {
             return new ValidationResult(
                 "National Insurance number should contain no more than 9 alphanumeric characters");
         }
 
-        if (!NinoValidation.IsValidCanonical(nino))
+        if (!NinoValidation.IsValidInput(nino))
         {
             return new ValidationResult("Enter a National Insurance number in the correct format");
         }

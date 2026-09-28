@@ -86,9 +86,7 @@ public class Perform2YoEligibilityCheckUseCaseTests
         Encoding.UTF8.GetString(ninoBytes).Should().Be("AB123456C");
     }
 
-    [TestCase("ab 12 34 56 c")]
-    [TestCase("ab-12.34/56c")]
-    [TestCase("ab\t12\r\n3456c")]
+    [TestCase("ab123456c")]
     public async Task Execute_Should_Canonicalise_Nino_Without_Changing_Submitted_Model(
     string input)
     {

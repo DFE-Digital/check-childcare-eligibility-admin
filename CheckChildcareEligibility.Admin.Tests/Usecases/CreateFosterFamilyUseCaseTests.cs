@@ -67,9 +67,7 @@ public class CreateFosterFamilyUseCaseTests
             Times.Never);
     }
 
-    [TestCase("ab 12 34 56 c", "ce 12 34 56 a")]
-    [TestCase("ab-12.34/56c", "ce-12.34/56a")]
-    [TestCase("ab\t12\r\n3456c", "ce\t12\r\n3456a")]
+    [TestCase("ab123456c", "ce123456a")]
     public async Task Execute_Should_Forward_Canonical_Carer_And_Partner_Ninos(
     string carerNino,
     string partnerNino)

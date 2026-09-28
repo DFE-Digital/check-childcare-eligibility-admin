@@ -52,6 +52,11 @@ public class NinoAttributeTests
     [TestCase("AB\u0661\u0662\u0663\u0664\u0665\u0666C", NINOFormatErrorMessage)]
     [TestCase("AB\uFF11\uFF12\uFF13\uFF14\uFF15\uFF16C", NINOFormatErrorMessage)]
     [TestCase("---", NINOFormatErrorMessage)]
+    [TestCase("AB-123456C", NINOFormatErrorMessage)]
+    [TestCase("AB 12 34 56 C", NINOFormatErrorMessage)]
+    [TestCase("ab 12 34 56 c", NINOFormatErrorMessage)]
+    [TestCase("ab-12.34/56c", NINOFormatErrorMessage)]
+    [TestCase("ab\t12\r\n3456c", NINOFormatErrorMessage)]
     public void Given_Nino_When_Invalid_Should_ReturnErrorMessage(string? nino, string? errorMessage)
     {
         // Act
@@ -67,9 +72,6 @@ public class NinoAttributeTests
     [TestCase("AB123456B")]
     [TestCase("AB123456C")]
     [TestCase("AB123456D")]
-    [TestCase("ab 12 34 56 c")]
-    [TestCase("ab-12.34/56c")]
-    [TestCase("ab\t12\r\n3456c")]
     public void Given_Nino_When_Valid_Should_ReturnNull(string? nino)
     {
         // Act
@@ -79,9 +81,8 @@ public class NinoAttributeTests
         result.Should().BeNull(nino);
     }
 
-    [TestCase("ab 12 34 56 c")]
-    [TestCase("ab-12.34/56c")]
-    [TestCase("ab\t12\r\n3456c")]
+    [TestCase("ab123456c")]
+    [TestCase("AB123456C")]
     public void Given_Valid_Nino_Should_Not_Change_Submitted_Model(string input)
     {
         var parent = new ParentGuardian
@@ -101,10 +102,8 @@ public class NinoAttributeTests
         parent.NationalInsuranceNumber.Should().Be(input);
     }
 
-    [TestCase("ab 12 34 56 c")]
-    [TestCase("ab-12.34/56c")]
-    [TestCase("ab\t12\r\n3456c")]
-    [TestCase("A B 1 2 3 4 5 6 C")]
+    [TestCase("ab123456c")]
+    [TestCase("AB123456C")]
     public void Given_Valid_Nino_Model_Attributes_Should_Accept_Without_Mutation(
     string input)
     {
