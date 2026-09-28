@@ -35,4 +35,9 @@ public class BaseController : Controller
         ViewBag.Claims = _Claims;
         await base.OnActionExecutionAsync(context, next);
     }
+
+    public int GetLocalAuthorityId()
+    {
+        return int.Parse(_Claims.Organisation.EstablishmentNumber);
+    }
 }

@@ -16,4 +16,6 @@ public static class ValidationMessages
     public const string EligibilityCodeIncorrectLength = "Eligibility code must be 11 digits long";
 
     public const string CarerAlreadyExists = "There is already a carer with this National Insurance Number";
+    
+    public const string PartnerAlreadyExists = "There is already a partner with this National Insurance Number";
 }
