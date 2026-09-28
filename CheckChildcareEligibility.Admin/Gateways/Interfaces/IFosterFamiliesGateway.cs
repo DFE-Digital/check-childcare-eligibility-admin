@@ -6,7 +6,7 @@ namespace CheckChildcareEligibility.Admin.Gateways.Interfaces;
 public interface IFosterFamiliesGateway
 {
     //FosterFamilies
-    Task<FosterFamiliesSearchResponse> GetFosterFamiliesSearchRecords(int pageNumber, int pageSize);
+    Task<FosterFamiliesSearchResponse> GetFosterFamiliesSearchRecords(int pageNumber, int pageSize, string ninoFilter = "");
     Task<FosterFamilyCreatedResponse> CreateFosterFamily(FosterFamilyRequest request);
     Task<FosterFamilyCodePreviewResponse> PreviewFosterFamilyCode(FosterFamilyRequest request, int localAuthorityId);
     Task<FosterFamilyResponse> GetFosterFamily(Guid fosterCarerId, int localAuthorityId, bool includeChildren = false);

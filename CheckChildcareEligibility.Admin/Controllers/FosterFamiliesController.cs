@@ -62,11 +62,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
         }
 
         [HttpGet("Search")]
-        public async Task<IActionResult> Search_Records_FF(int pageNumber = 1)
+        public async Task<IActionResult> Search_Records_FF(int pageNumber = 1, string ninoFilter = "")
         {
-            var fosterFamiliesSearchRequest = new FosterFamiliesSearchRequest(pageNumber, 10);
+            var fosterFamiliesSearchRequest = new FosterFamiliesSearchRequest(pageNumber, 10, ninoFilter);
             var response = await _searchFosterFamiliesRecordsUseCase.Execute(fosterFamiliesSearchRequest);
-
             SearchFosterFamiliesRecordsViewModel vm = new()
             {
                 PageNumber = response.PageNumber,
@@ -103,9 +102,21 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpPost("EnterCarer")]
         public async Task<IActionResult> Enter_Carer_Details_FF(FosterCarerDetailsViewModel request)
         {
-            var validationResult = _validateFosterCarerDetailsUseCase.Execute(request, ModelState);
+            var validationResult = await _validateFosterCarerDetailsUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
+                // If validation failure was caused by a duplicate carer conflict, return conflict view
+                if (validationResult.ConflictingFosterCarerId != Guid.Empty)
+                {
+                    var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
+                    var conflictViewModel = new FosterCarerConflictViewModel()
+                    {
+                        CarerDetails = request,
+                        ConflictingFamily = await _getFosterFamilyUseCase.Execute(validationResult.ConflictingFosterCarerId, laID, false)
+                    };
+                    return View("Resolve_Carer_Conflict_FF", conflictViewModel);
+                }
+
                 return View(request);
             }
 
@@ -157,7 +168,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpPost("UpdateCarer")]
         public async Task<IActionResult> Update_Carer_Details_FF(FosterCarerDetailsViewModel request)
         {
-            var validationResult = _validateFosterCarerDetailsUseCase.Execute(request, ModelState);
+            var validationResult = await _validateFosterCarerDetailsUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
                 return View("Enter_Carer_Details_FF", request);

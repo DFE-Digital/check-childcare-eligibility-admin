@@ -1,12 +1,8 @@
-﻿using Azure.Core;
-using CheckChildcareEligibility.Admin.Boundary.Requests;
+﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
-using CheckChildcareEligibility.Admin.Models;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System.Drawing.Printing;
 
 namespace CheckChildcareEligibility.Admin.Gateways;
 
@@ -30,13 +26,12 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         _httpClient = httpClient;
     }
 
-    public async Task<FosterFamiliesSearchResponse> GetFosterFamiliesSearchRecords(int pageNumber, int pageSize)
+    public async Task<FosterFamiliesSearchResponse> GetFosterFamiliesSearchRecords(int pageNumber, int pageSize, string ninoFilter = "")
     {
         var url = FosterFamiliesUrlsDict[FosterFamiliesUrls.FosterFamilySearch];
-
         try
         {
-            var response = await ApiDataGetAsynch($"{url}?pageNumber={pageNumber}&pageSize={pageSize}", new FosterFamiliesSearchResponse());
+            var response = await ApiDataGetAsynch($"{url}?pageNumber={pageNumber}&pageSize={pageSize}&ninoFilter={ninoFilter}", new FosterFamiliesSearchResponse());
             return response;
         }
         catch (Exception ex)
