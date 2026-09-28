@@ -55,12 +55,6 @@ function initCookieConsent() {
     }
 }
 
-//document.getElementById('accept-cookies').onclick = function () {
-//    cookie.create("cookie", "true", 365);
-//    document.getElementById('cookie-banner').style.display = 'none';
-//    initializeClarity();
-//};
-
 document.getElementById('accept-cookies').onclick = function () {
     cookie.create("cookie", "true", 365);
     document.getElementById('cookie-banner').style.display = 'none';

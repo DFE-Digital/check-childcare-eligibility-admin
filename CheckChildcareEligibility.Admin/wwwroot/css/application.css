@@ -83,6 +83,10 @@ p + .govuk-heading-s,
     }
 }
 
+div.cookie-hidden {
+    display: none
+}
+
 /* stylelint-disable color-no-hex */
 /* stylelint-enable color-no-hex */
 /* stylelint-disable string-quotes, order/properties-alphabetical-order */
