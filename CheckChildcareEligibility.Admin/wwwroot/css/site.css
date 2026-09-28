@@ -197,20 +197,6 @@
 /*END - Accessible dashboard card links */
 
 
-/* BEGIN MENU ITEM */
-.moj-button-menu__item {
-    display: inline-block;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    width: auto;
-}
-
-    .moj-button-menu__item:last-child {
-        margin-right: 0;
-    }
-/* END MENU ITEM */
-
-
 /*BEGIN - Child Details form title width extention override */
 @media (min-width: 40.0625em) {
     .govuk-summary-list__key {
