@@ -38,7 +38,6 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
             RuleFor(x => x.SubmissionDate)
                 .Must(DataValidation.BeWithin31Days)
                 .WithMessage(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, DateTime.Today.AddDays(-31)));
-
         }
     }
 
@@ -47,18 +46,16 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
         public FosterCarerRequestValidator()
         {
             RuleFor(x => x.CarerFirstName)
+                .Cascade(CascadeMode.Stop)
                 .NotEmpty()
-                .WithMessage(FosterFamilyValidationMessages.CarerFirstNameEmpty);
-
-            RuleFor(x => x.CarerFirstName)
+                .WithMessage(FosterFamilyValidationMessages.CarerFirstNameEmpty)
                 .Must(DataValidation.BeAValidName)
                 .WithMessage(FosterFamilyValidationMessages.CarerFirstNameInvalid);
 
             RuleFor(x => x.CarerLastName)
+                .Cascade(CascadeMode.Stop)
                 .NotEmpty()
-                .WithMessage(FosterFamilyValidationMessages.CarerLastNameEmpty);
-
-            RuleFor(x => x.CarerLastName)
+                .WithMessage(FosterFamilyValidationMessages.CarerLastNameEmpty)
                 .Must(DataValidation.BeAValidName)
                 .WithMessage(FosterFamilyValidationMessages.CarerLastNameInvalid);
 
@@ -77,18 +74,16 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
         public FosterPartnerRequestValidator()
         {
             RuleFor(x => x.PartnerFirstName)
+                .Cascade(CascadeMode.Stop)
                 .NotEmpty()
-                .WithMessage(FosterFamilyValidationMessages.PartnerFirstNameEmpty);
-
-            RuleFor(x => x.PartnerFirstName)
+                .WithMessage(FosterFamilyValidationMessages.PartnerFirstNameEmpty)
                 .Must(DataValidation.BeAValidName)
                 .WithMessage(FosterFamilyValidationMessages.PartnerFirstNameInvalid);
 
             RuleFor(x => x.PartnerLastName)
+                .Cascade(CascadeMode.Stop)
                 .NotEmpty()
-                .WithMessage(FosterFamilyValidationMessages.PartnerLastNameEmpty);
-
-            RuleFor(x => x.PartnerLastName)
+                .WithMessage(FosterFamilyValidationMessages.PartnerLastNameEmpty)
                 .Must(DataValidation.BeAValidName)
                 .WithMessage(FosterFamilyValidationMessages.PartnerLastNameInvalid);
 
@@ -107,18 +102,16 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
         public FosterChildRequestValidator()
         {
             RuleFor(x => x.ChildFirstName)
+                .Cascade(CascadeMode.Stop)
                 .NotEmpty()
-                .WithMessage(FosterFamilyValidationMessages.ChildFirstNameEmpty);
-
-            RuleFor(x => x.ChildFirstName)
+                .WithMessage(FosterFamilyValidationMessages.ChildFirstNameEmpty)
                 .Must(DataValidation.BeAValidName)
                 .WithMessage(FosterFamilyValidationMessages.ChildFirstNameInvalid);
 
             RuleFor(x => x.ChildLastName)
+                .Cascade(CascadeMode.Stop)
                 .NotEmpty()
-                .WithMessage(FosterFamilyValidationMessages.ChildLastNameEmpty);
-
-            RuleFor(x => x.ChildLastName)
+                .WithMessage(FosterFamilyValidationMessages.ChildLastNameEmpty)
                 .Must(DataValidation.BeAValidName)
                 .WithMessage(FosterFamilyValidationMessages.ChildLastNameInvalid);
 
