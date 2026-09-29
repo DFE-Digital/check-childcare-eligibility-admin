@@ -107,80 +107,84 @@
                         </h2>
                         <ul class="govuk-summary-card__actions">
                             <li class="govuk-summary-card__action">
-                                <a class="govuk-link" href="@Url.Action("Update_Partner_Details_FF", "FosterFamilies", new { FosterCarerId = Model.Response.FosterCarerId })">Change
-                                    <span class="govuk-visually-hidden">Partner details</span></a>
-                                </li>
-                                <li class="govuk-summary-card__action">
-                                    <a class="govuk-link" href="@Url.Action("Remove_Partner_Details_FF", "FosterFamilies", new { FosterCarerId = Model.Response.FosterCarerId })">Remove
-                                        <span class="govuk-visually-hidden">Partner details</span></a>
-                                    </li>
-                                </ul>
+                                <a class="govuk-link"
+                                   href="@Url.Action("Update_Partner_Details_FF", "FosterFamilies", new { FosterCarerId = Model.Response.FosterCarerId })">Change
+                                    <span class="govuk-visually-hidden">Partner details</span>
+                                </a>
+                            </li>
+                            <li class="govuk-summary-card__action">
+                                <a class="govuk-link"
+                                   href="@Url.Action("Remove_Partner_Details_FF", "FosterFamilies", new { FosterCarerId = Model.Response.FosterCarerId })">Remove
+                                    <span class="govuk-visually-hidden">Partner details</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="govuk-summary-card__content">
+                        <dl class="govuk-summary-list">
+
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    Full name
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                    @Model.Response.PartnerFirstName @Model.Response.PartnerLastName
+                                </dd>
                             </div>
-                            <div class="govuk-summary-card__content">
-                                <dl class="govuk-summary-list">
 
-                                    <div class="govuk-summary-list__row">
-                                        <dt class="govuk-summary-list__key">
-                                            Full name
-                                        </dt>
-                                        <dd class="govuk-summary-list__value">
-                                            @Model.Response.PartnerFirstName @Model.Response.PartnerLastName
-                                        </dd>
-                                    </div>
-
-                                    <div class="govuk-summary-list__row">
-                                        <dt class="govuk-summary-list__key">
-                                            Date of birth
-                                        </dt>
-                                        <dd class="govuk-summary-list__value">
-                                            @Model.Response.PartnerDateOfBirth?.ToString("d MMMM yyyy")
-                                        </dd>
-                                    </div>
-
-                                    <div class="govuk-summary-list__row">
-                                        <dt class="govuk-summary-list__key">
-                                            National Insurance number
-                                        </dt>
-                                        <dd class="govuk-summary-list__value">
-                                            @Model.Response.PartnerNationalInsuranceNumber
-                                        </dd>
-                                    </div>
-                                </dl>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    Date of birth
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                    @Model.Response.PartnerDateOfBirth?.ToString("d MMMM yyyy")
+                                </dd>
                             </div>
-                        </div>
-                    }
 
-                    <div class="govuk-summary-card">
-                        <div class="govuk-summary-card__title-wrapper">
-                            <h2 class="govuk-summary-card__title">
-                                Children
-                            </h2>
-                        </div>
-                        <div class="govuk-summary-card__content">
-                            <dl class="govuk-summary-list">
-                                @{
-                                    var index = 1;
-                                }
-                                @foreach (var child in Model.Response.FosterChildren)
-                                {
-                                    <div class="govuk-summary-list__row">
-                                        <dt class="govuk-summary-list__key">
-                                            Child @index
-                                        </dt>
-                                        <dd class="govuk-summary-list__value">
-                                            @child.FirstName @child.LastName
-                                        </dd>
-                                        <dd class="govuk-summary-list__actions">
-                                            <a class="govuk-link"
-                                               href="@Url.ActionLink("Code_Record_FF", "FosterFamilies", new { child.FosterChildId })">View<span
-                                                class="govuk-visually-hidden">child details</span></a>
-                                            </dd>
-                                        </div>
-                                        index++;
-                                    }
-                                </dl>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    National Insurance number
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                    @Model.Response.PartnerNationalInsuranceNumber
+                                </dd>
                             </div>
-                        </div>
+                        </dl>
+                    </div>
+                </div>
+            }
+
+            <div class="govuk-summary-card">
+                <div class="govuk-summary-card__title-wrapper">
+                    <h2 class="govuk-summary-card__title">
+                        Children
+                    </h2>
+                </div>
+                <div class="govuk-summary-card__content">
+                    <dl class="govuk-summary-list">
+                        @{
+                            var index = 1;
+                        }
+                        @foreach (var child in Model.Response.FosterChildren)
+                        {
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    Child @index
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                    @child.FirstName @child.LastName
+                                </dd>
+                                <dd class="govuk-summary-list__actions">
+                                    <a class="govuk-link"
+                                       href="@Url.ActionLink("Code_Record_FF", "FosterFamilies", new { child.FosterChildId })">View<span
+                                        class="govuk-visually-hidden">child details</span></a>
+                                    </dd>
+                                </div>
+                                index++;
+                            }
+                        </dl>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
