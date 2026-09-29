@@ -6,10 +6,13 @@
 
         public int PageSize { get; set; } = 10;
 
-        public FosterFamiliesSearchRequest(int pageNumber, int pageSize)
+        public string NINOFilter { get; set; } = string.Empty;
+
+        public FosterFamiliesSearchRequest(int pageNumber, int pageSize, string ninoFilter = "")
         {
             PageNumber = pageNumber;
             PageSize = pageSize;
+            NINOFilter = ninoFilter;
         }
     }
 }

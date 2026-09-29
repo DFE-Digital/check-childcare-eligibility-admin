@@ -1,0 +1,38 @@
+﻿@using CheckChildcareEligibility.Admin.ViewModels
+@model FosterCarerConflictViewModel
+@{
+    ViewData["Title"] = "There is already a foster family with this carer National Insurance (NI) number";
+}
+
+<div class="govuk-grid-column-two-thirds">
+    <a class="govuk-back-link backLinkJS"
+       href="@Url.Action(action: "Enter_Carer_Details_FF", "FosterFamilies", new { Model.CarerDetails.ContextId })">Back</a>
+
+    <div class="govuk-panel govuk-panel--interruption">
+        <h1 class="govuk-panel__title govuk-panel__title--interruption">
+            @ViewData["Title"]
+        </h1>
+        <div class="govuk-panel__body">
+            <p class="govuk-body govuk-panel__body--interruption">You entered
+                <strong>@Model.CarerDetails.CarerNationalInsuranceNumber</strong>.
+            </p>
+            <p class="govuk-body govuk-panel__body--interruption">If this is correct, you can add another child
+                to the foster family of @Model.ConflictingFamily.CarerFirstName
+                @Model.ConflictingFamily.CarerLastName.
+            </p>
+        </div>
+        <div class="govuk-panel__actions">
+            <div class="govuk-button-group">
+                <a href="@Url.ActionLink("Family_Record_FF", "FosterFamilies", new { Model.ConflictingFamily.FosterCarerId })"
+                   role="button" draggable="false" class="govuk-button govuk-button--inverse"
+                   data-module="govuk-button" data-govuk-button-init="">
+                    Add child to family
+                </a>
+                <a class="govuk-link govuk-link--inverse backLinkJS"
+                   href="@Url.Action("Enter_Carer_Details_FF", "FosterFamilies", new { Model.CarerDetails.ContextId })">
+                    Enter a different NI number
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

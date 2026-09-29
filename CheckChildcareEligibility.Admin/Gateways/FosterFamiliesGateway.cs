@@ -25,13 +25,12 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         _httpClient = httpClient;
     }
 
-    public async Task<FosterFamiliesSearchResponse> GetFosterFamiliesSearchRecords(int pageNumber, int pageSize)
+    public async Task<FosterFamiliesSearchResponse> GetFosterFamiliesSearchRecords(int pageNumber, int pageSize, string ninoFilter = "")
     {
         var url = FosterFamiliesUrlsDict[FosterFamiliesUrls.FosterFamilySearch];
-
         try
         {
-            var response = await ApiDataGetAsynch($"{url}?pageNumber={pageNumber}&pageSize={pageSize}", new FosterFamiliesSearchResponse());
+            var response = await ApiDataGetAsynch($"{url}?pageNumber={pageNumber}&pageSize={pageSize}&ninoFilter={ninoFilter}", new FosterFamiliesSearchResponse());
             return response;
         }
         catch (Exception ex)

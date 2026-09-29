@@ -10,7 +10,7 @@
 
     bool isUpdate = Model != null && string.IsNullOrEmpty(Model.ContextId);
     var actionName = isUpdate ? "UpdatePartner" : "EnterPartner";
-    ViewData["Title"] = isUpdate && !string.IsNullOrEmpty(Model.PartnerFirstName) ? 
+    ViewData["Title"] = isUpdate && !string.IsNullOrEmpty(Model.PartnerFirstName) ?
         "Edit the partner details" : "Enter the partner details";
 }
 
