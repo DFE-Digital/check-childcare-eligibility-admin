@@ -10,7 +10,7 @@
 
     bool isUpdate = Model != null && string.IsNullOrEmpty(Model.ContextId);
     var actionName = isUpdate ? "UpdatePartner" : "EnterPartner";
-    ViewData["Title"] = isUpdate && !string.IsNullOrEmpty(Model.PartnerFirstName) ? 
+    ViewData["Title"] = isUpdate && !string.IsNullOrEmpty(Model.PartnerFirstName) ?
         "Edit the partner details" : "Enter the partner details";
 }
 
@@ -18,7 +18,7 @@
     @if (isUpdate)
     {
         <a class="govuk-back-link backLinkJS"
-           href="@Url.ActionLink("Family_Record_FF", "FosterFamilies", new { CarerId = Model.FosterCarerId.ToString() })">Back</a>
+           href="@Url.ActionLink("Family_Record_FF", "FosterFamilies", new { Model.FosterCarerId })">Back</a>
     }
     else
     {

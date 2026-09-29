@@ -1,8 +1,9 @@
-﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
+using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Usecases;
 using FluentAssertions;
+using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -11,15 +12,84 @@ namespace CheckChildcareEligibility.Admin.Tests.UseCases;
 [TestFixture]
 public class CreateFosterFamilyUseCaseTests
 {
+    private Mock<ILogger<CreateFosterFamilyUseCase>> _loggerMock = null!;
+    private Mock<IFosterFamiliesGateway> _gatewayMock = null!;
+    private CreateFosterFamilyUseCase _sut = null!;
+
+    [SetUp]
+    public void SetUp()
+    {
+        _loggerMock = new Mock<ILogger<CreateFosterFamilyUseCase>>();
+        _gatewayMock = new Mock<IFosterFamiliesGateway>();
+        _sut = new CreateFosterFamilyUseCase(
+            _loggerMock.Object,
+            _gatewayMock.Object);
+    }
+
+    [Test]
+    public async Task Execute_WhenRequestIsNull_ThrowsArgumentNullException()
+    {
+        await FluentActions.Invoking(async () => await _sut.Execute(null!, 123))
+            .Should()
+            .ThrowAsync<ArgumentNullException>();
+    }
+
+    [Test]
+    public async Task Execute_WhenRequestIsInvalid_ThrowsValidationException()
+    {
+        var request = new FosterFamilyRequest
+        {
+            FosterCarer = new FosterCarerRequest
+            {
+                CarerFirstName = "",
+                CarerLastName = "Doe",
+                CarerDateOfBirth = DateTime.Today.AddYears(-30),
+                CarerNationalInsuranceNumber = "AA123456A"
+            },
+            FosterChild = new FosterChildRequest
+            {
+                ChildFirstName = "Child",
+                ChildLastName = "Doe",
+                ChildDateOfBirth = DateTime.Today.AddYears(-4),
+                ChildPostCode = "SW1A 1AA"
+            },
+            SubmissionDate = DateTime.Today.AddDays(-1)
+        };
+
+        await FluentActions.Invoking(async () => await _sut.Execute(request, 123))
+            .Should()
+            .ThrowAsync<ValidationException>();
+    }
+
+    [Test]
+    public async Task Execute_WhenRequestIsValid_SetsLocalAuthorityAndReturnsCreatedResponse()
+    {
+        var request = BuildValidFosterFamilyRequest();
+        var expected = new FosterFamilyCreatedResponse
+        {
+            FosterCarerId = Guid.NewGuid(),
+            FosterChildId = Guid.NewGuid()
+        };
+
+        _gatewayMock
+            .Setup(x => x.CreateFosterFamily(request))
+            .ReturnsAsync(expected);
+
+        var result = await _sut.Execute(request, 456);
+
+        result.Should().BeEquivalentTo(expected);
+        request.FosterCarer.LocalAuthorityID.Should().Be(456);
+
+        _gatewayMock.Verify(
+            x => x.CreateFosterFamily(request),
+            Times.Once);
+    }
+
     [TestCase(false)]
     [TestCase(true)]
     public async Task Execute_Should_Reject_Invalid_Nino_Without_Calling_Gateway(
         bool invalidPartner)
     {
-        var gateway = new Mock<IFosterFamiliesGateway>(MockBehavior.Strict);
-        var logger = new Mock<ILogger<CreateFosterFamilyUseCase>>();
-        var sut = new CreateFosterFamilyUseCase(logger.Object, gateway.Object);
-
         var request = new FosterFamilyRequest
         {
             SubmissionDate = DateTime.Today,
@@ -49,10 +119,10 @@ public class CreateFosterFamilyUseCaseTests
             }
         };
 
-        Func<Task> act = () => sut.Execute(request, 201);
+        Func<Task> act = () => _sut.Execute(request, 201);
 
         var thrown = await act.Should()
-            .ThrowAsync<FluentValidation.ValidationException>();
+            .ThrowAsync<ValidationException>();
 
         var expectedProperty = invalidPartner
             ? "Partner.PartnerNationalInsuranceNumber"
@@ -62,20 +132,16 @@ public class CreateFosterFamilyUseCaseTests
         thrown.Which.Errors.Should().OnlyContain(
             error => error.PropertyName == expectedProperty);
 
-        gateway.Verify(
+        _gatewayMock.Verify(
             g => g.CreateFosterFamily(It.IsAny<FosterFamilyRequest>()),
             Times.Never);
     }
 
     [TestCase("ab123456c", "ce123456a")]
     public async Task Execute_Should_Forward_Canonical_Carer_And_Partner_Ninos(
-    string carerNino,
-    string partnerNino)
+        string carerNino,
+        string partnerNino)
     {
-        var gateway = new Mock<IFosterFamiliesGateway>(MockBehavior.Strict);
-        var logger = new Mock<ILogger<CreateFosterFamilyUseCase>>();
-        var sut = new CreateFosterFamilyUseCase(logger.Object, gateway.Object);
-
         var request = new FosterFamilyRequest
         {
             SubmissionDate = DateTime.Today,
@@ -103,13 +169,12 @@ public class CreateFosterFamilyUseCaseTests
             }
         };
 
-        // Request properties preserve input until the use case processes it.
         request.FosterCarer.CarerNationalInsuranceNumber.Should().Be(carerNino);
         request.Partner.PartnerNationalInsuranceNumber.Should().Be(partnerNino);
 
         var expectedResponse = new FosterFamilyCreatedResponse();
 
-        gateway
+        _gatewayMock
             .Setup(g => g.CreateFosterFamily(
                 It.Is<FosterFamilyRequest>(r =>
                     r.FosterCarer.CarerNationalInsuranceNumber == "AB123456C" &&
@@ -118,13 +183,37 @@ public class CreateFosterFamilyUseCaseTests
                     r.Partner.PartnerNationalInsuranceNumber == "CE123456A")))
             .ReturnsAsync(expectedResponse);
 
-        var result = await sut.Execute(request, 201);
+        var result = await _sut.Execute(request, 201);
 
         result.Should().BeSameAs(expectedResponse);
 
-        gateway.Verify(
+        _gatewayMock.Verify(
             g => g.CreateFosterFamily(It.IsAny<FosterFamilyRequest>()),
             Times.Once);
-        gateway.VerifyAll();
+
+        _gatewayMock.VerifyAll();
+    }
+
+    public static FosterFamilyRequest BuildValidFosterFamilyRequest()
+    {
+        return new FosterFamilyRequest
+        {
+            FosterCarer = new FosterCarerRequest
+            {
+                CarerFirstName = "Jane",
+                CarerLastName = "Doe",
+                CarerDateOfBirth = DateTime.Today.AddYears(-30),
+                CarerNationalInsuranceNumber = "AA123456A"
+            },
+            FosterChild = new FosterChildRequest
+            {
+                ChildFirstName = "Child",
+                ChildLastName = "Doe",
+                ChildDateOfBirth = DateTime.Today.AddYears(-4),
+                ChildPostCode = "SW1A 1AA"
+            },
+            SubmissionDate = DateTime.Today.AddDays(-1),
+            HasPartner = false
+        };
     }
 }

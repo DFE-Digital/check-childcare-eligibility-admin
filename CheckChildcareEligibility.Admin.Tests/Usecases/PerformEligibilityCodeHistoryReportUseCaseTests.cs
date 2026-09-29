@@ -2,9 +2,9 @@
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.UseCases;
 using FluentAssertions;
-
 using Microsoft.Extensions.Logging;
 using Moq;
+
 namespace CheckChildcareEligibility.Admin.Tests.Usecases
 {
     [TestFixture]

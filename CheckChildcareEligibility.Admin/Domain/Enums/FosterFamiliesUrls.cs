@@ -3,8 +3,7 @@
     public enum FosterFamiliesUrls
     {
         FosterFamilySearch,
-        GetFosterFamily,
-        GetFosterChild,
-        UpdateFosterCarer,
+        FosterFamily,
+        FosterChild
     }
 }

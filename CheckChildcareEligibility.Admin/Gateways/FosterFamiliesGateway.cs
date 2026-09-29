@@ -1,12 +1,8 @@
-﻿using Azure.Core;
-using CheckChildcareEligibility.Admin.Boundary.Requests;
+﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
-using CheckChildcareEligibility.Admin.Models;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System.Drawing.Printing;
 
 namespace CheckChildcareEligibility.Admin.Gateways;
 
@@ -18,9 +14,8 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
     private static readonly Dictionary<FosterFamiliesUrls, string> FosterFamiliesUrlsDict = new()
     {
         [FosterFamiliesUrls.FosterFamilySearch] = "foster-family/search",
-        [FosterFamiliesUrls.GetFosterFamily] = "/foster-family/{fosterCarerId}",
-        [FosterFamiliesUrls.GetFosterChild] = "/foster-family/child/{fosterChildId}",
-        [FosterFamiliesUrls.UpdateFosterCarer] = "/foster-family/{fosterCarerId}"
+        [FosterFamiliesUrls.FosterFamily] = "/foster-family/{fosterCarerId}",
+        [FosterFamiliesUrls.FosterChild] = "/foster-family/child/{fosterChildId}",
     };
 
     public FosterFamiliesGateway(ILoggerFactory logger, HttpClient httpClient, IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : base("EcsService",
@@ -30,13 +25,12 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         _httpClient = httpClient;
     }
 
-    public async Task<FosterFamiliesSearchResponse> GetFosterFamiliesSearchRecords(int pageNumber, int pageSize)
+    public async Task<FosterFamiliesSearchResponse> GetFosterFamiliesSearchRecords(int pageNumber, int pageSize, string ninoFilter = "")
     {
         var url = FosterFamiliesUrlsDict[FosterFamiliesUrls.FosterFamilySearch];
-
         try
         {
-            var response = await ApiDataGetAsynch($"{url}?pageNumber={pageNumber}&pageSize={pageSize}", new FosterFamiliesSearchResponse());
+            var response = await ApiDataGetAsynch($"{url}?pageNumber={pageNumber}&pageSize={pageSize}&ninoFilter={ninoFilter}", new FosterFamiliesSearchResponse());
             return response;
         }
         catch (Exception ex)
@@ -82,7 +76,7 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
     {
         try
         {
-            var url = FosterFamiliesUrlsDict[FosterFamiliesUrls.GetFosterFamily].Replace("{fosterCarerId}", fosterCarerId.ToString());
+            var url = FosterFamiliesUrlsDict[FosterFamiliesUrls.FosterFamily].Replace("{fosterCarerId}", fosterCarerId.ToString());
             var response = await ApiDataGetAsynch($"{url}?includeChildren={includeChildren}", new FosterFamilyResponse());
 
             return response;
@@ -90,7 +84,7 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         catch (Exception ex)
         {
             _logger.LogError(ex,
-                $"Get GetFosterFamily failed. uri:-{_httpClient.BaseAddress}{FosterFamiliesUrlsDict[FosterFamiliesUrls.GetFosterFamily]}");
+                $"Get GetFosterFamily failed. uri:-{_httpClient.BaseAddress}{FosterFamiliesUrlsDict[FosterFamiliesUrls.FosterFamily]}");
         }
 
         return null;
@@ -100,7 +94,7 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
     {
         try
         {
-            var url = FosterFamiliesUrlsDict[FosterFamiliesUrls.GetFosterChild].Replace("{fosterChildId}", fosterChildId.ToString());
+            var url = FosterFamiliesUrlsDict[FosterFamiliesUrls.FosterChild].Replace("{fosterChildId}", fosterChildId.ToString());
             var response = await ApiDataGetAsynch($"{url}?includeFosterCarer={includeFosterCarer}", new FosterChildResponse());
 
             return response;
@@ -108,7 +102,7 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         catch (Exception ex)
         {
             _logger.LogError(ex,
-                $"Get GetFosterChild failed. uri:-{_httpClient.BaseAddress}{FosterFamiliesUrlsDict[FosterFamiliesUrls.GetFosterChild]}");
+                $"Get GetFosterChild failed. uri:-{_httpClient.BaseAddress}{FosterFamiliesUrlsDict[FosterFamiliesUrls.FosterChild]}");
         }
 
         return null;
@@ -116,8 +110,7 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
 
     public async Task UpdateFosterCarer(Guid fosterCarerId, int localAuthorityId, UpdateFosterCarerRequest request)
     {
-        var url = FosterFamiliesUrlsDict[FosterFamiliesUrls.UpdateFosterCarer].Replace("{fosterCarerId}", fosterCarerId.ToString());
-
+        var url = FosterFamiliesUrlsDict[FosterFamiliesUrls.FosterFamily].Replace("{fosterCarerId}", fosterCarerId.ToString());
         try
         {
             _ = await ApiDataPatchAsynch(url, request, new object());
@@ -126,6 +119,21 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         {
             _logger.LogError(ex, $"Patch UpdateFosterCarer failed. uri:-{_httpClient.BaseAddress}{url}");
             _logger.LogTrace(ex, $"Patch UpdateFosterCarer failed. uri:-{_httpClient.BaseAddress}{url} content:-{JsonConvert.SerializeObject(request)}");
+            throw;
+        }
+    }
+
+    public async Task UpdateFosterChild(Guid fosterChildId, int localAuthorityId, UpdateFosterChildRequest request)
+    {
+        var url = FosterFamiliesUrlsDict[FosterFamiliesUrls.FosterChild].Replace("{fosterChildId}", fosterChildId.ToString());
+        try
+        {
+            _ = await ApiDataPatchAsynch(url, request, new object());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Patch UpdateFosterChild failed. uri:-{_httpClient.BaseAddress}{url}");
+            _logger.LogTrace(ex, $"Patch UpdateFosterChild failed. uri:-{_httpClient.BaseAddress}{url} content:-{JsonConvert.SerializeObject(request)}");
             throw;
         }
     }
