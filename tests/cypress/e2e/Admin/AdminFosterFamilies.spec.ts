@@ -19,7 +19,7 @@ describe('Foster Families search records and add Family', () => {
         dobMonth: '5',
         dobYear: '1996',
         displayedDob: '4 May 1996',
-        nin: 'NN123456C'
+        nin: testNino.random()
     };
     const child = {
         firstName: 'Childing',

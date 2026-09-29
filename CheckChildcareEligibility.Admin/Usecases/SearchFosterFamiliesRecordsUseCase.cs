@@ -24,7 +24,11 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
         public async Task<FosterFamiliesSearchResponse> Execute(FosterFamiliesSearchRequest request)
         {
-            var response = await _fosterFamiliesGateway.GetFosterFamiliesSearchRecords(request.PageNumber, request.PageSize);
+            var response = await _fosterFamiliesGateway.GetFosterFamiliesSearchRecords(
+                request.PageNumber,
+                request.PageSize,
+                request.NINOFilter);
+
             if (response == null)
             {
                 throw new ApplicationException($"Failed to load foster families search results");

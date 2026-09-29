@@ -62,11 +62,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
         }
 
         [HttpGet("Search")]
-        public async Task<IActionResult> Search_Records_FF(int pageNumber = 1)
+        public async Task<IActionResult> Search_Records_FF(int pageNumber = 1, string ninoFilter = "")
         {
-            var fosterFamiliesSearchRequest = new FosterFamiliesSearchRequest(pageNumber, 10);
+            var fosterFamiliesSearchRequest = new FosterFamiliesSearchRequest(pageNumber, 10, ninoFilter);
             var response = await _searchFosterFamiliesRecordsUseCase.Execute(fosterFamiliesSearchRequest);
-
             SearchFosterFamiliesRecordsViewModel vm = new()
             {
                 PageNumber = response.PageNumber,
@@ -103,9 +102,20 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpPost("EnterCarer")]
         public async Task<IActionResult> Enter_Carer_Details_FF(FosterCarerDetailsViewModel request)
         {
-            var validationResult = _validateFosterCarerDetailsUseCase.Execute(request, ModelState);
+            var validationResult = await _validateFosterCarerDetailsUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
+                // If validation failure was caused by a duplicate carer conflict, return conflict view
+                if (validationResult.ConflictingFosterCarerId != Guid.Empty)
+                {
+                    var conflictViewModel = new FosterCarerConflictViewModel()
+                    {
+                        CarerDetails = request,
+                        ConflictingFamily = await _getFosterFamilyUseCase.Execute(validationResult.ConflictingFosterCarerId, GetLocalAuthorityId(), false)
+                    };
+                    return View("Resolve_Carer_Conflict_FF", conflictViewModel);
+                }
+
                 return View(request);
             }
 
@@ -148,8 +158,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpGet("UpdateCarer/{FosterCarerId}")]
         public async Task<IActionResult> Update_Carer_Details_FF(Guid FosterCarerId)
         {
-            var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
-            var request = await _getFosterFamilyUseCase.Execute(FosterCarerId, laID);
+            var request = await _getFosterFamilyUseCase.Execute(FosterCarerId, GetLocalAuthorityId());
             var fosterCarerViewModel = await _loadFosterCarerDetailsUseCase.Execute(request);
             return View("Enter_Carer_Details_FF", fosterCarerViewModel);
         }
@@ -157,7 +166,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpPost("UpdateCarer")]
         public async Task<IActionResult> Update_Carer_Details_FF(FosterCarerDetailsViewModel request)
         {
-            var validationResult = _validateFosterCarerDetailsUseCase.Execute(request, ModelState);
+            var validationResult = await _validateFosterCarerDetailsUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
                 return View("Enter_Carer_Details_FF", request);
@@ -168,9 +177,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 int.Parse(request.Month),
                 int.Parse(request.Day));
 
-            var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
-
-            var existingCarer = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, laID, true);
+            var existingCarer = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, GetLocalAuthorityId(), true);
             if (existingCarer == null) { return RedirectToAction("Search_Records_FF"); }
 
             UpdateFosterCarerRequest updateRequest = new()
@@ -195,7 +202,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 };
             }
 
-            await _updateFosterCarerUseCase.Execute(request.FosterCarerId, laID, updateRequest);
+            await _updateFosterCarerUseCase.Execute(request.FosterCarerId, GetLocalAuthorityId(), updateRequest);
             return RedirectToAction("Family_Record_FF", new { request.FosterCarerId, Confirmation = "Changes to carer saved" });
         }
 
@@ -218,9 +225,19 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpPost("EnterPartner")]
         public async Task<IActionResult> Enter_Partner_Details_FF(FosterPartnerDetailsViewModel request)
         {
-            var validationResult = _validateFosterPartnerDetailsUseCase.Execute(request, ModelState);
+            var validationResult = await _validateFosterPartnerDetailsUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
+                if (validationResult?.ConflictingFosterCarerId != Guid.Empty)
+                {
+                    var conflictViewModel = new FosterPartnerConflictViewModel()
+                    {
+                        PartnerDetails = request,
+                        ConflictingFamily = await _getFosterFamilyUseCase.Execute(validationResult.ConflictingFosterCarerId, GetLocalAuthorityId(), false)
+                    };
+                    return View("Resolve_Partner_Conflict_FF", conflictViewModel);
+                }
+
                 return View(request);
             }
 
@@ -244,8 +261,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpGet("UpdatePartner/{FosterCarerId}")]
         public async Task<IActionResult> Update_Partner_Details_FF(Guid FosterCarerId)
         {
-            var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
-            var request = await _getFosterFamilyUseCase.Execute(FosterCarerId, laID);
+            var request = await _getFosterFamilyUseCase.Execute(FosterCarerId, GetLocalAuthorityId());
             var viewModel = await _loadFosterPartnerDetailsUseCase.Execute(request);
             return View("Enter_Partner_Details_FF", viewModel);
         }
@@ -253,9 +269,19 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpPost("UpdatePartner")]
         public async Task<IActionResult> Update_Partner_Details_FF(FosterPartnerDetailsViewModel request)
         {
-            var validationResult = _validateFosterPartnerDetailsUseCase.Execute(request, ModelState);
+            var validationResult = await _validateFosterPartnerDetailsUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
+                if (validationResult?.ConflictingFosterCarerId != Guid.Empty)
+                {
+                    var conflictViewModel = new FosterPartnerConflictViewModel()
+                    {
+                        PartnerDetails = request,
+                        ConflictingFamily = await _getFosterFamilyUseCase.Execute(validationResult.ConflictingFosterCarerId, GetLocalAuthorityId(), false)
+                    };
+                    return View("Resolve_Partner_Conflict_FF", conflictViewModel);
+                }
+
                 return View("Enter_Partner_Details_FF", request);
             }
 
@@ -264,8 +290,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 int.Parse(request.Month),
                 int.Parse(request.Day));
 
-            var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
-            var response = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, laID, true);
+            var response = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, GetLocalAuthorityId(), true);
 
             UpdateFosterCarerRequest updateRequest = new()
             {
@@ -277,16 +302,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
                     CarerNationalInsuranceNumber = response.CarerNationalInsuranceNumber,
                     HasPartner = true
                 },
-                FosterPartnerRequest = new FosterPartnerRequest
-                {
-                    PartnerFirstName = request.PartnerFirstName,
-                    PartnerLastName = request.PartnerLastName,
-                    PartnerDateOfBirth = request.PartnerDateOfBirth,
-                    PartnerNationalInsuranceNumber = request.PartnerNationalInsuranceNumber
-                }
+                FosterPartnerRequest = request.BuildRequest()
             };
 
-            await _updateFosterCarerUseCase.Execute(request.FosterCarerId, laID, updateRequest);
+            await _updateFosterCarerUseCase.Execute(request.FosterCarerId, GetLocalAuthorityId(), updateRequest);
             return RedirectToAction("Family_Record_FF", new
             {
                 request.FosterCarerId,
@@ -299,8 +318,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpGet("RemovePartner/{FosterCarerId}")]
         public async Task<IActionResult> Remove_Partner_Details_FF(Guid FosterCarerId)
         {
-            var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
-            var request = await _getFosterFamilyUseCase.Execute(FosterCarerId, laID);
+            var request = await _getFosterFamilyUseCase.Execute(FosterCarerId, GetLocalAuthorityId());
             var viewModel = await _loadFosterPartnerDetailsUseCase.Execute(request);
             return View("Remove_Partner_Details_FF", viewModel);
         }
@@ -308,8 +326,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpPost("RemovePartner")]
         public async Task<IActionResult> Remove_Partner_Details_FF(FosterPartnerDetailsViewModel request)
         {
-            var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
-            var response = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, laID, true);
+            var response = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, GetLocalAuthorityId(), true);
 
             UpdateFosterCarerRequest updateRequest = new()
             {
@@ -322,7 +339,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
                     HasPartner = false
                 }
             };
-            await _updateFosterCarerUseCase.Execute(request.FosterCarerId, laID, updateRequest);
+            await _updateFosterCarerUseCase.Execute(request.FosterCarerId, GetLocalAuthorityId(), updateRequest);
             return RedirectToAction("Family_Record_FF", new { request.FosterCarerId, Confirmation = "Partner removed" });
         }
 
@@ -445,7 +462,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
                     Partner = fosterPartnerDetails?.BuildRequest(),
                     HasPartner = fosterCarerDetails.HasPartner,
                     SubmissionDate = fosterApplicationSubmittedDate.SubmissionDate
-                }, int.Parse(_Claims.Organisation.EstablishmentNumber)
+                }, GetLocalAuthorityId()
             );
 
             FosterApplicationCheckDetailsViewModel fosterCarerApplication = new()
@@ -492,8 +509,6 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // If fosterApplicationSubmittedDate is null, redirect to submission date to complete required details
             if (fosterApplicationSubmittedDate == null) { return RedirectToAction("Enter_Submitted_Date_Details_FF", new { request.ContextId }); }
 
-            var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
-
             // Prepare request
             var fosterFamilyRequest = new FosterFamilyRequest
             {
@@ -504,10 +519,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 SubmissionDate = fosterApplicationSubmittedDate.SubmissionDate,
             };
 
-            fosterFamilyRequest.FosterCarer.LocalAuthorityID = laID;
+            fosterFamilyRequest.FosterCarer.LocalAuthorityID = GetLocalAuthorityId();
             try
             {
-                var response = await _createFosterFamilyUseCase.Execute(fosterFamilyRequest, laID);
+                var response = await _createFosterFamilyUseCase.Execute(fosterFamilyRequest, GetLocalAuthorityId());
                 return RedirectToAction("Code_Created_FF", new { response.FosterChildId });
             }
             catch (BadHttpRequestException ex)
@@ -528,8 +543,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpGet("CodeCreated/{FosterChildId}")]
         public async Task<IActionResult> Code_Created_FF(Guid FosterChildId)
         {
-            var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
-            var response = await _getFosterChildUseCase.Execute(FosterChildId, laID, true);
+            var response = await _getFosterChildUseCase.Execute(FosterChildId, GetLocalAuthorityId(), true);
             var viewModel = new FosterFamilyCreatedViewModel { Response = response };
             return View(viewModel);
         }
@@ -539,8 +553,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             string? confirmation
         )
         {
-            var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
-            var response = await _getFosterFamilyUseCase.Execute(FosterCarerId, laID, true);
+            var response = await _getFosterFamilyUseCase.Execute(FosterCarerId, GetLocalAuthorityId(), true);
             var viewModel = new FosterFamilyViewModel()
             {
                 Response = response,
@@ -552,8 +565,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpGet("Code/{FosterChildId}")]
         public async Task<IActionResult> Code_Record_FF(Guid FosterChildId)
         {
-            var laID = int.Parse(_Claims.Organisation.EstablishmentNumber);
-            var childResponse = await _getFosterChildUseCase.Execute(FosterChildId, laID, true);
+            var childResponse = await _getFosterChildUseCase.Execute(FosterChildId, GetLocalAuthorityId(), true);
             var viewModel = new FosterFamiliesCodeResponseViewModel()
             {
                 Response = childResponse,
