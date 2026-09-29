@@ -43,7 +43,7 @@ public class SearchFosterFamiliesRecordsUseCaseTests
             }
         };
 
-        _gatewayMock.Setup(x => x.GetFosterFamiliesSearchRecords(1, 20)).ReturnsAsync(expected);
+        _gatewayMock.Setup(x => x.GetFosterFamiliesSearchRecords(1, 20, "")).ReturnsAsync(expected);
 
         var result = await _sut.Execute(request);
 
@@ -55,7 +55,7 @@ public class SearchFosterFamiliesRecordsUseCaseTests
     {
         var request = new FosterFamiliesSearchRequest(1, 20);
 
-        _gatewayMock.Setup(x => x.GetFosterFamiliesSearchRecords(1, 20)).ReturnsAsync((FosterFamiliesSearchResponse)null!);
+        _gatewayMock.Setup(x => x.GetFosterFamiliesSearchRecords(1, 20, "")).ReturnsAsync((FosterFamiliesSearchResponse)null!);
 
         await FluentActions.Invoking(async () => await _sut.Execute(request))
             .Should().ThrowAsync<ApplicationException>()
