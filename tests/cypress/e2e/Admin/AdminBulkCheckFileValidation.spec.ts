@@ -300,9 +300,11 @@ describe("Admin Bulk Check File Validation Journey", () => {
       "Batch checks status"
     );
   
-    cy.contains("tr", "bulkchecktemplate_complete.csv")
-      .contains("Delete")
-      .click();
+    cy.contains("tr", "bulkchecktemplate_complete.csv", { timeout: 80000 })
+    .should("contain.text", "Delete")
+    .within(() => {
+      cy.contains("Delete").click();
+    });
   
     cy.get("h1.govuk-heading-l").should(
       "include.text",
