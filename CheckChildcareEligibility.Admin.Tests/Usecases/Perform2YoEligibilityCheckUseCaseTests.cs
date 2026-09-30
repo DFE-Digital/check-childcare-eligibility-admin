@@ -4,6 +4,7 @@ using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Moq;
