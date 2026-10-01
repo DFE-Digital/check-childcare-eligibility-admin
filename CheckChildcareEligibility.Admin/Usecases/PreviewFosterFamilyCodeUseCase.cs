@@ -7,7 +7,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
 {
     public interface IPreviewFosterFamilyCodeUseCase
     {
-        Task<FosterFamilyCodePreviewResponse> Execute(FosterFamilyRequest request, int localAuthorityId);
+        Task<FosterCodePreviewResponse> Execute(FosterFamilyRequest request);
     }
 
     public class PreviewFosterFamilyCodeUseCase : IPreviewFosterFamilyCodeUseCase
@@ -23,7 +23,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
             _fosterFamiliesGateway = fosterFamiliesGateway;
         }
 
-        public async Task<FosterFamilyCodePreviewResponse> Execute(FosterFamilyRequest request, int localAuthorityId)
+        public async Task<FosterCodePreviewResponse> Execute(FosterFamilyRequest request)
         {
             ArgumentNullException.ThrowIfNull(request);
 
@@ -35,9 +35,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                 throw new FluentValidation.ValidationException(validationResult.Errors);
             }
 
-            request.FosterCarer.LocalAuthorityID = localAuthorityId;
-
-            return await _fosterFamiliesGateway.PreviewFosterFamilyCode(request, localAuthorityId);
+            return await _fosterFamiliesGateway.PreviewFosterFamilyCode(request);
         }
     }
 }

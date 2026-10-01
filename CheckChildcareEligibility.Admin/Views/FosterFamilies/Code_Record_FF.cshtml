@@ -31,10 +31,14 @@
 
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
 
-            <a href="#" role="button" draggable="false" class="govuk-button" data-module="govuk-button"
-               data-govuk-button-init="">
-                Reconfirm eligibility code (**ToDo**)
-            </a>
+            @if (DateTime.UtcNow.Date >= Model.CodeProperties.ReconfirmationProperties.StartDate)
+            {
+                <a href="@Url.ActionLink("Enter_Reconfirm_Date_FF", "FosterFamilies", new { Model.Response.FosterChildId })"
+                   role="button" draggable="false" class="govuk-button" data-module="govuk-button"
+                   data-govuk-button-init="">
+                    Reconfirm eligibility code
+                </a>
+            }
 
             <div class="govuk-summary-card">
                 <div class="govuk-summary-card__title-wrapper">
@@ -90,7 +94,8 @@
                                 Reconfirm between
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @WorkingFamiliesCheckHelper.GetReconfirmBetween(EligibilityCodeType.Foster, Model.Response.ReconfirmationProperties)
+                                @WorkingFamiliesCheckHelper.GetReconfirmBetween(EligibilityCodeType.Foster,
+                                Model.Response.ReconfirmationProperties)
                             </dd>
                         </div>
 
@@ -115,7 +120,7 @@
                         <li class="govuk-summary-card__action">
                             <a class="govuk-link"
                                href="@Url.ActionLink("Update_Child_Details_FF", "FosterFamilies", new { Model.Response.FosterChildId })">Change
-                               <span class="govuk-visually-hidden">Child details</span>
+                                <span class="govuk-visually-hidden">Child details</span>
                             </a>
                         </li>
                     </ul>

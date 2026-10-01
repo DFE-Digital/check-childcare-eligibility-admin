@@ -27,7 +27,7 @@ public class CreateFosterFamilyUseCaseTests
     [Test]
     public async Task Execute_WhenRequestIsNull_ThrowsArgumentNullException()
     {
-        await FluentActions.Invoking(async () => await _sut.Execute(null!, 123))
+        await FluentActions.Invoking(async () => await _sut.Execute(null!))
             .Should().ThrowAsync<ArgumentNullException>();
     }
 
@@ -53,23 +53,56 @@ public class CreateFosterFamilyUseCaseTests
             SubmissionDate = DateTime.Today.AddDays(-1)
         };
 
-        await FluentActions.Invoking(async () => await _sut.Execute(request, 123))
+        await FluentActions.Invoking(async () => await _sut.Execute(request))
             .Should().ThrowAsync<ValidationException>();
     }
 
     [Test]
-    public async Task Execute_WhenRequestIsValid_SetsLocalAuthorityAndReturnsCreatedResponse()
+    public async Task Execute_WhenRequestIsValid_ReturnsCreatedResponse()
     {
         var request = BuildValidFosterFamilyRequest();
         var expected = new FosterFamilyCreatedResponse { FosterCarerId = Guid.NewGuid(), FosterChildId = Guid.NewGuid() };
 
         _gatewayMock.Setup(x => x.CreateFosterFamily(request)).ReturnsAsync(expected);
 
-        var result = await _sut.Execute(request, 456);
+        var result = await _sut.Execute(request);
 
         result.Should().BeEquivalentTo(expected);
-        request.FosterCarer.LocalAuthorityID.Should().Be(456);
         _gatewayMock.Verify(x => x.CreateFosterFamily(request), Times.Once);
+    }
+
+    [Test]
+    public async Task Execute_WhenValidPartnerIsProvided_ReturnsCreatedResponseAndCallsGateway()
+    {
+        var request = BuildValidFosterFamilyRequest();
+        request.HasPartner = true;
+        request.Partner = new FosterPartnerRequest
+        {
+            PartnerFirstName = "John",
+            PartnerLastName = "Doe",
+            PartnerDateOfBirth = DateTime.Today.AddYears(-28),
+            PartnerNationalInsuranceNumber = "BB123456B"
+        };
+        var expected = new FosterFamilyCreatedResponse { FosterCarerId = Guid.NewGuid(), FosterChildId = Guid.NewGuid() };
+
+        _gatewayMock.Setup(x => x.CreateFosterFamily(request)).ReturnsAsync(expected);
+
+        var result = await _sut.Execute(request);
+
+        result.Should().BeEquivalentTo(expected);
+        _gatewayMock.Verify(x => x.CreateFosterFamily(request), Times.Once);
+    }
+
+    [Test]
+    public async Task Execute_WhenPartnerIsRequiredButMissing_ThrowsValidationExceptionAndDoesNotCallGateway()
+    {
+        var request = BuildValidFosterFamilyRequest();
+        request.HasPartner = true;
+
+        await FluentActions.Invoking(async () => await _sut.Execute(request))
+            .Should().ThrowAsync<ValidationException>();
+
+        _gatewayMock.Verify(x => x.CreateFosterFamily(It.IsAny<FosterFamilyRequest>()), Times.Never);
     }
 
     public static FosterFamilyRequest BuildValidFosterFamilyRequest()

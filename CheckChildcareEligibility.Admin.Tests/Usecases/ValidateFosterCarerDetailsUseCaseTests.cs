@@ -87,4 +87,72 @@ public class ValidateFosterCarerDetailsUseCaseTests
         result.Errors.Should().BeNull();
         result.ConflictingFosterCarerId.Should().Be(Guid.Empty);
     }
+
+    [Test]
+    public async Task Execute_WhenMatchingNinoBelongsToCurrentCarer_ShouldReturnValidResult()
+    {
+        var currentCarerId = Guid.NewGuid();
+        var request = new FosterCarerDetailsViewModel
+        {
+            CarerFirstName = "Jane",
+            CarerLastName = "Smith",
+            Day = "12",
+            Month = "04",
+            Year = "1990",
+            CarerNationalInsuranceNumber = "AB123456C",
+            FosterCarerId = currentCarerId
+        };
+        var modelState = new ModelStateDictionary();
+
+        _gatewayMock
+            .Setup(x => x.GetFosterFamiliesSearchRecords(1, 2, "AB123456C"))
+            .ReturnsAsync(new FosterFamiliesSearchResponse
+            {
+                Data = [new FosterFamiliesSearchItemResponse { FosterCarerId = currentCarerId }]
+            });
+
+        var result = await _sut.Execute(request, modelState);
+
+        result.IsValid.Should().BeTrue();
+        result.ConflictingFosterCarerId.Should().Be(Guid.Empty);
+        modelState.Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task Execute_WhenModelStateIsInvalid_ShouldReturnErrorsWithoutQueryingGateway()
+    {
+        var request = new FosterCarerDetailsViewModel();
+        var modelState = new ModelStateDictionary();
+        modelState.AddModelError("CarerFirstName", "Carer first name is required");
+
+        var result = await _sut.Execute(request, modelState);
+
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().ContainKey("CarerFirstName");
+        _gatewayMock.Verify(
+            x => x.GetFosterFamiliesSearchRecords(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task Execute_WhenCarerDetailsFailDomainValidation_ShouldReturnErrorsWithoutQueryingGateway()
+    {
+        var request = new FosterCarerDetailsViewModel
+        {
+            CarerFirstName = "",
+            CarerLastName = "Smith",
+            Day = "12",
+            Month = "04",
+            Year = "1990",
+            CarerNationalInsuranceNumber = "AB123456C"
+        };
+
+        var result = await _sut.Execute(request, new ModelStateDictionary());
+
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().ContainKey("CarerFirstName");
+        _gatewayMock.Verify(
+            x => x.GetFosterFamiliesSearchRecords(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()),
+            Times.Never);
+    }
 }
