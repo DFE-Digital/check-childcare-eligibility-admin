@@ -22,7 +22,7 @@ public class GetFosterFamilyUseCaseTests
     [Test]
     public async Task Execute_WhenFosterCarerIdIsEmpty_ThrowsValidationException()
     {
-        await FluentActions.Invoking(async () => await _sut.Execute(Guid.Empty, 123))
+        await FluentActions.Invoking(async () => await _sut.Execute(Guid.Empty))
             .Should().ThrowAsync<System.ComponentModel.DataAnnotations.ValidationException>();
     }
 
@@ -30,9 +30,9 @@ public class GetFosterFamilyUseCaseTests
     public async Task Execute_WhenGatewayReturnsNull_ThrowsKeyNotFoundException()
     {
         var id = Guid.NewGuid();
-        _gatewayMock.Setup(x => x.GetFosterFamily(id, 123, false)).ReturnsAsync((FosterFamilyResponse)null!);
+        _gatewayMock.Setup(x => x.GetFosterFamily(id, false)).ReturnsAsync((FosterFamilyResponse)null!);
 
-        await FluentActions.Invoking(async () => await _sut.Execute(id, 123))
+        await FluentActions.Invoking(async () => await _sut.Execute(id))
             .Should().ThrowAsync<KeyNotFoundException>()
             .WithMessage($"Foster carer {id} not found");
     }
@@ -51,9 +51,9 @@ public class GetFosterFamilyUseCaseTests
             SubmissionDate = DateTime.Today.AddDays(-2)
         };
 
-        _gatewayMock.Setup(x => x.GetFosterFamily(id, 123, true)).ReturnsAsync(expected);
+        _gatewayMock.Setup(x => x.GetFosterFamily(id, true)).ReturnsAsync(expected);
 
-        var result = await _sut.Execute(id, 123, true);
+        var result = await _sut.Execute(id, true);
 
         result.Should().BeEquivalentTo(expected);
     }

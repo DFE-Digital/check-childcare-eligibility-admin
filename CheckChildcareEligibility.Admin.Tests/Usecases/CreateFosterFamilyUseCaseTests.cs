@@ -68,7 +68,6 @@ public class CreateFosterFamilyUseCaseTests
         var result = await _sut.Execute(request);
 
         result.Should().BeEquivalentTo(expected);
-        request.FosterCarer.LocalAuthorityID.Should().Be(456);
         _gatewayMock.Verify(x => x.CreateFosterFamily(request), Times.Once);
     }
 
