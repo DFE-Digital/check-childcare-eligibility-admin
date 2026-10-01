@@ -651,11 +651,11 @@ namespace CheckChildcareEligibility.Admin.Controllers
             }
             _sessionContextService.SetSessionData(request.FosterChildId.ToString(), "FosterCodeReconfirmDate", request);
 
-            return RedirectToAction("CheckReconfirmDetails", new { request.FosterChildId });
+            return RedirectToAction("Check_Reconfirm_Details_FF", new { request.FosterChildId });
         }
 
         [HttpGet("CheckReconfirmDetails/{fosterChildId}")]
-        public async Task<IActionResult> CheckReconfirmDetails(Guid fosterChildId)
+        public async Task<IActionResult> Check_Reconfirm_Details_FF(Guid fosterChildId)
         {
             // Pull the FosterCodeReconfirmDateViewModel from session by FosterChildId if it exists
             var fosterCodeReconfirmDateViewModel = _sessionContextService.GetSessionData<FosterCodeReconfirmDateViewModel>(fosterChildId.ToString(), "FosterCodeReconfirmDate");
@@ -684,7 +684,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
 
 
         [HttpPost("CheckReconfirmDetails")]
-        public async Task<IActionResult> CheckReconfirmDetails(FosterCodeReconfirmCheckDetailsViewModel request)
+        public async Task<IActionResult> Check_Reconfirm_Details_FF(FosterCodeReconfirmCheckDetailsViewModel request)
         {
             // Pull the FosterCodeReconfirmDateViewModel from session by FosterChildId if it exists
             var fosterCodeReconfirmDateViewModel = _sessionContextService.GetSessionData<FosterCodeReconfirmDateViewModel>(request.FosterChildId.ToString(), "FosterCodeReconfirmDate");
