@@ -58,7 +58,7 @@ public class CreateFosterFamilyUseCaseTests
     }
 
     [Test]
-    public async Task Execute_WhenRequestIsValid_SetsLocalAuthorityAndReturnsCreatedResponse()
+    public async Task Execute_WhenRequestIsValid_ReturnsCreatedResponse()
     {
         var request = BuildValidFosterFamilyRequest();
         var expected = new FosterFamilyCreatedResponse { FosterCarerId = Guid.NewGuid(), FosterChildId = Guid.NewGuid() };
@@ -69,6 +69,40 @@ public class CreateFosterFamilyUseCaseTests
 
         result.Should().BeEquivalentTo(expected);
         _gatewayMock.Verify(x => x.CreateFosterFamily(request), Times.Once);
+    }
+
+    [Test]
+    public async Task Execute_WhenValidPartnerIsProvided_ReturnsCreatedResponseAndCallsGateway()
+    {
+        var request = BuildValidFosterFamilyRequest();
+        request.HasPartner = true;
+        request.Partner = new FosterPartnerRequest
+        {
+            PartnerFirstName = "John",
+            PartnerLastName = "Doe",
+            PartnerDateOfBirth = DateTime.Today.AddYears(-28),
+            PartnerNationalInsuranceNumber = "BB123456B"
+        };
+        var expected = new FosterFamilyCreatedResponse { FosterCarerId = Guid.NewGuid(), FosterChildId = Guid.NewGuid() };
+
+        _gatewayMock.Setup(x => x.CreateFosterFamily(request)).ReturnsAsync(expected);
+
+        var result = await _sut.Execute(request);
+
+        result.Should().BeEquivalentTo(expected);
+        _gatewayMock.Verify(x => x.CreateFosterFamily(request), Times.Once);
+    }
+
+    [Test]
+    public async Task Execute_WhenPartnerIsRequiredButMissing_ThrowsValidationExceptionAndDoesNotCallGateway()
+    {
+        var request = BuildValidFosterFamilyRequest();
+        request.HasPartner = true;
+
+        await FluentActions.Invoking(async () => await _sut.Execute(request))
+            .Should().ThrowAsync<ValidationException>();
+
+        _gatewayMock.Verify(x => x.CreateFosterFamily(It.IsAny<FosterFamilyRequest>()), Times.Never);
     }
 
     public static FosterFamilyRequest BuildValidFosterFamilyRequest()

@@ -85,4 +85,72 @@ public class ValidateFosterPartnerDetailsUseCaseTests
         result.Errors.Should().BeNull();
         result.ConflictingFosterCarerId.Should().Be(Guid.Empty);
     }
+
+    [Test]
+    public async Task Execute_WhenMatchingNinoBelongsToCurrentCarer_ShouldReturnValidResult()
+    {
+        var currentCarerId = Guid.NewGuid();
+        var request = new FosterPartnerDetailsViewModel
+        {
+            PartnerFirstName = "John",
+            PartnerLastName = "Smith",
+            Day = "12",
+            Month = "04",
+            Year = "1990",
+            PartnerNationalInsuranceNumber = "AB123456C",
+            FosterCarerId = currentCarerId
+        };
+        var modelState = new ModelStateDictionary();
+
+        _gatewayMock
+            .Setup(x => x.GetFosterFamiliesSearchRecords(1, 2, "AB123456C"))
+            .ReturnsAsync(new FosterFamiliesSearchResponse
+            {
+                Data = [new FosterFamiliesSearchItemResponse { FosterCarerId = currentCarerId }]
+            });
+
+        var result = await _sut.Execute(request, modelState);
+
+        result.IsValid.Should().BeTrue();
+        result.ConflictingFosterCarerId.Should().Be(Guid.Empty);
+        modelState.Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task Execute_WhenModelStateIsInvalid_ShouldReturnErrorsWithoutQueryingGateway()
+    {
+        var request = new FosterPartnerDetailsViewModel();
+        var modelState = new ModelStateDictionary();
+        modelState.AddModelError("PartnerFirstName", "Partner first name is required");
+
+        var result = await _sut.Execute(request, modelState);
+
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().ContainKey("PartnerFirstName");
+        _gatewayMock.Verify(
+            x => x.GetFosterFamiliesSearchRecords(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task Execute_WhenPartnerDetailsFailDomainValidation_ShouldReturnErrorsWithoutQueryingGateway()
+    {
+        var request = new FosterPartnerDetailsViewModel
+        {
+            PartnerFirstName = "",
+            PartnerLastName = "Smith",
+            Day = "12",
+            Month = "04",
+            Year = "1990",
+            PartnerNationalInsuranceNumber = "AB123456C"
+        };
+
+        var result = await _sut.Execute(request, new ModelStateDictionary());
+
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().ContainKey("PartnerFirstName");
+        _gatewayMock.Verify(
+            x => x.GetFosterFamiliesSearchRecords(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()),
+            Times.Never);
+    }
 }
