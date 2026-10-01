@@ -9,6 +9,6 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public FosterPartnerDetailsViewModel? FosterPartnerDetailsViewModel { get; set; }
         public FosterChildDetailsViewModel FosterChildDetailsViewModel { get; set; } = new();
         public FosterApplicationSubmittedDateViewModel FosterApplicationSubmittedDateViewModel { get; set; } = new();
-        public FosterFamilyCodePreviewResponse FosterCodePreview { get; set; } = new();
+        public FosterCodePreviewResponse FosterCodePreview { get; set; } = new();
     }
 }

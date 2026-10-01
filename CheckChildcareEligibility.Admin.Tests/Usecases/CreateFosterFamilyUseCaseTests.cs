@@ -27,7 +27,7 @@ public class CreateFosterFamilyUseCaseTests
     [Test]
     public async Task Execute_WhenRequestIsNull_ThrowsArgumentNullException()
     {
-        await FluentActions.Invoking(async () => await _sut.Execute(null!, 123))
+        await FluentActions.Invoking(async () => await _sut.Execute(null!))
             .Should().ThrowAsync<ArgumentNullException>();
     }
 
@@ -53,7 +53,7 @@ public class CreateFosterFamilyUseCaseTests
             SubmissionDate = DateTime.Today.AddDays(-1)
         };
 
-        await FluentActions.Invoking(async () => await _sut.Execute(request, 123))
+        await FluentActions.Invoking(async () => await _sut.Execute(request))
             .Should().ThrowAsync<ValidationException>();
     }
 
@@ -65,7 +65,7 @@ public class CreateFosterFamilyUseCaseTests
 
         _gatewayMock.Setup(x => x.CreateFosterFamily(request)).ReturnsAsync(expected);
 
-        var result = await _sut.Execute(request, 456);
+        var result = await _sut.Execute(request);
 
         result.Should().BeEquivalentTo(expected);
         request.FosterCarer.LocalAuthorityID.Should().Be(456);

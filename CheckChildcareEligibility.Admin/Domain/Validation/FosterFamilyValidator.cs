@@ -117,4 +117,19 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
         }
     }
 
+    public class FosterChildReconfirmRequestValidator
+        : AbstractValidator<FosterChildReconfirmRequest>
+    {
+        public FosterChildReconfirmRequestValidator()
+        {
+            RuleFor(x => x.SubmissionDate)
+                .Must(DataValidation.BeAPastDate)
+                .WithMessage(FosterFamilyValidationMessages.DateMustBeInPast);
+
+            RuleFor(x => x.SubmissionDate)
+                .Must(DataValidation.BeWithin31Days)
+                .WithMessage(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, DateTime.Today.AddDays(-31)));
+        }
+    }
+
 }

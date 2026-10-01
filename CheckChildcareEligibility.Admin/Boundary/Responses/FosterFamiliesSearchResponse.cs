@@ -8,7 +8,6 @@
 
         public int TotalNumberOfRecords { get; set; }
 
-        public IEnumerable<FosterFamiliesSearchItemResponse> Data { get; set; }
-            = [];
+        public IEnumerable<FosterFamiliesSearchItemResponse> Data { get; set; } = [];
     }
 }

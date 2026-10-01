@@ -7,7 +7,7 @@ namespace CheckChildcareEligibility.Admin.UseCases;
 
 public interface IGetFosterFamilyUseCase
 {
-    Task<FosterFamilyResponse> Execute(Guid fosterCarerId, int localAuthorityId, bool includeChildren = false);
+    Task<FosterFamilyResponse> Execute(Guid fosterCarerId, bool includeChildren = false);
 }
 
 public class GetFosterFamilyUseCase : IGetFosterFamilyUseCase
@@ -19,11 +19,11 @@ public class GetFosterFamilyUseCase : IGetFosterFamilyUseCase
         _fosterFamiliesGateway = fosterFamiliesGateway;
     }
 
-    public async Task<FosterFamilyResponse> Execute(Guid fosterCarerId, int localAuthorityId, bool includeChildren = false)
+    public async Task<FosterFamilyResponse> Execute(Guid fosterCarerId, bool includeChildren = false)
     {
         if (fosterCarerId == Guid.Empty) throw new ValidationException(FosterFamilyValidationMessages.FosterCarerId);
 
-        var result = await _fosterFamiliesGateway.GetFosterFamily(fosterCarerId, localAuthorityId, includeChildren);
+        var result = await _fosterFamiliesGateway.GetFosterFamily(fosterCarerId, includeChildren);
         if (result == null) throw new KeyNotFoundException($"Foster carer {fosterCarerId} not found");
 
         return result;

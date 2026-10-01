@@ -1,9 +1,9 @@
 ﻿@using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies
 @using CheckChildcareEligibility.Admin.Helpers
 @using CheckChildcareEligibility.Admin.ViewModels
-@model FosterFamilyCreatedViewModel
+@model FosterCodeReconfirmedViewModel
 @{
-    ViewData["Title"] = "Family added and code created";
+    ViewData["Title"] = "Code reconfirmed";
 }
 
 <div class="govuk-grid-column-full">
@@ -18,8 +18,6 @@
                     Eligibility code <br> <strong>@Model.Response.EligibilityCode</strong>
                 </div>
             </div>
-
-            <p class="govuk-!-margin-top-6">Send the eligibility code to the social worker. The foster family will need to  give the code to the childcare provider.</p>
 
             <table class="govuk-table">
                 <caption class="govuk-table__caption govuk-table__caption--m"></caption>
