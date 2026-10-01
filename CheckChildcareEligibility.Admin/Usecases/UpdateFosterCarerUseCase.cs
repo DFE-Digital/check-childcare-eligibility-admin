@@ -48,6 +48,20 @@ namespace CheckChildcareEligibility.Admin.Usecases
                 }
             }
 
+            if (request.FosterCarerRequest is not null)
+            {
+                request.FosterCarerRequest.CarerNationalInsuranceNumber =
+                    NinoValidation.Normalize(
+                        request.FosterCarerRequest.CarerNationalInsuranceNumber);
+            }
+
+            if (request.FosterPartnerRequest is not null)
+            {
+                request.FosterPartnerRequest.PartnerNationalInsuranceNumber =
+                    NinoValidation.Normalize(
+                        request.FosterPartnerRequest.PartnerNationalInsuranceNumber);
+            }
+
             await _fosterFamiliesGateway.UpdateFosterCarer(fosterCarerId, localAuthorityId, request);
         }
     }

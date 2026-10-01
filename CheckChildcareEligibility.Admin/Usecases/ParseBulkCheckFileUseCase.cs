@@ -1,5 +1,6 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Domain.Enums;
+using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.Usecases.Constants;
 using CsvHelper;
@@ -142,13 +143,15 @@ namespace CheckChildcareEligibility.Admin.Usecases
                                 var requestDataWF = new CheckEligibilityRequestWorkingFamiliesData();
                                 requestDataWF.EligibilityCode = workingFamilyRow.EligibilityCode;
                                 requestDataWF.DateOfBirth = workingFamilyRow.DOB;//must remain in original pre-parsed form to go through validator
-                                requestDataWF.NationalInsuranceNumber = workingFamilyRow.Ni.ToUpper().Replace(" ", "");
+                                requestDataWF.NationalInsuranceNumber = workingFamilyRow.Ni;
                                 requestDataWF.Type = eligibilityType;
                                 requestDataWF.Order = sequence;
                                 validationResults = _validator.Validate(requestDataWF);
                                 if (validationResults.IsValid) {
                                     //We know this passed parse earlier but it must be translated to correct format (yyyy-MM-dd) for Database to access
                                     requestDataWF.DateOfBirth = DateTime.Parse(record.DOB).ToString("yyyy-MM-dd");
+                                    requestDataWF.NationalInsuranceNumber =
+                                        NinoValidation.Normalize(requestDataWF.NationalInsuranceNumber)!;
                                     result.ValidRequests.Add(requestDataWF);
                                 }
                                 break;
@@ -157,7 +160,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                                 var requestData = new CheckEligibilityRequestData();
                                 requestData.LastName = row.LastName;
                                 requestData.DateOfBirth = row.DOB;//must remain in original pre-parsed form to go through validator
-                                requestData.NationalInsuranceNumber = row.Ni.ToUpper().Replace(" ", "");
+                                requestData.NationalInsuranceNumber = row.Ni;
                                 requestData.Type = eligibilityType;
                                 requestData.Order = sequence;
                                 validationResults = _validator.Validate(requestData);
@@ -165,6 +168,8 @@ namespace CheckChildcareEligibility.Admin.Usecases
                                 {
                                     //We know this passed parse earlier but it must be translated to correct format (yyyy-MM-dd) for Database to access
                                     requestData.DateOfBirth = DateTime.Parse(record.DOB).ToString("yyyy-MM-dd");
+                                    requestData.NationalInsuranceNumber =
+                                        NinoValidation.Normalize(requestData.NationalInsuranceNumber)!;
                                     result.ValidRequests.Add(requestData);
                                 }
                                 break;

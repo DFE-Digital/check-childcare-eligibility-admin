@@ -25,15 +25,19 @@ public class UpdateFosterCarerUseCaseTests
     {
         var request = BuildValidUpdateFosterCarerRequest();
 
-        await FluentActions.Invoking(async () => await _sut.Execute(Guid.Empty, 123, request))
-            .Should().ThrowAsync<ValidationException>();
+        await FluentActions.Invoking(
+                async () => await _sut.Execute(Guid.Empty, 123, request))
+            .Should()
+            .ThrowAsync<ValidationException>();
     }
 
     [Test]
     public async Task Execute_WhenRequestIsNull_ThrowsArgumentNullException()
     {
-        await FluentActions.Invoking(async () => await _sut.Execute(Guid.NewGuid(), 123, null!))
-            .Should().ThrowAsync<ArgumentNullException>();
+        await FluentActions.Invoking(
+                async () => await _sut.Execute(Guid.NewGuid(), 123, null!))
+            .Should()
+            .ThrowAsync<ArgumentNullException>();
     }
 
     [Test]
@@ -55,8 +59,10 @@ public class UpdateFosterCarerUseCaseTests
             }
         };
 
-        await FluentActions.Invoking(async () => await _sut.Execute(Guid.NewGuid(), 123, request))
-            .Should().ThrowAsync<ValidationException>();
+        await FluentActions.Invoking(
+                async () => await _sut.Execute(Guid.NewGuid(), 123, request))
+            .Should()
+            .ThrowAsync<ValidationException>();
     }
 
     [Test]
@@ -67,7 +73,71 @@ public class UpdateFosterCarerUseCaseTests
 
         await _sut.Execute(id, 456, request);
 
-        _gatewayMock.Verify(x => x.UpdateFosterCarer(id, 456, request), Times.Once);
+        _gatewayMock.Verify(
+            x => x.UpdateFosterCarer(id, 456, request),
+            Times.Once);
+    }
+
+    [TestCase(true, "ab123456c")]
+    [TestCase(false, "ab123456c")]
+    public async Task Execute_Should_Forward_Canonical_Nino(
+        bool partner,
+        string input)
+    {
+        var id = Guid.NewGuid();
+        var request = BuildRequest(partner, input);
+
+        _gatewayMock
+            .Setup(g => g.UpdateFosterCarer(
+                id,
+                201,
+                It.Is<UpdateFosterCarerRequest>(r =>
+                    partner
+                        ? r.FosterPartnerRequest != null &&
+                          r.FosterPartnerRequest
+                              .PartnerNationalInsuranceNumber == "AB123456C"
+                        : r.FosterCarerRequest != null &&
+                          r.FosterCarerRequest
+                              .CarerNationalInsuranceNumber == "AB123456C")))
+            .Returns(Task.CompletedTask);
+
+        await _sut.Execute(id, 201, request);
+
+        _gatewayMock.VerifyAll();
+
+        _gatewayMock.Verify(
+            g => g.UpdateFosterCarer(id, 201, request),
+            Times.Once);
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Execute_Should_Reject_Invalid_Nino_Without_Calling_Gateway(
+        bool partner)
+    {
+        var request = BuildRequest(partner, "BG123456C");
+
+        Func<Task> act = () =>
+            _sut.Execute(Guid.NewGuid(), 201, request);
+
+        var thrown = await act.Should()
+            .ThrowAsync<ValidationException>();
+
+        var expectedProperty = partner
+            ? "PartnerNationalInsuranceNumber"
+            : "CarerNationalInsuranceNumber";
+
+        thrown.Which.Errors.Should().NotBeEmpty();
+
+        thrown.Which.Errors.Should().OnlyContain(
+            error => error.PropertyName == expectedProperty);
+
+        _gatewayMock.Verify(
+            g => g.UpdateFosterCarer(
+                It.IsAny<Guid>(),
+                It.IsAny<int>(),
+                It.IsAny<UpdateFosterCarerRequest>()),
+            Times.Never);
     }
 
     private static UpdateFosterCarerRequest BuildValidUpdateFosterCarerRequest()
@@ -89,5 +159,32 @@ public class UpdateFosterCarerUseCaseTests
                 PartnerNationalInsuranceNumber = "BB123456B"
             }
         };
+    }
+
+    private static UpdateFosterCarerRequest BuildRequest(
+        bool partner,
+        string nino)
+    {
+        return partner
+            ? new UpdateFosterCarerRequest
+            {
+                FosterPartnerRequest = new FosterPartnerRequest
+                {
+                    PartnerFirstName = "Pat",
+                    PartnerLastName = "Foster",
+                    PartnerDateOfBirth = new DateTime(1982, 4, 5),
+                    PartnerNationalInsuranceNumber = nino
+                }
+            }
+            : new UpdateFosterCarerRequest
+            {
+                FosterCarerRequest = new FosterCarerRequest
+                {
+                    CarerFirstName = "Alex",
+                    CarerLastName = "Foster",
+                    CarerDateOfBirth = new DateTime(1980, 2, 3),
+                    CarerNationalInsuranceNumber = nino
+                }
+            };
     }
 }
