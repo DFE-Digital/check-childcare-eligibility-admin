@@ -498,7 +498,7 @@ describe('Foster Families search records and add Family', () => {
                     .siblings('.govuk-summary-list__value')
                     .should('contain.text', submittedDate.displayedSubmittedDate)
             })
-        cy.contains('button', 'Add foster family').click();
+        cy.contains('button', 'Add family and create code').click();
 
         //Family added page
         cy.get('.govuk-panel--confirmation', { timeout: 10000 }).should('be.visible');

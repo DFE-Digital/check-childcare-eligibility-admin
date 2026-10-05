@@ -5,29 +5,29 @@ using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 
 namespace CheckChildcareEligibility.Admin.Usecases
 {
-    public interface IPreviewFosterFamilyCodeUseCase
+    public interface IReconfirmFosterCodeUseCase
     {
-        Task<FosterCodePreviewResponse> Execute(FosterFamilyRequest request);
+        Task<FosterChildResponse> Execute(Guid fosterChildId, FosterChildReconfirmRequest request);
     }
 
-    public class PreviewFosterFamilyCodeUseCase : IPreviewFosterFamilyCodeUseCase
+    public class ReconfirmFosterCodeUseCase : IReconfirmFosterCodeUseCase
     {
         private readonly IFosterFamiliesGateway _fosterFamiliesGateway;
-        private readonly ILogger<PreviewFosterFamilyCodeUseCase> _logger;
+        private readonly ILogger<ReconfirmFosterCodeUseCase> _logger;
 
-        public PreviewFosterFamilyCodeUseCase(
-            ILogger<PreviewFosterFamilyCodeUseCase> logger,
+        public ReconfirmFosterCodeUseCase(
+            ILogger<ReconfirmFosterCodeUseCase> logger,
             IFosterFamiliesGateway fosterFamiliesGateway)
         {
             _logger = logger;
             _fosterFamiliesGateway = fosterFamiliesGateway;
         }
 
-        public async Task<FosterCodePreviewResponse> Execute(FosterFamilyRequest request)
+        public async Task<FosterChildResponse> Execute(Guid fosterChildId, FosterChildReconfirmRequest request)
         {
             ArgumentNullException.ThrowIfNull(request);
 
-            var validator = new FosterFamilyRequestValidator();
+            var validator = new FosterChildReconfirmRequestValidator();
             var validationResult = validator.Validate(request);
 
             if (!validationResult.IsValid)
@@ -35,7 +35,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                 throw new FluentValidation.ValidationException(validationResult.Errors);
             }
 
-            return await _fosterFamiliesGateway.PreviewFosterFamilyCode(request);
+            return await _fosterFamiliesGateway.ReconfirmFosterChild(fosterChildId, request);
         }
     }
 }

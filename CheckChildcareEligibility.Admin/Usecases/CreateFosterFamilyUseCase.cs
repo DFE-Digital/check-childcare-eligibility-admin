@@ -7,7 +7,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
 {
     public interface ICreateFosterFamilyUseCase
     {
-        Task<FosterFamilyCreatedResponse> Execute(FosterFamilyRequest request, int localAuthorityId);
+        Task<FosterFamilyCreatedResponse> Execute(FosterFamilyRequest request);
     }
 
     public class CreateFosterFamilyUseCase : ICreateFosterFamilyUseCase
@@ -23,7 +23,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
             _fosterFamiliesGateway = fosterFamiliesGateway;
         }
 
-        public async Task<FosterFamilyCreatedResponse> Execute(FosterFamilyRequest request, int localAuthorityId)
+        public async Task<FosterFamilyCreatedResponse> Execute(FosterFamilyRequest request)
         {
             ArgumentNullException.ThrowIfNull(request);
 
@@ -45,8 +45,6 @@ namespace CheckChildcareEligibility.Admin.Usecases
                     NinoValidation.Normalize(
                         request.Partner.PartnerNationalInsuranceNumber);
             }
-
-            request.FosterCarer.LocalAuthorityID = localAuthorityId;
 
             return await _fosterFamiliesGateway.CreateFosterFamily(request);
         }

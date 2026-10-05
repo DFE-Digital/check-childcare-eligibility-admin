@@ -26,7 +26,7 @@ public class UpdateFosterCarerUseCaseTests
         var request = BuildValidUpdateFosterCarerRequest();
 
         await FluentActions.Invoking(
-                async () => await _sut.Execute(Guid.Empty, 123, request))
+                async () => await _sut.Execute(Guid.Empty, request))
             .Should()
             .ThrowAsync<ValidationException>();
     }
@@ -35,7 +35,7 @@ public class UpdateFosterCarerUseCaseTests
     public async Task Execute_WhenRequestIsNull_ThrowsArgumentNullException()
     {
         await FluentActions.Invoking(
-                async () => await _sut.Execute(Guid.NewGuid(), 123, null!))
+                async () => await _sut.Execute(Guid.NewGuid(), null!))
             .Should()
             .ThrowAsync<ArgumentNullException>();
     }
@@ -60,7 +60,7 @@ public class UpdateFosterCarerUseCaseTests
         };
 
         await FluentActions.Invoking(
-                async () => await _sut.Execute(Guid.NewGuid(), 123, request))
+                async () => await _sut.Execute(Guid.NewGuid(), request))
             .Should()
             .ThrowAsync<ValidationException>();
     }
@@ -71,10 +71,10 @@ public class UpdateFosterCarerUseCaseTests
         var id = Guid.NewGuid();
         var request = BuildValidUpdateFosterCarerRequest();
 
-        await _sut.Execute(id, 456, request);
+        await _sut.Execute(id, request);
 
         _gatewayMock.Verify(
-            x => x.UpdateFosterCarer(id, 456, request),
+            x => x.UpdateFosterCarer(id, request),
             Times.Once);
     }
 
@@ -90,7 +90,6 @@ public class UpdateFosterCarerUseCaseTests
         _gatewayMock
             .Setup(g => g.UpdateFosterCarer(
                 id,
-                201,
                 It.Is<UpdateFosterCarerRequest>(r =>
                     partner
                         ? r.FosterPartnerRequest != null &&
@@ -101,12 +100,12 @@ public class UpdateFosterCarerUseCaseTests
                               .CarerNationalInsuranceNumber == "AB123456C")))
             .Returns(Task.CompletedTask);
 
-        await _sut.Execute(id, 201, request);
+        await _sut.Execute(id, request);
 
         _gatewayMock.VerifyAll();
 
         _gatewayMock.Verify(
-            g => g.UpdateFosterCarer(id, 201, request),
+            g => g.UpdateFosterCarer(id, request),
             Times.Once);
     }
 
@@ -118,7 +117,7 @@ public class UpdateFosterCarerUseCaseTests
         var request = BuildRequest(partner, "BG123456C");
 
         Func<Task> act = () =>
-            _sut.Execute(Guid.NewGuid(), 201, request);
+            _sut.Execute(Guid.NewGuid(), request);
 
         var thrown = await act.Should()
             .ThrowAsync<ValidationException>();
@@ -135,7 +134,6 @@ public class UpdateFosterCarerUseCaseTests
         _gatewayMock.Verify(
             g => g.UpdateFosterCarer(
                 It.IsAny<Guid>(),
-                It.IsAny<int>(),
                 It.IsAny<UpdateFosterCarerRequest>()),
             Times.Never);
     }
