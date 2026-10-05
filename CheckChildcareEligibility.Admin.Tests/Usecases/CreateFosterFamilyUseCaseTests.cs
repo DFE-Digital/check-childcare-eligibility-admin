@@ -175,7 +175,6 @@ public class CreateFosterFamilyUseCaseTests
             .Setup(g => g.CreateFosterFamily(
                 It.Is<FosterFamilyRequest>(r =>
                     r.FosterCarer.CarerNationalInsuranceNumber == "AB123456C" &&
-                    r.FosterCarer.LocalAuthorityID == 201 &&
                     r.Partner != null &&
                     r.Partner.PartnerNationalInsuranceNumber == "CE123456A")))
             .ReturnsAsync(expectedResponse);
