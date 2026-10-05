@@ -116,7 +116,7 @@ public class CreateFosterFamilyUseCaseTests
             }
         };
 
-        Func<Task> act = () => _sut.Execute(request, 201);
+        Func<Task> act = () => _sut.Execute(request);
 
         var thrown = await act.Should()
             .ThrowAsync<ValidationException>();
