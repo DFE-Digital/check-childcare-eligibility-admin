@@ -28,7 +28,7 @@ public class PreviewFosterFamilyCodeUseCaseTests
     [Test]
     public async Task Execute_WhenRequestIsNull_ThrowsArgumentNullException()
     {
-        await FluentActions.Invoking(async () => await _sut.Execute(null!, 123))
+        await FluentActions.Invoking(async () => await _sut.Execute(null!))
             .Should().ThrowAsync<ArgumentNullException>();
     }
 
@@ -54,7 +54,7 @@ public class PreviewFosterFamilyCodeUseCaseTests
             SubmissionDate = DateTime.Today.AddDays(-1)
         };
 
-        await FluentActions.Invoking(async () => await _sut.Execute(request, 123))
+        await FluentActions.Invoking(async () => await _sut.Execute(request))
             .Should().ThrowAsync<ValidationException>();
     }
 
@@ -62,22 +62,20 @@ public class PreviewFosterFamilyCodeUseCaseTests
     public async Task Execute_WhenRequestIsValid_ReturnsPreviewResponse()
     {
         var request = CreateFosterFamilyUseCaseTests.BuildValidFosterFamilyRequest();
-        var expected = new FosterFamilyCodePreviewResponse
+        var expected = new FosterCodePreviewResponse
         {
             ValidityStartDate = DateTime.Today.AddDays(-5),
             ValidFromTerm = new Term(TermName.Spring, DateTime.Today.AddDays(-10)),
-            EligibilityConfirmed = DateTime.Today.AddDays(-10),
             ReconfirmBetweenStart = DateTime.Today.AddDays(-2),
             ReconfirmBetweenEnd = DateTime.Today.AddDays(2),
             GracePeriodEndDate = DateTime.Today.AddDays(30)
         };
 
-        _gatewayMock.Setup(x => x.PreviewFosterFamilyCode(request, 456)).ReturnsAsync(expected);
+        _gatewayMock.Setup(x => x.PreviewFosterFamilyCode(request)).ReturnsAsync(expected);
 
-        var result = await _sut.Execute(request, 456);
+        var result = await _sut.Execute(request);
 
         result.Should().BeEquivalentTo(expected);
-        request.FosterCarer.LocalAuthorityID.Should().Be(456);
-        _gatewayMock.Verify(x => x.PreviewFosterFamilyCode(request, 456), Times.Once);
+        _gatewayMock.Verify(x => x.PreviewFosterFamilyCode(request), Times.Once);
     }
 }

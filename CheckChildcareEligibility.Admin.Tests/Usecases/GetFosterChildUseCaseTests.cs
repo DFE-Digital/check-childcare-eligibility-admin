@@ -22,7 +22,7 @@ public class GetFosterChildUseCaseTests
     [Test]
     public async Task Execute_WhenFosterChildIdIsEmpty_ThrowsValidationException()
     {
-        await FluentActions.Invoking(async () => await _sut.Execute(Guid.Empty, 123))
+        await FluentActions.Invoking(async () => await _sut.Execute(Guid.Empty))
             .Should().ThrowAsync<System.ComponentModel.DataAnnotations.ValidationException>();
     }
 
@@ -30,9 +30,9 @@ public class GetFosterChildUseCaseTests
     public async Task Execute_WhenGatewayReturnsNull_ThrowsKeyNotFoundException()
     {
         var id = Guid.NewGuid();
-        _gatewayMock.Setup(x => x.GetFosterChild(id, 123, false)).ReturnsAsync((FosterChildResponse)null!);
+        _gatewayMock.Setup(x => x.GetFosterChild(id, false)).ReturnsAsync((FosterChildResponse)null!);
 
-        await FluentActions.Invoking(async () => await _sut.Execute(id, 123))
+        await FluentActions.Invoking(async () => await _sut.Execute(id))
             .Should().ThrowAsync<KeyNotFoundException>()
             .WithMessage($"Foster child {id} not found");
     }
@@ -51,9 +51,9 @@ public class GetFosterChildUseCaseTests
             EligibilityCode = "ABC123"
         };
 
-        _gatewayMock.Setup(x => x.GetFosterChild(id, 123, true)).ReturnsAsync(expected);
+        _gatewayMock.Setup(x => x.GetFosterChild(id, true)).ReturnsAsync(expected);
 
-        var result = await _sut.Execute(id, 123, true);
+        var result = await _sut.Execute(id, true);
 
         result.Should().BeEquivalentTo(expected);
     }

@@ -67,9 +67,12 @@ builder.Services.AddScoped<IGetFosterFamilyUseCase, GetFosterFamilyUseCase>();
 builder.Services.AddScoped<IGetFosterChildUseCase, GetFosterChildUseCase>();
 builder.Services.AddScoped<IUpdateFosterCarerUseCase, UpdateFosterCarerUseCase>();
 builder.Services.AddScoped<IValidator<IEligibilityServiceType>, CheckEligibilityRequestDataValidator>();
-builder.Services.AddScoped<IPerformEligibilityCodeHistoryReportUseCase, PerformEligibilityCodeHistoryReportUseCase > ();
-builder.Services.AddScoped <IValidateEligibilityCodeUseCase,ValidateEligibilityCodeUseCase>();
+builder.Services.AddScoped<IPerformEligibilityCodeHistoryReportUseCase, PerformEligibilityCodeHistoryReportUseCase>();
+builder.Services.AddScoped<IValidateEligibilityCodeUseCase, ValidateEligibilityCodeUseCase>();
 builder.Services.AddScoped<IPreviewFosterFamilyCodeUseCase, PreviewFosterFamilyCodeUseCase>();
+builder.Services.AddScoped<IValidateFosterCodeReconfirmDateUseCase, ValidateFosterCodeReconfirmDateUseCase>();
+builder.Services.AddScoped<IPreviewFosterCodeReconfirmUseCase, PreviewFosterCodeReconfirmUseCase>();
+builder.Services.AddScoped<IReconfirmFosterCodeUseCase, ReconfirmFosterCodeUseCase>();
 builder.Services.AddScoped<IUpdateFosterChildUseCase, UpdateFosterChildUseCase>();
 builder.Services.AddSession();
 
@@ -111,7 +114,7 @@ app.Use((context, next) =>
     context.Response.Headers["X-Frame-Options"] = "sameorigin";
     context.Response.Headers["Cache-Control"] = "Private";
     context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
-    context.Response.Headers["X-Content-Type-Options"] = "nosniff"; 
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
     if (!builder.Configuration.GetValue<bool>("AllowSearchIndexing"))
     {
         context.Response.Headers["X-Robots-Tag"] = "noindex,nofollow";

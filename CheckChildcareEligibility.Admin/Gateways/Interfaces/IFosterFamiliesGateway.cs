@@ -9,13 +9,18 @@ public interface IFosterFamiliesGateway
 
     Task<FosterFamilyCreatedResponse> CreateFosterFamily(FosterFamilyRequest request);
 
-    Task<FosterFamilyCodePreviewResponse> PreviewFosterFamilyCode(FosterFamilyRequest request, int localAuthorityId);
+    Task<FosterCodePreviewResponse> PreviewFosterFamilyCode(FosterFamilyRequest request);
 
-    Task<FosterFamilyResponse> GetFosterFamily(Guid fosterCarerId, int localAuthorityId, bool includeChildren = false);
+    Task<FosterFamilyResponse> GetFosterFamily(Guid fosterCarerId, bool includeChildren = false);
 
-    Task<FosterChildResponse> GetFosterChild(Guid fosterChildId, int localAuthorityId, bool includeFosterCarer = false);
+    Task<FosterChildResponse> GetFosterChild(Guid fosterChildId, bool includeFosterCarer = false);
 
-    Task UpdateFosterCarer(Guid fosterCarerId, int localAuthorityId, UpdateFosterCarerRequest request);
+    Task UpdateFosterCarer(Guid fosterCarerId, UpdateFosterCarerRequest request);
 
-    Task UpdateFosterChild(Guid fosterChildId, int localAuthorityId, UpdateFosterChildRequest request);
+    Task UpdateFosterChild(Guid fosterChildId, UpdateFosterChildRequest request);
+
+    Task<FosterCodePreviewResponse> PreviewFosterChildReconfirm(Guid fosterChildId, FosterChildReconfirmRequest request);
+
+    Task<FosterChildResponse> ReconfirmFosterChild(Guid fosterChildId, FosterChildReconfirmRequest request);
+
 }

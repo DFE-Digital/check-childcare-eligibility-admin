@@ -15,7 +15,7 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
     {
         [FosterFamiliesUrls.FosterFamilySearch] = "foster-family/search",
         [FosterFamiliesUrls.FosterFamily] = "/foster-family/{fosterCarerId}",
-        [FosterFamiliesUrls.FosterChild] = "/foster-family/child/{fosterChildId}",
+        [FosterFamiliesUrls.FosterChild] = "/foster-family/child/{fosterChildId}"
     };
 
     public FosterFamiliesGateway(ILoggerFactory logger, HttpClient httpClient, IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : base("EcsService",
@@ -57,11 +57,11 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         }
     }
 
-    public async Task<FosterFamilyCodePreviewResponse> PreviewFosterFamilyCode(FosterFamilyRequest request, int localAuthorityId)
+    public async Task<FosterCodePreviewResponse> PreviewFosterFamilyCode(FosterFamilyRequest request)
     {
         try
         {
-            var result = await ApiDataPostAsynch("foster-family/preview", request, new FosterFamilyCodePreviewResponse());
+            var result = await ApiDataPostAsynch("foster-family/preview", request, new FosterCodePreviewResponse());
             return result;
         }
         catch (Exception ex)
@@ -72,7 +72,7 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         }
     }
 
-    public async Task<FosterFamilyResponse> GetFosterFamily(Guid fosterCarerId, int localAuthorityId, bool includeChildren = false)
+    public async Task<FosterFamilyResponse> GetFosterFamily(Guid fosterCarerId, bool includeChildren = false)
     {
         try
         {
@@ -90,7 +90,7 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         return null;
     }
 
-    public async Task<FosterChildResponse> GetFosterChild(Guid fosterChildId, int localAuthorityId, bool includeFosterCarer = false)
+    public async Task<FosterChildResponse> GetFosterChild(Guid fosterChildId, bool includeFosterCarer = false)
     {
         try
         {
@@ -108,7 +108,7 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         return null;
     }
 
-    public async Task UpdateFosterCarer(Guid fosterCarerId, int localAuthorityId, UpdateFosterCarerRequest request)
+    public async Task UpdateFosterCarer(Guid fosterCarerId, UpdateFosterCarerRequest request)
     {
         var url = FosterFamiliesUrlsDict[FosterFamiliesUrls.FosterFamily].Replace("{fosterCarerId}", fosterCarerId.ToString());
         try
@@ -123,7 +123,7 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         }
     }
 
-    public async Task UpdateFosterChild(Guid fosterChildId, int localAuthorityId, UpdateFosterChildRequest request)
+    public async Task UpdateFosterChild(Guid fosterChildId, UpdateFosterChildRequest request)
     {
         var url = FosterFamiliesUrlsDict[FosterFamiliesUrls.FosterChild].Replace("{fosterChildId}", fosterChildId.ToString());
         try
@@ -137,4 +137,37 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
             throw;
         }
     }
+
+    public async Task<FosterCodePreviewResponse> PreviewFosterChildReconfirm(Guid fosterChildId, FosterChildReconfirmRequest request)
+    {
+        var url = FosterFamiliesUrlsDict[FosterFamiliesUrls.FosterChild].Replace("{fosterChildId}", fosterChildId.ToString()) + "/preview-reconfirm";
+        try
+        {
+            var result = await ApiDataPostAsynch(url, request, new FosterCodePreviewResponse());
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Post PreviewFosterChildReconfirm failed. uri:-{_httpClient.BaseAddress}{url}");
+            _logger.LogTrace(ex, $"Post PreviewFosterChildReconfirm failed. uri:-{_httpClient.BaseAddress}{url} content:-{JsonConvert.SerializeObject(request)}");
+            throw;
+        }
+    }
+
+    public async Task<FosterChildResponse> ReconfirmFosterChild(Guid fosterChildId, FosterChildReconfirmRequest request)
+    {
+        var url = FosterFamiliesUrlsDict[FosterFamiliesUrls.FosterChild].Replace("{fosterChildId}", fosterChildId.ToString()) + "/reconfirm";
+        try
+        {
+            var result = await ApiDataPostAsynch(url, request, new FosterChildResponse());
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Post ReconfirmFosterChild failed. uri:-{_httpClient.BaseAddress}{url}");
+            _logger.LogTrace(ex, $"Post ReconfirmFosterChild failed. uri:-{_httpClient.BaseAddress}{url} content:-{JsonConvert.SerializeObject(request)}");
+            throw;
+        }
+    }
+
 }

@@ -8,7 +8,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
 {
     public interface IUpdateFosterCarerUseCase
     {
-        Task Execute(Guid fosterCarerId, int localAuthorityId, UpdateFosterCarerRequest request);
+        Task Execute(Guid fosterCarerId, UpdateFosterCarerRequest request);
     }
 
     public class UpdateFosterCarerUseCase : IUpdateFosterCarerUseCase
@@ -19,7 +19,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
             _fosterFamiliesGateway = fosterFamiliesGateway;
         }
 
-        public async Task Execute(Guid fosterCarerId, int localAuthorityId, UpdateFosterCarerRequest request)
+        public async Task Execute(Guid fosterCarerId, UpdateFosterCarerRequest request)
         {
             if (fosterCarerId == Guid.Empty) throw new ValidationException(FosterFamilyValidationMessages.FosterCarerId);
 
@@ -48,7 +48,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                 }
             }
 
-            await _fosterFamiliesGateway.UpdateFosterCarer(fosterCarerId, localAuthorityId, request);
+            await _fosterFamiliesGateway.UpdateFosterCarer(fosterCarerId, request);
         }
     }
 }
