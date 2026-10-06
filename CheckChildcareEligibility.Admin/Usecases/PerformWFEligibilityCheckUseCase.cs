@@ -1,6 +1,7 @@
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Enums;
+using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.ViewModels;
 using System.Text;
@@ -29,6 +30,8 @@ public class PerformWFEligibilityCheckUseCase : IPerformWFEligibilityCheckUseCas
         ParentAndChildViewModel parentAndChildRequest,
         ISession session)
     {
+        var canonicalNino =
+            NinoValidation.Normalize(parentAndChildRequest.NationalInsuranceNumber);
         session.Set("EligibilityCode", Encoding.UTF8.GetBytes(parentAndChildRequest.Child.EligibilityCode ?? string.Empty));
 
         // Build DOB string
@@ -40,7 +43,9 @@ public class PerformWFEligibilityCheckUseCase : IPerformWFEligibilityCheckUseCas
 
         session.Set("ChildDOB", Encoding.UTF8.GetBytes(dobString));
 
-        session.Set("ParentNINO", Encoding.UTF8.GetBytes(parentAndChildRequest.NationalInsuranceNumber ?? ""));
+        session.Set(
+            "ParentNINO",
+            Encoding.UTF8.GetBytes(canonicalNino ?? string.Empty));
 
         // Build ECS request
         var checkEligibilityRequest = new CheckEligibilityRequest
@@ -49,7 +54,7 @@ public class PerformWFEligibilityCheckUseCase : IPerformWFEligibilityCheckUseCas
             {
                 Type = CheckEligibilityType.WorkingFamilies,
                 EligibilityCode = parentAndChildRequest.Child.EligibilityCode,
-                NationalInsuranceNumber = parentAndChildRequest.NationalInsuranceNumber?.ToUpper(),
+                NationalInsuranceNumber = canonicalNino,
                 DateOfBirth = dobString
             }
         };

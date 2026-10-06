@@ -1,4 +1,5 @@
 ﻿using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeConstants;
+using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
@@ -145,7 +146,8 @@ public class CheckController : BaseController
                 EligibilityTypeLabel = GetEligibilityTypeLabel(eligibilityType),
                 ParentLastName = parent?.LastName ?? string.Empty,
                 ParentDateOfBirth = GetDateOfBirth(parent?.Day, parent?.Month, parent?.Year).ToString(),
-                ParentNino = parent?.NationalInsuranceNumber ?? string.Empty
+                ParentNino = NinoValidation.Normalize(
+                    parent?.NationalInsuranceNumber) ?? string.Empty
             };
 
             var isLA = _Claims?.Organisation?.Category?.Name == CheckChildcareEligibility.Admin.Models.Constants.CategoryTypeLA; //false=school
@@ -190,7 +192,9 @@ public class CheckController : BaseController
                 {
                     eligibilityOutcomeVm.ParentLastName = parent.LastName ?? string.Empty;
                     eligibilityOutcomeVm.ParentDateOfBirth = GetDateOfBirth(parent.Day, parent.Month, parent.Year).ToString();
-                    eligibilityOutcomeVm.ParentNino = parent.NationalInsuranceNumber ?? string.Empty;
+                    eligibilityOutcomeVm.ParentNino =
+                        NinoValidation.Normalize(
+                            parent.NationalInsuranceNumber) ?? string.Empty;
                 }
             }
 
