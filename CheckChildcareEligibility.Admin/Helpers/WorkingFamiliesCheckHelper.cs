@@ -93,7 +93,7 @@ public static class WorkingFamiliesCheckHelper
         {
             result = $"Code {WorkingFamiliesResponseBanner.CodeExpired}";
         }
-        else if (properties.IsNotValidYet) // Code cannot be used yet
+        else if (properties.IsNotValidForCurrentTerm || properties.IsNeverValid) // Code cannot be used yet
         {
             result = $"Code {WorkingFamiliesResponseBanner.CodeNotValidYet}";
         }
