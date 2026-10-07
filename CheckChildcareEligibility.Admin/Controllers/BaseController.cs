@@ -18,7 +18,7 @@ public class BaseController : Controller
         _dfeSignInApiService = dfeSignInApiService;
     }
 
-    internal async Task GetDfeClaimsAsync()
+    public async Task GetDfeClaimsAsync()
     {
         _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
 
