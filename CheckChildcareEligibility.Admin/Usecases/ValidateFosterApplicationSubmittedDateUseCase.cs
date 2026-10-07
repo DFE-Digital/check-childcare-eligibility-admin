@@ -11,7 +11,7 @@ public class FosterApplicationSubmittedDateValidationResult
 
 public interface IValidateFosterApplicationSubmittedDateUseCase
 {
-    FosterApplicationSubmittedDateValidationResult Execute(FosterApplicationSubmittedDateViewModel request, ModelStateDictionary modelState);
+    Task<FosterApplicationSubmittedDateValidationResult> Execute(FosterApplicationSubmittedDateViewModel request, ModelStateDictionary modelState);
 }
 
 public class ValidateFosterApplicationSubmittedDateUseCase : IValidateFosterApplicationSubmittedDateUseCase
@@ -23,7 +23,7 @@ public class ValidateFosterApplicationSubmittedDateUseCase : IValidateFosterAppl
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public FosterApplicationSubmittedDateValidationResult Execute(FosterApplicationSubmittedDateViewModel viewModel, ModelStateDictionary modelState)
+    public async Task<FosterApplicationSubmittedDateValidationResult> Execute(FosterApplicationSubmittedDateViewModel viewModel, ModelStateDictionary modelState)
     {
         // If model passes form validation construct date fields then perform additional validation using FluentValidation
         if (modelState.IsValid)

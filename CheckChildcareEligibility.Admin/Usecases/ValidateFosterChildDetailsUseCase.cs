@@ -12,7 +12,7 @@ public class FosterChildDetailsValidationResult
 
 public interface IValidateFosterChildDetailsUseCase
 {
-    FosterChildDetailsValidationResult Execute(FosterChildDetailsViewModel request, ModelStateDictionary modelState);
+    Task<FosterChildDetailsValidationResult> Execute(FosterChildDetailsViewModel request, ModelStateDictionary modelState);
 }
 
 public class ValidateFosterChildDetailsUseCase : IValidateFosterChildDetailsUseCase
@@ -24,7 +24,7 @@ public class ValidateFosterChildDetailsUseCase : IValidateFosterChildDetailsUseC
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public FosterChildDetailsValidationResult Execute(FosterChildDetailsViewModel viewModel, ModelStateDictionary modelState)
+    public async Task<FosterChildDetailsValidationResult> Execute(FosterChildDetailsViewModel viewModel, ModelStateDictionary modelState)
     {
         ArgumentNullException.ThrowIfNull(viewModel);
 

@@ -17,12 +17,12 @@
         if (Model.HasPartner)
         {
             <a class="govuk-back-link backLinkJS"
-               href="@Url.Action("EnterPartner", "FosterFamilies", new { Model.ContextId })">Back</a>
+               href="@Url.Action("Enter_Partner_Details_FF", "FosterFamilies", new { Model.ContextId })">Back</a>
         }
         else
         {
             <a class="govuk-back-link backLinkJS"
-               href="@Url.Action("EnterCarer", "FosterFamilies", new { Model.ContextId })">Back</a>
+               href="@Url.Action("Enter_Carer_Details_FF", "FosterFamilies", new { Model.ContextId })">Back</a>
         }
     }
 

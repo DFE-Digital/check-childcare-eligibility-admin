@@ -109,6 +109,14 @@ namespace CheckChildcareEligibility.Admin.Controllers
             {
                 // Pull the FosterCarerDetailsViewModel from session if it exists    
                 viewModel = _sessionContextService.GetSessionData<FosterCarerDetailsViewModel>(contextId, "FosterCarerDetails");
+
+                // Validate the model if it exists to allow post-redirect-get behaviour for validation messages
+                if (viewModel != null)
+                {
+                    TryValidateModel(viewModel);
+                    await _validateFosterCarerDetailsUseCase.Execute(viewModel, ModelState);
+                }
+
                 viewModel ??= new FosterCarerDetailsViewModel { ContextId = contextId };
             }
             return View(viewModel);
@@ -117,6 +125,9 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpPost("EnterCarer")]
         public async Task<IActionResult> Enter_Carer_Details_FF(FosterCarerDetailsViewModel request)
         {
+            // Populate session context with the FosterCarerDetailsViewModel before validation
+            _sessionContextService.SetSessionData(request.ContextId, "FosterCarerDetails", request);
+
             var validationResult = await _validateFosterCarerDetailsUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
@@ -130,12 +141,9 @@ namespace CheckChildcareEligibility.Admin.Controllers
                     };
                     return View("Resolve_Carer_Conflict_FF", conflictViewModel);
                 }
-
-                return View(request);
+                // Redirect back to get page to show validation errors
+                return RedirectToAction("Enter_Carer_Details_FF", new { request.ContextId });
             }
-
-            // Populate session context with the FosterCarerDetailsViewModel
-            _sessionContextService.SetSessionData(request.ContextId, "FosterCarerDetails", request);
 
             if (request.HasPartner == true)
             {
@@ -173,24 +181,47 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpGet("UpdateCarer/{FosterCarerId}")]
         public async Task<IActionResult> Update_Carer_Details_FF(Guid FosterCarerId)
         {
+            // Load foster carer record to ensure it exists and we have access
             var request = await _getFosterFamilyUseCase.Execute(FosterCarerId);
-            var fosterCarerViewModel = await _loadFosterCarerDetailsUseCase.Execute(request);
-            return View("Enter_Carer_Details_FF", fosterCarerViewModel);
+
+            // Pull the FosterCarerDetailsViewModel from session if it exists    
+            var viewModel = _sessionContextService.GetSessionData<FosterCarerDetailsViewModel>(FosterCarerId.ToString(), "FosterCarerDetails");
+
+            if (viewModel != null)
+            {
+                // Validate the model if it exists to allow post-redirect-get behaviour for validation messages
+                TryValidateModel(viewModel);
+                await _validateFosterCarerDetailsUseCase.Execute(viewModel, ModelState);
+            }
+            else
+            {
+                // Otherwise load the view model from the use case if it does not exist in session
+                viewModel = await _loadFosterCarerDetailsUseCase.Execute(request);
+            }
+
+            return View("Enter_Carer_Details_FF", viewModel);
         }
 
         [HttpPost("UpdateCarer")]
         public async Task<IActionResult> Update_Carer_Details_FF(FosterCarerDetailsViewModel request)
         {
+            // Populate session context with the FosterCarerDetailsViewModel before validation
+            _sessionContextService.SetSessionData(request.FosterCarerId.ToString(), "FosterCarerDetails", request);
+
             var validationResult = await _validateFosterCarerDetailsUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
-                return View("Enter_Carer_Details_FF", request);
+                if (validationResult?.ConflictingFosterCarerId != Guid.Empty)
+                {
+                    var conflictViewModel = new FosterCarerConflictViewModel()
+                    {
+                        CarerDetails = request,
+                        ConflictingFamily = await _getFosterFamilyUseCase.Execute(validationResult.ConflictingFosterCarerId, false)
+                    };
+                    return View("Resolve_Carer_Conflict_FF", conflictViewModel);
+                }
+                return RedirectToAction("Update_Carer_Details_FF", new { request.FosterCarerId });
             }
-
-            request.CarerDateOfBirth = new DateTime( // Set DateOfBirth in request before serializing
-                int.Parse(request.Year),
-                int.Parse(request.Month),
-                int.Parse(request.Day));
 
             var existingCarer = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, true);
             if (existingCarer == null) { return RedirectToAction("Search_Records_FF"); }
@@ -226,15 +257,26 @@ namespace CheckChildcareEligibility.Admin.Controllers
             if (fosterCarerDetails == null) { return RedirectToAction("Enter_Carer_Details_FF"); }
 
             // Pull the FosterPartnerDetailsViewModel from session if it exists, otherwise initialise with contextId
-            var fosterPartnerDetails = _sessionContextService.GetSessionData<FosterPartnerDetailsViewModel>(contextId, "FosterPartnerDetails");
-            fosterPartnerDetails ??= new FosterPartnerDetailsViewModel { ContextId = contextId };
+            var viewModel = _sessionContextService.GetSessionData<FosterPartnerDetailsViewModel>(contextId, "FosterPartnerDetails");
 
-            return View(fosterPartnerDetails);
+            // Validate the model if it exists to allow post-redirect-get behaviour for validation messages
+            if (viewModel != null)
+            {
+                TryValidateModel(viewModel);
+                await _validateFosterPartnerDetailsUseCase.Execute(viewModel, ModelState);
+            }
+
+            viewModel ??= new FosterPartnerDetailsViewModel { ContextId = contextId };
+
+            return View(viewModel);
         }
 
         [HttpPost("EnterPartner")]
         public async Task<IActionResult> Enter_Partner_Details_FF(FosterPartnerDetailsViewModel request)
         {
+            // Populate session context with the FosterCarerDetailsViewModel before validation
+            _sessionContextService.SetSessionData(request.ContextId, "FosterPartnerDetails", request);
+
             var validationResult = await _validateFosterPartnerDetailsUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
@@ -248,11 +290,8 @@ namespace CheckChildcareEligibility.Admin.Controllers
                     return View("Resolve_Partner_Conflict_FF", conflictViewModel);
                 }
 
-                return View(request);
+                return RedirectToAction("Enter_Partner_Details_FF", new { request.ContextId });
             }
-
-            // Populate session context with the FosterCarerDetailsViewModel
-            _sessionContextService.SetSessionData(request.ContextId, "FosterPartnerDetails", request);
 
             // Redirect to enter child details if they do not yet exist
             var fosterChildDetails = _sessionContextService.GetSessionData<FosterChildDetailsViewModel>(request.ContextId, "FosterChildDetails");
@@ -271,14 +310,34 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpGet("UpdatePartner/{FosterCarerId}")]
         public async Task<IActionResult> Update_Partner_Details_FF(Guid FosterCarerId)
         {
+            // Load foster carer record to ensure it exists and we have access
             var request = await _getFosterFamilyUseCase.Execute(FosterCarerId);
-            var viewModel = await _loadFosterPartnerDetailsUseCase.Execute(request);
+
+            // Pull the FosterPartnerDetailsViewModel from session if it exists    
+            var viewModel = _sessionContextService.GetSessionData<FosterPartnerDetailsViewModel>(FosterCarerId.ToString(), "FosterPartnerDetails");
+
+            if (viewModel != null)
+            {
+                // Validate the model if it exists to allow post-redirect-get behaviour for validation messages
+                TryValidateModel(viewModel);
+                await _validateFosterPartnerDetailsUseCase.Execute(viewModel, ModelState);
+            }
+            else
+            {
+                // Otherwise load the view model from the use case if it does not exist in session
+                viewModel = await _loadFosterPartnerDetailsUseCase.Execute(request);
+            }
+
             return View("Enter_Partner_Details_FF", viewModel);
         }
 
         [HttpPost("UpdatePartner")]
         public async Task<IActionResult> Update_Partner_Details_FF(FosterPartnerDetailsViewModel request)
         {
+
+            // Populate session context with the FosterPartnerDetailsViewModel before validation
+            _sessionContextService.SetSessionData(request.FosterCarerId.ToString(), "FosterPartnerDetails", request);
+
             var validationResult = await _validateFosterPartnerDetailsUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
@@ -292,13 +351,9 @@ namespace CheckChildcareEligibility.Admin.Controllers
                     return View("Resolve_Partner_Conflict_FF", conflictViewModel);
                 }
 
-                return View("Enter_Partner_Details_FF", request);
+                // Redirect back to get page to show validation errors
+                return RedirectToAction("Update_Partner_Details_FF", new { request.FosterCarerId });
             }
-
-            request.PartnerDateOfBirth = new DateTime( // Set DateOfBirth in request before serializing
-                int.Parse(request.Year),
-                int.Parse(request.Month),
-                int.Parse(request.Day));
 
             var response = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, true);
 
@@ -364,27 +419,35 @@ namespace CheckChildcareEligibility.Admin.Controllers
             if (fosterCarerDetails == null) { return RedirectToAction("Enter_Carer_Details_FF"); }
 
             // Pull the fosterChildDetailsViewModel from session if it exists, otherwise initialise with contextId
-            var fosterChildDetails = _sessionContextService.GetSessionData<FosterChildDetailsViewModel>(contextId, "FosterChildDetails");
-            fosterChildDetails ??= new FosterChildDetailsViewModel
+            var viewModel = _sessionContextService.GetSessionData<FosterChildDetailsViewModel>(contextId, "FosterChildDetails");
+
+            // Validate the model if it exists to allow post-redirect-get behaviour for validation messages
+            if (viewModel != null)
+            {
+                TryValidateModel(viewModel);
+                await _validateFosterChildDetailsUseCase.Execute(viewModel, ModelState);
+            }
+
+            viewModel ??= new FosterChildDetailsViewModel
             {
                 ContextId = contextId,
                 HasPartner = fosterCarerDetails.HasPartner
             };
 
-            return View(fosterChildDetails);
+            return View(viewModel);
         }
 
         [HttpPost("EnterChild")]
         public async Task<IActionResult> Enter_Child_Details_FF(FosterChildDetailsViewModel request)
         {
-            var validationResult = _validateFosterChildDetailsUseCase.Execute(request, ModelState);
+            // Populate session context with the FosterCarerDetailsViewModel before validation
+            _sessionContextService.SetSessionData(request.ContextId, "FosterChildDetails", request);
+
+            var validationResult = await _validateFosterChildDetailsUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
-                return View(request);
+                return RedirectToAction("Enter_Child_Details_FF", new { request.ContextId });
             }
-
-            // Populate session context with the FosterCarerDetailsViewModel
-            _sessionContextService.SetSessionData(request.ContextId, "FosterChildDetails", request);
 
             // Redirect to enter submitted date details if they do not yet exist
             var submittedDateDetails = _sessionContextService.GetSessionData<FosterApplicationSubmittedDateViewModel>(request.ContextId, "FosterChildDetails");
@@ -402,27 +465,43 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpGet("UpdateChild/{fosterChildId}")]
         public async Task<IActionResult> Update_Child_Details_FF(Guid fosterChildId)
         {
+            // Load foster child record to ensure it exists and we have access
             var request = await _getFosterChildUseCase.Execute(fosterChildId);
-            var fosterChildViewModel = await _loadFosterChildDetailsUseCase.Execute(request);
-            return View("Enter_Child_Details_FF", fosterChildViewModel);
+
+            // Pull the FosterChildDetailsViewModel from session if it exists    
+            var viewModel = _sessionContextService.GetSessionData<FosterChildDetailsViewModel>(fosterChildId.ToString(), "FosterChildDetails");
+
+            if (viewModel != null)
+            {
+                // Validate the model if it exists to allow post-redirect-get behaviour for validation messages
+                TryValidateModel(viewModel);
+                await _validateFosterChildDetailsUseCase.Execute(viewModel, ModelState);
+            }
+            else
+            {
+                // Otherwise load the view model from the use case if it does not exist in session
+                viewModel = await _loadFosterChildDetailsUseCase.Execute(request);
+            }
+
+            return View("Enter_Child_Details_FF", viewModel);
         }
 
 
         [HttpPost("UpdateChild")]
         public async Task<IActionResult> Update_Child_Details_FF(FosterChildDetailsViewModel request)
         {
-            var validationResult = _validateFosterChildDetailsUseCase.Execute(request, ModelState);
+            // Load foster child record to ensure it exists and we have access
+            await _getFosterChildUseCase.Execute(request.FosterChildId, true);
+
+            // Populate session context with the FosterChildDetailsViewModel before validation
+            _sessionContextService.SetSessionData(request.FosterChildId.ToString(), "FosterChildDetails", request);
+
+            var validationResult = await _validateFosterChildDetailsUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
-                return View("Enter_Child_Details_FF", request);
+                return RedirectToAction("Update_Child_Details_FF", new { request.FosterChildId });
             }
 
-            request.ChildDateOfBirth = new DateTime( // Set DateOfBirth in request before serializing
-                int.Parse(request.Year),
-                int.Parse(request.Month),
-                int.Parse(request.Day));
-
-            var response = await _getFosterChildUseCase.Execute(request.FosterChildId, true);
             UpdateFosterChildRequest updateRequest = new()
             {
                 FosterChildRequest = request.BuildRequest()
@@ -451,24 +530,32 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // If fosterChildDetails is null, redirect to enter child to complete required details
             if (fosterChildDetails == null) { return RedirectToAction("Enter_Child_Details_FF", new { contextId }); }
 
-            // Pull the fosterChildDetailsViewModel from session if it exists, otherwise initialise with contextId
-            var fosterApplicationSubmittedDateViewModel = _sessionContextService.GetSessionData<FosterApplicationSubmittedDateViewModel>(contextId, "FosterApplicationSubmittedDate");
-            fosterApplicationSubmittedDateViewModel ??= new FosterApplicationSubmittedDateViewModel { ContextId = contextId };
+            // Pull the fosterChildDetailsViewModel from session if it exists
+            var viewModel = _sessionContextService.GetSessionData<FosterApplicationSubmittedDateViewModel>(contextId, "FosterApplicationSubmittedDate");
 
-            return View(fosterApplicationSubmittedDateViewModel);
+            // Validate the model if it exists to allow post-redirect-get behaviour for validation messages
+            if (viewModel != null)
+            {
+                TryValidateModel(viewModel);
+                await _validateFosterApplicationSubmittedDateUseCase.Execute(viewModel, ModelState);
+            }
+
+            viewModel ??= new FosterApplicationSubmittedDateViewModel { ContextId = contextId };
+
+            return View(viewModel);
         }
 
         [HttpPost("SubmittedDate")]
         public async Task<IActionResult> Enter_Submitted_Date_Details_FF(FosterApplicationSubmittedDateViewModel request)
         {
-            var validationResult = _validateFosterApplicationSubmittedDateUseCase.Execute(request, ModelState);
+            // Populate session context with the FosterCarerDetailsViewModel before validation
+            _sessionContextService.SetSessionData(request.ContextId, "FosterApplicationSubmittedDate", request);
+
+            var validationResult = await _validateFosterApplicationSubmittedDateUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
-                return View(request);
+                return RedirectToAction("Enter_Submitted_Date_Details_FF", new { request.ContextId });
             }
-
-            // Populate session context with the FosterCarerDetailsViewModel
-            _sessionContextService.SetSessionData(request.ContextId, "FosterApplicationSubmittedDate", request);
 
             return RedirectToAction("Check_Details_FF", new { request.ContextId });
         }
