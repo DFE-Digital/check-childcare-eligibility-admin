@@ -18,7 +18,7 @@ public class BaseController : Controller
         _dfeSignInApiService = dfeSignInApiService;
     }
 
-    public async Task GetDfeClaimsAsync()
+    internal async Task GetDfeClaimsAsync()
     {
         _Claims = DfeSignInExtensions.GetDfeClaims(HttpContext.User.Claims);
 
@@ -36,7 +36,7 @@ public class BaseController : Controller
         await base.OnActionExecutionAsync(context, next);
     }
 
-    public int GetLocalAuthorityId()
+    internal int GetLocalAuthorityId()
     {
         return int.Parse(_Claims.Organisation.EstablishmentNumber);
     }
