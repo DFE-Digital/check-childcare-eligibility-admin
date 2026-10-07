@@ -29,7 +29,6 @@ public static class NinoValidation
         {
             return !required;
         }
-
-        return IsValidCanonical(value.ToUpperInvariant());
+        return IsValidCanonical(Normalize(value).ToUpperInvariant());
     }
 }
