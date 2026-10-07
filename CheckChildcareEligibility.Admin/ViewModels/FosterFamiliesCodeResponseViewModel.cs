@@ -1,5 +1,4 @@
 using CheckChildcareEligibility.Admin.Boundary.Responses;
-using CheckChildcareEligibility.Admin.Domain.Constants.Generic;
 using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies;
 using CheckChildcareEligibility.Admin.Helpers;
 using CheckChildcareEligibility.Admin.Models;
@@ -17,5 +16,7 @@ public class FosterFamiliesCodeResponseViewModel
     public string CodeStatus => WorkingFamiliesCheckHelper.GetCodeStatus_FF(CodeProperties);
 
     public string[] ReconfirmStatus => WorkingFamiliesCheckHelper.GetReconfirmStatus(CodeProperties.ReconfirmationProperties);
+
+    public string? Confirmation { get; set; }
 
 }

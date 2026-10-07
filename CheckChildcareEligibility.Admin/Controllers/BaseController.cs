@@ -36,7 +36,7 @@ public class BaseController : Controller
         await base.OnActionExecutionAsync(context, next);
     }
 
-    public int GetLocalAuthorityId()
+    internal int GetLocalAuthorityId()
     {
         return int.Parse(_Claims.Organisation.EstablishmentNumber);
     }

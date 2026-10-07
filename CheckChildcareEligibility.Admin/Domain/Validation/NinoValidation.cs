@@ -17,6 +17,12 @@ public static class NinoValidation
             : NonAsciiAlphaNumeric.Replace(value, string.Empty)
                 .ToUpperInvariant();
     }
+    public static string? RemoveSpaces(string? value)
+    {
+        return value is null
+            ? null
+            : value.Replace(" ", string.Empty).ToUpperInvariant();
+    }
 
     public static bool IsValidCanonical(string? value)
     {
@@ -29,7 +35,6 @@ public static class NinoValidation
         {
             return !required;
         }
-
         return IsValidCanonical(value.ToUpperInvariant());
     }
 }

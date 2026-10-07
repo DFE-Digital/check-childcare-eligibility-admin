@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using CheckChildcareEligibility.Admin.Attributes;
+using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Helpers;
 
 namespace CheckYourEligibility.API.Domain.Validation;
@@ -46,8 +47,7 @@ internal static class DataValidation
 
     internal static bool BeAValidNi(string? value)
     {
-        return CheckChildcareEligibility.Admin.Domain.Validation
-            .NinoValidation.IsValidInput(value);
+        return NinoValidation.IsValidInput(NinoValidation.RemoveSpaces(value));
     }
 
     internal static bool BeAValidUkPostcode(string? value)

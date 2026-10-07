@@ -28,10 +28,20 @@
                    data-module="govuk-button" data-govuk-button-init="">
                     Add child to family
                 </a>
-                <a class="govuk-link govuk-link--inverse backLinkJS"
-                   href="@Url.Action("Enter_Carer_Details_FF", "FosterFamilies", new { Model.CarerDetails.ContextId })">
-                    Enter a different NI number
-                </a>
+                @if (!string.IsNullOrEmpty(Model.CarerDetails.ContextId))
+                {
+                    <a class="govuk-link govuk-link--inverse"
+                       href="@Url.Action("Enter_Carer_Details_FF", "FosterFamilies", new { Model.CarerDetails.ContextId })">
+                        Enter a different NI number
+                    </a>
+                }
+                else
+                {
+                    <a class="govuk-link govuk-link--inverse"
+                       href="@Url.Action(action: "Update_Carer_Details_FF", "FosterFamilies", new { Model.CarerDetails.FosterCarerId })">
+                        Enter a different NI number
+                    </a>
+                }
             </div>
         </div>
     </div>
