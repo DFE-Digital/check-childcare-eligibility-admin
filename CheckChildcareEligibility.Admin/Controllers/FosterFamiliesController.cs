@@ -587,6 +587,15 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // If fosterApplicationSubmittedDate is null, redirect to submission date to complete required details
             if (fosterApplicationSubmittedDate == null) { return RedirectToAction("Enter_Submitted_Date_Details_FF", new { contextId }); }
 
+            // Re-validate all models
+            await _validateFosterCarerDetailsUseCase.Execute(fosterCarerDetails, ModelState);
+            if (fosterCarerDetails.HasPartner == true)
+            {
+                await _validateFosterPartnerDetailsUseCase.Execute(fosterPartnerDetails, ModelState);
+            }
+            await _validateFosterChildDetailsUseCase.Execute(fosterChildDetails, ModelState);
+            await _validateFosterApplicationSubmittedDateUseCase.Execute(fosterApplicationSubmittedDate, ModelState);          
+
             // Build request
             var fosterFamilyRequest = new FosterFamilyRequest
             {
@@ -645,6 +654,15 @@ namespace CheckChildcareEligibility.Admin.Controllers
             var fosterApplicationSubmittedDate = _sessionContextService.GetSessionData<FosterApplicationSubmittedDateViewModel>(request.ContextId, "FosterApplicationSubmittedDate");
             // If fosterApplicationSubmittedDate is null, redirect to submission date to complete required details
             if (fosterApplicationSubmittedDate == null) { return RedirectToAction("Enter_Submitted_Date_Details_FF", new { request.ContextId }); }
+
+            // Re-validate all models
+            await _validateFosterCarerDetailsUseCase.Execute(fosterCarerDetails, ModelState);
+            if (fosterCarerDetails.HasPartner == true)
+            {
+                await _validateFosterPartnerDetailsUseCase.Execute(fosterPartnerDetails, ModelState);
+            }
+            await _validateFosterChildDetailsUseCase.Execute(fosterChildDetails, ModelState);
+            await _validateFosterApplicationSubmittedDateUseCase.Execute(fosterApplicationSubmittedDate, ModelState);          
 
             // Prepare request
             var fosterFamilyRequest = new FosterFamilyRequest
