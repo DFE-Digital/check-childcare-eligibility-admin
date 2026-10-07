@@ -136,7 +136,7 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
 
             RuleFor(x => x.SubmissionDate)
                 .Must(DataValidation.BeWithin31Days)
-                .WithMessage(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, DateTime.Today.AddDays(-31)));
+                .WithMessage(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, DateTime.Today.AddMonths(-32)));
         }
     }
 
