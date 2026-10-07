@@ -145,6 +145,9 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return RedirectToAction("Enter_Carer_Details_FF", new { request.ContextId });
             }
 
+            // Update session context with the FosterCarerDetailsViewModel post successful validation
+            _sessionContextService.SetSessionData(request.ContextId, "FosterCarerDetails", request);
+
             if (request.HasPartner == true)
             {
                 // Redirect to enter partner details if they do not yet exist
@@ -223,6 +226,9 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return RedirectToAction("Update_Carer_Details_FF", new { request.FosterCarerId });
             }
 
+            // Update session context with the FosterCarerDetailsViewModel post successful validation
+            _sessionContextService.SetSessionData(request.FosterCarerId.ToString(), "FosterCarerDetails", request);
+
             var existingCarer = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, true);
             if (existingCarer == null) { return RedirectToAction("Search_Records_FF"); }
 
@@ -293,6 +299,9 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return RedirectToAction("Enter_Partner_Details_FF", new { request.ContextId });
             }
 
+            // Update session context with the FosterPartnerDetailsViewModel post successful validation
+            _sessionContextService.SetSessionData(request.ContextId, "FosterPartnerDetails", request);
+
             // Redirect to enter child details if they do not yet exist
             var fosterChildDetails = _sessionContextService.GetSessionData<FosterChildDetailsViewModel>(request.ContextId, "FosterChildDetails");
             if (fosterChildDetails == null)
@@ -354,6 +363,9 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 // Redirect back to get page to show validation errors
                 return RedirectToAction("Update_Partner_Details_FF", new { request.FosterCarerId });
             }
+
+            // Update session context with the FosterPartnerDetailsViewModel post successful validation
+            _sessionContextService.SetSessionData(request.FosterCarerId.ToString(), "FosterPartnerDetails", request);
 
             var response = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, true);
 
@@ -449,6 +461,9 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return RedirectToAction("Enter_Child_Details_FF", new { request.ContextId });
             }
 
+            // Update session context with the FosterChildDetailsViewModel post successful validation
+            _sessionContextService.SetSessionData(request.ContextId, "FosterChildDetails", request);
+
             // Redirect to enter submitted date details if they do not yet exist
             var submittedDateDetails = _sessionContextService.GetSessionData<FosterApplicationSubmittedDateViewModel>(request.ContextId, "FosterChildDetails");
             if (submittedDateDetails == null)
@@ -502,17 +517,16 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return RedirectToAction("Update_Child_Details_FF", new { request.FosterChildId });
             }
 
+            // Update session context with the FosterChildDetailsViewModel post successful validation
+            _sessionContextService.SetSessionData(request.FosterChildId.ToString(), "FosterChildDetails", request);
+
             UpdateFosterChildRequest updateRequest = new()
             {
                 FosterChildRequest = request.BuildRequest()
             };
 
             await _updateFosterChildUseCase.Execute(request.FosterChildId, updateRequest);
-            return RedirectToAction("Code_Record_FF", new
-            {
-                request.FosterChildId,
-                Confirmation = "Changes to child saved"
-            });
+            return RedirectToAction("Code_Record_FF", new { request.FosterChildId, Confirmation = "Changes to child saved" });
         }
 
         [HttpGet("SubmittedDate/{contextId}")]
@@ -557,6 +571,9 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return RedirectToAction("Enter_Submitted_Date_Details_FF", new { request.ContextId });
             }
 
+            // Update session context with the FosterApplicationSubmittedDateViewModel post successful validation
+            _sessionContextService.SetSessionData(request.ContextId, "FosterApplicationSubmittedDate", request);
+
             return RedirectToAction("Check_Details_FF", new { request.ContextId });
         }
 
@@ -586,15 +603,6 @@ namespace CheckChildcareEligibility.Admin.Controllers
             var fosterApplicationSubmittedDate = _sessionContextService.GetSessionData<FosterApplicationSubmittedDateViewModel>(contextId, "FosterApplicationSubmittedDate");
             // If fosterApplicationSubmittedDate is null, redirect to submission date to complete required details
             if (fosterApplicationSubmittedDate == null) { return RedirectToAction("Enter_Submitted_Date_Details_FF", new { contextId }); }
-
-            // Re-validate all models
-            await _validateFosterCarerDetailsUseCase.Execute(fosterCarerDetails, ModelState);
-            if (fosterCarerDetails.HasPartner == true)
-            {
-                await _validateFosterPartnerDetailsUseCase.Execute(fosterPartnerDetails, ModelState);
-            }
-            await _validateFosterChildDetailsUseCase.Execute(fosterChildDetails, ModelState);
-            await _validateFosterApplicationSubmittedDateUseCase.Execute(fosterApplicationSubmittedDate, ModelState);          
 
             // Build request
             var fosterFamilyRequest = new FosterFamilyRequest
@@ -655,15 +663,6 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // If fosterApplicationSubmittedDate is null, redirect to submission date to complete required details
             if (fosterApplicationSubmittedDate == null) { return RedirectToAction("Enter_Submitted_Date_Details_FF", new { request.ContextId }); }
 
-            // Re-validate all models
-            await _validateFosterCarerDetailsUseCase.Execute(fosterCarerDetails, ModelState);
-            if (fosterCarerDetails.HasPartner == true)
-            {
-                await _validateFosterPartnerDetailsUseCase.Execute(fosterPartnerDetails, ModelState);
-            }
-            await _validateFosterChildDetailsUseCase.Execute(fosterChildDetails, ModelState);
-            await _validateFosterApplicationSubmittedDateUseCase.Execute(fosterApplicationSubmittedDate, ModelState);          
-
             // Prepare request
             var fosterFamilyRequest = new FosterFamilyRequest
             {
@@ -704,9 +703,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
         }
 
         [HttpGet("Family/{FosterCarerId}")]
-        public async Task<IActionResult> Family_Record_FF(Guid fosterCarerId,
-            string? confirmation
-        )
+        public async Task<IActionResult> Family_Record_FF(Guid fosterCarerId, string? confirmation)
         {
             var response = await _getFosterFamilyUseCase.Execute(fosterCarerId, true);
             var viewModel = new FosterFamilyViewModel()
@@ -718,13 +715,14 @@ namespace CheckChildcareEligibility.Admin.Controllers
         }
 
         [HttpGet("Code/{fosterChildId}")]
-        public async Task<IActionResult> Code_Record_FF(Guid fosterChildId)
+        public async Task<IActionResult> Code_Record_FF(Guid fosterChildId, string? confirmation)
         {
             var childResponse = await _getFosterChildUseCase.Execute(fosterChildId, true);
             var viewModel = new FosterFamiliesCodeResponseViewModel()
             {
                 Response = childResponse,
-                CodeProperties = new EligibilityCodeProperties(childResponse)
+                CodeProperties = new EligibilityCodeProperties(childResponse),
+                Confirmation = confirmation
             };
             return View(viewModel);
         }
