@@ -76,6 +76,20 @@ namespace CheckChildcareEligibility.Admin.Controllers
             _updateFosterChildUseCase = updateFosterChildUseCase;
         }
 
+        private void DetectJourneyRestartAndClearSession(string sessionId, string sessionKey, string journeyName)
+        {
+            // Detect referrer pattern - if journeyName is not the final or penultimate segment then 
+            // we should clear session data to restart the journey
+            string[] referrer = HttpContext.Request.Headers.Referer.ToString()
+                .Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if (referrer.Length == 0 ||
+                (referrer[^1] != journeyName && (referrer.Length < 2 || referrer[^2] != journeyName)))
+            {
+                // Clear session data to restart the journey
+                _sessionContextService.ClearSessionData(sessionId, sessionKey);
+            }
+        }
+
         [HttpGet("Search")]
         public async Task<IActionResult> Search_Records_FF(int pageNumber = 1, string ninoFilter = "")
         {
@@ -132,7 +146,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             if (validationResult == null || !validationResult.IsValid)
             {
                 // If validation failure was caused by a duplicate carer conflict, return conflict view
-                if (validationResult.ConflictingFosterCarerId != Guid.Empty)
+                if (validationResult != null && validationResult.ConflictingFosterCarerId != Guid.Empty)
                 {
                     var conflictViewModel = new FosterCarerConflictViewModel()
                     {
@@ -181,14 +195,18 @@ namespace CheckChildcareEligibility.Admin.Controllers
             }
         }
 
+
         [HttpGet("UpdateCarer/{FosterCarerId}")]
-        public async Task<IActionResult> Update_Carer_Details_FF(Guid FosterCarerId)
+        public async Task<IActionResult> Update_Carer_Details_FF(Guid fosterCarerId)
         {
             // Load foster carer record to ensure it exists and we have access
-            var request = await _getFosterFamilyUseCase.Execute(FosterCarerId);
+            var request = await _getFosterFamilyUseCase.Execute(fosterCarerId);
+
+            // Clear session to restart journey if required
+            DetectJourneyRestartAndClearSession(fosterCarerId.ToString(), "FosterCarerDetails", "UpdateCarer");
 
             // Pull the FosterCarerDetailsViewModel from session if it exists    
-            var viewModel = _sessionContextService.GetSessionData<FosterCarerDetailsViewModel>(FosterCarerId.ToString(), "FosterCarerDetails");
+            var viewModel = _sessionContextService.GetSessionData<FosterCarerDetailsViewModel>(fosterCarerId.ToString(), "FosterCarerDetails");
 
             if (viewModel != null)
             {
@@ -208,13 +226,16 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpPost("UpdateCarer")]
         public async Task<IActionResult> Update_Carer_Details_FF(FosterCarerDetailsViewModel request)
         {
+            // Load foster carer record to ensure it exists and we have access
+            var existingCarer = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, true);
+
             // Populate session context with the FosterCarerDetailsViewModel before validation
             _sessionContextService.SetSessionData(request.FosterCarerId.ToString(), "FosterCarerDetails", request);
 
             var validationResult = await _validateFosterCarerDetailsUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
-                if (validationResult?.ConflictingFosterCarerId != Guid.Empty)
+                if (validationResult != null && validationResult.ConflictingFosterCarerId != Guid.Empty)
                 {
                     var conflictViewModel = new FosterCarerConflictViewModel()
                     {
@@ -226,12 +247,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return RedirectToAction("Update_Carer_Details_FF", new { request.FosterCarerId });
             }
 
-            // Update session context with the FosterCarerDetailsViewModel post successful validation
-            _sessionContextService.SetSessionData(request.FosterCarerId.ToString(), "FosterCarerDetails", request);
+            // Clear carer details from session
+            _sessionContextService.ClearSessionData(request.FosterCarerId.ToString(), "FosterCarerDetails");
 
-            var existingCarer = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, true);
-            if (existingCarer == null) { return RedirectToAction("Search_Records_FF"); }
-
+            // Build update request
             request.HasPartner = existingCarer.HasPartner;
             UpdateFosterCarerRequest updateRequest = new()
             {
@@ -286,7 +305,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             var validationResult = await _validateFosterPartnerDetailsUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
-                if (validationResult?.ConflictingFosterCarerId != Guid.Empty)
+                if (validationResult != null && validationResult.ConflictingFosterCarerId != Guid.Empty)
                 {
                     var conflictViewModel = new FosterPartnerConflictViewModel()
                     {
@@ -317,13 +336,16 @@ namespace CheckChildcareEligibility.Admin.Controllers
 
 
         [HttpGet("UpdatePartner/{FosterCarerId}")]
-        public async Task<IActionResult> Update_Partner_Details_FF(Guid FosterCarerId)
+        public async Task<IActionResult> Update_Partner_Details_FF(Guid fosterCarerId)
         {
             // Load foster carer record to ensure it exists and we have access
-            var request = await _getFosterFamilyUseCase.Execute(FosterCarerId);
+            var request = await _getFosterFamilyUseCase.Execute(fosterCarerId);
+
+            // Clear session to restart journey if required
+            DetectJourneyRestartAndClearSession(fosterCarerId.ToString(), "FosterPartnerDetails", "UpdatePartner");
 
             // Pull the FosterPartnerDetailsViewModel from session if it exists    
-            var viewModel = _sessionContextService.GetSessionData<FosterPartnerDetailsViewModel>(FosterCarerId.ToString(), "FosterPartnerDetails");
+            var viewModel = _sessionContextService.GetSessionData<FosterPartnerDetailsViewModel>(fosterCarerId.ToString(), "FosterPartnerDetails");
 
             if (viewModel != null)
             {
@@ -344,13 +366,16 @@ namespace CheckChildcareEligibility.Admin.Controllers
         public async Task<IActionResult> Update_Partner_Details_FF(FosterPartnerDetailsViewModel request)
         {
 
+            // Load foster carer record to ensure it exists and we have access
+            var existingCarer = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, true);
+            
             // Populate session context with the FosterPartnerDetailsViewModel before validation
             _sessionContextService.SetSessionData(request.FosterCarerId.ToString(), "FosterPartnerDetails", request);
 
             var validationResult = await _validateFosterPartnerDetailsUseCase.Execute(request, ModelState);
             if (validationResult == null || !validationResult.IsValid)
             {
-                if (validationResult?.ConflictingFosterCarerId != Guid.Empty)
+                if (validationResult != null && validationResult.ConflictingFosterCarerId != Guid.Empty)
                 {
                     var conflictViewModel = new FosterPartnerConflictViewModel()
                     {
@@ -364,19 +389,17 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return RedirectToAction("Update_Partner_Details_FF", new { request.FosterCarerId });
             }
 
-            // Update session context with the FosterPartnerDetailsViewModel post successful validation
-            _sessionContextService.SetSessionData(request.FosterCarerId.ToString(), "FosterPartnerDetails", request);
-
-            var response = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, true);
+            // Clear partner details from session
+            _sessionContextService.ClearSessionData(request.FosterCarerId.ToString(), "FosterPartnerDetails");
 
             UpdateFosterCarerRequest updateRequest = new()
             {
                 FosterCarerRequest = new FosterCarerRequest
                 {
-                    CarerFirstName = response.CarerFirstName,
-                    CarerLastName = response.CarerLastName,
-                    CarerDateOfBirth = response.CarerDateOfBirth,
-                    CarerNationalInsuranceNumber = response.CarerNationalInsuranceNumber,
+                    CarerFirstName = existingCarer.CarerFirstName,
+                    CarerLastName = existingCarer.CarerLastName,
+                    CarerDateOfBirth = existingCarer.CarerDateOfBirth,
+                    CarerNationalInsuranceNumber = existingCarer.CarerNationalInsuranceNumber,
                     HasPartner = true
                 },
                 FosterPartnerRequest = request.BuildRequest()
@@ -386,16 +409,16 @@ namespace CheckChildcareEligibility.Admin.Controllers
             return RedirectToAction("Family_Record_FF", new
             {
                 request.FosterCarerId,
-                Confirmation = response.HasPartner ?
+                Confirmation = existingCarer.HasPartner ?
                     "Changes to partner saved" :
                     "Partner added"
             });
         }
 
         [HttpGet("RemovePartner/{FosterCarerId}")]
-        public async Task<IActionResult> Remove_Partner_Details_FF(Guid FosterCarerId)
+        public async Task<IActionResult> Remove_Partner_Details_FF(Guid fosterCarerId)
         {
-            var request = await _getFosterFamilyUseCase.Execute(FosterCarerId);
+            var request = await _getFosterFamilyUseCase.Execute(fosterCarerId);
             var viewModel = await _loadFosterPartnerDetailsUseCase.Execute(request);
             return View("Remove_Partner_Details_FF", viewModel);
         }
@@ -403,8 +426,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
         [HttpPost("RemovePartner")]
         public async Task<IActionResult> Remove_Partner_Details_FF(FosterPartnerDetailsViewModel request)
         {
+            // Load foster carer record to ensure it exists and we have access
             var response = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, true);
 
+            // Build request
             UpdateFosterCarerRequest updateRequest = new()
             {
                 FosterCarerRequest = new FosterCarerRequest
@@ -417,6 +442,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 }
             };
             await _updateFosterCarerUseCase.Execute(request.FosterCarerId, updateRequest);
+
+            // Ensure any cached partner details are cleared from session
+            _sessionContextService.ClearSessionData(request.FosterCarerId.ToString(), "FosterPartnerDetails");
+
             return RedirectToAction("Family_Record_FF", new { request.FosterCarerId, Confirmation = "Partner removed" });
         }
 
@@ -465,7 +494,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             _sessionContextService.SetSessionData(request.ContextId, "FosterChildDetails", request);
 
             // Redirect to enter submitted date details if they do not yet exist
-            var submittedDateDetails = _sessionContextService.GetSessionData<FosterApplicationSubmittedDateViewModel>(request.ContextId, "FosterChildDetails");
+            var submittedDateDetails = _sessionContextService.GetSessionData<FosterApplicationSubmittedDateViewModel>(request.ContextId, "FosterApplicationSubmittedDate");
             if (submittedDateDetails == null)
             {
                 return RedirectToAction("Enter_Submitted_Date_Details_FF", new { request.ContextId });
@@ -482,6 +511,9 @@ namespace CheckChildcareEligibility.Admin.Controllers
         {
             // Load foster child record to ensure it exists and we have access
             var request = await _getFosterChildUseCase.Execute(fosterChildId);
+
+            // Clear session to restart journey if required
+            DetectJourneyRestartAndClearSession(fosterChildId.ToString(), "FosterChildDetails", "UpdateChild");
 
             // Pull the FosterChildDetailsViewModel from session if it exists    
             var viewModel = _sessionContextService.GetSessionData<FosterChildDetailsViewModel>(fosterChildId.ToString(), "FosterChildDetails");
@@ -517,8 +549,8 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return RedirectToAction("Update_Child_Details_FF", new { request.FosterChildId });
             }
 
-            // Update session context with the FosterChildDetailsViewModel post successful validation
-            _sessionContextService.SetSessionData(request.FosterChildId.ToString(), "FosterChildDetails", request);
+            // Clear child details from session
+            _sessionContextService.ClearSessionData(request.FosterChildId.ToString(), "FosterChildDetails");
 
             UpdateFosterChildRequest updateRequest = new()
             {
