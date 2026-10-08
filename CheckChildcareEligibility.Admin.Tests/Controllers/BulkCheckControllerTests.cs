@@ -13,9 +13,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
 
 namespace CheckChildcareEligibility.Admin.Tests.Controllers
 {
