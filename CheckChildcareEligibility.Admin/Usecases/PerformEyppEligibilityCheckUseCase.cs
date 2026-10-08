@@ -2,6 +2,7 @@ using System.Text;
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Enums;
+using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
 
@@ -28,6 +29,8 @@ public class PerformEyppEligibilityCheckUseCase : IPerformEyppEligibilityCheckUs
         ParentGuardian parentRequest,
         ISession session)
     {
+        var canonicalNino =
+            NinoValidation.Normalize(parentRequest.NationalInsuranceNumber);
         session.Set("ParentLastName", Encoding.UTF8.GetBytes(parentRequest.LastName ?? string.Empty));
 
         // Build DOB string
@@ -38,8 +41,10 @@ public class PerformEyppEligibilityCheckUseCase : IPerformEyppEligibilityCheckUs
         ).ToString("yyyy-MM-dd");
 
         session.Set("ParentDOB", Encoding.UTF8.GetBytes(dobString));
-        
-        session.Set("ParentNINO", Encoding.UTF8.GetBytes(parentRequest.NationalInsuranceNumber ?? ""));
+
+        session.Set(
+            "ParentNINO",
+            Encoding.UTF8.GetBytes(canonicalNino ?? string.Empty));
 
         // Build ECS request
         var checkEligibilityRequest = new CheckEligibilityRequest
@@ -48,7 +53,7 @@ public class PerformEyppEligibilityCheckUseCase : IPerformEyppEligibilityCheckUs
             {
                 Type = CheckEligibilityType.EarlyYearPupilPremium,
                 LastName = parentRequest.LastName,
-                NationalInsuranceNumber = parentRequest.NationalInsuranceNumber?.ToUpper(),
+                NationalInsuranceNumber = canonicalNino,
                 DateOfBirth = dobString
             }
         };

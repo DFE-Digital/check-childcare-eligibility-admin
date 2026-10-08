@@ -1,5 +1,8 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Domain.Enums;
+using CheckChildcareEligibility.Admin.Domain.Validation;
+using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
+using System.Text;
 using CheckChildcareEligibility.Admin.Tests.Properties;
 using CheckChildcareEligibility.Admin.Usecases;
 using CheckChildcareEligibility.Admin.Usecases.Constants;
@@ -32,6 +35,74 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
         // system under test
         private IParseBulkCheckFileUseCase _sut;
 
+        [TestCase(CheckEligibilityType.TwoYearOffer)]
+        [TestCase(CheckEligibilityType.EarlyYearPupilPremium)]
+        [TestCase(CheckEligibilityType.WorkingFamilies)]
+        public async Task Execute_WithRealValidator_Should_Canonicalise_Valid_Nino_And_Reject_Forbidden_Prefix(
+            CheckEligibilityType eligibilityType)
+        {
+            var parser = new ParseBulkCheckFileUseCase(
+                new CheckEligibilityRequestDataValidator(),
+                _config.Object);
+
+            var csv = eligibilityType == CheckEligibilityType.WorkingFamilies
+                ? "Eligibility code,National Insurance number,Child date of birth\r\n"
+                  + "50173110190,ab123456c,2022-01-01\r\n"
+                  + "50173110191,BG123456C,2022-01-01\r\n"
+                : "Parent Last Name,Parent Date of Birth,Parent National Insurance number\r\n"
+                  + "Smith,1980-01-01,ab123456c\r\n"
+                  + "Jones,1980-01-01,BG123456C\r\n";
+
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(csv));
+
+            var result = await parser.Execute(stream, eligibilityType);
+
+            result.ErrorMessage.Should().BeEmpty();
+
+            result.ValidRequests.Should().ContainSingle();
+            result.ValidRequests[0].NationalInsuranceNumber.Should().Be("AB123456C");
+            result.ValidRequests[0].Type.Should().Be(eligibilityType);
+            result.ValidRequests[0].Order.Should().Be(1);
+
+            result.Errors.Should().ContainSingle();
+            result.Errors[0].LineNumber.Should().Be(3);
+            result.Errors[0].Message.Should().Be(ValidationMessages.ValidNI);
+        }
+
+        [Test]
+        public async Task Execute_WithRealValidator_Should_Reject_Invalid_Ninos(
+            [Values(
+                CheckEligibilityType.TwoYearOffer,
+                CheckEligibilityType.EarlyYearPupilPremium,
+                CheckEligibilityType.WorkingFamilies)] CheckEligibilityType eligibilityType,
+            [Values(
+                "AB123456E",
+                "AB123456",
+                "AB12345C",
+                "AB123456CD",
+                "AB\u0661\u0662\u0663\u0664\u0665\u0666C",
+                "---")] string nino)
+        {
+            var parser = new ParseBulkCheckFileUseCase(
+                new CheckEligibilityRequestDataValidator(),
+                _config.Object);
+
+            var csv = eligibilityType == CheckEligibilityType.WorkingFamilies
+                ? "Eligibility code,National Insurance number,Child date of birth\r\n"
+                  + $"50173110190,{nino},2022-01-01\r\n"
+                : "Parent Last Name,Parent Date of Birth,Parent National Insurance number\r\n"
+                  + $"Smith,1980-01-01,{nino}\r\n";
+
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(csv));
+
+            var result = await parser.Execute(stream, eligibilityType);
+
+            result.ErrorMessage.Should().BeEmpty();
+            result.ValidRequests.Should().BeEmpty();
+            result.Errors.Should().ContainSingle();
+            result.Errors[0].LineNumber.Should().Be(2);
+            result.Errors[0].Message.Should().Be(ValidationMessages.ValidNI);
+        }
 
         [Test]
         public async Task Given_Bulk_Check_When_FileHasInvalidHeaders_2YO()

@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using CheckChildcareEligibility.Admin.Attributes;
 using CheckChildcareEligibility.Admin.Models;
+using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
+using CheckChildcareEligibility.Admin.ViewModels;
 using FluentAssertions;
 
 namespace CheckChildcareEligibility.Admin.Tests.Attributes;
@@ -43,6 +45,27 @@ public class NameAttributeTests
 
         result.Should().NotBeNull();
         result!.ErrorMessage.Should().Be("Enter a last name with valid characters");
+    }
+
+    [Test]
+    public void IsValid_IdenticalInvalidNames_Uses_LastName_Message_For_LastName()
+    {
+        var model = new FosterCarerDetailsViewModel
+        {
+            CarerFirstName = "Test123",
+            CarerLastName = "Test123"
+        };
+
+        var context = new ValidationContext(model)
+        {
+            MemberName = nameof(FosterCarerDetailsViewModel.CarerLastName)
+        };
+
+        var result = _sut.GetValidationResult(model.CarerLastName, context);
+
+        result.Should().NotBeNull();
+        result!.ErrorMessage.Should().Be(
+            FosterFamilyValidationMessages.CarerLastNameInvalid);
     }
 }
 

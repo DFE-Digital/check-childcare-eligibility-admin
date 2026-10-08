@@ -15,11 +15,10 @@
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
             <p>Manage foster families claiming Childcare for working families.</p>
 
-            @Html.ActionLink("Add foster family", actionName: "EnterCarer", "FosterFamilies", null, new { @class = "govuk-button govuk-!-margin-bottom-9" })
-
-            <h2 class="govuk-heading-m">Children and eligibility codes</h2>
+            @Html.ActionLink("Add foster family", actionName: "EnterCarer", "FosterFamilies", null, new{ @class = "govuk-button govuk-!-margin-bottom-9" })
             @if (Model.Data != null && Model.Data.Any())
             {
+                <h2 class="govuk-heading-m">Children and eligibility codes</h2>
                 <table class="govuk-table govuk-table--small-text-until-tablet">
                     <thead class="govuk-table__head">
                         <tr class="govuk-table__row">
@@ -37,13 +36,14 @@
                         @foreach (var item in Model.Data)
                         {
                             string[] reconfirmStatus = WorkingFamiliesCheckHelper.GetReconfirmStatus(item.ReconfirmationProperties);
+                            string reconfirmBetween = WorkingFamiliesCheckHelper.GetReconfirmBetween(EligibilityCodeType.Foster, item.ReconfirmationProperties);
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell">@Html.ActionLink(item.ChildName, "Code_Record_FF", "FosterFamilies", new { item.FosterChildId }, new { @class = "govuk-link" })</td>
                                 <td class="govuk-table__cell">@item.ChildDateOfBirth.ToString("d MMMM yyyy")</td>
                                 <td class="govuk-table__cell">@item.EligibilityCode</td>
                                 <td class="govuk-table__cell">@Html.ActionLink(item.CarerName, "Family_Record_FF", "FosterFamilies", new { item.FosterCarerId }, new { @class = "govuk-link" })</td>
                                 <td class="govuk-table__cell">@item.ValidityStartDate.ToString(format: "d MMMM yyyy")</td>
-                                <td class="govuk-table__cell">@WorkingFamiliesCheckHelper.GetReconfirmBetween(EligibilityCodeType.Foster, item.ReconfirmationProperties)</td>
+                                <td class="govuk-table__cell">@reconfirmBetween</td>
                                 <td class="govuk-table__cell">@item.GracePeriodEndDate.ToString("d MMMM yyyy")</td>
                                 <td class="govuk-table__cell">
                                     <strong class="govuk-tag govuk-tag--@reconfirmStatus[1]" style="max-width:100%;">
@@ -54,10 +54,6 @@
                         }
                     </tbody>
                 </table>
-            }
-            else
-            {
-                <p>No results found.</p>
             }
 
             @{
@@ -77,7 +73,9 @@
             }
             @if (Model.Data == null)
             {
-                <p class="govuk-!-margin-bottom-6"><a href="/public/csv/childcare/dev/foster-families-codes-YYYY-MM-DD.csv">Download as CSV file</a></p>
+                <p class="govuk-!-margin-bottom-6">
+                    <a href="/public/csv/childcare/dev/foster-families-codes-YYYY-MM-DD.csv">Download as CSV file</a>
+                </p>
             }
         </div>
     </div>

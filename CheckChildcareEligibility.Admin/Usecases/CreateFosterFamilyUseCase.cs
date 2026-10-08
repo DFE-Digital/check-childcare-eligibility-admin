@@ -35,6 +35,17 @@ namespace CheckChildcareEligibility.Admin.Usecases
                 throw new FluentValidation.ValidationException(validationResult.Errors);
             }
 
+            request.FosterCarer.CarerNationalInsuranceNumber =
+                NinoValidation.Normalize(
+                    request.FosterCarer.CarerNationalInsuranceNumber);
+
+            if (request.HasPartner && request.Partner is not null)
+            {
+                request.Partner.PartnerNationalInsuranceNumber =
+                    NinoValidation.Normalize(
+                        request.Partner.PartnerNationalInsuranceNumber);
+            }
+
             return await _fosterFamiliesGateway.CreateFosterFamily(request);
         }
     }

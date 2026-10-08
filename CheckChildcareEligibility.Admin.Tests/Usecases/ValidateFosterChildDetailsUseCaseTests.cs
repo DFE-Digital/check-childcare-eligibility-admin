@@ -20,20 +20,21 @@ public class ValidateFosterChildDetailsUseCaseTests
     }
 
     [Test]
-    public void Execute_WhenRequestIsNull_ThrowsArgumentNullException()
+    public async Task Execute_WhenRequestIsNull_ThrowsArgumentNullException()
     {
-        FluentActions.Invoking(() => _sut.Execute(null!, new ModelStateDictionary()))
-            .Should().Throw<ArgumentNullException>();
+        FluentActions.Invoking(
+            async () => await _sut.Execute(null!, new ModelStateDictionary())
+        ).Should().ThrowAsync<ArgumentNullException>();
     }
 
     [Test]
-    public void Execute_WhenModelStateIsInvalid_ReturnsErrorsWithoutConstructingDate()
+    public async Task Execute_WhenModelStateIsInvalid_ReturnsErrorsWithoutConstructingDate()
     {
         var request = new FosterChildDetailsViewModel { Day = "invalid" };
         var modelState = new ModelStateDictionary();
         modelState.AddModelError("ChildFirstName", "Child first name is required");
 
-        var result = _sut.Execute(request, modelState);
+        var result = await _sut.Execute(request, modelState);
 
         result.IsValid.Should().BeFalse();
         result.Errors.Should().ContainKey("ChildFirstName");
@@ -41,7 +42,7 @@ public class ValidateFosterChildDetailsUseCaseTests
     }
 
     [Test]
-    public void Execute_WhenRequestIsValid_ConstructsDateAndReturnsValid()
+    public async Task Execute_WhenRequestIsValid_ConstructsDateAndReturnsValid()
     {
         var request = new FosterChildDetailsViewModel
         {
@@ -53,7 +54,7 @@ public class ValidateFosterChildDetailsUseCaseTests
             Year = DateTime.Today.AddYears(-4).Year.ToString()
         };
 
-        var result = _sut.Execute(request, new ModelStateDictionary());
+        var result = await _sut.Execute(request, new ModelStateDictionary());
 
         result.IsValid.Should().BeTrue();
         result.Errors.Should().BeNull();
