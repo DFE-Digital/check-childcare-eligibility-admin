@@ -42,10 +42,14 @@ public class ValidateFosterCarerDetailsUseCase : IValidateFosterCarerDetailsUseC
         // If model passes form validation construct date fields then perform additional validation using FluentValidation
         if (modelState.IsValid)
         {
+            // Set DateOfBirth in request before serializing
             viewModel.CarerDateOfBirth = new DateTime(
                 int.Parse(viewModel.Year),
                 int.Parse(viewModel.Month),
                 int.Parse(viewModel.Day));
+            
+            // Remove spaces from NINO before validation
+            viewModel.CarerNationalInsuranceNumber = NinoValidation.RemoveSpaces(viewModel.CarerNationalInsuranceNumber);
 
             var request = viewModel.BuildRequest();
             var validator = new FosterCarerRequestValidator();

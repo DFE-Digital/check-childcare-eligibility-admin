@@ -44,6 +44,9 @@ public class ValidateFosterPartnerDetailsUseCase : IValidateFosterPartnerDetails
                 int.Parse(viewModel.Month),
                 int.Parse(viewModel.Day));
 
+            // Remove spaces from NINO before validation
+            viewModel.PartnerNationalInsuranceNumber = NinoValidation.RemoveSpaces(viewModel.PartnerNationalInsuranceNumber);
+
             var request = viewModel.BuildRequest();
             var validator = new FosterPartnerRequestValidator();
             var validationResult = validator.Validate(request);
