@@ -1,26 +1,30 @@
-﻿using CheckChildcareEligibility.Admin.Domain.Constants;
+﻿using CheckChildcareEligibility.Admin.Controllers;
+using CheckChildcareEligibility.Admin.Domain.Constants;
 using CheckChildcareEligibility.Admin.Domain.DfeSignIn;
 using CheckChildcareEligibility.Admin.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.FeatureManagement;
+using System.Security.Claims;
 
 namespace CheckChildcareEligibility.Admin.Gateways.Interfaces;
 
 public interface IMenuProvider
 {
     Task<IEnumerable<MenuItem>> GetMenuItemsFor(DfeClaims claims);
-    IEnumerable<MenuItem> GetMenuItemsForReports();
+    IEnumerable<MenuItem> GetMenuItemsForReports(DfeClaims claims);
 }
 
 public class MenuProvider : IMenuProvider
 {
     private readonly IMemoryCache _cache;
     private readonly IFeatureManager _featureManager;
+    private readonly IConfiguration _config;
 
-    public MenuProvider(IMemoryCache cache, IFeatureManager featureManager)
+    public MenuProvider(IMemoryCache cache, IFeatureManager featureManager, IConfiguration config)
     {
         _cache = cache;
         _featureManager = featureManager;
+        _config = config;
     }
 
     public async Task<IEnumerable<MenuItem>> GetMenuItemsFor(DfeClaims claims)
@@ -36,7 +40,7 @@ public class MenuProvider : IMenuProvider
         {
             return cachedMenu;
         }
-         var menu = await FilterTilesAsync(BuildMenuForRole(role));
+        var menu = await FilterTilesAsync(BuildMenuForRole(role));
         _cache.Set(cacheKey, menu, TimeSpan.FromMinutes(5));
         return menu;
     }
@@ -113,8 +117,12 @@ public class MenuProvider : IMenuProvider
             default: return Enumerable.Empty<MenuItem>();
         }
     }
-    public IEnumerable<MenuItem> GetMenuItemsForReports()
+    public IEnumerable<MenuItem> GetMenuItemsForReports(DfeClaims claims)
     {
+        if (!IsLocalAuthorityPrivateBeta(claims))
+        {
+            return Enumerable.Empty<MenuItem>();
+        }
         return BuildMenuForRoleReports();
     }
     private IEnumerable<MenuItem> BuildMenuForRoleReports()
@@ -128,6 +136,16 @@ public class MenuProvider : IMenuProvider
             "Code_Search"
             )
         };
+    }
+    public bool IsLocalAuthorityPrivateBeta(DfeClaims claims)
+
+    {
+        var laId = int.Parse(claims.Organisation.EstablishmentNumber);
+        var allowedLAs = _config
+        .GetSection("FeatureFlags:LAsThatCanUseWF")
+        .Get<int[]>() ?? Array.Empty<int>();
+        return allowedLAs.Contains(laId);
+
     }
 
 }

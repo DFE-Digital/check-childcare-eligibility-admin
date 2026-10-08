@@ -30,7 +30,7 @@ public class CheckController : BaseController
         IPerformEyppEligibilityCheckUseCase performEyppEligibilityCheckUseCase,
         IGetCheckStatusUseCase getCheckStatusUseCase,
         IValidateParentDetailsUseCase validateParentDetailsUseCase,
-        IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService)
+        IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService, configuration)
     {
         _config = configuration;
         _logger = logger;

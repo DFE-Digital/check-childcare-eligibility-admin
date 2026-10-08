@@ -3,6 +3,8 @@ using CheckChildcareEligibility.Admin.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Configuration;
+using System.Configuration;
 
 namespace CheckChildcareEligibility.Admin.Controllers;
 
@@ -12,10 +14,14 @@ public class BaseController : Controller
     protected DfeClaims? _Claims;
 
     private readonly IDfeSignInApiService _dfeSignInApiService;
+    private readonly IConfiguration _config;
 
-    public BaseController(IDfeSignInApiService dfeSignInApiService)
+    public BaseController(
+        IDfeSignInApiService dfeSignInApiService,
+        IConfiguration configuration)
     {
         _dfeSignInApiService = dfeSignInApiService;
+        _config = configuration;
     }
 
     public async Task GetDfeClaimsAsync()
@@ -39,5 +45,26 @@ public class BaseController : Controller
     public int GetLocalAuthorityId()
     {
         return int.Parse(_Claims.Organisation.EstablishmentNumber);
+    }
+
+    public bool IsLocalAuthorityPrivateBeta()
+    {
+        var localAuthorityId = _Claims.Organisation.EstablishmentNumber?.Trim();
+
+        var allowedLASection = _config.GetSection("FeatureFlags:LAsThatCanUseWF");
+        var allowedLAs = allowedLASection.Get<string[]>() ?? Array.Empty<string>();
+
+        if (!allowedLAs.Any())
+        {
+            var allowedLASetting = allowedLASection.Get<string>();
+
+            allowedLAs = string.IsNullOrWhiteSpace(allowedLASetting)
+            ? Array.Empty<string>()
+            : allowedLASetting.Split(',')
+            .Select(x => x.Trim())
+            .ToArray();
+        }
+
+        return allowedLAs.Contains(localAuthorityId, StringComparer.OrdinalIgnoreCase);
     }
 }

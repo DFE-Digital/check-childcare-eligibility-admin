@@ -22,17 +22,23 @@ namespace CheckChildcareEligibility.Admin.Controllers
         public ReportController(
              IPerformEligibilityCodeHistoryReportUseCase performEligibilityCodeHistoryReportUse,
              IValidateEligibilityCodeUseCase validateEligibilityCodeUseCase,
-            IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService)
+            IDfeSignInApiService dfeSignInApiService,
+            IConfiguration configuration) : base(dfeSignInApiService, configuration)
         {
             _performEligibilityCodeHistoryReportUseCase = performEligibilityCodeHistoryReportUse;
             _validateEligibilityCodeUseCase = validateEligibilityCodeUseCase;
         }
-        public IActionResult Reports()
+        public async Task<IActionResult> Reports()
         {
+            await GetDfeClaimsAsync();
+            ViewBag.Claims = _Claims;
             return View();
         }
         public IActionResult Code_Search()
         {
+            if (!IsLocalAuthorityPrivateBeta())
+            { return RedirectToAction("Index", "Home"); }
+
             var model = new EligibilityCodeSearchViewModel();
 
             var errorsJson = TempData["Errors"]?.ToString();
