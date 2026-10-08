@@ -436,7 +436,8 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             DateTime? reconfirmationEndDate = null,
             string status = "eligible",
             bool ChildTooYoung = false,
-            bool? isDiscretionaryValidityStartDateApplied = null)
+            bool? isDiscretionaryValidityStartDateApplied = null,
+            bool isGracePeriodEndDateApplied = true)
         {
             var response = new CheckEligibilityItemWorkingFamilies
             {
@@ -450,7 +451,8 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
                 GracePeriodEndDate = gracePeriodEndDate ?? DateTime.Today.AddMonths(6),
                 ChildTooYoung = ChildTooYoung,
                 IsDiscretionaryValidityStartDateApplied = isDiscretionaryValidityStartDateApplied,
-                TermValidity = new TermValidity(currentTerm, nextTerm)
+                TermValidity = new TermValidity(currentTerm, nextTerm),
+                IsGracePeriodEndDateApplied = isGracePeriodEndDateApplied
             };
 
             if (reconfirmationStatus.HasValue || reconfirmationStartDate.HasValue || reconfirmationEndDate.HasValue)
