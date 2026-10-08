@@ -4,6 +4,7 @@ using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Moq;
@@ -83,6 +84,40 @@ public class Perform2YoEligibilityCheckUseCaseTests
         Encoding.UTF8.GetString(lastNameBytes).Should().Be("Doe");
         Encoding.UTF8.GetString(dobBytes).Should().Be("1980-01-01");
         Encoding.UTF8.GetString(ninoBytes).Should().Be("AB123456C");
+    }
+
+    [TestCase("ab123456c")]
+    public async Task Execute_Should_Canonicalise_Nino_Without_Changing_Submitted_Model(
+    string input)
+    {
+        _parent.NationalInsuranceNumber = input;
+        _sessionStorage.Clear();
+
+        CheckEligibilityRequest? capturedRequest = null;
+
+        _checkGatewayMock
+            .Setup(g => g.PostCheck(It.IsAny<CheckEligibilityRequest>()))
+            .Callback<CheckEligibilityRequest>(request => capturedRequest = request)
+            .ReturnsAsync(_eligibilityResponse);
+
+        await _sut.Execute(_parent, _sessionMock.Object);
+
+        capturedRequest.Should().NotBeNull();
+        var data = capturedRequest!.Data.Should()
+            .BeOfType<CheckEligibilityRequestData>().Subject;
+
+        data.Type.Should().Be(CheckEligibilityType.TwoYearOffer);
+        data.NationalInsuranceNumber.Should().Be("AB123456C");
+
+        _sessionStorage.Should().ContainKey("ParentNINO");
+        Encoding.UTF8.GetString(_sessionStorage["ParentNINO"])
+            .Should().Be("AB123456C");
+
+        _parent.NationalInsuranceNumber.Should().Be(input);
+
+        _checkGatewayMock.Verify(
+            g => g.PostCheck(It.IsAny<CheckEligibilityRequest>()),
+            Times.Once);
     }
 
     [Test]

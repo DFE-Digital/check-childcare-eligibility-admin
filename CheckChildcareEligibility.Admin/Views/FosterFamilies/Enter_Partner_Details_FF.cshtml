@@ -10,8 +10,7 @@
 
     bool isUpdate = Model != null && string.IsNullOrEmpty(Model.ContextId);
     var actionName = isUpdate ? "UpdatePartner" : "EnterPartner";
-    ViewData["Title"] = isUpdate && !string.IsNullOrEmpty(Model.PartnerFirstName) ?
-        "Edit the partner details" : "Enter the partner details";
+    ViewData["Title"] = isUpdate ? "Edit the partner details" : "Enter the partner details";
 }
 
 <div class="govuk-grid-column-two-thirds">
@@ -145,7 +144,7 @@
                             <span asp-validation-for="PartnerNationalInsuranceNumber"></span>
                         </p>
                         <input class="@ninoInputClasses" asp-controller="Check" asp-for="PartnerNationalInsuranceNumber"
-                               type="text" spellcheck="false" autocomplete="text" maxlength="9">
+                               type="text" spellcheck="false" autocomplete="text">
                     </div>
                 </fieldset>
                 @if (!isUpdate)

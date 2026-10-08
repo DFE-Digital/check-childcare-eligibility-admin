@@ -69,9 +69,11 @@ namespace CheckChildcareEligibility.Admin.Models
 
         public bool IsInGracePeriod => DateTime.UtcNow.Date > ValidityEndDate && DateTime.UtcNow.Date <= GracePeriodEndDate;
 
-        public bool IsNotValidYet => CurrentTerm.Name == TermName.None && NextTerm.Name != TermName.None;
+        public bool IsNotValidForCurrentTerm => CurrentTerm.Name == TermName.None && NextTerm.Name != TermName.None;
 
-        public bool IsReconfirmed => IsEligible && !IsNotValidYet && !IsInGracePeriod && NextTerm.Name != TermName.None;
+        public bool IsNeverValid => CurrentTerm.Name == TermName.None && NextTerm.Name == TermName.None;
+
+        public bool IsReconfirmed => IsEligible && !IsNotValidForCurrentTerm && !IsInGracePeriod && NextTerm.Name != TermName.None;
 
     }
 }

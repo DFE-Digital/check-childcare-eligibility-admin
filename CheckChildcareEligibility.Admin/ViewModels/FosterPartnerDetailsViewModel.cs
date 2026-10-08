@@ -24,7 +24,6 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
         [Required(ErrorMessage = FosterFamilyValidationMessages.PartnerNationalInsuranceNumberEmpty)]
         [Nino]
-        [MaxLength(13)]
         public string PartnerNationalInsuranceNumber { get; set; }
 
 

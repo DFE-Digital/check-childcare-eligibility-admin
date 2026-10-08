@@ -25,52 +25,40 @@ public class NameAttribute : ValidationAttribute
 
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
-        var model = validationContext.ObjectInstance;
+        if (value == null || value.ToString() == string.Empty)
+            return ValidationResult.Success;
 
-        var firstNameProperty = model.GetType()
-                            .GetProperties()
-                            .FirstOrDefault(p => p.Name.Contains("FirstName"));
-        var lastNameProperty = model.GetType()
-                            .GetProperties()
-                            .FirstOrDefault(p => p.Name.Contains("LastName"));
+        if (regex.IsMatch(value.ToString()))
+            return ValidationResult.Success;
 
-        var firstName = firstNameProperty?.GetValue(model)?.ToString() ?? string.Empty;
-        var lastName = lastNameProperty?.GetValue(model)?.ToString() ?? string.Empty;
+        var memberName = validationContext.MemberName;
 
-        if (firstName == value)
+        if (memberName?.Contains("FirstName") == true)
         {
-            if (value == null || value == "")
-                return ValidationResult.Success;
+            var constantName = $"{memberName}Invalid";
+            var field = typeof(FosterFamilyValidationMessages).GetField(constantName);
 
-            if (!regex.IsMatch(value.ToString()))
+            if (field != null)
             {
-                var constantName = $"{firstNameProperty.Name}Invalid";
-                var field = typeof(FosterFamilyValidationMessages).GetField(constantName);
-                if (field != null)
-                {
-                    var message = field?.GetValue(null)?.ToString();
-                    return new ValidationResult(message);
-                }
-                return new ValidationResult("Enter a first name with valid characters");
+                var message = field.GetValue(null)?.ToString();
+                return new ValidationResult(message);
             }
+
+            return new ValidationResult("Enter a first name with valid characters");
         }
 
-        if (lastName == value)
+        if (memberName?.Contains("LastName") == true)
         {
-            if (value == null || value == "")
-                return ValidationResult.Success;
+            var constantName = $"{memberName}Invalid";
+            var field = typeof(FosterFamilyValidationMessages).GetField(constantName);
 
-            if (!regex.IsMatch(value.ToString()))
+            if (field != null)
             {
-                var constantName = $"{lastNameProperty.Name}Invalid";
-                var field = typeof(FosterFamilyValidationMessages).GetField(constantName);
-                if (field != null)
-                {
-                    var message = field?.GetValue(null)?.ToString();
-                    return new ValidationResult(message);
-                }
-                return new ValidationResult("Enter a last name with valid characters");
+                var message = field.GetValue(null)?.ToString();
+                return new ValidationResult(message);
             }
+
+            return new ValidationResult("Enter a last name with valid characters");
         }
 
         return ValidationResult.Success;

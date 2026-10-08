@@ -174,7 +174,7 @@ public class SubmissionDateAttribute : ValidationAttribute
                         new[] { "SubmissionDate", "Day", "Month", "Year" });
                 }
 
-                DateTime backdateWindow = DateTime.Now.AddDays(-31);
+                DateTime backdateWindow = DateTime.Today.AddDays(-31);
                 if (submissionDate < backdateWindow)
                 {
                     return new ValidationResult(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, backdateWindow.ToString("d MMMM yyyy")),

@@ -17,12 +17,12 @@
         if (Model.HasPartner)
         {
             <a class="govuk-back-link backLinkJS"
-               href="@Url.Action("EnterPartner", "FosterFamilies", new { Model.ContextId })">Back</a>
+               href="@Url.Action("Enter_Partner_Details_FF", "FosterFamilies", new { Model.ContextId })">Back</a>
         }
         else
         {
             <a class="govuk-back-link backLinkJS"
-               href="@Url.Action("EnterCarer", "FosterFamilies", new { Model.ContextId })">Back</a>
+               href="@Url.Action("Enter_Carer_Details_FF", "FosterFamilies", new { Model.ContextId })">Back</a>
         }
     }
 
@@ -59,7 +59,7 @@
                             Last name
                         </label>
                         <p class="govuk-error-message">
-                            <span asp-validation-for="ChildFirstName"></span>
+                            <span asp-validation-for="ChildLastName"></span>
                         </p>
                         <input
                         class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["ChildLastName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"

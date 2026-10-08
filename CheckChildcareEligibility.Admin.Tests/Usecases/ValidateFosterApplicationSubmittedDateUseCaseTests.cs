@@ -20,18 +20,18 @@ public class ValidateFosterApplicationSubmittedDateUseCaseTests
     }
 
     [Test]
-    public void Execute_WhenTodayIsSelected_UsesToday()
+    public async Task Execute_WhenTodayIsSelected_UsesToday()
     {
         var request = new FosterApplicationSubmittedDateViewModel { IsTodaySelected = true };
 
-        var result = _sut.Execute(request, new ModelStateDictionary());
+        var result = await _sut.Execute(request, new ModelStateDictionary());
 
         result.IsValid.Should().BeTrue();
         request.SubmissionDate.Should().Be(DateTime.Today);
     }
 
     [Test]
-    public void Execute_WhenAnotherDateIsSelected_UsesDateParts()
+    public async Task Execute_WhenAnotherDateIsSelected_UsesDateParts()
     {
         var request = new FosterApplicationSubmittedDateViewModel
         {
@@ -41,20 +41,20 @@ public class ValidateFosterApplicationSubmittedDateUseCaseTests
             Year = "2026"
         };
 
-        var result = _sut.Execute(request, new ModelStateDictionary());
+        var result = await _sut.Execute(request, new ModelStateDictionary());
 
         result.IsValid.Should().BeTrue();
         request.SubmissionDate.Should().Be(new DateTime(2026, 4, 12));
     }
 
     [Test]
-    public void Execute_WhenModelStateIsInvalid_ReturnsErrorsWithoutChangingDate()
+    public async Task Execute_WhenModelStateIsInvalid_ReturnsErrorsWithoutChangingDate()
     {
         var request = new FosterApplicationSubmittedDateViewModel { SubmissionDate = new DateTime(2026, 1, 1) };
         var modelState = new ModelStateDictionary();
         modelState.AddModelError("IsTodaySelected", "Select a date");
 
-        var result = _sut.Execute(request, modelState);
+        var result = await _sut.Execute(request, modelState);
 
         result.IsValid.Should().BeFalse();
         result.Errors.Should().ContainKey("IsTodaySelected");

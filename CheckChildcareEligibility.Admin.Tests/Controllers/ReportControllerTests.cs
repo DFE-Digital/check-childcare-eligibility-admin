@@ -2,25 +2,20 @@
 using CheckChildcareEligibility.Admin.Controllers;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
-using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.UseCases;
 using CheckChildcareEligibility.Admin.ViewModels;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
-using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CheckChildcareEligibility.Admin.Tests.Controllers;
 [TestFixture]
 public class ReportControllerTests : TestBase
 {
-    private Mock<IMenuProvider> _menuProviderMock;
     private Mock<IPerformEligibilityCodeHistoryReportUseCase> _performEligibilityCodeHistoryReportUseCaseMock;
     private Mock<IValidateEligibilityCodeUseCase> _validateEligibilityCodeUseCaseMock;
     private Mock<IDfeSignInApiService> _mockDfeSignInApiService;

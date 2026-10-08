@@ -48,7 +48,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
 
             // Assert
             sut.Properties.ChildIsTooYoung.Should().BeFalse();
-            sut.Properties.IsNotValidYet.Should().BeTrue();
+            sut.Properties.IsNotValidForCurrentTerm.Should().BeTrue();
             result.Should().Be("Date will appear here when the code can be used");
         }
 
@@ -71,7 +71,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
 
             // Assert
             sut.Properties.ChildIsTooYoung.Should().BeFalse();
-            sut.Properties.IsNotValidYet.Should().BeFalse();
+            sut.Properties.IsNotValidForCurrentTerm.Should().BeFalse();
             result.Should().Be(gracePeriodEndDate.ToString("d MMMM yyyy"));
         }
 
@@ -116,7 +116,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
 
             // Assert
             sut.Properties.ChildIsTooOld.Should().BeTrue();
-            sut.Properties.IsNotValidYet.Should().BeTrue();
+            sut.Properties.IsNotValidForCurrentTerm.Should().BeTrue();
             sut.CodeStatus.Should().Be(WorkingFamiliesResponseBanner.CodeExpired);
             sut.BannerColour.Should().Be(WorkingFamiliesResponseBanner.ColourOrange);
             sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermExpiredOn} {sut.Properties.ValidityEndDate:d MMMM yyyy}");
@@ -138,7 +138,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
 
             // Assert
             sut.Properties.ChildIsTooYoung.Should().BeTrue();
-            sut.Properties.IsNotValidYet.Should().BeTrue();
+            sut.Properties.IsNotValidForCurrentTerm.Should().BeTrue();
             sut.CodeStatus.Should().Be(WorkingFamiliesResponseBanner.CodeChildTooYoung);
             sut.BannerColour.Should().Be(WorkingFamiliesResponseBanner.ColourBlue);
             sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermValidFrom} summer term {DateTime.Today.Year}");

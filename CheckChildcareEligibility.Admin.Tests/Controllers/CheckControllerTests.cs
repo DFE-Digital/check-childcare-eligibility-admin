@@ -395,6 +395,65 @@ public class CheckControllerTests : TestBase
     }
 
     [Test]
+    public async Task Loader_When_Parent_Nino_Is_Lowercase_Should_Display_Canonical_Nino()
+    {
+        // Arrange
+        var statusValue = _fixture.Build<StatusValue>()
+            .With(x => x.Status, "eligible")
+            .Create();
+
+        var checkEligibilityResponse = _fixture.Build<CheckEligibilityResponse>()
+            .With(x => x.Data, statusValue)
+            .Create();
+
+        _httpContext.Setup(ctx => ctx.Session).Returns(_sessionMock.Object);
+
+        _sut.ControllerContext.HttpContext.User = new ClaimsPrincipal(
+            new ClaimsIdentity(new List<Claim>
+            {
+            new(
+                "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
+                "12345"),
+            new(
+                "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
+                "test@example.com"),
+            new("OrganisationCategoryName", Constants.CategoryTypeLA)
+            }));
+
+        var parent = _fixture.Build<ParentGuardian>()
+            .With(x => x.NationalInsuranceNumber, "nn123456c")
+            .Create();
+
+        var responseJson = JsonConvert.SerializeObject(checkEligibilityResponse);
+
+        _tempData["Response"] = responseJson;
+        _tempData["EligibilityType"] = "2YO";
+        _tempData["ParentDetails"] = JsonConvert.SerializeObject(parent);
+
+        _getCheckStatusUseCaseMock
+            .Setup(x => x.Execute(responseJson, _sessionMock.Object))
+            .ReturnsAsync(statusValue);
+
+        _loadParentDetailsUseCaseMock
+            .Setup(x => x.Execute(
+                It.IsAny<string>(),
+                It.IsAny<string>()))
+            .ReturnsAsync((parent, null));
+
+        // Act
+        var result = await _sut.Loader();
+
+        // Assert
+        result.Should().BeOfType<ViewResult>();
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as EligibilityOutcomeViewModel;
+
+        model.Should().NotBeNull();
+        model!.ParentNino.Should().Be("NN123456C");
+    }
+
+    [Test]
     public async Task Loader_When_DateOfBirth_Is_Invalid_Should_Handle_Gracefully()
     {
         // Arrange
