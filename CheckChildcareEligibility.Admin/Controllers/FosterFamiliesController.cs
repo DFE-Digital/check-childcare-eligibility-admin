@@ -247,9 +247,6 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return RedirectToAction("Update_Carer_Details_FF", new { request.FosterCarerId });
             }
 
-            // Clear carer details from session
-            _sessionContextService.ClearSessionData(request.FosterCarerId.ToString(), "FosterCarerDetails");
-
             // Build update request
             request.HasPartner = existingCarer.HasPartner;
             UpdateFosterCarerRequest updateRequest = new()
@@ -267,8 +264,11 @@ namespace CheckChildcareEligibility.Admin.Controllers
                     PartnerNationalInsuranceNumber = existingCarer.PartnerNationalInsuranceNumber
                 };
             }
-
             await _updateFosterCarerUseCase.Execute(request.FosterCarerId, updateRequest);
+            
+            // Clear carer details from session
+            _sessionContextService.ClearSessionData(request.FosterCarerId.ToString(), "FosterCarerDetails");
+
             return RedirectToAction("Family_Record_FF", new { request.FosterCarerId, Confirmation = "Changes to carer saved" });
         }
 
@@ -389,9 +389,6 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return RedirectToAction("Update_Partner_Details_FF", new { request.FosterCarerId });
             }
 
-            // Clear partner details from session
-            _sessionContextService.ClearSessionData(request.FosterCarerId.ToString(), "FosterPartnerDetails");
-
             UpdateFosterCarerRequest updateRequest = new()
             {
                 FosterCarerRequest = new FosterCarerRequest
@@ -406,6 +403,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
             };
 
             await _updateFosterCarerUseCase.Execute(request.FosterCarerId, updateRequest);
+
+            // Clear partner details from session
+            _sessionContextService.ClearSessionData(request.FosterCarerId.ToString(), "FosterPartnerDetails");
+
             return RedirectToAction("Family_Record_FF", new
             {
                 request.FosterCarerId,
@@ -549,15 +550,16 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 return RedirectToAction("Update_Child_Details_FF", new { request.FosterChildId });
             }
 
-            // Clear child details from session
-            _sessionContextService.ClearSessionData(request.FosterChildId.ToString(), "FosterChildDetails");
-
             UpdateFosterChildRequest updateRequest = new()
             {
                 FosterChildRequest = request.BuildRequest()
             };
 
             await _updateFosterChildUseCase.Execute(request.FosterChildId, updateRequest);
+
+            // Clear child details from session
+            _sessionContextService.ClearSessionData(request.FosterChildId.ToString(), "FosterChildDetails");
+
             return RedirectToAction("Code_Record_FF", new { request.FosterChildId, Confirmation = "Changes to child saved" });
         }
 
