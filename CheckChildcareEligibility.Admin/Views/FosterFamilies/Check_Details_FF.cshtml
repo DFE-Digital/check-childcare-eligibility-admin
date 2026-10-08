@@ -1,4 +1,6 @@
-﻿@using CheckChildcareEligibility.Admin.ViewModels
+﻿@using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies
+@using CheckChildcareEligibility.Admin.Helpers
+@using CheckChildcareEligibility.Admin.ViewModels
 @model FosterApplicationCheckDetailsViewModel
 @{
     ViewData["Title"] = "Check details";
@@ -211,11 +213,10 @@
 
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
-                                Code valid from
+                                Code status
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @Model.FosterCodePreview.ValidFromTerm.Name term @Model.FosterCodePreview.ValidFromTerm.StartDate.Year
-                                (starts @Model.FosterCodePreview.ValidFromTerm.StartDate.ToString("d MMMM yyyy"))
+                                @Model.CodeStatus
                             </dd>
                         </div>
 
@@ -224,8 +225,7 @@
                                 Reconfirm between
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @Model.FosterCodePreview.ReconfirmBetweenStart.ToString("d MMMM yyyy")
-                                and @Model.FosterCodePreview.ReconfirmBetweenEnd.ToString("d MMMM yyyy")
+                                @WorkingFamiliesCheckHelper.GetReconfirmBetween(EligibilityCodeType.Foster, Model.FosterCodePreview.ReconfirmationProperties)
                             </dd>
                         </div>
 
@@ -234,7 +234,7 @@
                                 Grace period ends
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @Model.FosterCodePreview.GracePeriodEndDate.ToString("d MMMM yyyy")
+                                @Model.GracePeriod
                             </dd>
                         </div>
                     </dl>

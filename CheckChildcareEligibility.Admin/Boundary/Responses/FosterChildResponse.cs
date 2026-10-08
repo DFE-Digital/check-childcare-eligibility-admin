@@ -12,12 +12,13 @@
 
         public DateTime GracePeriodEndDate { get; set; }
 
+        public bool IsGracePeriodEndDateApplied { get; set; }
+
         public ReconfirmationProperties ReconfirmationProperties { get; set; }
 
         public TermValidity TermValidity { get; set; }
         
         public bool ChildTooYoung { get; set; }
-
         // Child
         public Guid FosterChildId { get; set; }
 

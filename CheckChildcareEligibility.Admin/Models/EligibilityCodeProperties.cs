@@ -7,32 +7,61 @@ namespace CheckChildcareEligibility.Admin.Models
     public class EligibilityCodeProperties
     {
 
-        public EligibilityCodeProperties(FosterChildResponse fosterChild)
+        public EligibilityCodeProperties(FosterChildResponse source)
         {
             Type = EligibilityCodeType.Foster;
             Status = CheckEligibilityStatus.eligible;
-            EligibilityCode = fosterChild.EligibilityCode;
-            ValidityStartDate = fosterChild.ValidityStartDate;
-            ValidityEndDate = fosterChild.ValidityEndDate;
-            GracePeriodEndDate = fosterChild.GracePeriodEndDate;
-            ChildDateOfBirth = fosterChild.ChildDateOfBirth;
-            TermValidity = fosterChild.TermValidity;
-            ReconfirmationProperties = fosterChild.ReconfirmationProperties;
-            ChildIsTooYoung = fosterChild.ChildTooYoung;
+            EligibilityCode = source.EligibilityCode;
+            ValidityStartDate = source.ValidityStartDate;
+            ValidityEndDate = source.ValidityEndDate;
+            GracePeriodEndDate = source.GracePeriodEndDate;
+            IsGracePeriodEndDateApplied = source.IsGracePeriodEndDateApplied;
+            ChildDateOfBirth = source.ChildDateOfBirth;
+            TermValidity = source.TermValidity;
+            ReconfirmationProperties = source.ReconfirmationProperties;
+            ChildIsTooYoung = source.ChildTooYoung;
         }
 
-        public EligibilityCodeProperties(CheckEligibilityItemWorkingFamilies workingFamiliesResponse)
+        public EligibilityCodeProperties(FosterCodePreviewResponse source)
         {
-            Type = workingFamiliesResponse.EligibilityCodeType ?? EligibilityCodeType.Standard;
-            Status = Enum.Parse<CheckEligibilityStatus>(workingFamiliesResponse.Status);
-            EligibilityCode = workingFamiliesResponse.EligibilityCode;
-            ValidityStartDate = workingFamiliesResponse.ValidityStartDate;
-            ValidityEndDate = workingFamiliesResponse.ValidityEndDate;
-            GracePeriodEndDate = workingFamiliesResponse.GracePeriodEndDate;
-            ChildDateOfBirth = DateTime.Parse(workingFamiliesResponse.DateOfBirth);
-            TermValidity = workingFamiliesResponse.TermValidity;
-            ReconfirmationProperties = workingFamiliesResponse.ReconfirmationProperties;
-            ChildIsTooYoung = workingFamiliesResponse.ChildTooYoung;
+            Type = EligibilityCodeType.Foster;
+            Status = CheckEligibilityStatus.eligible;
+            ValidityStartDate = source.ValidityStartDate;
+            ValidityEndDate = source.ValidityEndDate;
+            GracePeriodEndDate = source.GracePeriodEndDate;
+            IsGracePeriodEndDateApplied = source.IsGracePeriodEndDateApplied;
+            TermValidity = source.TermValidity;
+            ReconfirmationProperties = source.ReconfirmationProperties;
+            ChildIsTooYoung = source.ChildTooYoung;
+        }
+
+        public EligibilityCodeProperties(CheckEligibilityItemWorkingFamilies source)
+        {
+            Type = source.EligibilityCodeType ?? EligibilityCodeType.Standard;
+            Status = Enum.Parse<CheckEligibilityStatus>(source.Status);
+            EligibilityCode = source.EligibilityCode;
+            ValidityStartDate = source.ValidityStartDate;
+            ValidityEndDate = source.ValidityEndDate;
+            GracePeriodEndDate = source.GracePeriodEndDate;
+            ChildDateOfBirth = DateTime.Parse(source.DateOfBirth);
+            TermValidity = source.TermValidity;
+            ReconfirmationProperties = source.ReconfirmationProperties;
+            ChildIsTooYoung = source.ChildTooYoung;
+        }
+
+        public EligibilityCodeProperties(FosterFamiliesSearchItemResponse item)
+        {
+            Type = EligibilityCodeType.Foster;
+            Status = CheckEligibilityStatus.eligible;
+            EligibilityCode = item.EligibilityCode;
+            ValidityStartDate = item.ValidityStartDate;
+            ValidityEndDate = item.ValidityEndDate;
+            IsGracePeriodEndDateApplied = item.IsGracePeriodEndDateApplied;
+            GracePeriodEndDate = item.GracePeriodEndDate;
+            ChildDateOfBirth = item.ChildDateOfBirth;
+            TermValidity = item.TermValidity;
+            ReconfirmationProperties = item.ReconfirmationProperties;
+            ChildIsTooYoung = item.ChildTooYoung;
         }
 
         public CheckEligibilityStatus Status { get; init; }
@@ -49,13 +78,15 @@ namespace CheckChildcareEligibility.Admin.Models
 
         public DateTime GracePeriodEndDate { get; init; }
 
+        public bool IsGracePeriodEndDateApplied { get; init; }
+
         public ReconfirmationProperties ReconfirmationProperties { get; init; }
 
         public TermValidity TermValidity { get; init; }
 
         public bool ChildIsTooYoung { get; set; }
 
-        // Calvulated properties
+        // Calculated properties
 
         public bool IsEligible => Status == CheckEligibilityStatus.eligible;
 

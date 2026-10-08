@@ -84,6 +84,10 @@ public static class WorkingFamiliesCheckHelper
         if (properties.ChildIsTooYoung) // Child too young
         {
             result = WorkingFamiliesResponseBanner.CodeChildTooYoung;
+            if (properties.IsNotValidForCurrentTerm)
+            {
+                result += $" - {WorkingFamiliesResponseBanner.TermValidFrom.ToLower()} {nextTermView} {properties.NextTerm.StartDate.Year}";
+            }
         }
         else if (properties.ChildIsTooOld)
         {
@@ -96,6 +100,10 @@ public static class WorkingFamiliesCheckHelper
         else if (properties.IsNotValidForCurrentTerm || properties.IsNeverValid) // Code cannot be used yet
         {
             result = $"Code {WorkingFamiliesResponseBanner.CodeNotValidYet}";
+            if (properties.IsNotValidForCurrentTerm)
+            {
+                result += $" - {WorkingFamiliesResponseBanner.TermValidFrom.ToLower()} {nextTermView} {properties.NextTerm.StartDate.Year}";
+            }
         }
         // Is valid and reconfirmation has happened
         else if (properties.IsReconfirmed)
@@ -113,4 +121,10 @@ public static class WorkingFamiliesCheckHelper
         return result;
     }
 
+    public static string GetGracePeriod_FF(EligibilityCodeProperties codeProperties)
+    {
+        return codeProperties.ChildIsTooYoung || codeProperties.IsNotValidForCurrentTerm
+                    ? WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable
+                    : codeProperties.GracePeriodEndDate.ToString("d MMMM yyyy");
+    }
 }
