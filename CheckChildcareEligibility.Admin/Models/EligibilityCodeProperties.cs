@@ -33,6 +33,7 @@ namespace CheckChildcareEligibility.Admin.Models
             TermValidity = workingFamiliesResponse.TermValidity;
             ReconfirmationProperties = workingFamiliesResponse.ReconfirmationProperties;
             ChildIsTooYoung = workingFamiliesResponse.ChildTooYoung;
+            IsGracePeriodEndDateApplied = workingFamiliesResponse.IsGracePeriodEndDateApplied;
         }
 
         public CheckEligibilityStatus Status { get; init; }
@@ -48,6 +49,7 @@ namespace CheckChildcareEligibility.Admin.Models
         public DateTime ValidityEndDate { get; init; }
 
         public DateTime GracePeriodEndDate { get; init; }
+        public bool IsGracePeriodEndDateApplied { get; set; }
 
         public ReconfirmationProperties ReconfirmationProperties { get; init; }
 
@@ -59,7 +61,7 @@ namespace CheckChildcareEligibility.Admin.Models
 
         public bool IsEligible => Status == CheckEligibilityStatus.eligible;
 
-        public bool IsExpired => GracePeriodEndDate < DateTime.UtcNow.Date;
+        public bool IsExpired => (IsGracePeriodEndDateApplied ? GracePeriodEndDate : ValidityEndDate) < DateTime.UtcNow.Date;
 
         public Term CurrentTerm => TermValidity.Current ?? Term.None;
 
@@ -67,7 +69,7 @@ namespace CheckChildcareEligibility.Admin.Models
 
         public bool ChildIsTooOld => ReconfirmationProperties.Status == ReconfirmationStatus.ChildTooOld;
 
-        public bool IsInGracePeriod => DateTime.UtcNow.Date > ValidityEndDate && DateTime.UtcNow.Date <= GracePeriodEndDate;
+        public bool IsInGracePeriod => DateTime.UtcNow.Date > ValidityEndDate && DateTime.UtcNow.Date <= GracePeriodEndDate && IsGracePeriodEndDateApplied;
 
         public bool IsNotValidForCurrentTerm => CurrentTerm.Name == TermName.None && NextTerm.Name != TermName.None;
 
