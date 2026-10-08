@@ -29,7 +29,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public string GracePeriodEndDisplay =>
             Properties.ChildIsTooOld
                 ? Properties.ValidityEndDate.ToString("d MMMM yyyy")
-                : (Properties.IsEligible && Properties.ChildIsTooYoung) || Properties.IsNotValidForCurrentTerm
+                : (Properties.IsEligible && Properties.ChildIsTooYoung) || Properties.IsNotValidForCurrentTerm || Properties.IsNeverValid
                     ? WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable
                     : Properties.GracePeriodEndDate.ToString("d MMMM yyyy");
 
@@ -87,12 +87,13 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
             SetBannerCodeType();
 
-            if ((Properties.IsEligible && Properties.ChildIsTooYoung) || (Properties.IsNotValidForCurrentTerm && Properties.ChildIsTooYoung)) // Child too young
+            if ((Properties.IsEligible && Properties.ChildIsTooYoung) || (Properties.IsNotValidForCurrentTerm && Properties.ChildIsTooYoung)
+                || (Properties.IsNeverValid && Properties.ChildIsTooYoung)) // Child too young
             {
                 DateTime nineMonthsDate = Properties.ChildDateOfBirth.AddMonths(9);
                 CodeStatus = WorkingFamiliesResponseBanner.CodeChildTooYoung;
                 BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
-                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {nextTermView} {nineMonthsDate.Year}";
+                TermValidityDetails = Properties.IsNeverValid ? "" : $"{WorkingFamiliesResponseBanner.TermValidFrom} {nextTermView} {nineMonthsDate.Year}";
             }
             else if (Properties.ChildIsTooOld || Properties.IsExpired) // Expired or too old
             {
@@ -100,12 +101,13 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
                 TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermExpiredOn} {GracePeriodEndDisplay}";
             }
-            else if (Properties.IsNotValidForCurrentTerm) // Code cannot be used yet
+            else if (Properties.IsNotValidForCurrentTerm || Properties.IsNeverValid) // Code cannot be used yet
             {
                 CodeStatus = WorkingFamiliesResponseBanner.CodeNotValidYet;
                 BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
-                TermValidityDetails = $"{WorkingFamiliesResponseBanner.TermValidFrom} {nextTermView} {Properties.GracePeriodEndDate.Year}";
-
+                TermValidityDetails = Properties.IsNotValidForCurrentTerm ? 
+                    $"{WorkingFamiliesResponseBanner.TermValidFrom} {nextTermView} {Properties.GracePeriodEndDate.Year}" :
+                     "";
             }
 
             // is Valid and reconfirmation has happened
