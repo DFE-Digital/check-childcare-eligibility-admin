@@ -1,4 +1,5 @@
 using CheckChildcareEligibility.Admin.Domain.DfeSignIn;
+using CheckChildcareEligibility.Admin.Helpers;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -50,29 +51,9 @@ public class BaseController : Controller
      public bool IsLocalAuthorityPrivateBeta()
     {
         var localAuthorityId = _Claims.Organisation.EstablishmentNumber?.Trim();
-
-        var betaList = _config.GetSection<string[]> ("FeatureFlags:LAsThatCanUseWF");
-     
-         return betaList?.Contains(localAuthorityId, StringComparer.OrdinalIgnoreCase)?? false;
         
-    }
-    {
-        var localAuthorityId = _Claims.Organisation.EstablishmentNumber?.Trim();
-
-        var allowedLASection = _config.GetSection("FeatureFlags:LAsThatCanUseWF");
-        var allowedLAs = allowedLASection.Get<string[]>() ?? Array.Empty<string>();
-
-        if (!allowedLAs.Any())
-        {
-            var allowedLASetting = allowedLASection.Get<string>();
-
-            allowedLAs = string.IsNullOrWhiteSpace(allowedLASetting)
-            ? Array.Empty<string>()
-            : allowedLASetting.Split(',')
-            .Select(x => x.Trim())
-            .ToArray();
-        }
-
-        return allowedLAs.Contains(localAuthorityId, StringComparer.OrdinalIgnoreCase);
+        var betaList = _config.GetValue<string> ("FeatureFlags:LAsThatCanUseWF");
+     
+         return OrganisationRolesHelper.IsLocalAuthorityPrivateBeta(betaList, localAuthorityId);
     }
 }

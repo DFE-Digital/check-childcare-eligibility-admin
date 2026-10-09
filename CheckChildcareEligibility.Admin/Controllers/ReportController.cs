@@ -31,7 +31,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
         public async Task<IActionResult> Reports()
         {
             if (!IsLocalAuthorityPrivateBeta())
-            { return RedirectToAction("Index", "Home"); }
+            { return RedirectToAction("NotFound", "Error"); }
             await GetDfeClaimsAsync();
             ViewBag.Claims = _Claims;
             return View();
@@ -39,7 +39,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
         public IActionResult Code_Search()
         {
             if (!IsLocalAuthorityPrivateBeta())
-            { return RedirectToAction("Index", "Home"); }
+            { return RedirectToAction("NotFound", "Error"); }
 
             var model = new EligibilityCodeSearchViewModel();
 

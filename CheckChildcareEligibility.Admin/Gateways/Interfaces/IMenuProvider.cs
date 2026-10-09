@@ -1,6 +1,7 @@
 ﻿using CheckChildcareEligibility.Admin.Controllers;
 using CheckChildcareEligibility.Admin.Domain.Constants;
 using CheckChildcareEligibility.Admin.Domain.DfeSignIn;
+using CheckChildcareEligibility.Admin.Helpers;
 using CheckChildcareEligibility.Admin.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.FeatureManagement;
@@ -33,14 +34,15 @@ public class MenuProvider : IMenuProvider
         {
             return Array.Empty<MenuItem>();
         }
+        var localAuthorityId = claims.Organisation.EstablishmentNumber?.Trim();
         var role = claims.Roles[0].Code;
-        var cacheKey = $"Menu_{role}";
+        var cacheKey = $"Menu_{localAuthorityId}";
         var cacheHit = _cache.TryGetValue(cacheKey, out List<MenuItem>? cachedMenu);
         if (cacheHit && cachedMenu is not null)
         {
             return cachedMenu;
         }
-        var menu = await FilterTilesAsync(BuildMenuForRole(role));
+        var menu = await FilterTilesAsync(BuildMenuForRole(role, localAuthorityId));
         _cache.Set(cacheKey, menu, TimeSpan.FromMinutes(5));
         return menu;
     }
@@ -63,66 +65,79 @@ public class MenuProvider : IMenuProvider
         return result;
     }
 
-    private IEnumerable<MenuItem> BuildMenuForRole(string role)
+    private IEnumerable<MenuItem> BuildMenuForRole(string role,string localAuthorityId)
     {
+        var betaList = _config.GetValue<string>("FeatureFlags:LAsThatCanUseWF");
+
         switch (role)
         {
             case "mefcsLocalAuthority":
-                return new[] {
-                    new MenuItem(
-                        "Home",
-                        "Home",
-                        "Dashboard",
-                        "Home",
-                        ""
-                        ),
-                    new MenuItem(
-                        "Run a check",
-                        "Run a check",
-                        "Run an eligibility check for one parent or guardian.",
-                        "Home",
-                        "MenuSingleCheck"
-                        ),
-                    new MenuItem(
-                        "Run batch check",
-                        "Run a batch check",
-                        "Run an eligibility check for multiple parents or guardians.",
-                        "Home",
-                        "MenuBulkCheck"
-                        ),
-                    new MenuItem(
-                        "Manage foster families",
-                        "Manage foster families",
-                        "Manage foster families claiming Childcare for working families.",
-                        "FosterFamilies",
-                        "Search",
-                        featureName: Features.FosterFamilies
-                        ),
-                    new MenuItem(
-                        "Run reports",
-                        "Run reports",
-                        "Run and export reports on all applications for childcare.",
-                        "Report",
-                        "Reports",
-                        featureName: Features.Reports
-                        ),
+
+                var menu = new List<MenuItem>
+            {
+                new MenuItem(
+                    "Home",
+                    "Home",
+                    "Dashboard",
+                    "Home",
+                    ""
+                ),
+                new MenuItem(
+                    "Run a check",
+                    "Run a check",
+                    "Run an eligibility check for one parent or guardian.",
+                    "Home",
+                    "MenuSingleCheck"
+                ),
+                new MenuItem(
+                    "Run batch check",
+                    "Run a batch check",
+                    "Run an eligibility check for multiple parents or guardians.",
+                    "Home",
+                    "MenuBulkCheck"
+                ),
+                new MenuItem(
+                    "Manage foster families",
+                    "Manage foster families",
+                    "Manage foster families claiming Childcare for working families.",
+                    "FosterFamilies",
+                    "Search",
+                    featureName: Features.FosterFamilies
+                )
+            };
+
+                if (OrganisationRolesHelper.IsLocalAuthorityPrivateBeta(betaList, localAuthorityId))
+                {
+                    menu.Add(
+                        new MenuItem(
+                            "Run reports",
+                            "Run reports",
+                            "Run and export reports on all applications for childcare.",
+                            "Report",
+                            "Reports",
+                            featureName: Features.Reports
+                        )
+                    );
+                }
+
+                menu.Add(
                     new MenuItem(
                         "Guidance",
                         "Guidance",
                         "Read guidance on running eligibility checks and managing foster families.",
                         "Home",
                         "GuidanceHome"
-                        )
-                };
-            default: return Enumerable.Empty<MenuItem>();
+                    )
+                );
+
+                return menu;
+
+            default:
+                return Enumerable.Empty<MenuItem>();
         }
     }
     public IEnumerable<MenuItem> GetMenuItemsForReports(DfeClaims claims)
     {
-        if (!IsLocalAuthorityPrivateBeta(claims))
-        {
-            return Enumerable.Empty<MenuItem>();
-        }
         return BuildMenuForRoleReports();
     }
     private IEnumerable<MenuItem> BuildMenuForRoleReports()
@@ -137,15 +152,4 @@ public class MenuProvider : IMenuProvider
             )
         };
     }
-    public bool IsLocalAuthorityPrivateBeta(DfeClaims claims)
-
-    {
-        var laId = int.Parse(claims.Organisation.EstablishmentNumber);
-        var allowedLAs = _config
-        .GetSection("FeatureFlags:LAsThatCanUseWF")
-        .Get<int[]>() ?? Array.Empty<int>();
-        return allowedLAs.Contains(laId);
-
-    }
-
 }
