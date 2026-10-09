@@ -47,7 +47,15 @@ public class BaseController : Controller
         return int.Parse(_Claims.Organisation.EstablishmentNumber);
     }
 
-    public bool IsLocalAuthorityPrivateBeta()
+     public bool IsLocalAuthorityPrivateBeta()
+    {
+        var localAuthorityId = _Claims.Organisation.EstablishmentNumber?.Trim();
+
+        var betaList = _config.GetSection<string[]> ("FeatureFlags:LAsThatCanUseWF");
+     
+         return betaList?.Contains(localAuthorityId, StringComparer.OrdinalIgnoreCase)?? false;
+        
+    }
     {
         var localAuthorityId = _Claims.Organisation.EstablishmentNumber?.Trim();
 
