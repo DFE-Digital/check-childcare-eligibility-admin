@@ -19,7 +19,7 @@ internal class HomeControllerTests : TestBase
     public void SetUp()
     {
         _mockDfeSignInApiService = new Mock<IDfeSignInApiService>();
-        _sut = new HomeController(_mockDfeSignInApiService.Object);
+        _sut = new HomeController(_mockDfeSignInApiService.Object, _configMock.Object);
         base.SetUp();
         _sut.ControllerContext.HttpContext = _httpContext.Object;
         _sut.GetDfeClaimsAsync().Wait();

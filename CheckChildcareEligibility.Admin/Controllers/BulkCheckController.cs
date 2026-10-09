@@ -35,7 +35,7 @@ public class BulkCheckController : BaseController
         IParseBulkCheckFileUseCase parseBulkCheckFileUseCase,
         IGetBulkCheckStatusesUseCase getBulkCheckStatusesUseCase,
         IDeleteBulkCheckFileUseCase deleteBulkCheckFileUseCase,        
-        IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService)
+        IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService, configuration)
     {
         _config = configuration;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
