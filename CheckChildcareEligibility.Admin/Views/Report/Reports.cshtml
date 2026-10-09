@@ -2,8 +2,8 @@
 @inject IMenuProvider MenuProvider
 @{
     ViewData["Title"] = "Run reports";
-    var claims = ViewBag.Claims;
-    var menu = MenuProvider.GetMenuItemsForReports(claims);
+    
+    var menu = MenuProvider.GetMenuItemsForReports();
 }
 @model CheckChildcareEligibility.Admin.Domain.DfeSignIn.DfeClaims;
 

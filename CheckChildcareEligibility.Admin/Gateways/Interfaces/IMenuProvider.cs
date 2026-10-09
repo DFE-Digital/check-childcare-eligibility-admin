@@ -12,7 +12,7 @@ namespace CheckChildcareEligibility.Admin.Gateways.Interfaces;
 public interface IMenuProvider
 {
     Task<IEnumerable<MenuItem>> GetMenuItemsFor(DfeClaims claims);
-    IEnumerable<MenuItem> GetMenuItemsForReports(DfeClaims claims);
+    IEnumerable<MenuItem> GetMenuItemsForReports();
 }
 
 public class MenuProvider : IMenuProvider
@@ -136,7 +136,7 @@ public class MenuProvider : IMenuProvider
                 return Enumerable.Empty<MenuItem>();
         }
     }
-    public IEnumerable<MenuItem> GetMenuItemsForReports(DfeClaims claims)
+    public IEnumerable<MenuItem> GetMenuItemsForReports()
     {
         return BuildMenuForRoleReports();
     }

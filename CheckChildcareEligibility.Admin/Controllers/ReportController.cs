@@ -33,7 +33,6 @@ namespace CheckChildcareEligibility.Admin.Controllers
             if (!IsLocalAuthorityPrivateBeta())
             { return RedirectToAction("NotFound", "Error"); }
             await GetDfeClaimsAsync();
-            ViewBag.Claims = _Claims;
             return View();
         }
         public IActionResult Code_Search()
