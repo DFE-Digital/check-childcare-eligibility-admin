@@ -30,6 +30,8 @@ namespace CheckChildcareEligibility.Admin.Controllers
         }
         public async Task<IActionResult> Reports()
         {
+            if (!IsLocalAuthorityPrivateBeta())
+            { return RedirectToAction("Index", "Home"); }
             await GetDfeClaimsAsync();
             ViewBag.Claims = _Claims;
             return View();
