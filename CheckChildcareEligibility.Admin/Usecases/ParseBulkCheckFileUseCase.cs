@@ -82,11 +82,17 @@ namespace CheckChildcareEligibility.Admin.Usecases
                 {
 
                     case CheckEligibilityType.WorkingFamilies:
-                        expectedHeaders = ["Eligibility code", "National Insurance number", "Child date of birth"];
+                        expectedHeaders = ["Eligibility code", "National Insurance number", "Child date of birth", "Reference (optional)"];
                         break;
                     default:
-                        expectedHeaders = ["Parent Last Name", "Parent Date of Birth", "Parent National Insurance number"];
+                        expectedHeaders = ["Parent Last Name", "Parent Date of Birth", "Parent National Insurance Number", "Reference (optional)"];
                         break;
+                }
+
+                if (actualHeaders != null && !actualHeaders.Contains("Reference (optional)"))
+                {
+                    result.ErrorMessage = BulkCheckUseCaseValidationMessages.MissingReferenceHeader;
+                    return result;
                 }
 
                 if (!expectedHeaders.SequenceEqual(actualHeaders))
@@ -146,6 +152,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                                 requestDataWF.NationalInsuranceNumber = workingFamilyRow.Ni;
                                 requestDataWF.Type = eligibilityType;
                                 requestDataWF.Order = sequence;
+                                requestDataWF.Reference = workingFamilyRow.Reference;
                                 validationResults = _validator.Validate(requestDataWF);
                                 if (validationResults.IsValid) {
                                     //We know this passed parse earlier but it must be translated to correct format (yyyy-MM-dd) for Database to access
@@ -163,6 +170,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                                 requestData.NationalInsuranceNumber = row.Ni;
                                 requestData.Type = eligibilityType;
                                 requestData.Order = sequence;
+                                requestData.Reference = row.Reference;
                                 validationResults = _validator.Validate(requestData);
                                 if (validationResults.IsValid)
                                 {

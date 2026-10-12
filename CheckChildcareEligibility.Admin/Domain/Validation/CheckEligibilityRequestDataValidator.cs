@@ -12,6 +12,12 @@ public class CheckEligibilityRequestDataValidator : AbstractValidator<IEligibili
 {
     public CheckEligibilityRequestDataValidator()
     {
+        When(x => x is CheckEligibilityRequestDataBase, () =>
+        {
+            RuleFor(x => ((CheckEligibilityRequestDataBase)x).Reference)
+                .MaximumLength(100).WithMessage(ValidationMessages.ReferenceTooLong);
+        });
+
         When(x => x is CheckEligibilityRequestData, () =>
         {
             RuleFor(x => ((CheckEligibilityRequestData)x).LastName)
