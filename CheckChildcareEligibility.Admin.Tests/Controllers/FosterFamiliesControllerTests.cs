@@ -81,7 +81,8 @@ public class FosterFamiliesControllerTests : TestBase
             _previewReconfirm.Object,
             _reconfirmCode.Object,
             _updateChild.Object,
-            _dfeSignIn.Object)
+            _dfeSignIn.Object,
+            _configMock.Object)
         {
             ControllerContext = new ControllerContext
             {

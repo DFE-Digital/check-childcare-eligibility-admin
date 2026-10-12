@@ -6,6 +6,9 @@ using CheckChildcareEligibility.Admin.UseCases;
 using CheckChildcareEligibility.Admin.ViewModels;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 
@@ -16,7 +19,7 @@ public class ReportControllerTests : TestBase
     private Mock<IPerformEligibilityCodeHistoryReportUseCase> _performEligibilityCodeHistoryReportUseCaseMock;
     private Mock<IValidateEligibilityCodeUseCase> _validateEligibilityCodeUseCaseMock;
     private Mock<IDfeSignInApiService> _mockDfeSignInApiService;
-
+    private bool _mockIsLocalAuthorityPrivateBeta;
     private ReportController _sut;
 
     [SetUp]
@@ -28,11 +31,18 @@ public class ReportControllerTests : TestBase
         new Mock<IValidateEligibilityCodeUseCase>();
         _mockDfeSignInApiService =
         new Mock<IDfeSignInApiService>();
+        var sectionMock = new Mock<IConfigurationSection>();
+        sectionMock.Setup(s => s.Value).Returns("2200,891,380");
+
+        _configMock
+        .Setup(c => c.GetSection("FeatureFlags:LAsThatCanUseWF"))
+        .Returns(sectionMock.Object);
 
         _sut = new ReportController(
         _performEligibilityCodeHistoryReportUseCaseMock.Object,
         _validateEligibilityCodeUseCaseMock.Object,
-        _mockDfeSignInApiService.Object);
+        _mockDfeSignInApiService.Object,
+        _configMock.Object);
 
         SetUpSessionData();
         base.SetUp();
@@ -49,15 +59,15 @@ public class ReportControllerTests : TestBase
     }
 
     [Test]
-    public void Reports_Should_Return_View()
+    public async Task Reports_Should_Return_View()
     {
         // Act
-        var result = _sut.Reports();
+        var result = await _sut.Reports();
 
         // Assert
         result.Should().BeOfType<ViewResult>();
     }
-
+    
     [Test]
     public void CodeSearch_Get_Should_Return_View_With_Empty_Model()
     {

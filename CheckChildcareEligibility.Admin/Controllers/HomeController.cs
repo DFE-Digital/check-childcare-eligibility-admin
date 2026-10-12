@@ -5,7 +5,8 @@ namespace CheckChildcareEligibility.Admin.Controllers;
 
 public class HomeController : BaseController
 {
-    public HomeController(IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService)
+    public HomeController(IDfeSignInApiService dfeSignInApiService,
+        IConfiguration configuration) : base(dfeSignInApiService, configuration)
     {
     }
     public async Task<IActionResult> Index()

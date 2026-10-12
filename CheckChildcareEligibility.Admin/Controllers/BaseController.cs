@@ -1,8 +1,11 @@
 using CheckChildcareEligibility.Admin.Domain.DfeSignIn;
+using CheckChildcareEligibility.Admin.Helpers;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Configuration;
+using System.Configuration;
 
 namespace CheckChildcareEligibility.Admin.Controllers;
 
@@ -12,10 +15,14 @@ public class BaseController : Controller
     protected DfeClaims? _Claims;
 
     private readonly IDfeSignInApiService _dfeSignInApiService;
+    private readonly IConfiguration _config;
 
-    public BaseController(IDfeSignInApiService dfeSignInApiService)
+    public BaseController(
+        IDfeSignInApiService dfeSignInApiService,
+        IConfiguration configuration)
     {
         _dfeSignInApiService = dfeSignInApiService;
+        _config = configuration;
     }
 
     public async Task GetDfeClaimsAsync()
@@ -39,5 +46,14 @@ public class BaseController : Controller
     internal int GetLocalAuthorityId()
     {
         return int.Parse(_Claims.Organisation.EstablishmentNumber);
+    }
+
+     public bool IsLocalAuthorityPrivateBeta()
+    {
+        var localAuthorityId = _Claims.Organisation.EstablishmentNumber?.Trim();
+        
+        var betaList = _config.GetValue<string> ("FeatureFlags:LAsThatCanUseWF");
+     
+         return OrganisationRolesHelper.IsLocalAuthorityPrivateBeta(betaList, localAuthorityId);
     }
 }

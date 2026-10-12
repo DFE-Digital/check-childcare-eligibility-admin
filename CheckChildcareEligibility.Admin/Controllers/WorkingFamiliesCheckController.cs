@@ -27,7 +27,8 @@ public class WorkingFamiliesCheckController : BaseController
         IPerformWFEligibilityCheckUseCase performWFEligibilityCheckUseCase,
         IGetCheckStatusUseCase getCheckStatusUseCase,
         IValidateParentAndChildDetailsUseCase validateParentAndChildDetailsUseCase,
-        IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService)
+        IDfeSignInApiService dfeSignInApiService,
+        IConfiguration configuration) : base(dfeSignInApiService, configuration)
     {
 
         _logger = logger;

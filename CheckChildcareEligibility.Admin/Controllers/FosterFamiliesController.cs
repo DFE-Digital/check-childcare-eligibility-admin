@@ -54,7 +54,8 @@ namespace CheckChildcareEligibility.Admin.Controllers
             IPreviewFosterCodeReconfirmUseCase previewFosterCodeReconfirmUseCase,
             IReconfirmFosterCodeUseCase reconfirmFosterCodeUseCase,
             IUpdateFosterChildUseCase updateFosterChildUseCase,
-            IDfeSignInApiService dfeSignInApiService) : base(dfeSignInApiService)
+            IDfeSignInApiService dfeSignInApiService,
+            IConfiguration configuration) : base(dfeSignInApiService, configuration)
         {
             _sessionContextService = sessionContextService;
             _searchFosterFamiliesRecordsUseCase = searchFosterFamiliesRecordsUseCase;

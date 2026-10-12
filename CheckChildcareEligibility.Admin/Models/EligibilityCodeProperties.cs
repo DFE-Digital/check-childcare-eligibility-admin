@@ -37,7 +37,7 @@ namespace CheckChildcareEligibility.Admin.Models
 
         public EligibilityCodeProperties(CheckEligibilityItemWorkingFamilies source)
         {
-            Type = source.EligibilityCodeType ?? EligibilityCodeType.Standard;
+            Type = source?.EligibilityCodeType ?? EligibilityCodeType.Standard;
             Status = Enum.Parse<CheckEligibilityStatus>(source.Status);
             EligibilityCode = source.EligibilityCode;
             ValidityStartDate = source.ValidityStartDate;
@@ -47,6 +47,7 @@ namespace CheckChildcareEligibility.Admin.Models
             TermValidity = source.TermValidity;
             ReconfirmationProperties = source.ReconfirmationProperties;
             ChildIsTooYoung = source.ChildTooYoung;
+            IsGracePeriodEndDateApplied = source.IsGracePeriodEndDateApplied;
         }
 
         public EligibilityCodeProperties(FosterFamiliesSearchItemResponse item)
@@ -90,7 +91,7 @@ namespace CheckChildcareEligibility.Admin.Models
 
         public bool IsEligible => Status == CheckEligibilityStatus.eligible;
 
-        public bool IsExpired => GracePeriodEndDate < DateTime.UtcNow.Date;
+        public bool IsExpired => (IsGracePeriodEndDateApplied ? GracePeriodEndDate : ValidityEndDate) < DateTime.UtcNow.Date;
 
         public Term CurrentTerm => TermValidity.Current ?? Term.None;
 
@@ -98,7 +99,7 @@ namespace CheckChildcareEligibility.Admin.Models
 
         public bool ChildIsTooOld => ReconfirmationProperties.Status == ReconfirmationStatus.ChildTooOld;
 
-        public bool IsInGracePeriod => DateTime.UtcNow.Date > ValidityEndDate && DateTime.UtcNow.Date <= GracePeriodEndDate;
+        public bool IsInGracePeriod => DateTime.UtcNow.Date > ValidityEndDate && DateTime.UtcNow.Date <= GracePeriodEndDate && IsGracePeriodEndDateApplied;
 
         public bool IsNotValidForCurrentTerm => CurrentTerm.Name == TermName.None && NextTerm.Name != TermName.None;
 
