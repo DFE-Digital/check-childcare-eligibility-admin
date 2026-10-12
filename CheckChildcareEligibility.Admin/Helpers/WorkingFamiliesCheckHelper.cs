@@ -98,7 +98,7 @@ public static class WorkingFamiliesCheckHelper
         }
         else if (properties.IsInGracePeriod)
         {
-            result = $"{WorkingFamiliesResponseBanner.TermExpiresOn} {properties.GracePeriodEndDate:dd MMMM yyyy}";
+            result = WorkingFamiliesResponseBanner.CodeInGracePeriod;
         }
         else
         {
