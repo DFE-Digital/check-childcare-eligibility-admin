@@ -87,6 +87,25 @@ div.cookie-hidden {
     display: none
 }
 
+.govuk-header__logo {
+    margin-bottom: 10px;
+    padding-right: 80px;
+}
+
+@media (min-width: 48.0625em) {
+    .govuk-header__logo {
+        width: 33.33%;
+        padding-right: 15px;
+        float: left;
+        vertical-align: top;
+    }
+    .govuk-header__logo:last-child {
+        width: auto;
+        padding-right: 0;
+        float: none;
+    }
+}
+
 /* stylelint-disable color-no-hex */
 /* stylelint-enable color-no-hex */
 /* stylelint-disable string-quotes, order/properties-alphabetical-order */

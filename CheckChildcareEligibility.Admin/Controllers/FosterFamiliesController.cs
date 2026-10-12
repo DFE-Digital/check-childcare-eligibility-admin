@@ -266,7 +266,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 };
             }
             await _updateFosterCarerUseCase.Execute(request.FosterCarerId, updateRequest);
-            
+
             // Clear carer details from session
             _sessionContextService.ClearSessionData(request.FosterCarerId.ToString(), "FosterCarerDetails");
 
@@ -369,7 +369,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
 
             // Load foster carer record to ensure it exists and we have access
             var existingCarer = await _getFosterFamilyUseCase.Execute(request.FosterCarerId, true);
-            
+
             // Populate session context with the FosterPartnerDetailsViewModel before validation
             _sessionContextService.SetSessionData(request.FosterCarerId.ToString(), "FosterPartnerDetails", request);
 
@@ -661,7 +661,8 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 FosterPartnerDetailsViewModel = fosterPartnerDetails,
                 FosterChildDetailsViewModel = fosterChildDetails,
                 FosterApplicationSubmittedDateViewModel = fosterApplicationSubmittedDate,
-                FosterCodePreview = fosterCodePreview
+                FosterCodePreview = fosterCodePreview,
+                CodeProperties = new EligibilityCodeProperties(fosterCodePreview)
             };
 
             return View(fosterCarerApplication);
@@ -814,9 +815,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 {
                     SubmissionDate = fosterCodeReconfirmDateViewModel.SubmissionDate,
                     EligibilityCode = childResponse.EligibilityCode
-                }
+                }                
             );
             viewModel.FosterCodePreview = previewResult;
+            viewModel.CodeProperties = new EligibilityCodeProperties(previewResult);
             return View("Check_Reconfirm_Details_FF", viewModel);
         }
 

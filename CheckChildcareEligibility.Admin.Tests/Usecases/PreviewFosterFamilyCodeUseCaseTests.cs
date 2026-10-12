@@ -65,9 +65,16 @@ public class PreviewFosterFamilyCodeUseCaseTests
         var expected = new FosterCodePreviewResponse
         {
             ValidityStartDate = DateTime.Today.AddDays(-5),
-            ValidFromTerm = new Term(TermName.Spring, DateTime.Today.AddDays(-10)),
-            ReconfirmBetweenStart = DateTime.Today.AddDays(-2),
-            ReconfirmBetweenEnd = DateTime.Today.AddDays(2),
+            TermValidity = new TermValidity(
+                new Term(TermName.Spring, DateTime.Today.AddDays(-10)),
+                Term.None
+            ),
+            ReconfirmationProperties = new ReconfirmationProperties()
+            {
+                StartDate = DateTime.Today.AddDays(-2),
+                EndDate = DateTime.Today.AddDays(2),
+                Status = ReconfirmationStatus.Due
+            },
             GracePeriodEndDate = DateTime.Today.AddDays(30)
         };
 

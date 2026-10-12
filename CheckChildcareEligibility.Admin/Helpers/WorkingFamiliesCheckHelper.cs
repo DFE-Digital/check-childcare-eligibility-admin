@@ -8,7 +8,6 @@ namespace CheckChildcareEligibility.Admin.Helpers;
 public static class WorkingFamiliesCheckHelper
 {
 
-
     public static (Term Current, Term Next) GetTerms(DateTime date)
     {
         int year = date.Year;
@@ -75,36 +74,31 @@ public static class WorkingFamiliesCheckHelper
 
     public static string GetCodeStatus_FF(EligibilityCodeProperties properties)
     {
+        if (properties == null) { return string.Empty; }
+
         var nextTermView = WorkingFamiliesResponseBanner.TermNamesInView.GetValueOrDefault(properties.NextTerm.Name, string.Empty);
         var currentTermView = WorkingFamiliesResponseBanner.TermNamesInView.GetValueOrDefault(properties.CurrentTerm.Name, string.Empty);
 
-        bool isExpired = properties.GracePeriodEndDate < DateTime.UtcNow.Date;
         string result = "<unknown>";
-
-        if (properties.ChildIsTooYoung) // Child too young
+        if (properties.ChildIsTooOld || properties.IsExpired)
+        {
+            result = WorkingFamiliesResponseBanner.CodeExpired;
+        }
+        else if (properties.ChildIsTooYoung)
         {
             result = WorkingFamiliesResponseBanner.CodeChildTooYoung;
         }
-        else if (properties.ChildIsTooOld)
-        {
-            result = WorkingFamiliesResponseBanner.CodeChildTooOld;
-        }
-        else if (isExpired)
-        {
-            result = $"Code {WorkingFamiliesResponseBanner.CodeExpired}";
-        }
-        else if (properties.IsNotValidForCurrentTerm || properties.IsNeverValid) // Code cannot be used yet
+        else if (properties.IsNotValidForCurrentTerm || properties.IsNeverValid)
         {
             result = $"Code {WorkingFamiliesResponseBanner.CodeNotValidYet}";
         }
-        // Is valid and reconfirmation has happened
         else if (properties.IsReconfirmed)
         {
             result = $"{WorkingFamiliesResponseBanner.TermValidFor} {currentTermView} {DateTime.UtcNow.Year} and {nextTermView} {properties.GracePeriodEndDate.Year}";
         }
         else if (properties.IsInGracePeriod)
         {
-            result = $"{WorkingFamiliesResponseBanner.TermExpiresOn} {properties.GracePeriodEndDate:dd MMMM yyyy}";
+            result = WorkingFamiliesResponseBanner.CodeInGracePeriod;
         }
         else
         {
@@ -113,4 +107,12 @@ public static class WorkingFamiliesCheckHelper
         return result;
     }
 
+    public static string GetGracePeriod_FF(EligibilityCodeProperties properties)
+    {
+        if (properties == null) { return string.Empty; }
+
+        return properties.ChildIsTooYoung || properties.IsNotValidForCurrentTerm
+                    ? WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable
+                    : properties.GracePeriodEndDate.ToString("d MMMM yyyy");
+    }
 }

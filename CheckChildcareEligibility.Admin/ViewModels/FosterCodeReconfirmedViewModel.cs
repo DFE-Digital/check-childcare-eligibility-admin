@@ -1,6 +1,8 @@
 ﻿
+using System.Text.Json.Serialization;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
-using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies;
+using CheckChildcareEligibility.Admin.Helpers;
+using CheckChildcareEligibility.Admin.Models;
 
 namespace CheckChildcareEligibility.Admin.ViewModels
 {
@@ -9,7 +11,10 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
         public FosterChildResponse Response { get; init; }
 
-        public Term ValidFromTerm => Response.TermValidity.Current.Name != TermName.None ? Response.TermValidity.Current : Response.TermValidity.Next;
-
+        [JsonIgnore]
+        public string CodeStatus => WorkingFamiliesCheckHelper.GetCodeStatus_FF(new EligibilityCodeProperties(Response));
+        
+        [JsonIgnore]
+        public string GracePeriod => WorkingFamiliesCheckHelper.GetGracePeriod_FF(new EligibilityCodeProperties(Response));
     }
 }
