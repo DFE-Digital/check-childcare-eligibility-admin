@@ -5,33 +5,39 @@ namespace CheckChildcareEligibility.Admin.Models;
 public interface IBulkExport { }
 public class BulkExport : IBulkExport
 {
-    [Name("Parent Last Name")]
+    [Index(0), Name("Parent Last Name")]
     public string LastName { get; set; }
 
-    [Name("Parent Date of Birth")]
+    [Index(1), Name("Parent Date of Birth")]
     public string DOB { get; set; }
 
-    [Name("Parent National Insurance number")]
+    [Index(2), Name("Parent National Insurance Number")]
     public string NI { get; set; }
 
-    [Name("Outcome")]
+    [Index(3), Name("Outcome")]
     public string Outcome { get; set; }
+
+    [Index(4), Name("Reference (optional)")]
+    public string? Reference { get; set; }
 }
 public class BulkExportWorkingFamilies : IBulkExport
 {
-    [Name("Eligibility code")] public string EligibilityCode { get; set; }
+    [Index(0), Name("Eligibility code")] public string EligibilityCode { get; set; }
 
-    [Name("National Insurance number")] public string NI { get; set; }
+    [Index(1), Name("National Insurance number")] public string NI { get; set; }
 
-    [Name("Child date of birth")] public string ChildDOB { get; set; }
+    [Index(2), Name("Child date of birth")] public string ChildDOB { get; set; }
 
-    [Name("Outcome")] public string Outcome { get; set; }
+    [Index(3), Name("Outcome")] public string Outcome { get; set; }
 
     // 28-11-2025 This will be the returned VSD from the API for now 
-    [Name("Validity start date")] public string ValidityStartDate { get; set; }
+    [Index(4), Name("Validity start date")] public string ValidityStartDate { get; set; }
     // 28-11-2025 This will be the returned VED from the API 
-    [Name("Validity end date")] public string ValidityEndDate { get; set; }
-    [Name("Grace period ends")] public string GracePeriodEnds { get; set; }
+    [Index(5), Name("Validity end date")] public string ValidityEndDate { get; set; }
+    [Index(6), Name("Grace period ends")] public string GracePeriodEnds { get; set; }
+
+    [Index(7), Name("Reference (optional)")]
+    public string? Reference { get; set; }
 
 
 
