@@ -37,7 +37,8 @@
             
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
 
-            @if (DateTime.UtcNow.Date >= Model.CodeProperties.ReconfirmationProperties.StartDate)
+            @if (DateTime.UtcNow.Date >= Model.CodeProperties.ReconfirmationProperties.StartDate &&
+            !Model.CodeProperties.ChildIsTooOld)
             {
                 <a href="@Url.ActionLink("Enter_Reconfirm_Date_FF", "FosterFamilies", new { Model.Response.FosterChildId })"
                    role="button" draggable="false" class="govuk-button" data-module="govuk-button"
