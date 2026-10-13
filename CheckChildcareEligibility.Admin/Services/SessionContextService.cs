@@ -6,6 +6,8 @@ public interface ISessionContextService
 {
     public T? GetSessionData<T>(string contextId, string key);
 
+    public T? ConsumeSessionData<T>(string contextId, string key);
+
     public void ClearSessionData(string contextId, string key);
 
     public void SetSessionData<T>(string contextId, string key, T value);
@@ -38,6 +40,13 @@ public class SessionContextService : ISessionContextService
             }
         }
         return default;
+    }
+
+    public T? ConsumeSessionData<T>(string contextId, string key)
+    {
+        var data = GetSessionData<T>(contextId, key);
+        ClearSessionData(contextId, key);
+        return data;
     }
 
     public void SetSessionData<T>(string contextId, string key, T value)

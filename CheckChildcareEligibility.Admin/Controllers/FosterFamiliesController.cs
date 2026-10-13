@@ -270,7 +270,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // Clear carer details from session
             _sessionContextService.ClearSessionData(request.FosterCarerId.ToString(), "FosterCarerDetails");
 
-            return RedirectToAction("Family_Record_FF", new { request.FosterCarerId, Confirmation = "Changes to carer saved" });
+            // Save confirmation message to session
+            _sessionContextService.SetSessionData(request.FosterCarerId.ToString(), "Confirmation", "Changes to carer saved");
+
+            return RedirectToAction("Family_Record_FF", new { request.FosterCarerId });
         }
 
         [HttpGet("EnterPartner/{contextId}")]
@@ -408,13 +411,12 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // Clear partner details from session
             _sessionContextService.ClearSessionData(request.FosterCarerId.ToString(), "FosterPartnerDetails");
 
-            return RedirectToAction("Family_Record_FF", new
-            {
-                request.FosterCarerId,
-                Confirmation = existingCarer.HasPartner ?
+            // Save confirmation message to session
+            _sessionContextService.SetSessionData(request.FosterCarerId.ToString(), "Confirmation", existingCarer.HasPartner ?
                     "Changes to partner saved" :
-                    "Partner added"
-            });
+                    "Partner added");
+
+            return RedirectToAction("Family_Record_FF", new { request.FosterCarerId });
         }
 
         [HttpGet("RemovePartner/{FosterCarerId}")]
@@ -448,7 +450,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // Ensure any cached partner details are cleared from session
             _sessionContextService.ClearSessionData(request.FosterCarerId.ToString(), "FosterPartnerDetails");
 
-            return RedirectToAction("Family_Record_FF", new { request.FosterCarerId, Confirmation = "Partner removed" });
+            // Save confirmation message to session
+            _sessionContextService.SetSessionData(request.FosterCarerId.ToString(), "Confirmation", "Partner removed");
+
+            return RedirectToAction("Family_Record_FF", new { request.FosterCarerId });
         }
 
 
@@ -561,7 +566,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // Clear child details from session
             _sessionContextService.ClearSessionData(request.FosterChildId.ToString(), "FosterChildDetails");
 
-            return RedirectToAction("Code_Record_FF", new { request.FosterChildId, Confirmation = "Changes to child saved" });
+            // Save confirmation message to session
+            _sessionContextService.SetSessionData(request.FosterChildId.ToString(), "Confirmation", "Changes to child saved");
+
+            return RedirectToAction("Code_Record_FF", new { request.FosterChildId });
         }
 
         [HttpGet("SubmittedDate/{contextId}")]
@@ -739,26 +747,26 @@ namespace CheckChildcareEligibility.Admin.Controllers
         }
 
         [HttpGet("Family/{FosterCarerId}")]
-        public async Task<IActionResult> Family_Record_FF(Guid fosterCarerId, string? confirmation)
+        public async Task<IActionResult> Family_Record_FF(Guid fosterCarerId)
         {
             var response = await _getFosterFamilyUseCase.Execute(fosterCarerId, true);
             var viewModel = new FosterFamilyViewModel()
             {
                 Response = response,
-                Confirmation = confirmation
+                Confirmation = _sessionContextService.ConsumeSessionData<string>(fosterCarerId.ToString(), "Confirmation")
             };
             return View(viewModel);
         }
 
         [HttpGet("Code/{fosterChildId}")]
-        public async Task<IActionResult> Code_Record_FF(Guid fosterChildId, string? confirmation)
+        public async Task<IActionResult> Code_Record_FF(Guid fosterChildId)
         {
             var childResponse = await _getFosterChildUseCase.Execute(fosterChildId, true);
             var viewModel = new FosterFamiliesCodeResponseViewModel()
             {
                 Response = childResponse,
                 CodeProperties = new EligibilityCodeProperties(childResponse),
-                Confirmation = confirmation
+                Confirmation = _sessionContextService.ConsumeSessionData<string>(fosterChildId.ToString(), "Confirmation")
             };
             return View(viewModel);
         }
@@ -815,7 +823,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 {
                     SubmissionDate = fosterCodeReconfirmDateViewModel.SubmissionDate,
                     EligibilityCode = childResponse.EligibilityCode
-                }                
+                }
             );
             viewModel.FosterCodePreview = previewResult;
             viewModel.CodeProperties = new EligibilityCodeProperties(previewResult);
