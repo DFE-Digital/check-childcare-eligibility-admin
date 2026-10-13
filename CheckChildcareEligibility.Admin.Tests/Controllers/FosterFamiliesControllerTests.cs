@@ -3,6 +3,7 @@ using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Controllers;
 using CheckChildcareEligibility.Admin.Domain.DfeSignIn;
+using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Services;
 using CheckChildcareEligibility.Admin.Usecases;
@@ -409,6 +410,77 @@ public class FosterFamiliesControllerTests : TestBase
         _sessionContextService.Verify(
             x => x.SetSessionData(request.FosterChildId.ToString(), "FosterCodeReconfirmDate", request),
             Times.Never);
+    }
+
+    [Test]
+    public async Task EnterReconfirmDateGet_WhenReconfirmationHasNotStarted_RedirectsToCodeRecord()
+    {
+        var childId = Guid.NewGuid();
+        _getChild.Setup(x => x.Execute(childId, false))
+            .ReturnsAsync(new FosterChildResponse
+            {
+                FosterChildId = childId,
+                ReconfirmationProperties = new ReconfirmationProperties
+                {
+                    StartDate = DateTime.UtcNow.Date.AddDays(1),
+                    Status = ReconfirmationStatus.NotDueYet
+                }
+            });
+
+        var result = await _sut.Enter_Reconfirm_Date_FF(childId);
+
+        result.Should().BeOfType<RedirectToActionResult>()
+            .Which.ActionName.Should().Be("Code_Record_FF");
+        _sessionContextService.Verify(
+            x => x.GetSessionData<FosterCodeReconfirmDateViewModel>(It.IsAny<string>(), It.IsAny<string>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task EnterReconfirmDateGet_WhenChildIsTooOld_RedirectsToCodeRecord()
+    {
+        var childId = Guid.NewGuid();
+        _getChild.Setup(x => x.Execute(childId, false))
+            .ReturnsAsync(new FosterChildResponse
+            {
+                FosterChildId = childId,
+                ReconfirmationProperties = new ReconfirmationProperties
+                {
+                    StartDate = DateTime.UtcNow.Date.AddDays(-1),
+                    Status = ReconfirmationStatus.ChildTooOld
+                }
+            });
+
+        var result = await _sut.Enter_Reconfirm_Date_FF(childId);
+
+        result.Should().BeOfType<RedirectToActionResult>()
+            .Which.ActionName.Should().Be("Code_Record_FF");
+        _sessionContextService.Verify(
+            x => x.GetSessionData<FosterCodeReconfirmDateViewModel>(It.IsAny<string>(), It.IsAny<string>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task EnterReconfirmDateGet_WhenReconfirmationIsAllowed_ReturnsDateEntryForm()
+    {
+        var childId = Guid.NewGuid();
+        _getChild.Setup(x => x.Execute(childId, false))
+            .ReturnsAsync(new FosterChildResponse
+            {
+                FosterChildId = childId,
+                ReconfirmationProperties = new ReconfirmationProperties
+                {
+                    StartDate = DateTime.UtcNow.Date.AddDays(-1),
+                    Status = ReconfirmationStatus.Due
+                }
+            });
+
+        var result = await _sut.Enter_Reconfirm_Date_FF(childId);
+
+        var view = result.Should().BeOfType<ViewResult>().Subject;
+        view.ViewName.Should().Be("Enter_Reconfirm_Date_Details_FF");
+        view.Model.Should().BeOfType<FosterCodeReconfirmDateViewModel>()
+            .Which.FosterChildId.Should().Be(childId);
     }
 
     [Test]

@@ -1,4 +1,4 @@
-﻿using CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeConstants;
+﻿using CheckChildcareEligibility.Admin.Domain.Constants;
 using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;

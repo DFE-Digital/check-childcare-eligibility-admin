@@ -770,6 +770,13 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // Get child record to ensure it exists before displaying the reconfirmation form
             var childResponse = await _getFosterChildUseCase.Execute(fosterChildId, false);
 
+            // Ensure reconfirmation is allowed for this child
+            if (DateTime.UtcNow.Date < new EligibilityCodeProperties(childResponse).ReconfirmationProperties.StartDate ||
+                new EligibilityCodeProperties(childResponse).ChildIsTooOld)
+            {
+                return RedirectToAction("Code_Record_FF", new { fosterChildId });
+            }
+
             // Pull the FosterCodeReconfirmDateViewModel from session by FosterChildId if it exists
             var fosterCodeReconfirmDateViewModel = _sessionContextService.GetSessionData<FosterCodeReconfirmDateViewModel>(fosterChildId.ToString(), "FosterCodeReconfirmDate");
             // If fosterCodeReconfirmDateViewModel is null, create a new instance with the FosterChildId

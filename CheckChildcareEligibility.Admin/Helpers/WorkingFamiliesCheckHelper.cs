@@ -1,4 +1,5 @@
 using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.Constants;
 using CheckChildcareEligibility.Admin.Domain.Constants.Generic;
 using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies;
 using CheckChildcareEligibility.Admin.Models;
@@ -82,27 +83,27 @@ public static class WorkingFamiliesCheckHelper
         string result = "<unknown>";
         if (properties.ChildIsTooOld || properties.IsExpired)
         {
-            result = WorkingFamiliesResponseBanner.CodeExpired;
+            result = FosterFamiliesConstants.CodeExpired;
         }
         else if (properties.ChildIsTooYoung)
         {
-            result = WorkingFamiliesResponseBanner.CodeChildTooYoung;
+            result = FosterFamiliesConstants.CodeChildTooYoung;
         }
         else if (properties.IsNotValidForCurrentTerm || properties.IsNeverValid)
         {
-            result = $"Code {WorkingFamiliesResponseBanner.CodeNotValidYet}";
+            result = FosterFamiliesConstants.CodeNotValidYet;
         }
         else if (properties.IsReconfirmed)
         {
-            result = $"{WorkingFamiliesResponseBanner.TermValidFor} {currentTermView} {DateTime.UtcNow.Year} and {nextTermView} {properties.GracePeriodEndDate.Year}";
+            result = $"{FosterFamiliesConstants.CodeValidFor} {currentTermView} {DateTime.UtcNow.Year} and {nextTermView} {properties.GracePeriodEndDate.Year}";
         }
         else if (properties.IsInGracePeriod)
         {
-            result = WorkingFamiliesResponseBanner.CodeInGracePeriod;
+            result = FosterFamiliesConstants.CodeInGracePeriod;
         }
         else
         {
-            result = $"{WorkingFamiliesResponseBanner.TermValidFor} {currentTermView} {DateTime.UtcNow.Year}";
+            result = $"{FosterFamiliesConstants.CodeValidFor} {currentTermView} {DateTime.UtcNow.Year}";
         }
         return result;
     }
