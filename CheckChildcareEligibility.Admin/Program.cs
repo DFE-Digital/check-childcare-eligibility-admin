@@ -63,6 +63,7 @@ builder.Services.AddScoped<ILoadFosterChildDetailsUseCase, LoadFosterChildDetail
 builder.Services.AddScoped<IValidateFosterChildDetailsUseCase, ValidateFosterChildDetailsUseCase>();
 builder.Services.AddScoped<IValidateFosterApplicationSubmittedDateUseCase, ValidateFosterApplicationSubmittedDateUseCase>();
 builder.Services.AddScoped<ICreateFosterFamilyUseCase, CreateFosterFamilyUseCase>();
+builder.Services.AddScoped<ICreateFosterChildUseCase, CreateFosterChildUseCase>();
 builder.Services.AddScoped<IGetFosterFamilyUseCase, GetFosterFamilyUseCase>();
 builder.Services.AddScoped<IGetFosterChildUseCase, GetFosterChildUseCase>();
 builder.Services.AddScoped<IUpdateFosterCarerUseCase, UpdateFosterCarerUseCase>();

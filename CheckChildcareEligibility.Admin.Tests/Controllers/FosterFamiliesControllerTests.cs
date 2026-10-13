@@ -31,6 +31,7 @@ public class FosterFamiliesControllerTests : TestBase
     private Mock<IValidateFosterApplicationSubmittedDateUseCase> _validateSubmittedDate = null!;
     private Mock<IValidateFosterCodeReconfirmDateUseCase> _validateReconfirmDate = null!;
     private Mock<ICreateFosterFamilyUseCase> _createFamily = null!;
+    private Mock<ICreateFosterChildUseCase> _createChild = null!;
     private Mock<IGetFosterFamilyUseCase> _getFamily = null!;
     private Mock<IGetFosterChildUseCase> _getChild = null!;
     private Mock<IUpdateFosterCarerUseCase> _updateCarer = null!;
@@ -55,6 +56,7 @@ public class FosterFamiliesControllerTests : TestBase
         _validateSubmittedDate = new Mock<IValidateFosterApplicationSubmittedDateUseCase>();
         _validateReconfirmDate = new Mock<IValidateFosterCodeReconfirmDateUseCase>();
         _createFamily = new Mock<ICreateFosterFamilyUseCase>();
+        _createChild = new Mock<ICreateFosterChildUseCase>();
         _getFamily = new Mock<IGetFosterFamilyUseCase>();
         _getChild = new Mock<IGetFosterChildUseCase>();
         _updateCarer = new Mock<IUpdateFosterCarerUseCase>();
@@ -75,6 +77,7 @@ public class FosterFamiliesControllerTests : TestBase
             _validateSubmittedDate.Object,
             _validateReconfirmDate.Object,
             _createFamily.Object,
+            _createChild.Object,
             _getFamily.Object,
             _getChild.Object,
             _updateCarer.Object,
@@ -192,6 +195,166 @@ public class FosterFamiliesControllerTests : TestBase
         _sessionContextService.Verify(
             x => x.SetSessionData("journey", "FosterChildDetails", request),
             Times.Once);
+    }
+
+    [Test]
+    public async Task AddChildGet_WhenFamilyExists_InitializesChildJourney()
+    {
+        var fosterCarerId = Guid.NewGuid();
+        _getFamily.Setup(x => x.Execute(fosterCarerId, false))
+            .ReturnsAsync(new FosterFamilyResponse { FosterCarerId = fosterCarerId });
+        var contextId = Guid.NewGuid().ToString();
+
+        var result = await _sut.Add_Child_FF(fosterCarerId, contextId);
+
+        var view = result.Should().BeOfType<ViewResult>().Subject;
+        view.ViewName.Should().Be("Enter_Child_Details_FF");
+        var model = view.Model.Should().BeOfType<FosterChildDetailsViewModel>().Subject;
+        model.FosterCarerId.Should().Be(fosterCarerId);
+        model.ContextId.Should().Be(contextId);
+    }
+
+    [Test]
+    public async Task AddChildPost_WhenValid_RedirectsToSubmittedDate()
+    {
+        var familyId = Guid.NewGuid();
+        var contextId = Guid.NewGuid().ToString();
+        var request = new FosterChildDetailsViewModel
+        {
+            ContextId = contextId,
+            FosterCarerId = Guid.NewGuid(),
+            ChildFirstName = "Child",
+            ChildLastName = "Example"
+        };
+        _sessionContextService.Setup(x => x.GetSessionData<FosterChildDetailsViewModel>(contextId, "FosterChildDetails"))
+            .Returns(new FosterChildDetailsViewModel { ContextId = contextId, FosterCarerId = familyId });
+        _validateChild.Setup(x => x.Execute(request, It.IsAny<Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary>()))
+            .ReturnsAsync(new FosterChildDetailsValidationResult { IsValid = true });
+
+        var result = await _sut.Add_Child_FF(familyId, contextId, request);
+
+        var redirect = result.Should().BeOfType<RedirectToActionResult>().Subject;
+        redirect.ActionName.Should().Be("Enter_Submitted_Date_Details_FF");
+        redirect.RouteValues!["contextId"].Should().Be(contextId);
+        redirect.RouteValues["fosterCarerId"].Should().Be(familyId);
+        _createChild.Verify(x => x.Execute(
+            It.IsAny<Guid>(), It.IsAny<FosterChildRequest>(), It.IsAny<DateTime>()), Times.Never);
+    }
+
+    [Test]
+    public async Task SubmittedDateGet_ForAdditionalChild_UsesChildFamilyId()
+    {
+        var familyId = Guid.NewGuid();
+        const string contextId = "add-child";
+        _sessionContextService.Setup(x => x.GetSessionData<FosterChildDetailsViewModel>(contextId, "FosterChildDetails"))
+            .Returns(new FosterChildDetailsViewModel { ContextId = contextId, FosterCarerId = familyId });
+
+        var result = await _sut.Enter_Submitted_Date_Details_FF(contextId);
+
+        var model = result.Should().BeOfType<ViewResult>().Subject.Model
+            .Should().BeOfType<FosterApplicationSubmittedDateViewModel>().Subject;
+        model.FosterCarerId.Should().Be(familyId);
+        model.ContextId.Should().Be(contextId);
+    }
+
+    [Test]
+    public async Task SubmittedDatePost_ForAdditionalChild_RedirectsToAdditionalChildPreview()
+    {
+        const string contextId = "add-child";
+        var request = new FosterApplicationSubmittedDateViewModel
+        {
+            ContextId = contextId,
+            IsTodaySelected = true
+        };
+        _validateSubmittedDate.Setup(x => x.Execute(request, It.IsAny<Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary>()))
+            .ReturnsAsync(new FosterApplicationSubmittedDateValidationResult { IsValid = true });
+        _sessionContextService.Setup(x => x.GetSessionData<FosterChildDetailsViewModel>(contextId, "FosterChildDetails"))
+            .Returns(new FosterChildDetailsViewModel { ContextId = contextId, FosterCarerId = Guid.NewGuid() });
+
+        var result = await _sut.Enter_Submitted_Date_Details_FF(request);
+
+        result.Should().BeOfType<RedirectToActionResult>()
+            .Which.ActionName.Should().Be("Check_Add_Child_Details_FF");
+    }
+
+    [Test]
+    public async Task AddChildCheckPost_CreatesChildUsingItsSubmittedDate()
+    {
+        var familyId = Guid.NewGuid();
+        var childId = Guid.NewGuid();
+        var contextId = Guid.NewGuid().ToString();
+        var submissionDate = new DateTime(2026, 10, 1);
+        _sessionContextService.Setup(x => x.GetSessionData<FosterChildDetailsViewModel>(contextId, "FosterChildDetails"))
+            .Returns(new FosterChildDetailsViewModel
+            {
+                ContextId = contextId,
+                FosterCarerId = familyId,
+                ChildFirstName = "Child",
+                ChildLastName = "Example"
+            });
+        _sessionContextService.Setup(x => x.GetSessionData<FosterApplicationSubmittedDateViewModel>(contextId, "FosterApplicationSubmittedDate"))
+            .Returns(new FosterApplicationSubmittedDateViewModel { ContextId = contextId, SubmissionDate = submissionDate });
+        _createChild.Setup(x => x.Execute(familyId, It.IsAny<FosterChildRequest>(), submissionDate))
+            .ReturnsAsync(new FosterChildResponse { FosterChildId = childId, FosterCarerId = familyId });
+
+        var result = await _sut.Check_Add_Child_Details_FF(
+            familyId, contextId, new FosterApplicationCheckDetailsViewModel { ContextId = contextId });
+
+        var redirect = result.Should().BeOfType<RedirectToActionResult>().Subject;
+        redirect.ActionName.Should().Be("Add_Child_Code_Created_FF");
+        redirect.RouteValues!["fosterChildId"].Should().Be(childId);
+        redirect.RouteValues["fosterCarerId"].Should().Be(familyId);
+        redirect.RouteValues["contextId"].Should().Be(contextId);
+        _createChild.Verify(x => x.Execute(
+            familyId,
+            It.Is<FosterChildRequest>(request => request.SubmissionDate == submissionDate),
+            submissionDate), Times.Once);
+        _sessionContextService.Verify(x => x.ClearSessionData(contextId, "FosterChildDetails"), Times.Once);
+        _sessionContextService.Verify(x => x.ClearSessionData(contextId, "FosterApplicationSubmittedDate"), Times.Once);
+    }
+
+    [Test]
+    public async Task AddChildCheckGet_PreviewsCodeForExistingFamilyAndChildSubmissionDate()
+    {
+        await SetLocalAuthorityClaims();
+        var familyId = Guid.NewGuid();
+        var contextId = Guid.NewGuid().ToString();
+        var submissionDate = new DateTime(2026, 10, 1);
+        _sessionContextService.Setup(x => x.GetSessionData<FosterChildDetailsViewModel>(contextId, "FosterChildDetails"))
+            .Returns(new FosterChildDetailsViewModel
+            {
+                ContextId = contextId,
+                FosterCarerId = familyId,
+                ChildFirstName = "Child",
+                ChildLastName = "Example",
+                ChildDateOfBirth = new DateTime(2022, 8, 7),
+                ChildPostCode = "CH1 1LD"
+            });
+        _sessionContextService.Setup(x => x.GetSessionData<FosterApplicationSubmittedDateViewModel>(contextId, "FosterApplicationSubmittedDate"))
+            .Returns(new FosterApplicationSubmittedDateViewModel { ContextId = contextId, SubmissionDate = submissionDate });
+        _getFamily.Setup(x => x.Execute(familyId, false))
+            .ReturnsAsync(new FosterFamilyResponse
+            {
+                FosterCarerId = familyId,
+                CarerFirstName = "Carer",
+                CarerLastName = "Example",
+                CarerDateOfBirth = new DateTime(1990, 1, 1),
+                CarerNationalInsuranceNumber = "AB123456C"
+            });
+        var preview = new FosterCodePreviewResponse();
+        _previewCode.Setup(x => x.Execute(It.IsAny<FosterFamilyRequest>())).ReturnsAsync(preview);
+
+        var result = await _sut.Check_Add_Child_Details_FF(familyId, contextId);
+
+        var view = result.Should().BeOfType<ViewResult>().Subject;
+        view.ViewName.Should().Be("Check_Details_FF");
+        var model = view.Model.Should().BeOfType<FosterApplicationCheckDetailsViewModel>().Subject;
+        model.IsAdditionalChild.Should().BeTrue();
+        model.FosterCarerId.Should().Be(familyId);
+        _previewCode.Verify(x => x.Execute(It.Is<FosterFamilyRequest>(request =>
+            request.FosterChild.ChildFirstName == "Child" &&
+            request.SubmissionDate == submissionDate &&
+            request.FosterCarer.LocalAuthorityID == 12345)), Times.Once);
     }
 
     [Test]

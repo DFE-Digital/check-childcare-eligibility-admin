@@ -9,6 +9,10 @@ namespace CheckChildcareEligibility.Admin.ViewModels
     {
         public string? ContextId { get; set; }
 
+        public Guid FosterCarerId { get; set; }
+
+        public bool IsAdditionalChild { get; set; }
+
         public FosterCarerDetailsViewModel FosterCarerDetailsViewModel { get; set; } = new();
 
         public FosterPartnerDetailsViewModel? FosterPartnerDetailsViewModel { get; set; }

@@ -9,8 +9,9 @@
 
 <div class="govuk-grid-column-full">
     <a class="govuk-back-link backLinkJS"
-       href="@Url.Action("Enter_Submitted_Date_Details_FF", "FosterFamilies", new { Model.ContextId })">Back
-    </a>
+       href="@(Model.IsAdditionalChild
+           ? Url.Action("Enter_Submitted_Date_Details_FF", "FosterFamilies", new { fosterCarerId = Model.FosterCarerId, Model.ContextId })
+           : Url.Action("Enter_Submitted_Date_Details_FF", "FosterFamilies", new { Model.ContextId }))">Back</a>
 
     @if (!string.IsNullOrEmpty(errorMessage))
     {
@@ -40,10 +41,13 @@
                     </h2>
                     <ul class="govuk-summary-card__actions">
                         <li class="govuk-summary-card__action">
-                            <a class="govuk-link"
-                               href="@Url.Action("Enter_Carer_Details_FF", "FosterFamilies", new { Model.ContextId })">Change
-                                <span class="govuk-visually-hidden">Carer details</span>
-                            </a>
+                            @if (!Model.IsAdditionalChild)
+                            {
+                                <a class="govuk-link"
+                                   href="@Url.Action("Enter_Carer_Details_FF", "FosterFamilies", new { Model.ContextId })">Change
+                                    <span class="govuk-visually-hidden">Carer details</span>
+                                </a>
+                            }
                         </li>
                     </ul>
                 </div>
@@ -89,10 +93,13 @@
                         </h2>
                         <ul class="govuk-summary-card__actions">
                             <li class="govuk-summary-card__action">
-                                <a class="govuk-link"
-                                   href="@Url.Action("Enter_Partner_Details_FF", "FosterFamilies", new { Model.ContextId })">Change
-                                    <span class="govuk-visually-hidden">Partner details</span>
-                                </a>
+                                @if (!Model.IsAdditionalChild)
+                                {
+                                    <a class="govuk-link"
+                                       href="@Url.Action("Enter_Partner_Details_FF", "FosterFamilies", new { Model.ContextId })">Change
+                                        <span class="govuk-visually-hidden">Partner details</span>
+                                    </a>
+                                }
                             </li>
                         </ul>
                     </div>
@@ -137,7 +144,9 @@
                     <ul class="govuk-summary-card__actions">
                         <li class="govuk-summary-card__action">
                             <a class="govuk-link"
-                               href="@Url.Action("Enter_Child_Details_FF", "FosterFamilies", new { Model.ContextId })">Change<span
+                               href="@(Model.IsAdditionalChild
+                                   ? Url.Action("Add_Child_FF", "FosterFamilies", new { fosterCarerId = Model.FosterCarerId, Model.ContextId })
+                                   : Url.Action("Enter_Child_Details_FF", "FosterFamilies", new { Model.ContextId }))">Change<span
                                 class="govuk-visually-hidden">Child details</span>
                             </a>
                         </li>
@@ -184,7 +193,9 @@
                     <ul class="govuk-summary-card__actions">
                         <li class="govuk-summary-card__action">
                             <a class="govuk-link"
-                               href="@Url.Action("Enter_Submitted_Date_Details_FF", "FosterFamilies", new { Model.ContextId })">Change<span
+                               href="@(Model.IsAdditionalChild
+                                   ? Url.Action("Enter_Submitted_Date_Details_FF", "FosterFamilies", new { fosterCarerId = Model.FosterCarerId, Model.ContextId })
+                                   : Url.Action("Enter_Submitted_Date_Details_FF", "FosterFamilies", new { Model.ContextId }))">Change<span
                                 class="govuk-visually-hidden">Eligibility code date</span>
                             </a>
                         </li>
@@ -251,7 +262,9 @@
                 <li>providing an eligibility code is consistent with the child's care plan</li>
             </ul>
 
-            <form asp-controller="FosterFamilies" asp-action="CheckDetails" method="post">
+            <form asp-controller="FosterFamilies" asp-action="@(Model.IsAdditionalChild ? "Check_Add_Child_Details_FF" : "CheckDetails")"
+                  asp-route-fosterCarerId="@(Model.IsAdditionalChild ? Model.FosterCarerId : null)"
+                  asp-route-contextId="@(Model.IsAdditionalChild ? Model.ContextId : null)" method="post">
                 <input asp-for="ContextId" type="hidden" />
                 <!-- Carer Details -->
                 <input type="hidden" asp-for="FosterCarerDetailsViewModel.CarerFirstName" />
@@ -276,7 +289,7 @@
                 <input type="hidden" asp-for="FosterApplicationSubmittedDateViewModel.SubmissionDate" />
 
                 <button type="submit" class="govuk-button govuk-!-margin-top-5" data-module="govuk-button">
-                    Add family and create code
+                    @(Model.IsAdditionalChild ? "Add child and create code" : "Add family and create code")
                 </button>
             </form>
         </div>

@@ -21,6 +21,9 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         
         // For creation journey only
         public string? ContextId { get; set; }
+
+        // For adding a child to an existing family
+        public Guid FosterCarerId { get; set; }
         
     }
 }

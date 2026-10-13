@@ -1,9 +1,11 @@
 ﻿@using CheckChildcareEligibility.Admin.ViewModels
 @model FosterChildDetailsViewModel
 @{
-    bool isUpdate = Model != null && string.IsNullOrEmpty(Model.ContextId);
-    var actionName = isUpdate ? "UpdateChild" : "EnterChild";
+    bool isUpdate = Model != null && Model.FosterChildId != Guid.Empty;
+    bool isAddChild = Model != null && Model.FosterCarerId != Guid.Empty;
+    var actionName = isUpdate ? "UpdateChild" : isAddChild ? "Add_Child_FF" : "EnterChild";
     ViewData["Title"] = isUpdate ? "Edit the child details" : "Enter the child details";
+    var errorMessage = TempData["ErrorMessage"] as string;
 }
 
 <div class="govuk-grid-column-full">
@@ -11,6 +13,11 @@
     {
         <a class="govuk-back-link backLinkJS"
            href="@Url.ActionLink("Code_Record_FF", "FosterFamilies", new { Model.FosterChildId })">Back</a>
+    }
+    else if (isAddChild)
+    {
+        <a class="govuk-back-link backLinkJS"
+           href="@Url.Action("Family_Record_FF", "FosterFamilies", new { Model.FosterCarerId })">Back</a>
     }
     else
     {
@@ -31,14 +38,29 @@
         <partial name="_ValidationSummary" model="ViewData.ModelState" />
     }
 
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div id="error-summary" class="govuk-error-summary" data-module="govuk-error-summary">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">There is a problem</h2>
+                <div class="govuk-error-summary__body">
+                    <p class="govuk-error-message">@errorMessage</p>
+                </div>
+            </div>
+        </div>
+    }
+
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
-            <form asp-controller="FosterFamilies" asp-action="@actionName" method="post">
+            <form asp-controller="FosterFamilies" asp-action="@actionName"
+                  asp-route-fosterCarerId="@(isAddChild ? Model.FosterCarerId : null)"
+                  asp-route-contextId="@(isAddChild ? Model.ContextId : null)" method="post">
                 @if (Model != null)
                 {
                     <input asp-for="ContextId" type="hidden" />
                     <input asp-for="FosterChildId" type="hidden" />
+                    <input asp-for="FosterCarerId" type="hidden" />
                 }
                 <fieldset class="govuk-fieldset">
 
@@ -147,7 +169,7 @@
                 @if (!isUpdate)
                 {
                     <button type="submit" class="govuk-button" data-module="govuk-button">
-                        Continue
+                        @(isAddChild ? "Add child and create code" : "Continue")
                     </button>
                 }
                 else

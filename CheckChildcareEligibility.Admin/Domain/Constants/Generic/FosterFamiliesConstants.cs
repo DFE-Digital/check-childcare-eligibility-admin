@@ -9,4 +9,6 @@ public static class FosterFamiliesConstants
     public const string CodeExpired = "Expired";
     public const string CodeValidFor = "Valid for";
 
+    public const int SubmissionDateWindowDays = 31;
+
 }

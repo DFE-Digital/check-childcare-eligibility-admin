@@ -29,19 +29,23 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         //For Update Child Details only
         public Guid FosterChildId { get; set; }
 
+        // For adding a child to an existing family
+        public Guid FosterCarerId { get; set; }
+
         // For creation journey only
         public string? ContextId { get; set; }
 
         public bool HasPartner { get; set; }
 
-        public FosterChildRequest BuildRequest()
+        public FosterChildRequest BuildRequest(DateTime? submissionDate = null)
         {
             return new FosterChildRequest
             {
                 ChildFirstName = ChildFirstName,
                 ChildLastName = ChildLastName,
                 ChildDateOfBirth = ChildDateOfBirth,
-                ChildPostCode = ChildPostCode
+                ChildPostCode = ChildPostCode,
+                SubmissionDate = submissionDate
             };
         }
     }

@@ -9,6 +9,8 @@ public interface IFosterFamiliesGateway
 
     Task<FosterFamilyCreatedResponse> CreateFosterFamily(FosterFamilyRequest request);
 
+    Task<FosterChildResponse> CreateFosterChild(Guid fosterCarerId, FosterChildRequest request);
+
     Task<FosterCodePreviewResponse> PreviewFosterFamilyCode(FosterFamilyRequest request);
 
     Task<FosterFamilyResponse> GetFosterFamily(Guid fosterCarerId, bool includeChildren = false);

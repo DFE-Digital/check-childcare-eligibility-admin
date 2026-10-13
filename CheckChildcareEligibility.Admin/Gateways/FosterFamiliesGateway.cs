@@ -57,6 +57,21 @@ public class FosterFamiliesGateway : BaseGateway, IFosterFamiliesGateway
         }
     }
 
+    public async Task<FosterChildResponse> CreateFosterChild(Guid fosterCarerId, FosterChildRequest request)
+    {
+        var url = $"/foster-family/{fosterCarerId}/child";
+        try
+        {
+            return await ApiDataPostAsynch(url, request, new FosterChildResponse());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Post CreateFosterChild failed. uri:-{_httpClient.BaseAddress}{url}");
+            _logger.LogTrace(ex, $"Post CreateFosterChild failed. uri:-{_httpClient.BaseAddress}{url} content:-{JsonConvert.SerializeObject(request)}");
+            throw;
+        }
+    }
+
     public async Task<FosterCodePreviewResponse> PreviewFosterFamilyCode(FosterFamilyRequest request)
     {
         try

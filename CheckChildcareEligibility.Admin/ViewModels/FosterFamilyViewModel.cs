@@ -6,6 +6,8 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public FosterFamilyResponse Response { get; set; }
 
         public string? Confirmation { get; set; }
+
+        public string? ContextId { get; set; }
         
     }
 }
