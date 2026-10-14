@@ -717,7 +717,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             _sessionContextService.SetSessionData(request.ContextId, "FosterApplicationSubmittedDate", request);
 
             var fosterChildDetails = _sessionContextService.GetSessionData<FosterChildDetailsViewModel>(request.ContextId, "FosterChildDetails");
-            return fosterChildDetails?.FosterCarerId != Guid.Empty
+            return fosterChildDetails is not null && fosterChildDetails.FosterCarerId != Guid.Empty
                 ? RedirectToAction("Check_Add_Child_Details_FF", new { fosterCarerId = fosterChildDetails.FosterCarerId, request.ContextId })
                 : RedirectToAction("Check_Details_FF", new { request.ContextId });
         }
