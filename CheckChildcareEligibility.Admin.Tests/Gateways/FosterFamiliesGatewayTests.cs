@@ -100,6 +100,28 @@ public class FosterFamiliesGatewayTests
     }
 
     [Test]
+    public async Task CreateFosterChild_WhenApiReturnsResponse_PostsRequestToExistingFamilyAndReturnsResponse()
+    {
+        var familyId = Guid.NewGuid();
+        var request = new FosterChildRequest
+        {
+            ChildFirstName = "Child",
+            ChildLastName = "Example",
+            ChildDateOfBirth = new DateTime(2022, 8, 7),
+            ChildPostCode = "CH1 1LD",
+            SubmissionDate = new DateTime(2026, 10, 2)
+        };
+        var expected = new FosterChildResponse { FosterCarerId = familyId, FosterChildId = Guid.NewGuid() };
+        HttpRequestMessage? capturedRequest = null;
+        SetupResponse(HttpStatusCode.Created, expected, requestMessage => capturedRequest = requestMessage);
+
+        var result = await _sut.CreateFosterChild(familyId, request);
+
+        result.Should().BeEquivalentTo(expected);
+        await AssertRequestAsync(capturedRequest!, HttpMethod.Post, $"/foster-family/{familyId}/child", request);
+    }
+
+    [Test]
     public async Task PreviewFosterFamilyCode_WhenApiReturnsResponse_PostsRequestAndReturnsResponse()
     {
         var request = BuildFamilyRequest();
