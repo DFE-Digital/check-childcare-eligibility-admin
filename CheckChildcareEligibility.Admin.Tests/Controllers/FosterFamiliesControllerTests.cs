@@ -278,6 +278,40 @@ public class FosterFamiliesControllerTests : TestBase
     }
 
     [Test]
+    public async Task SubmittedDateGet_ForNewFamily_HasNoFosterCarerId()
+    {
+        const string contextId = "new-family";
+        _sessionContextService.Setup(x => x.GetSessionData<FosterChildDetailsViewModel>(contextId, "FosterChildDetails"))
+            .Returns(new FosterChildDetailsViewModel { ContextId = contextId });
+        _sessionContextService.Setup(x => x.GetSessionData<FosterCarerDetailsViewModel>(contextId, "FosterCarerDetails"))
+            .Returns(new FosterCarerDetailsViewModel { ContextId = contextId });
+
+        var result = await _sut.Enter_Submitted_Date_Details_FF(contextId);
+
+        var model = result.Should().BeOfType<ViewResult>().Subject.Model
+            .Should().BeOfType<FosterApplicationSubmittedDateViewModel>().Subject;
+        model.FosterCarerId.Should().BeEmpty();
+        model.ContextId.Should().Be(contextId);
+    }
+
+    [Test]
+    public async Task SubmittedDatePost_ForNewFamily_RedirectsToCreateFamilyPreview()
+    {
+        const string contextId = "new-family";
+        var request = new FosterApplicationSubmittedDateViewModel { ContextId = contextId, IsTodaySelected = true };
+        _validateSubmittedDate.Setup(x => x.Execute(request, It.IsAny<Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary>()))
+            .ReturnsAsync(new FosterApplicationSubmittedDateValidationResult { IsValid = true });
+        _sessionContextService.Setup(x => x.GetSessionData<FosterChildDetailsViewModel>(contextId, "FosterChildDetails"))
+            .Returns(new FosterChildDetailsViewModel { ContextId = contextId });
+
+        var result = await _sut.Enter_Submitted_Date_Details_FF(request);
+
+        var redirect = result.Should().BeOfType<RedirectToActionResult>().Subject;
+        redirect.ActionName.Should().Be("Check_Details_FF");
+        redirect.RouteValues!.Keys.Should().NotContain("fosterCarerId");
+    }
+
+    [Test]
     public async Task AddChildCheckPost_CreatesChildUsingItsSubmittedDate()
     {
         var familyId = Guid.NewGuid();
