@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using CheckChildcareEligibility.Admin.Domain.Constants;
 using CheckChildcareEligibility.Admin.ViewModels;
 using FluentAssertions;
 
@@ -8,9 +9,9 @@ namespace CheckChildcareEligibility.Admin.Tests.Attributes;
 public class SubmissionDateAttributeTests
 {
     [Test]
-    public void Validate_DateExactly31DaysAgo_ReturnsSuccess()
+    public void Validate_DateExactlySubmissionDateWindowDaysAgo_ReturnsSuccess()
     {
-        var submissionDate = DateTime.Today.AddDays(-31);
+        var submissionDate = DateTime.Today.AddDays(-FosterFamiliesConstants.SubmissionDateWindowDays);
 
         var model = new FosterApplicationSubmittedDateViewModel
         {
@@ -34,9 +35,9 @@ public class SubmissionDateAttributeTests
     }
 
     [Test]
-    public void Validate_Date32DaysAgo_ReturnsError()
+    public void Validate_DateOneDayBeforeSubmissionDateWindow_ReturnsError()
     {
-        var submissionDate = DateTime.Today.AddDays(-32);
+        var submissionDate = DateTime.Today.AddDays(-FosterFamiliesConstants.SubmissionDateWindowDays - 1);
 
         var model = new FosterApplicationSubmittedDateViewModel
         {

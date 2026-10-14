@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using CheckChildcareEligibility.Admin.Domain.Constants;
 using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
@@ -174,10 +175,10 @@ public class SubmissionDateAttribute : ValidationAttribute
                         new[] { "SubmissionDate", "Day", "Month", "Year" });
                 }
 
-                DateTime backdateWindow = DateTime.Today.AddDays(-31);
+                DateTime backdateWindow = DateTime.Today.AddDays(-FosterFamiliesConstants.SubmissionDateWindowDays);
                 if (submissionDate < backdateWindow)
                 {
-                    return new ValidationResult(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, backdateWindow.ToString("d MMMM yyyy")),
+                    return new ValidationResult(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, backdateWindow.AddDays(-1).ToString("d MMMM yyyy")),
                         new[] { "SubmissionDate", "Day", "Month", "Year" });
                 }
                 return ValidationResult.Success;

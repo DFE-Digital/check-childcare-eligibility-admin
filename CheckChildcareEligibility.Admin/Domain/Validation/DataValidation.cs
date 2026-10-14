@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using CheckChildcareEligibility.Admin.Attributes;
+using CheckChildcareEligibility.Admin.Domain.Constants;
 using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Helpers;
 
@@ -41,7 +42,7 @@ internal static class DataValidation
 
     internal static bool BeWithin31Days(DateTime value)
     {
-        DateTime backdateWindow = DateTime.Today.AddDays(-31);
+        DateTime backdateWindow = DateTime.Today.AddDays(-FosterFamiliesConstants.SubmissionDateWindowDays);
         return value >= backdateWindow;
     }
 

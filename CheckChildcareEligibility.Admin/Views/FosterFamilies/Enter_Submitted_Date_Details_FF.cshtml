@@ -1,13 +1,20 @@
 ﻿@using CheckChildcareEligibility.Admin.ViewModels
 @model FosterApplicationSubmittedDateViewModel
 @{
-    bool isUpdate = Model != null && string.IsNullOrEmpty(Model.ContextId);
-    var actionName = isUpdate ? "SubmittedDate" : "SubmittedDate";
+    bool isAddChild = Model != null && Model.FosterCarerId != Guid.Empty;
+    var actionName = isAddChild ? "Enter_Submitted_Date_Details_FF" : "SubmittedDate";
     ViewData["Title"] = "When was the application submitted?";
 }
 
 <div class="govuk-grid-column-full">
-    <a class="govuk-back-link backLinkJS" href="@Url.Action("Enter_Child_Details_FF", "FosterFamilies", new { Model.ContextId })">Back</a>
+    @if (isAddChild)
+    {
+        <a class="govuk-back-link backLinkJS" href="@Url.Action("Add_Child_FF", "FosterFamilies", new { fosterCarerId = Model.FosterCarerId, contextId = Model.ContextId })">Back</a>
+    }
+    else
+    {
+        <a class="govuk-back-link backLinkJS" href="@Url.Action("Enter_Child_Details_FF", "FosterFamilies", new { Model.ContextId })">Back</a>
+    }
 
     @if (!ViewData.ModelState.IsValid)
     {
@@ -17,10 +24,13 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
-            <form asp-controller="FosterFamilies" asp-action="SubmittedDate" method="post">
+            <form asp-controller="FosterFamilies" asp-action="@actionName"
+                  asp-route-fosterCarerId="@(isAddChild ? Model.FosterCarerId : null)"
+                  asp-route-contextId="@(isAddChild ? Model.ContextId : null)" method="post">
                 @if (Model != null)
                 {
                     <input asp-for="ContextId" type="hidden" />
+                    <input asp-for="FosterCarerId" type="hidden" />
                 }
                 <fieldset class="govuk-fieldset">
 

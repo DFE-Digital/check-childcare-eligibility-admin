@@ -1,4 +1,4 @@
-﻿namespace CheckChildcareEligibility.Admin.Domain.Constants.EligibilityTypeConstants;
+﻿namespace CheckChildcareEligibility.Admin.Domain.Constants;
 
 public static class EligibilityTypeConstants
 {

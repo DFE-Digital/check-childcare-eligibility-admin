@@ -22,13 +22,13 @@
         // Child
         public Guid FosterChildId { get; set; }
 
-        public string ChildFirstName { get; set; }
+        public string ChildFirstName { get; set; } = string.Empty;
 
-        public string ChildLastName { get; set; }
+        public string ChildLastName { get; set; } = string.Empty;
 
         public DateTime ChildDateOfBirth { get; set; }
 
-        public string ChildPostCode { get; set; }
+        public string ChildPostCode { get; set; } = string.Empty;
 
 
         // Foster Family

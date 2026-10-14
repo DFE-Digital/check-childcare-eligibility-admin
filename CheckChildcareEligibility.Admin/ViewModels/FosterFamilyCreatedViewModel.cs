@@ -11,6 +11,8 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
         public FosterChildResponse Response { get; init; }
 
+        public bool IsAdditionalChild { get; init; }
+
         [JsonIgnore]
         public string CodeStatus => WorkingFamiliesCheckHelper.GetCodeStatus_FF(new EligibilityCodeProperties(Response));
 
