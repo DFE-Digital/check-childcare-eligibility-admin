@@ -8,10 +8,9 @@
 }
 
 <div class="govuk-grid-column-full">
-    <a class="govuk-back-link backLinkJS"
-       href="@(Model.IsAdditionalChild
-           ? Url.Action("Enter_Submitted_Date_Details_FF", "FosterFamilies", new { fosterCarerId = Model.FosterCarerId, Model.ContextId })
-           : Url.Action("Enter_Submitted_Date_Details_FF", "FosterFamilies", new { Model.ContextId }))">Back</a>
+    <a class="govuk-back-link backLinkJS" href="@(Model.IsAdditionalChild
+           ? Url.Action("Enter_Submitted_Date_Details_FF", "FosterFamilies", new { Model.FosterCarerId, Model.ContextId })
+   : Url.Action("Enter_Submitted_Date_Details_FF", "FosterFamilies", new { Model.ContextId }))">Back</a>
 
     @if (!string.IsNullOrEmpty(errorMessage))
     {
@@ -34,83 +33,32 @@
 
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
 
-            <div class="govuk-summary-card">
-                <div class="govuk-summary-card__title-wrapper">
-                    <h2 class="govuk-summary-card__title">
-                        Carer
-                    </h2>
-                    <ul class="govuk-summary-card__actions">
-                        <li class="govuk-summary-card__action">
-                            @if (!Model.IsAdditionalChild)
-                            {
-                                <a class="govuk-link"
-                                   href="@Url.Action("Enter_Carer_Details_FF", "FosterFamilies", new { Model.ContextId })">Change
-                                    <span class="govuk-visually-hidden">Carer details</span>
-                                </a>
-                            }
-                        </li>
-                    </ul>
-                </div>
-                <div class="govuk-summary-card__content">
-                    <dl class="govuk-summary-list">
-
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                Full name
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                @Model.FosterCarerDetailsViewModel.CarerFirstName @Model.FosterCarerDetailsViewModel.CarerLastName
-                            </dd>
-                        </div>
-
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                Date of birth
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                @DateTime.Parse(Model.FosterCarerDetailsViewModel.CarerDateOfBirth.ToString()).ToString("d MMMM yyyy")
-                            </dd>
-                        </div>
-
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                National Insurance number
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                @Model.FosterCarerDetailsViewModel.CarerNationalInsuranceNumber
-                            </dd>
-                        </div>
-                    </dl>
-                </div>
-            </div>
-
-            @if (Model.FosterCarerDetailsViewModel.HasPartner == true)
+            @if (!Model.IsAdditionalChild)
             {
                 <div class="govuk-summary-card">
                     <div class="govuk-summary-card__title-wrapper">
                         <h2 class="govuk-summary-card__title">
-                            Partner
+                            Carer
                         </h2>
                         <ul class="govuk-summary-card__actions">
                             <li class="govuk-summary-card__action">
-                                @if (!Model.IsAdditionalChild)
-                                {
-                                    <a class="govuk-link"
-                                       href="@Url.Action("Enter_Partner_Details_FF", "FosterFamilies", new { Model.ContextId })">Change
-                                        <span class="govuk-visually-hidden">Partner details</span>
-                                    </a>
-                                }
+                                <a class="govuk-link"
+                                   href="@Url.Action("Enter_Carer_Details_FF", "FosterFamilies", new { Model.ContextId })">Change
+                                    <span class="govuk-visually-hidden">Carer details</span>
+                                </a>
                             </li>
                         </ul>
                     </div>
                     <div class="govuk-summary-card__content">
                         <dl class="govuk-summary-list">
+
                             <div class="govuk-summary-list__row">
                                 <dt class="govuk-summary-list__key">
                                     Full name
                                 </dt>
                                 <dd class="govuk-summary-list__value">
-                                    @Model.FosterPartnerDetailsViewModel.PartnerFirstName @Model.FosterPartnerDetailsViewModel.PartnerLastName
+                                    @Model.FosterCarerDetailsViewModel.CarerFirstName
+                                    @Model.FosterCarerDetailsViewModel.CarerLastName
                                 </dd>
                             </div>
 
@@ -119,7 +67,7 @@
                                     Date of birth
                                 </dt>
                                 <dd class="govuk-summary-list__value">
-                                    @DateTime.Parse(Model.FosterPartnerDetailsViewModel.PartnerDateOfBirth.ToString()).ToString("d MMMM yyyy")
+                                    @DateTime.Parse(Model.FosterCarerDetailsViewModel.CarerDateOfBirth.ToString()).ToString("d MMMM yyyy")
                                 </dd>
                             </div>
 
@@ -128,14 +76,99 @@
                                     National Insurance number
                                 </dt>
                                 <dd class="govuk-summary-list__value">
-                                    @Model.FosterPartnerDetailsViewModel.PartnerNationalInsuranceNumber
+                                    @Model.FosterCarerDetailsViewModel.CarerNationalInsuranceNumber
                                 </dd>
                             </div>
                         </dl>
                     </div>
                 </div>
-            }
 
+                @if (Model.FosterCarerDetailsViewModel.HasPartner == true)
+                {
+                    <div class="govuk-summary-card">
+                        <div class="govuk-summary-card__title-wrapper">
+                            <h2 class="govuk-summary-card__title">
+                                Partner
+                            </h2>
+                            <ul class="govuk-summary-card__actions">
+                                <li class="govuk-summary-card__action">
+                                    <a class="govuk-link"
+                                       href="@Url.Action("Enter_Partner_Details_FF", "FosterFamilies", new { Model.ContextId })">Change
+                                        <span class="govuk-visually-hidden">Partner details</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="govuk-summary-card__content">
+                            <dl class="govuk-summary-list">
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">
+                                        Full name
+                                    </dt>
+                                    <dd class="govuk-summary-list__value">
+                                        @Model.FosterPartnerDetailsViewModel.PartnerFirstName
+                                        @Model.FosterPartnerDetailsViewModel.PartnerLastName
+                                    </dd>
+                                </div>
+
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">
+                                        Date of birth
+                                    </dt>
+                                    <dd class="govuk-summary-list__value">
+                                        @DateTime.Parse(Model.FosterPartnerDetailsViewModel.PartnerDateOfBirth.ToString()).ToString("d MMMM yyyy")
+                                    </dd>
+                                </div>
+
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">
+                                        National Insurance number
+                                    </dt>
+                                    <dd class="govuk-summary-list__value">
+                                        @Model.FosterPartnerDetailsViewModel.PartnerNationalInsuranceNumber
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="govuk-summary-card">
+                    <div class="govuk-summary-card__title-wrapper">
+                        <h2 class="govuk-summary-card__title">
+                            Foster family
+                        </h2>
+                    </div>
+                    <div class="govuk-summary-card__content">
+                        <dl class="govuk-summary-list">
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    Carer
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                    @Model.FosterCarerDetailsViewModel.CarerFirstName
+                                    @Model.FosterCarerDetailsViewModel.CarerLastName
+                                </dd>
+                            </div>
+
+                            @if (Model.FosterCarerDetailsViewModel.HasPartner == true)
+                            {
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">
+                                        Partner
+                                    </dt>
+                                    <dd class="govuk-summary-list__value">
+                                        @Model.FosterPartnerDetailsViewModel.PartnerFirstName
+                                        @Model.FosterPartnerDetailsViewModel.PartnerLastName
+                                    </dd>
+                                </div>
+                            }
+                        </dl>
+                    </div>
+                </div>
+            }
             <div class="govuk-summary-card">
                 <div class="govuk-summary-card__title-wrapper">
                     <h2 class="govuk-summary-card__title">
@@ -146,7 +179,7 @@
                             <a class="govuk-link"
                                href="@(Model.IsAdditionalChild
                                    ? Url.Action("Add_Child_FF", "FosterFamilies", new { fosterCarerId = Model.FosterCarerId, Model.ContextId })
-                                   : Url.Action("Enter_Child_Details_FF", "FosterFamilies", new { Model.ContextId }))">Change<span
+                           : Url.Action("Enter_Child_Details_FF", "FosterFamilies", new { Model.ContextId }))">Change<span
                                 class="govuk-visually-hidden">Child details</span>
                             </a>
                         </li>
@@ -160,7 +193,8 @@
                                 Full name
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @Model.FosterChildDetailsViewModel.ChildFirstName @Model.FosterChildDetailsViewModel.ChildLastName
+                                @Model.FosterChildDetailsViewModel.ChildFirstName
+                                @Model.FosterChildDetailsViewModel.ChildLastName
                             </dd>
                         </div>
 
@@ -195,7 +229,7 @@
                             <a class="govuk-link"
                                href="@(Model.IsAdditionalChild
                                    ? Url.Action("Enter_Submitted_Date_Details_FF", "FosterFamilies", new { fosterCarerId = Model.FosterCarerId, Model.ContextId })
-                                   : Url.Action("Enter_Submitted_Date_Details_FF", "FosterFamilies", new { Model.ContextId }))">Change<span
+                           : Url.Action("Enter_Submitted_Date_Details_FF", "FosterFamilies", new { Model.ContextId }))">Change<span
                                 class="govuk-visually-hidden">Eligibility code date</span>
                             </a>
                         </li>
@@ -236,7 +270,8 @@
                                 Reconfirm between
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @WorkingFamiliesCheckHelper.GetReconfirmBetween(EligibilityCodeType.Foster, Model.FosterCodePreview.ReconfirmationProperties)
+                                @WorkingFamiliesCheckHelper.GetReconfirmBetween(EligibilityCodeType.Foster,
+                                Model.FosterCodePreview.ReconfirmationProperties)
                             </dd>
                         </div>
 
@@ -262,7 +297,8 @@
                 <li>providing an eligibility code is consistent with the child's care plan</li>
             </ul>
 
-            <form asp-controller="FosterFamilies" asp-action="@(Model.IsAdditionalChild ? "Check_Add_Child_Details_FF" : "CheckDetails")"
+            <form asp-controller="FosterFamilies"
+                  asp-action="@(Model.IsAdditionalChild ? "Check_Add_Child_Details_FF" : "CheckDetails")"
                   asp-route-fosterCarerId="@(Model.IsAdditionalChild ? Model.FosterCarerId : null)"
                   asp-route-contextId="@(Model.IsAdditionalChild ? Model.ContextId : null)" method="post">
                 <input asp-for="ContextId" type="hidden" />
