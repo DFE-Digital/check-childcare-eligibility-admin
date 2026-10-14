@@ -4,8 +4,6 @@ using CheckChildcareEligibility.Admin.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Configuration;
-using System.Configuration;
 
 namespace CheckChildcareEligibility.Admin.Controllers;
 
@@ -48,12 +46,12 @@ public class BaseController : Controller
         return int.Parse(_Claims.Organisation.EstablishmentNumber);
     }
 
-     public bool IsLocalAuthorityPrivateBeta()
+     public bool IsWorkingFamiliesEnabledForLA()
     {
         var localAuthorityId = _Claims.Organisation.EstablishmentNumber?.Trim();
         
         var betaList = _config.GetValue<string> ("FeatureFlags:LAsThatCanUseWF");
      
-         return OrganisationRolesHelper.IsLocalAuthorityPrivateBeta(betaList, localAuthorityId);
+         return OrganisationRolesHelper.IsWorkingFamiliesEnabledForLA(betaList, localAuthorityId);
     }
 }
