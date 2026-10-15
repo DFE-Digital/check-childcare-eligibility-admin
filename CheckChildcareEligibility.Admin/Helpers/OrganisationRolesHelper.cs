@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-namespace CheckChildcareEligibility.Admin.Helpers
+﻿namespace CheckChildcareEligibility.Admin.Helpers
 {
     public static class OrganisationRolesHelper
     {
