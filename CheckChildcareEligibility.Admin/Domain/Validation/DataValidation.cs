@@ -16,24 +16,23 @@ internal static class DataValidation
         return Regex.IsMatch(value, NameAttribute.NameValidationRegex);
     }
 
-    internal static bool BeAValidDate(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return false;
+    private static readonly string[] DateFormats =
+    [
+        "yyyy-MM-dd",
+        "dd-MM-yyyy",
+        "dd/MM/yyyy",
+        "d/M/yyyy"
+    ];
 
-        string[] formats =
-        [
-            "yyyy-MM-dd",
-            "dd-MM-yyyy"
-        ];
-
-        return DateTime.TryParseExact(
-            value,
-            formats,
+    internal static bool BeAValidDate(string value) =>
+        DateTime.TryParseExact(value, DateFormats,
             System.Globalization.CultureInfo.InvariantCulture,
-            System.Globalization.DateTimeStyles.None,
-            out _);
-    }
+            System.Globalization.DateTimeStyles.None, out _);
+
+    internal static DateTime ParseValidDate(string value) =>
+        DateTime.ParseExact(value, DateFormats,
+            System.Globalization.CultureInfo.InvariantCulture,
+            System.Globalization.DateTimeStyles.None);
 
     internal static bool BeAPastDate(DateTime value)
     {

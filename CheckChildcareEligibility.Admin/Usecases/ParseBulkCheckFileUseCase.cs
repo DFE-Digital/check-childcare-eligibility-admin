@@ -3,6 +3,7 @@ using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.Usecases.Constants;
+using CheckYourEligibility.API.Domain.Validation;
 using CsvHelper;
 using CsvHelper.Configuration;
 using FluentValidation;
@@ -149,7 +150,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                                 validationResults = _validator.Validate(requestDataWF);
                                 if (validationResults.IsValid) {
                                     //We know this passed parse earlier but it must be translated to correct format (yyyy-MM-dd) for Database to access
-                                    requestDataWF.DateOfBirth = DateTime.Parse(record.DOB).ToString("yyyy-MM-dd");
+                                    requestDataWF.DateOfBirth = DataValidation.ParseValidDate(record.DOB).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                                     requestDataWF.NationalInsuranceNumber =
                                         NinoValidation.Normalize(requestDataWF.NationalInsuranceNumber)!;
                                     result.ValidRequests.Add(requestDataWF);
@@ -167,7 +168,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                                 if (validationResults.IsValid)
                                 {
                                     //We know this passed parse earlier but it must be translated to correct format (yyyy-MM-dd) for Database to access
-                                    requestData.DateOfBirth = DateTime.Parse(record.DOB).ToString("yyyy-MM-dd");
+                                    requestData.DateOfBirth = DataValidation.ParseValidDate(record.DOB).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                                     requestData.NationalInsuranceNumber =
                                         NinoValidation.Normalize(requestData.NationalInsuranceNumber)!;
                                     result.ValidRequests.Add(requestData);
