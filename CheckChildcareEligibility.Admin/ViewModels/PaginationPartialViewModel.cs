@@ -10,7 +10,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         public int TotalRecords { get; set; }
         public string ControllerName { get; set; }
         public string? Keyword { get; set; }
-        public IEnumerable<CheckBulkEligibilityStatus>? Status { get; set; }
+        public IEnumerable<BulkCheckStatus>? Status { get; set; }
         public string? DateFrom { get; set; }
     }
 }
