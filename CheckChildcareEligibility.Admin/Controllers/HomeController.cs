@@ -42,6 +42,7 @@ public class HomeController : BaseController
             TempData.Remove("ParentAndChildDetails");
             TempData.Remove("Errors");
         }
+        ViewBag.CanUseWorkingFamilies = IsWorkingFamiliesEnabledForLA();
         return View("MenuSingleCheck", _Claims);
     }
 
@@ -73,6 +74,7 @@ public class HomeController : BaseController
     //Bulk
     public IActionResult MenuBulkCheck()
     {
+        ViewBag.CanUseWorkingFamilies = IsWorkingFamiliesEnabledForLA();
         return View(_Claims);
     }
 
