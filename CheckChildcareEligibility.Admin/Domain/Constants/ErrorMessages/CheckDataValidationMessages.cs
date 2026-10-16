@@ -2,6 +2,7 @@
 
 public static class ValidationMessages
 {
+    public const string ReferenceTooLong = "Reference must be 100 characters or fewer.";
     public const string RequiredLastName = "Enter parent or guardian's last name";
     public const string RequiredDOB = "Enter parent or guardian's date of birth";
     public const string RequiredNI = "Enter parent or guardian's National Insurance number";

@@ -104,6 +104,47 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
 
         }
 
+        [TestCase("2YO")]
+        [TestCase("EYPP")]
+        [TestCase("WF")]
+        public async Task Bulk_Check_With_Overlong_Reference_Rejects_Whole_Batch_Without_Using_Upload_Attempt(string serviceType)
+        {
+            var parser = new ParseBulkCheckFileUseCase(
+                new CheckChildcareEligibility.Admin.Domain.Validation.CheckEligibilityRequestDataValidator(),
+                _configMock.Object);
+            using var controller = new BulkCheckController(
+                _loggerMock, _checkGatewayMock.Object, _configMock.Object, _webHostEnvironmentMock.Object,
+                parser, _getBulkCheckStatusesUseCaseMock.Object, _deleteBulkCheckFileUseCase.Object,
+                _mockDfeSignInApiService.Object)
+            {
+                ControllerContext = new ControllerContext { HttpContext = _httpContext.Object },
+                TempData = _tempData
+            };
+            await controller.GetDfeClaimsAsync();
+
+            var header = serviceType == "WF"
+                ? "Eligibility code,National Insurance number,Child date of birth,Reference (optional)"
+                : "Parent Last Name,Parent Date of Birth,Parent National Insurance Number,Reference (optional)";
+            var row = serviceType == "WF" ? "50173110190,AB123456C,2022-01-01," : "Smith,1980-01-01,AB123456C,";
+            using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(
+                header + "\r\n" + row + "VALID\r\n" + row + new string('x', 101)));
+            var file = new FormFile(stream, 0, stream.Length, "fileUpload", "references.csv")
+            {
+                Headers = new HeaderDictionary(), ContentType = "text/csv"
+            };
+
+            var result = await controller.Bulk_Check(file, serviceType);
+
+            var view = result.Should().BeOfType<ViewResult>().Which;
+            view.ViewName.Should().Be("BulkOutcome/Error_Data_Issue");
+            var model = view.Model.Should().BeOfType<CheckChildcareEligibility.Admin.ViewModels.BulkCheckErrorsViewModel>().Which;
+            var error = model.Errors.Should().ContainSingle().Which;
+            error.LineNumber.Should().Be(3);
+            error.Message.Should().Be("Reference must be 100 characters or fewer.");
+            _checkGatewayMock.Verify(x => x.PostBulkCheck(It.IsAny<CheckEligibilityRequestBulk>()), Times.Never);
+            _sessionMock.Verify(x => x.Set("BulkSubmissions", It.IsAny<byte[]>()), Times.Never);
+        }
+
         //[Test]
         //public async Task Given_Bulk_Check_When_FileData_Empty_Should_Return_Error_Data_Issue()
         //{

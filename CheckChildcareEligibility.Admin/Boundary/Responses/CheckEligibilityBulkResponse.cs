@@ -37,6 +37,7 @@ public class CheckEligibilityBulkResponse : CheckEligibilityBulkResponseBase
         return Data.OrderBy(x => x.Order).Select(x => new BulkExport
         {
             LastName = x.LastName,
+            Reference = x.Reference?.Trim(),
             DOB = x.DateOfBirth,
             NI = x.NationalInsuranceNumber,
             Outcome = GetStatusDescription(x.Status),
@@ -72,6 +73,7 @@ public class CheckEligibilityBulkWorkingFamiliesResponse : CheckEligibilityBulkR
         return Data.OrderBy(x => x.Order).Select(x => new BulkExportWorkingFamilies
         {
             EligibilityCode = x.EligibilityCode,
+            Reference = x.Reference?.Trim(),
             ChildDOB = x.DateOfBirth,
             NI = x.NationalInsuranceNumber,
             ValidityStartDate = x.ValidityStartDate.ToString("yyyy-MM-dd"),

@@ -56,6 +56,8 @@
       <None Update="Resources\working_families_small_valid.csv">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Include="..\CheckChildcareEligibility.Admin\wwwroot\documents\BulkCheckTemplate.csv" Link="TemplateWebRoot\documents\BulkCheckTemplate.csv" CopyToOutputDirectory="PreserveNewest" />
+      <None Include="..\CheckChildcareEligibility.Admin\wwwroot\documents\WFBulkCheckTemplate.csv" Link="TemplateWebRoot\documents\WFBulkCheckTemplate.csv" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
 </Project>
