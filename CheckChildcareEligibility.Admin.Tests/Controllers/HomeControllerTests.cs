@@ -4,6 +4,7 @@ using CheckChildcareEligibility.Admin.Infrastructure;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using System.Security.Claims;
 
@@ -19,6 +20,11 @@ internal class HomeControllerTests : TestBase
     public void SetUp()
     {
         _mockDfeSignInApiService = new Mock<IDfeSignInApiService>();
+        var featureFlagSection = new Mock<IConfigurationSection>();
+        featureFlagSection.Setup(section => section.Value).Returns(string.Empty);
+        _configMock
+            .Setup(configuration => configuration.GetSection("FeatureFlags:LAsThatCanUseWF"))
+            .Returns(featureFlagSection.Object);
         _sut = new HomeController(_mockDfeSignInApiService.Object, _configMock.Object);
         base.SetUp();
         _sut.ControllerContext.HttpContext = _httpContext.Object;
@@ -202,6 +208,18 @@ internal class HomeControllerTests : TestBase
         // Assert
         var viewResult = result as ViewResult;
         viewResult.ViewName.Should().Be("MenuSingleCheck");
+        viewResult.ViewData["CanUseWorkingFamilies"].Should().Be(true);
+    }
+
+    [Test]
+    public void Given_MenuBulkCheck_Get_ReturnsViewWithWorkingFamiliesAvailability()
+    {
+        // Act
+        var result = _sut.MenuBulkCheck();
+
+        // Assert
+        var viewResult = result as ViewResult;
+        viewResult.ViewData["CanUseWorkingFamilies"].Should().Be(true);
     }
 
     [Test]
