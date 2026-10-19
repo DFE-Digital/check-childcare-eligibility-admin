@@ -109,8 +109,6 @@ public class WorkingFamiliesCheckController : BaseController
                 TempData["Response"] = responseJson;
             }
 
-            _logger.LogError(outcome.Status);
-
             var parentAndChildDetailsJson = TempData["ParentAndChildDetails"]?.ToString();
             TempData["ParentAndChildDetails"] = parentAndChildDetailsJson;
 
