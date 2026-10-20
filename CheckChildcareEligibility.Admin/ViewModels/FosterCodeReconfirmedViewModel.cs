@@ -11,10 +11,10 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
         public FosterChildResponse Response { get; init; }
 
+        public EligibilityCodeProperties CodeProperties { get; init; }
+
         [JsonIgnore]
-        public string CodeStatus => WorkingFamiliesCheckHelper.GetCodeStatus_FF(new EligibilityCodeProperties(Response));
+        public string CodeStatus => WorkingFamiliesCheckHelper.GetCodeStatus_FF(CodeProperties);
         
-        [JsonIgnore]
-        public string GracePeriod => WorkingFamiliesCheckHelper.GetGracePeriod_FF(new EligibilityCodeProperties(Response));
     }
 }

@@ -26,18 +26,6 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 ? " (discretionary start date applied)"
                 : string.Empty);
 
-        public string GracePeriodEndDisplay =>
-            Properties.ChildIsTooOld
-                ? Properties.ValidityEndDate.ToString("d MMMM yyyy")
-                : (Properties.IsEligible && Properties.ChildIsTooYoung) || Properties.IsNotValidForCurrentTerm || !Response.IsGracePeriodEndDateApplied
-                    ? WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable
-                    : Properties.GracePeriodEndDate.ToString("d MMMM yyyy");
-
-        public string GracePeriodEndLabel =>
-            Properties.ChildIsTooOld
-                ? "Grace period ended"
-                : "Grace period ends";
-
         public string ReconfirmationDateLabel =>
             Properties.Type == EligibilityCodeType.Temporary
                 ? "Apply for a new code by"

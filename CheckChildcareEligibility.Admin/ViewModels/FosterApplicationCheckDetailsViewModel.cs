@@ -28,8 +28,5 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         [JsonIgnore]
         public string CodeStatus => WorkingFamiliesCheckHelper.GetCodeStatus_FF(CodeProperties);
         
-        [JsonIgnore]
-        public string GracePeriod => WorkingFamiliesCheckHelper.GetGracePeriod_FF(CodeProperties);
-
     }
 }

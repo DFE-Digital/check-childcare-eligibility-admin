@@ -958,6 +958,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             var viewModel = new FosterFamilyCreatedViewModel
             {
                 Response = response,
+                CodeProperties = new EligibilityCodeProperties(response),
                 IsAdditionalChild = childAdded
             };
             return View(viewModel);
@@ -978,6 +979,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             return View("Code_Created_FF", new FosterFamilyCreatedViewModel
             {
                 Response = response,
+                CodeProperties = new EligibilityCodeProperties(response),
                 IsAdditionalChild = true
             });
         }
@@ -1015,9 +1017,12 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // Get child record to ensure it exists before displaying the reconfirmation form
             var childResponse = await _getFosterChildUseCase.Execute(fosterChildId, false);
 
+            // Generate code properties for the child response
+            var codeProperties = new EligibilityCodeProperties(childResponse);
+
             // Ensure reconfirmation is allowed for this child
-            if (DateTime.UtcNow.Date < new EligibilityCodeProperties(childResponse).ReconfirmationProperties.StartDate ||
-                new EligibilityCodeProperties(childResponse).ChildIsTooOld)
+            if (DateTime.UtcNow.Date < codeProperties.ReconfirmationProperties.StartDate ||
+                codeProperties.ChildIsTooOld)
             {
                 return RedirectToAction("Code_Record_FF", new { fosterChildId });
             }
@@ -1097,7 +1102,10 @@ namespace CheckChildcareEligibility.Admin.Controllers
             );
 
             // Build view model for the reconfirmation result
-            var viewModel = new FosterCodeReconfirmedViewModel() { Response = reconfirmResponse };
+            var viewModel = new FosterCodeReconfirmedViewModel() { 
+                Response = reconfirmResponse,
+                CodeProperties = new EligibilityCodeProperties(reconfirmResponse)
+            };
             return View("Code_Reconfirmed_FF", viewModel);
         }
     }
