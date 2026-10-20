@@ -30,14 +30,14 @@ namespace CheckChildcareEligibility.Admin.Controllers
         }
         public async Task<IActionResult> Reports()
         {
-            if (!IsLocalAuthorityPrivateBeta())
+            if (!IsWorkingFamiliesEnabledForLA())
             { return RedirectToAction("NotFound", "Error"); }
             await GetDfeClaimsAsync();
             return View();
         }
         public IActionResult Code_Search()
         {
-            if (!IsLocalAuthorityPrivateBeta())
+            if (!IsWorkingFamiliesEnabledForLA())
             { return RedirectToAction("NotFound", "Error"); }
 
             var model = new EligibilityCodeSearchViewModel();

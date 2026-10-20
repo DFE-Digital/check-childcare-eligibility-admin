@@ -20,6 +20,8 @@ public class CheckEligibilityRequestDataValidatorDateTests
 
     [TestCase("1980-01-31")]
     [TestCase("31-01-1980")]
+    [TestCase("31/01/1980")]
+    [TestCase("1/1/1980")]
     public void Validate_SupportedDateFormat_Passes(string dateOfBirth)
     {
         var request = CreateValidRequest(dateOfBirth);
@@ -30,7 +32,8 @@ public class CheckEligibilityRequestDataValidatorDateTests
     }
 
     [TestCase("1980/01/31")]
-    [TestCase("31/01/1980")]
+    [TestCase("31/02/1980")]
+    [TestCase("31/01/80")]
     [TestCase("31 Jan 1980")]
     public void Validate_UnsupportedDateFormat_ReturnsInvalidDateMessage(string dateOfBirth)
     {

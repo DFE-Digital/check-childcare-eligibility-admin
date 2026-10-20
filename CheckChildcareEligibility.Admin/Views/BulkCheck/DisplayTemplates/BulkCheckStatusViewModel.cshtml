@@ -1,21 +1,9 @@
 ﻿@using CheckChildcareEligibility.Admin.Domain.Constants;
+@using CheckChildcareEligibility.Admin.Domain.Constants.Generic
 
 @model CheckChildcareEligibility.Admin.ViewModels.BulkCheckStatusViewModel
 @{
-    Dictionary<string, string> statusColor = new()
-    {
-        { "NotStarted", "govuk-tag--grey" },
-        { "InProgress", "govuk-tag--blue" },
-        { "Completed", "govuk-tag--green" },
-    };
-
-    Dictionary<string, string> statusName = new()
-    {
-        { "NotStarted", "Not Started" },
-        { "InProgress", "In Progress" },
-        { "Completed", "Complete" },
-    };
-
+    var statusTag = BulkCheckConstants.StatusTags[Model.Status];
     Dictionary<string, string> eligibilityTypeKeyMap = new()
     {
         { "TwoYearOffer", "2YO" },
@@ -30,10 +18,11 @@
     <td class="govuk-table__cell">@(Model.DateSubmitted.ToLocalString12HourFormatReadable())</td>
     <td class="govuk-table__cell">@(Model.SubmittedBy)</td>
     <td class="govuk-table__cell">
-        <strong class="govuk-tag @statusColor[Model.Status]">
-            @statusName[Model.Status]
+        <strong class="govuk-tag @statusTag.Colour">
+            @statusTag.Description
         </strong>
     </td>
+
 
     @if (Model.Status == "Completed")
     {

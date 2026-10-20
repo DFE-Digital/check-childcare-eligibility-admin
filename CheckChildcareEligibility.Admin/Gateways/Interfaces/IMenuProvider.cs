@@ -106,7 +106,7 @@ public class MenuProvider : IMenuProvider
                 )
             };
 
-                if (OrganisationRolesHelper.IsLocalAuthorityPrivateBeta(betaList, localAuthorityId))
+                if (OrganisationRolesHelper.IsWorkingFamiliesEnabledForLA(betaList, localAuthorityId))
                 {
                     menu.Add(
                         new MenuItem(
