@@ -1,4 +1,5 @@
-﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
+using CheckChildcareEligibility.Admin.Boundary.Requests;
+using CheckChildcareEligibility.Admin.Domain.Constants;
 using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
 using CheckYourEligibility.API.Domain.Validation;
 using FluentValidation;
@@ -7,7 +8,7 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
 {
     public class FosterFamilyRequestValidator : AbstractValidator<FosterFamilyRequest>
     {
-        public FosterFamilyRequestValidator()
+        public FosterFamilyRequestValidator(bool enforceSubmissionDateWindow = true)
         {
             RuleFor(x => x.FosterCarer)
                 .NotNull();
@@ -35,9 +36,12 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
                 .Must(DataValidation.BeAPastDate)
                 .WithMessage(FosterFamilyValidationMessages.DateMustBeInPast);
 
-            RuleFor(x => x.SubmissionDate)
-                .Must(DataValidation.BeWithin31Days)
-                .WithMessage(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, DateTime.Today.AddDays(-32)));
+            if (enforceSubmissionDateWindow)
+            {
+                RuleFor(x => x.SubmissionDate)
+                    .Must(DataValidation.BeWithinSubmissionDateWindow)
+                    .WithMessage(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, DateTime.Today.AddDays(-(FosterFamiliesConstants.SubmissionDateWindowDays + 1))));
+            }
         }
     }
 
@@ -128,15 +132,18 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
     public class FosterChildReconfirmRequestValidator
         : AbstractValidator<FosterChildReconfirmRequest>
     {
-        public FosterChildReconfirmRequestValidator()
+        public FosterChildReconfirmRequestValidator(bool enforceSubmissionDateWindow)
         {
             RuleFor(x => x.SubmissionDate)
                 .Must(DataValidation.BeAPastDate)
                 .WithMessage(FosterFamilyValidationMessages.DateMustBeInPast);
 
-            RuleFor(x => x.SubmissionDate)
-                .Must(DataValidation.BeWithin31Days)
-                .WithMessage(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, DateTime.Today.AddDays(-32)));
+            if (enforceSubmissionDateWindow)
+            {
+                RuleFor(x => x.SubmissionDate)
+                    .Must(DataValidation.BeWithinSubmissionDateWindow)
+                    .WithMessage(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, DateTime.Today.AddDays(-32)));
+            }
         }
     }
 

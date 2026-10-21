@@ -26,7 +26,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             var sut = CreateViewModel(childDateOfBirth, validityStartDate, currentTerm: Term.None, nextTerm: Term_Summer, status: "eligible", ChildTooYoung: true);
 
             // Act
-            var result = sut.GracePeriodEndDisplay;
+            var result = sut.Properties.GracePeriodEndDisplay;
 
             // Assert
             sut.Properties.ChildIsTooYoung.Should().BeTrue();
@@ -44,7 +44,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
                 nextTerm: Term_Spring);
 
             // Act
-            var result = sut.GracePeriodEndDisplay;
+            var result = sut.Properties.GracePeriodEndDisplay;
 
             // Assert
             sut.Properties.ChildIsTooYoung.Should().BeFalse();
@@ -67,7 +67,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
                 currentTerm: Term_Spring);
 
             // Act
-            var result = sut.GracePeriodEndDisplay;
+            var result = sut.Properties.GracePeriodEndDisplay;
 
             // Assert
             sut.Properties.ChildIsTooYoung.Should().BeFalse();
@@ -90,13 +90,13 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
                 reconfirmationStatus: ReconfirmationStatus.ChildTooOld);
 
             // Act
-            var result = sut.GracePeriodEndDisplay;
+            var result = sut.Properties.GracePeriodEndDisplay;
 
             // Assert
             sut.Properties.ChildIsTooOld.Should().BeTrue();
             result.Should().Be(sut.Properties.ValidityEndDate.ToString("d MMMM yyyy"));
             result.Should().NotBe(gracePeriodEndDate.ToString("d MMMM yyyy"));
-            sut.GracePeriodEndLabel.Should().Be("Grace period ended");
+            sut.Properties.GracePeriodEndLabel.Should().Be("Grace period ended");
         }
 
         [Test]
@@ -120,8 +120,8 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             sut.CodeStatus.Should().Be(WorkingFamiliesResponseBanner.CodeExpired);
             sut.BannerColour.Should().Be(WorkingFamiliesResponseBanner.ColourOrange);
             sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermExpiredOn} {sut.Properties.ValidityEndDate:d MMMM yyyy}");
-            sut.GracePeriodEndDisplay.Should().Be(sut.Properties.ValidityEndDate.ToString("d MMMM yyyy"));
-            sut.GracePeriodEndLabel.Should().Be("Grace period ended");
+            sut.Properties.GracePeriodEndDisplay.Should().Be(sut.Properties.ValidityEndDate.ToString("d MMMM yyyy"));
+            sut.Properties.GracePeriodEndLabel.Should().Be("Grace period ended");
         }
 
         [Test]
@@ -142,7 +142,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             sut.CodeStatus.Should().Be(WorkingFamiliesResponseBanner.CodeChildTooYoung);
             sut.BannerColour.Should().Be(WorkingFamiliesResponseBanner.ColourBlue);
             sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermValidFrom} summer term {DateTime.Today.Year}");
-            sut.GracePeriodEndLabel.Should().Be("Grace period ends");
+            sut.Properties.GracePeriodEndLabel.Should().Be("Grace period ends");
         }
 
         [Test]

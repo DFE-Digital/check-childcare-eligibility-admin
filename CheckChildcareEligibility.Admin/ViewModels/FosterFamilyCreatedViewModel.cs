@@ -13,10 +13,9 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
         public bool IsAdditionalChild { get; init; }
 
-        [JsonIgnore]
-        public string CodeStatus => WorkingFamiliesCheckHelper.GetCodeStatus_FF(new EligibilityCodeProperties(Response));
+        public EligibilityCodeProperties CodeProperties { get; init; }
 
         [JsonIgnore]
-        public string GracePeriod => WorkingFamiliesCheckHelper.GetGracePeriod_FF(new EligibilityCodeProperties(Response));
+        public string CodeStatus => WorkingFamiliesCheckHelper.GetCodeStatus_FF(CodeProperties);
     }
 }

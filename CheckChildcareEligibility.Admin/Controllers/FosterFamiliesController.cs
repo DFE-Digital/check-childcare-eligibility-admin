@@ -527,12 +527,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 };
                 _sessionContextService.SetSessionData(contextId, "FosterChildDetails", viewModel);
             }
-            else if (!string.IsNullOrEmpty(viewModel.ChildFirstName) ||
-                     !string.IsNullOrEmpty(viewModel.ChildLastName) ||
-                     !string.IsNullOrEmpty(viewModel.ChildPostCode) ||
-                     !string.IsNullOrEmpty(viewModel.Day) ||
-                     !string.IsNullOrEmpty(viewModel.Month) ||
-                     !string.IsNullOrEmpty(viewModel.Year))
+            else
             {
                 TryValidateModel(viewModel);
                 await _validateFosterChildDetailsUseCase.Execute(viewModel, ModelState);
@@ -569,7 +564,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // Otherwise redirect back to check details page as this is a change action
             else
             {
-                return RedirectToAction("Check_Details_FF", new { fosterCarerId = request.FosterCarerId, contextId = request.ContextId });
+                return RedirectToAction("Check_Add_Child_Details_FF", new { request.FosterCarerId, request.ContextId });
             }
         }
 
@@ -636,7 +631,14 @@ namespace CheckChildcareEligibility.Admin.Controllers
             var fosterChildDetails = _sessionContextService.GetSessionData<FosterChildDetailsViewModel>(contextId, "FosterChildDetails");
             if (fosterChildDetails == null)
             {
-                return RedirectToAction("Enter_Carer_Details_FF");
+                if (fosterCarerId != default)
+                {
+                    return RedirectToAction("Family_Record_FF", new { fosterCarerId });
+                }
+                else
+                {
+                    return RedirectToAction("Enter_Carer_Details_FF");
+                }
             }
 
             if (fosterChildDetails.FosterCarerId != Guid.Empty)
@@ -958,6 +960,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             var viewModel = new FosterFamilyCreatedViewModel
             {
                 Response = response,
+                CodeProperties = new EligibilityCodeProperties(response),
                 IsAdditionalChild = childAdded
             };
             return View(viewModel);
@@ -978,6 +981,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             return View("Code_Created_FF", new FosterFamilyCreatedViewModel
             {
                 Response = response,
+                CodeProperties = new EligibilityCodeProperties(response),
                 IsAdditionalChild = true
             });
         }
@@ -1015,9 +1019,12 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // Get child record to ensure it exists before displaying the reconfirmation form
             var childResponse = await _getFosterChildUseCase.Execute(fosterChildId, false);
 
+            // Generate code properties for the child response
+            var codeProperties = new EligibilityCodeProperties(childResponse);
+
             // Ensure reconfirmation is allowed for this child
-            if (DateTime.UtcNow.Date < new EligibilityCodeProperties(childResponse).ReconfirmationProperties.StartDate ||
-                new EligibilityCodeProperties(childResponse).ChildIsTooOld)
+            if (DateTime.UtcNow.Date < codeProperties.ReconfirmationProperties.StartDate ||
+                codeProperties.ChildIsTooOld)
             {
                 return RedirectToAction("Code_Record_FF", new { fosterChildId });
             }
@@ -1097,7 +1104,11 @@ namespace CheckChildcareEligibility.Admin.Controllers
             );
 
             // Build view model for the reconfirmation result
-            var viewModel = new FosterCodeReconfirmedViewModel() { Response = reconfirmResponse };
+            var viewModel = new FosterCodeReconfirmedViewModel()
+            {
+                Response = reconfirmResponse,
+                CodeProperties = new EligibilityCodeProperties(reconfirmResponse)
+            };
             return View("Code_Reconfirmed_FF", viewModel);
         }
     }

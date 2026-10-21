@@ -108,10 +108,10 @@
 
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
-                                Grace period ends
+                                @Model.CodeProperties.GracePeriodEndLabel
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @Model.GracePeriod
+                                @Model.CodeProperties.GracePeriodEndDisplay
                             </dd>
                         </div>
                     </dl>

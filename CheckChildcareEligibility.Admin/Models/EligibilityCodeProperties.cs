@@ -1,4 +1,5 @@
 using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.Constants.Generic;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies;
 
@@ -106,6 +107,17 @@ namespace CheckChildcareEligibility.Admin.Models
         public bool IsNeverValid => CurrentTerm.Name == TermName.None && NextTerm.Name == TermName.None;
 
         public bool IsReconfirmed => IsEligible && !IsNotValidForCurrentTerm && !IsInGracePeriod && NextTerm.Name != TermName.None;
+
+
+        public string GracePeriodEndDisplay => ChildIsTooOld
+                ? ValidityEndDate.ToString("d MMMM yyyy")
+                : (IsEligible && ChildIsTooYoung) || IsNotValidForCurrentTerm || !IsGracePeriodEndDateApplied
+                    ? WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable
+                    : GracePeriodEndDate.ToString("d MMMM yyyy");
+
+        public string GracePeriodEndLabel => ChildIsTooOld
+                ? "Grace period ended"
+                : "Grace period ends";
 
     }
 }

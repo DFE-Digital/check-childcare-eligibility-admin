@@ -93,27 +93,18 @@ public static class WorkingFamiliesCheckHelper
         {
             result = FosterFamiliesConstants.CodeNotValidYet;
         }
-        else if (properties.IsReconfirmed)
-        {
-            result = $"{FosterFamiliesConstants.CodeValidFor} {currentTermView} {DateTime.UtcNow.Year} and {nextTermView} {properties.GracePeriodEndDate.Year}";
-        }
         else if (properties.IsInGracePeriod)
         {
             result = FosterFamiliesConstants.CodeInGracePeriod;
         }
         else
         {
-            result = $"{FosterFamiliesConstants.CodeValidFor} {currentTermView} {DateTime.UtcNow.Year}";
+            result = $"{FosterFamiliesConstants.CodeValidFor} {currentTermView} {properties.CurrentTerm.StartDate.Year}";
+            if (nextTermView != string.Empty)
+            {
+                result += $" and {nextTermView} {properties.NextTerm.StartDate.Year}";
+            }
         }
         return result;
-    }
-
-    public static string GetGracePeriod_FF(EligibilityCodeProperties properties)
-    {
-        if (properties == null) { return string.Empty; }
-
-        return properties.ChildIsTooYoung || properties.IsNotValidForCurrentTerm
-                    ? WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable
-                    : properties.GracePeriodEndDate.ToString("d MMMM yyyy");
     }
 }
