@@ -1,4 +1,4 @@
-﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
+using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
 using CheckYourEligibility.API.Domain.Validation;
 using FluentValidation;
@@ -7,7 +7,7 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
 {
     public class FosterFamilyRequestValidator : AbstractValidator<FosterFamilyRequest>
     {
-        public FosterFamilyRequestValidator()
+        public FosterFamilyRequestValidator(bool enforceSubmissionDateWindow = true)
         {
             RuleFor(x => x.FosterCarer)
                 .NotNull();
@@ -35,9 +35,12 @@ namespace CheckChildcareEligibility.Admin.Domain.Validation
                 .Must(DataValidation.BeAPastDate)
                 .WithMessage(FosterFamilyValidationMessages.DateMustBeInPast);
 
-            RuleFor(x => x.SubmissionDate)
-                .Must(DataValidation.BeWithin31Days)
-                .WithMessage(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, DateTime.Today.AddDays(-32)));
+            if (enforceSubmissionDateWindow)
+            {
+                RuleFor(x => x.SubmissionDate)
+                    .Must(DataValidation.BeWithin31Days)
+                    .WithMessage(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, DateTime.Today.AddDays(-32)));
+            }
         }
     }
 

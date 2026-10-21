@@ -1,4 +1,4 @@
-﻿using CheckChildcareEligibility.Admin.Boundary.Requests;
+using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
@@ -14,11 +14,14 @@ namespace CheckChildcareEligibility.Admin.Usecases
     {
         private readonly IFosterFamiliesGateway _fosterFamiliesGateway;
         private readonly ILogger<CreateFosterFamilyUseCase> _logger;
+        private readonly bool _enforceSubmissionDateWindow;
 
         public CreateFosterFamilyUseCase(
             ILogger<CreateFosterFamilyUseCase> logger,
-            IFosterFamiliesGateway fosterFamiliesGateway)
+            IFosterFamiliesGateway fosterFamiliesGateway,
+            IConfiguration? configuration = null)
         {
+            _enforceSubmissionDateWindow = configuration?.GetValue("FosterFamilies:EnforceSubmissionDateWindow", true) ?? true;
             _logger = logger;
             _fosterFamiliesGateway = fosterFamiliesGateway;
         }
@@ -27,7 +30,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
         {
             ArgumentNullException.ThrowIfNull(request);
 
-            var validator = new FosterFamilyRequestValidator();
+            var validator = new FosterFamilyRequestValidator(_enforceSubmissionDateWindow);
             var validationResult = validator.Validate(request);
 
             if (!validationResult.IsValid)
