@@ -631,7 +631,14 @@ namespace CheckChildcareEligibility.Admin.Controllers
             var fosterChildDetails = _sessionContextService.GetSessionData<FosterChildDetailsViewModel>(contextId, "FosterChildDetails");
             if (fosterChildDetails == null)
             {
-                return RedirectToAction("Enter_Carer_Details_FF");
+                if (fosterCarerId != default)
+                {
+                    return RedirectToAction("Family_Record_FF", new { fosterCarerId });
+                }
+                else
+                {
+                    return RedirectToAction("Enter_Carer_Details_FF");
+                }
             }
 
             if (fosterChildDetails.FosterCarerId != Guid.Empty)
@@ -1097,7 +1104,8 @@ namespace CheckChildcareEligibility.Admin.Controllers
             );
 
             // Build view model for the reconfirmation result
-            var viewModel = new FosterCodeReconfirmedViewModel() { 
+            var viewModel = new FosterCodeReconfirmedViewModel()
+            {
                 Response = reconfirmResponse,
                 CodeProperties = new EligibilityCodeProperties(reconfirmResponse)
             };
