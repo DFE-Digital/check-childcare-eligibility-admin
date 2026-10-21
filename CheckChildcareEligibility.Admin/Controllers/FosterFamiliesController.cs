@@ -527,12 +527,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 };
                 _sessionContextService.SetSessionData(contextId, "FosterChildDetails", viewModel);
             }
-            else if (!string.IsNullOrEmpty(viewModel.ChildFirstName) ||
-                     !string.IsNullOrEmpty(viewModel.ChildLastName) ||
-                     !string.IsNullOrEmpty(viewModel.ChildPostCode) ||
-                     !string.IsNullOrEmpty(viewModel.Day) ||
-                     !string.IsNullOrEmpty(viewModel.Month) ||
-                     !string.IsNullOrEmpty(viewModel.Year))
+            else
             {
                 TryValidateModel(viewModel);
                 await _validateFosterChildDetailsUseCase.Execute(viewModel, ModelState);
@@ -569,7 +564,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
             // Otherwise redirect back to check details page as this is a change action
             else
             {
-                return RedirectToAction("Check_Details_FF", new { fosterCarerId = request.FosterCarerId, contextId = request.ContextId });
+                return RedirectToAction("Check_Add_Child_Details_FF", new { request.FosterCarerId, request.ContextId });
             }
         }
 
