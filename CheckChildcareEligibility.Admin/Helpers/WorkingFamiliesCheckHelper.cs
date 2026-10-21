@@ -93,17 +93,17 @@ public static class WorkingFamiliesCheckHelper
         {
             result = FosterFamiliesConstants.CodeNotValidYet;
         }
-        else if (properties.IsReconfirmed)
-        {
-            result = $"{FosterFamiliesConstants.CodeValidFor} {currentTermView} {DateTime.UtcNow.Year}";
-        }
         else if (properties.IsInGracePeriod)
         {
             result = FosterFamiliesConstants.CodeInGracePeriod;
         }
         else
         {
-            result = $"{FosterFamiliesConstants.CodeValidFor} {currentTermView} {DateTime.UtcNow.Year}";
+            result = $"{FosterFamiliesConstants.CodeValidFor} {currentTermView} {properties.CurrentTerm.StartDate.Year}";
+            if (nextTermView != string.Empty)
+            {
+                result += $" and {nextTermView} {properties.NextTerm.StartDate.Year}";
+            }
         }
         return result;
     }
