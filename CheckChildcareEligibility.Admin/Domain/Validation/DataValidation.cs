@@ -39,7 +39,7 @@ internal static class DataValidation
         return value.Date <= DateTime.Today;
     }
 
-    internal static bool BeWithin31Days(DateTime value)
+    internal static bool BeWithinSubmissionDateWindow(DateTime value)
     {
         DateTime backdateWindow = DateTime.Today.AddDays(-FosterFamiliesConstants.SubmissionDateWindowDays);
         return value >= backdateWindow;
