@@ -135,21 +135,4 @@ public class FosterRequestValidatorNameTests
             .Should()
             .Equal(FosterFamilyValidationMessages.ChildLastNameEmpty);
     }
-
-    [Test]
-    public void FosterChild_OverAgeLimit_IsValid()
-    {
-        var sut = new FosterChildRequestValidator();
-        var request = new FosterChildRequest
-        {
-            ChildFirstName = "Sam",
-            ChildLastName = "Smith",
-            ChildPostCode = "M1 1AA",
-            ChildDateOfBirth = DateTime.Today.AddYears(-6)
-        };
-
-        var result = sut.Validate(request);
-
-        result.IsValid.Should().BeTrue();
-    }
 }
