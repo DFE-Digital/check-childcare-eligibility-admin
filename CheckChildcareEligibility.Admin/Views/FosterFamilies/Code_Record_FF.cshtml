@@ -38,7 +38,7 @@
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
 
             @if (DateTime.UtcNow.Date >= Model.CodeProperties.ReconfirmationProperties.StartDate &&
-            !Model.CodeProperties.ChildIsTooOld)
+            !Model.CodeProperties.ChildTooOld)
             {
                 <a href="@Url.ActionLink("Enter_Reconfirm_Date_FF", "FosterFamilies", new { Model.Response.FosterChildId })"
                    role="button" draggable="false" class="govuk-button" data-module="govuk-button"
@@ -81,9 +81,7 @@
                                 Code status
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                <td class="govuk-table__cell">
-                                    @Model.CodeStatus
-                                </td>
+                                @Model.CodeStatus
                             </dd>
                         </div>
 
@@ -101,17 +99,16 @@
                                 Reconfirm between
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @WorkingFamiliesCheckHelper.GetReconfirmBetween(EligibilityCodeType.Foster,
-                                Model.Response.ReconfirmationProperties)
+                                @WorkingFamiliesCheckHelper.GetReconfirmBetween(Model.CodeProperties)
                             </dd>
                         </div>
 
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
-                                Grace period ends
+                                @Model.CodeProperties.GracePeriodEndLabel
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @Model.GracePeriod
+                                @Model.CodeProperties.GracePeriodEndDisplay
                             </dd>
                         </div>
                     </dl>

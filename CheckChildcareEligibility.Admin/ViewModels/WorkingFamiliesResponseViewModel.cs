@@ -26,28 +26,12 @@ namespace CheckChildcareEligibility.Admin.ViewModels
                 ? " (discretionary start date applied)"
                 : string.Empty);
 
-        public string GracePeriodEndDisplay =>
-            Properties.ChildIsTooOld
-                ? Properties.ValidityEndDate.ToString("d MMMM yyyy")
-                : (Properties.IsEligible && Properties.ChildIsTooYoung) || Properties.IsNotValidForCurrentTerm || !Response.IsGracePeriodEndDateApplied
-                    ? WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable
-                    : Properties.GracePeriodEndDate.ToString("d MMMM yyyy");
-
-        public string GracePeriodEndLabel =>
-            Properties.ChildIsTooOld
-                ? "Grace period ended"
-                : "Grace period ends";
-
         public string ReconfirmationDateLabel =>
             Properties.Type == EligibilityCodeType.Temporary
                 ? "Apply for a new code by"
                 : "Reconfirm between";
 
-        public string ReconfirmBetween => WorkingFamiliesCheckHelper.GetReconfirmBetween(
-             Properties.Type,
-             Properties.ReconfirmationProperties,
-             Properties.ValidityEndDate
-        );
+        public string ReconfirmBetween => WorkingFamiliesCheckHelper.GetReconfirmBetween(Properties);
 
         public string CodeType = string.Empty;
         public string CodeStatus = WorkingFamiliesResponseBanner.CodeValid;
@@ -60,7 +44,7 @@ namespace CheckChildcareEligibility.Admin.ViewModels
         // else apply correct content for code type
         private void SetBannerCodeType()
         {
-            if (Properties.ChildIsTooYoung && !Properties.IsExpired) return;
+            if (Properties.ChildTooYoung && !Properties.IsExpired) return;
             if (Properties.Type == EligibilityCodeType.Temporary)
             {
                 CodeType = WorkingFamiliesResponseBanner.CodeTemporary;
@@ -87,19 +71,19 @@ namespace CheckChildcareEligibility.Admin.ViewModels
 
             SetBannerCodeType();
 
-            if (Properties.ChildIsTooOld || Properties.IsExpired) // Expired or too old
+            if (Properties.ChildTooOld || Properties.IsExpired) // Expired or too old
             {
                 // If code is expired and the GPED is applied
                 // display the GPED as the expiry date on the banner
                 // else display the VED
-                string expiryDate = !Properties.IsGracePeriodEndDateApplied || Properties.ChildIsTooOld
+                string expiryDate = !Properties.IsGracePeriodEndDateApplied || Properties.ChildTooOld
                  ? Properties.ValidityEndDate.ToString("d MMMM yyyy"): Properties.GracePeriodEndDate.ToString("d MMMM yyyy");
 
                 CodeStatus = WorkingFamiliesResponseBanner.CodeExpired;
                 BannerColour = WorkingFamiliesResponseBanner.ColourOrange;
                 TermValidityDetails =  $"{WorkingFamiliesResponseBanner.TermExpiredOn} {expiryDate}";
             }
-            else if (Properties.ChildIsTooYoung) // Child too young
+            else if (Properties.ChildTooYoung) // Child too young
             {
                 DateTime nineMonthsDate = Properties.ChildDateOfBirth.AddMonths(9);
                 CodeStatus = WorkingFamiliesResponseBanner.CodeChildTooYoung;

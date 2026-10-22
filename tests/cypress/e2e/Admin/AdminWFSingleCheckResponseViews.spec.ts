@@ -1,3 +1,5 @@
+import * as testNino from 'test-nino';
+
 const eligibilityCodePrefixes = {
   cannotBeUsedYet: "700",
   notValidYet: "700",
@@ -345,7 +347,7 @@ describe("Single check Working Families response views", () => {
       code,
       "AA123456B",
       "Grace period ended",
-       undefined,
+      "Not applicable",
       "Reconfirm between",
       "Not applicable",
       "Child too old",
@@ -492,7 +494,7 @@ describe("Single check Working Families response views", () => {
 
   it("shows the due now reconfirmation status", () => {
     const code = buildEligibilityCode(eligibilityCodePrefixes.validForThisTerm);
-    const nino = `AB123456${reconfirmationStatusDueNowNinoSuffix}`;
+    const nino = testNino.random().substring(0, 8) + reconfirmationStatusDueNowNinoSuffix;
     runWorkingFamiliesCheck(code, nino);
 
     cy.get(".govuk-tag").should("contain.text", "Due now");

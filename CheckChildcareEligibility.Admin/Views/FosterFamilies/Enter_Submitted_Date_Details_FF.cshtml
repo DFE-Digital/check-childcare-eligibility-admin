@@ -30,7 +30,10 @@
                 @if (Model != null)
                 {
                     <input asp-for="ContextId" type="hidden" />
-                    <input asp-for="FosterCarerId" type="hidden" />
+                    if(Model.FosterCarerId != Guid.Empty)
+                    {
+                        <input asp-for="FosterCarerId" type="hidden" />
+                    }
                 }
                 <fieldset class="govuk-fieldset">
 

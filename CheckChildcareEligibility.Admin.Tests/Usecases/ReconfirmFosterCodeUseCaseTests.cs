@@ -4,6 +4,7 @@ using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Usecases;
 using FluentAssertions;
 using FluentValidation;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -21,7 +22,8 @@ public class ReconfirmFosterCodeUseCaseTests
         _gatewayMock = new Mock<IFosterFamiliesGateway>();
         _sut = new ReconfirmFosterCodeUseCase(
             new Mock<ILogger<ReconfirmFosterCodeUseCase>>().Object,
-            _gatewayMock.Object);
+            _gatewayMock.Object,
+            new ConfigurationBuilder().Build());
     }
 
     [Test]

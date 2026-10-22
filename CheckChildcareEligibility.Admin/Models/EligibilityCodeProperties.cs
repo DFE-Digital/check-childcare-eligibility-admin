@@ -1,4 +1,5 @@
 using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.Constants.Generic;
 using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies;
 
@@ -19,10 +20,12 @@ namespace CheckChildcareEligibility.Admin.Models
             ChildDateOfBirth = source.ChildDateOfBirth;
             TermValidity = source.TermValidity;
             ReconfirmationProperties = source.ReconfirmationProperties;
-            ChildIsTooYoung = source.ChildTooYoung;
+            ChildTooYoung = source.ChildTooYoung;
+            ChildTooOld = source.ChildTooOld ||
+                source.ReconfirmationProperties?.Status == ReconfirmationStatus.ChildTooOld;
         }
 
-        public EligibilityCodeProperties(FosterCodePreviewResponse source)
+        public EligibilityCodeProperties(FosterCodePreviewResponse source, DateTime childDateOfBirth)
         {
             Type = EligibilityCodeType.Foster;
             Status = CheckEligibilityStatus.eligible;
@@ -30,9 +33,12 @@ namespace CheckChildcareEligibility.Admin.Models
             ValidityEndDate = source.ValidityEndDate;
             GracePeriodEndDate = source.GracePeriodEndDate;
             IsGracePeriodEndDateApplied = source.IsGracePeriodEndDateApplied;
+            ChildDateOfBirth = childDateOfBirth;
             TermValidity = source.TermValidity;
             ReconfirmationProperties = source.ReconfirmationProperties;
-            ChildIsTooYoung = source.ChildTooYoung;
+            ChildTooYoung = source.ChildTooYoung;
+            ChildTooOld = source.ChildTooOld ||
+                source.ReconfirmationProperties?.Status == ReconfirmationStatus.ChildTooOld;
         }
 
         public EligibilityCodeProperties(CheckEligibilityItemWorkingFamilies source)
@@ -43,11 +49,13 @@ namespace CheckChildcareEligibility.Admin.Models
             ValidityStartDate = source.ValidityStartDate;
             ValidityEndDate = source.ValidityEndDate;
             GracePeriodEndDate = source.GracePeriodEndDate;
+            IsGracePeriodEndDateApplied = source.IsGracePeriodEndDateApplied;
             ChildDateOfBirth = DateTime.Parse(source.DateOfBirth);
             TermValidity = source.TermValidity;
             ReconfirmationProperties = source.ReconfirmationProperties;
-            ChildIsTooYoung = source.ChildTooYoung;
-            IsGracePeriodEndDateApplied = source.IsGracePeriodEndDateApplied;
+            ChildTooYoung = source.ChildTooYoung;
+            ChildTooOld = source.ChildTooOld ||
+                source.ReconfirmationProperties?.Status == ReconfirmationStatus.ChildTooOld;
         }
 
         public EligibilityCodeProperties(FosterFamiliesSearchItemResponse item)
@@ -62,7 +70,9 @@ namespace CheckChildcareEligibility.Admin.Models
             ChildDateOfBirth = item.ChildDateOfBirth;
             TermValidity = item.TermValidity;
             ReconfirmationProperties = item.ReconfirmationProperties;
-            ChildIsTooYoung = item.ChildTooYoung;
+            ChildTooYoung = item.ChildTooYoung;
+            ChildTooOld = item.ChildTooOld ||
+                item.ReconfirmationProperties?.Status == ReconfirmationStatus.ChildTooOld;
         }
 
         public CheckEligibilityStatus Status { get; init; }
@@ -85,7 +95,9 @@ namespace CheckChildcareEligibility.Admin.Models
 
         public TermValidity TermValidity { get; init; }
 
-        public bool ChildIsTooYoung { get; set; }
+        public bool ChildTooYoung { get; set; }
+
+        public bool ChildTooOld { get; set; }
 
         // Calculated properties
 
@@ -97,8 +109,6 @@ namespace CheckChildcareEligibility.Admin.Models
 
         public Term NextTerm => TermValidity.Next ?? Term.None;
 
-        public bool ChildIsTooOld => ReconfirmationProperties.Status == ReconfirmationStatus.ChildTooOld;
-
         public bool IsInGracePeriod => DateTime.UtcNow.Date > ValidityEndDate && DateTime.UtcNow.Date <= GracePeriodEndDate && IsGracePeriodEndDateApplied;
 
         public bool IsNotValidForCurrentTerm => CurrentTerm.Name == TermName.None && NextTerm.Name != TermName.None;
@@ -106,6 +116,31 @@ namespace CheckChildcareEligibility.Admin.Models
         public bool IsNeverValid => CurrentTerm.Name == TermName.None && NextTerm.Name == TermName.None;
 
         public bool IsReconfirmed => IsEligible && !IsNotValidForCurrentTerm && !IsInGracePeriod && NextTerm.Name != TermName.None;
+
+
+        public string GracePeriodEndDisplay
+        {
+            get
+            {
+                if (ChildTooOld)
+                {
+                    return WorkingFamiliesResponseDetails.StatusNotApplicable;
+                }
+                if(IsExpired && !IsGracePeriodEndDateApplied)
+                {
+                    return WorkingFamiliesResponseDetails.StatusNotApplicable;
+                }
+                if ((IsEligible && ChildTooYoung) || IsNotValidForCurrentTerm || !IsGracePeriodEndDateApplied)
+                {
+                    return WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable;
+                }
+                return GracePeriodEndDate.ToString("d MMMM yyyy");
+            }
+        }
+
+        public string GracePeriodEndLabel => ChildTooOld
+                ? "Grace period ended"
+                : "Grace period ends";
 
     }
 }

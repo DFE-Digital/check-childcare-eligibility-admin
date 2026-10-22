@@ -35,17 +35,17 @@ public static class WorkingFamiliesCheckHelper
         );
     }
 
-    public static string GetReconfirmBetween(EligibilityCodeType? codeType, ReconfirmationProperties? properties, DateTime? validityEndDate = null)
+    public static string GetReconfirmBetween(EligibilityCodeProperties properties)
     {
-        if (codeType == EligibilityCodeType.Temporary)
+        if (properties.Type == EligibilityCodeType.Temporary)
         {
-            return validityEndDate?.ToString("d MMMM yyyy");
+            return properties.ValidityEndDate.ToString("d MMMM yyyy");
         }
-        if (properties?.Status == ReconfirmationStatus.ChildTooOld)
+        if (properties.ChildTooOld)
         {
             return WorkingFamiliesResponseDetails.StatusNotApplicable;
         }
-        return $"{properties?.StartDate:d MMMM yyyy} and {properties?.EndDate:d MMMM yyyy}";
+        return $"{properties.ReconfirmationProperties?.StartDate:d MMMM yyyy} and {properties.ReconfirmationProperties?.EndDate:d MMMM yyyy}";
     }
 
     public static string[] GetReconfirmStatus(ReconfirmationProperties properties)
@@ -81,11 +81,11 @@ public static class WorkingFamiliesCheckHelper
         var currentTermView = WorkingFamiliesResponseBanner.TermNamesInView.GetValueOrDefault(properties.CurrentTerm.Name, string.Empty);
 
         string result = "<unknown>";
-        if (properties.ChildIsTooOld || properties.IsExpired)
+        if (properties.ChildTooOld || properties.IsExpired)
         {
             result = FosterFamiliesConstants.CodeExpired;
         }
-        else if (properties.ChildIsTooYoung)
+        else if (properties.ChildTooYoung)
         {
             result = FosterFamiliesConstants.CodeChildTooYoung;
         }
@@ -93,27 +93,18 @@ public static class WorkingFamiliesCheckHelper
         {
             result = FosterFamiliesConstants.CodeNotValidYet;
         }
-        else if (properties.IsReconfirmed)
-        {
-            result = $"{FosterFamiliesConstants.CodeValidFor} {currentTermView} {DateTime.UtcNow.Year} and {nextTermView} {properties.GracePeriodEndDate.Year}";
-        }
         else if (properties.IsInGracePeriod)
         {
             result = FosterFamiliesConstants.CodeInGracePeriod;
         }
         else
         {
-            result = $"{FosterFamiliesConstants.CodeValidFor} {currentTermView} {DateTime.UtcNow.Year}";
+            result = $"{FosterFamiliesConstants.CodeValidFor} {currentTermView} {properties.CurrentTerm.StartDate.Year}";
+            if (nextTermView != string.Empty)
+            {
+                result += $" and {nextTermView} {properties.NextTerm.StartDate.Year}";
+            }
         }
         return result;
-    }
-
-    public static string GetGracePeriod_FF(EligibilityCodeProperties properties)
-    {
-        if (properties == null) { return string.Empty; }
-
-        return properties.ChildIsTooYoung || properties.IsNotValidForCurrentTerm
-                    ? WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable
-                    : properties.GracePeriodEndDate.ToString("d MMMM yyyy");
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using CheckChildcareEligibility.Admin.Domain.Constants;
 using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
 
@@ -175,11 +175,15 @@ public class SubmissionDateAttribute : ValidationAttribute
                         new[] { "SubmissionDate", "Day", "Month", "Year" });
                 }
 
-                DateTime backdateWindow = DateTime.Today.AddDays(-FosterFamiliesConstants.SubmissionDateWindowDays);
-                if (submissionDate < backdateWindow)
+                var configuration = validationContext.GetService(typeof(IConfiguration)) as IConfiguration;
+                if (configuration?.GetValue("FosterFamilies:EnforceSubmissionDateWindow", true) ?? true)
                 {
-                    return new ValidationResult(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, backdateWindow.AddDays(-1).ToString("d MMMM yyyy")),
-                        new[] { "SubmissionDate", "Day", "Month", "Year" });
+                    DateTime backdateWindow = DateTime.Today.AddDays(-FosterFamiliesConstants.SubmissionDateWindowDays);
+                    if (submissionDate < backdateWindow)
+                    {
+                        return new ValidationResult(string.Format(FosterFamilyValidationMessages.DateMustBeAfter, backdateWindow.AddDays(-1).ToString("d MMMM yyyy")),
+                            new[] { "SubmissionDate", "Day", "Month", "Year" });
+                    }
                 }
                 return ValidationResult.Success;
             }
