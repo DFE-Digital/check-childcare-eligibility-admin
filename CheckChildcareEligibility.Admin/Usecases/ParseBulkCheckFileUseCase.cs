@@ -85,7 +85,7 @@ namespace CheckChildcareEligibility.Admin.Usecases
                         expectedHeaders = ["Eligibility code", "National Insurance number", "Child date of birth", "Reference (optional)"];
                         break;
                     default:
-                        expectedHeaders = ["Parent Last Name", "Parent Date of Birth", "Parent National Insurance Number", "Reference (optional)"];
+                        expectedHeaders = ["Parent Last Name", "Parent Date of Birth", "Parent National Insurance number", "Reference (optional)"];
                         break;
                 }
 

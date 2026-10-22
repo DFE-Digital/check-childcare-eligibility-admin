@@ -177,7 +177,7 @@ public class BulkReferenceUploadTests
 
     private static string Header(CheckEligibilityType type) => type == CheckEligibilityType.WorkingFamilies
         ? "Eligibility code,National Insurance number,Child date of birth,Reference (optional)"
-        : "Parent Last Name,Parent Date of Birth,Parent National Insurance Number,Reference (optional)";
+        : "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)";
 
     private static string Row(CheckEligibilityType type, string reference)
     {

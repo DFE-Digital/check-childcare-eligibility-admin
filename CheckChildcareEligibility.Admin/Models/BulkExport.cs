@@ -11,7 +11,7 @@ public class BulkExport : IBulkExport
     [Index(1), Name("Parent Date of Birth")]
     public string DOB { get; set; }
 
-    [Index(2), Name("Parent National Insurance Number")]
+    [Index(2), Name("Parent National Insurance number")]
     public string NI { get; set; }
 
     [Index(3), Name("Outcome")]

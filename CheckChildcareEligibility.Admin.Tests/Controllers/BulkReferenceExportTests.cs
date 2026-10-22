@@ -115,7 +115,7 @@ public class BulkReferenceExportTests : TestBase
         var headers = workingFamilies
             ? new[] { "Eligibility code", "National Insurance number", "Child date of birth", "Outcome",
                 "Validity start date", "Validity end date", "Grace period ends", "Reference (optional)" }
-            : new[] { "Parent Last Name", "Parent Date of Birth", "Parent National Insurance Number",
+            : new[] { "Parent Last Name", "Parent Date of Birth", "Parent National Insurance number",
                 "Outcome", "Reference (optional)" };
         csv.HeaderRecord.Should().Equal(headers);
         var rows = new List<string[]>();

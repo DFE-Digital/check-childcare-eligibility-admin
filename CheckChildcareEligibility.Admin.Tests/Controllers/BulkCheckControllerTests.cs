@@ -124,7 +124,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
 
             var header = serviceType == "WF"
                 ? "Eligibility code,National Insurance number,Child date of birth,Reference (optional)"
-                : "Parent Last Name,Parent Date of Birth,Parent National Insurance Number,Reference (optional)";
+                : "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)";
             var row = serviceType == "WF" ? "50173110190,AB123456C,2022-01-01," : "Smith,1980-01-01,AB123456C,";
             using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(
                 header + "\r\n" + row + "VALID\r\n" + row + new string('x', 101)));

@@ -219,7 +219,7 @@ describe("Admin Bulk Check File Validation Journey", () => {
           expect(response.status).to.eq(200);
           const lines = String(response.body).replace(/^\uFEFF/, "").split(/\r?\n/).filter((line) => line.length > 0);
           expect(lines[0]).to.eq(
-            "Parent Last Name,Parent Date of Birth,Parent National Insurance Number,Outcome,Reference (optional)"
+            "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Outcome,Reference (optional)"
           );
           expect(lines).to.have.length(7);
           lines.slice(1).forEach((line) => {

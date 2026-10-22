@@ -9,7 +9,7 @@ const services = [
 services.forEach((service) => {
   const fields = service.workingFamilies
     ? ["Eligibility code", "National Insurance number", "Child date of birth"]
-    : ["Parent Last Name", "Parent Date of Birth", "Parent National Insurance Number"];
+    : ["Parent Last Name", "Parent Date of Birth", "Parent National Insurance number"];
   const header = fields.concat("Reference (optional)").join(",");
   const row = service.workingFamilies
     ? "90012345671,AA123456C,2022-06-07"
