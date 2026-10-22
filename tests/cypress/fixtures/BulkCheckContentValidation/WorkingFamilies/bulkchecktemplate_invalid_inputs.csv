@@ -1,4 +1,4 @@
-Eligibility code,National Insurance number,Child date of birth
+Eligibility code,National Insurance number,Child date of birth,Reference (optional)
 50012345678,QQ123456A,01-01-1970
 50012345679,AA123456A,02-01-1970
 wrongcode123,AA123456A,03-01-1970

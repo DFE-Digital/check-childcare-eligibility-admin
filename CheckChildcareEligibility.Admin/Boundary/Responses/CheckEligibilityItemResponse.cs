@@ -11,6 +11,8 @@ public class CheckEligibilityItemResponseBase
 #region 2YO EYPP
 public class CheckEligibilityItem
 {
+    public string? Reference { get; set; }
+
     public string NationalInsuranceNumber { get; set; }
 
     public string LastName { get; set; }
@@ -33,6 +35,8 @@ public class CheckEligibilityItemResponse : CheckEligibilityItemResponseBase
 #region Working Families
 public class CheckEligibilityItemWorkingFamilies
 {
+    public string? Reference { get; set; }
+
     public TermValidity? TermValidity { get; set; }
     public ReconfirmationProperties ReconfirmationProperties { get; set; }
     public bool? IsDiscretionaryValidityStartDateApplied { get; set; }

@@ -46,10 +46,10 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
                 _config.Object);
 
             var csv = eligibilityType == CheckEligibilityType.WorkingFamilies
-                ? "Eligibility code,National Insurance number,Child date of birth\r\n"
+                ? "Eligibility code,National Insurance number,Child date of birth,Reference (optional)\r\n"
                   + "50173110190,ab123456c,2022-01-01\r\n"
                   + "50173110191,BG123456C,2022-01-01\r\n"
-                : "Parent Last Name,Parent Date of Birth,Parent National Insurance number\r\n"
+                : "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)\r\n"
                   + "Smith,1980-01-01,ab123456c\r\n"
                   + "Jones,1980-01-01,BG123456C\r\n";
 
@@ -88,9 +88,9 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
                 _config.Object);
 
             var csv = eligibilityType == CheckEligibilityType.WorkingFamilies
-                ? "Eligibility code,National Insurance number,Child date of birth\r\n"
+                ? "Eligibility code,National Insurance number,Child date of birth,Reference (optional)\r\n"
                   + $"50173110190,{nino},2022-01-01\r\n"
-                : "Parent Last Name,Parent Date of Birth,Parent National Insurance number\r\n"
+                : "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)\r\n"
                   + $"Smith,1980-01-01,{nino}\r\n";
 
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(csv));
