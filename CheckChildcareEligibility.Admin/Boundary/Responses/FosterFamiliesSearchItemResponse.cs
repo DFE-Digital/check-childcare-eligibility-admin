@@ -25,8 +25,10 @@
         public ReconfirmationProperties ReconfirmationProperties { get; set; }
 
         public TermValidity TermValidity { get; set; }
-        
+
         public bool ChildTooYoung { get; set; }
+
+        public bool ChildTooOld { get; set; }
 
     }
 }

@@ -15,5 +15,7 @@ namespace CheckChildcareEligibility.Admin.Boundary.Responses
         public TermValidity TermValidity { get; set; }
 
         public bool ChildTooYoung { get; set; }
+
+        public bool ChildTooOld { get; set; }
     }
 }

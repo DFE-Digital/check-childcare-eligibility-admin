@@ -48,6 +48,7 @@ public class CheckEligibilityItemWorkingFamilies
     public DateTime GracePeriodEndDate { get; set; }
     public bool IsGracePeriodEndDateApplied { get; set; }
     public bool ChildTooYoung { get; set; }
+    public bool ChildTooOld { get; set; }
     public int? Order { get; set; }
 }
 

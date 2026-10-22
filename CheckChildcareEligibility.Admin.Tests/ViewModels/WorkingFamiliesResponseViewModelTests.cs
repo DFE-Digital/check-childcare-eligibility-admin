@@ -29,7 +29,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             var result = sut.Properties.GracePeriodEndDisplay;
 
             // Assert
-            sut.Properties.ChildIsTooYoung.Should().BeTrue();
+            sut.Properties.ChildTooYoung.Should().BeTrue();
             result.Should().Be("Date will appear here when the code can be used");
         }
 
@@ -47,7 +47,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             var result = sut.Properties.GracePeriodEndDisplay;
 
             // Assert
-            sut.Properties.ChildIsTooYoung.Should().BeFalse();
+            sut.Properties.ChildTooYoung.Should().BeFalse();
             sut.Properties.IsNotValidForCurrentTerm.Should().BeTrue();
             result.Should().Be("Date will appear here when the code can be used");
         }
@@ -70,13 +70,13 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             var result = sut.Properties.GracePeriodEndDisplay;
 
             // Assert
-            sut.Properties.ChildIsTooYoung.Should().BeFalse();
+            sut.Properties.ChildTooYoung.Should().BeFalse();
             sut.Properties.IsNotValidForCurrentTerm.Should().BeFalse();
             result.Should().Be(gracePeriodEndDate.ToString("d MMMM yyyy"));
         }
 
         [Test]
-        public void GracePeriodEndDisplay_WhenChildIsTooOld_ShouldReturnFormattedValidityEndDate()
+        public void GracePeriodEndDisplay_WhenChildIsTooOld_ShouldReturnNotApplicable()
         {
             // Arrange
             var currentTermStart = new DateTime(DateTime.Today.Year, 1, 1); //simulate spring term;
@@ -93,10 +93,26 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             var result = sut.Properties.GracePeriodEndDisplay;
 
             // Assert
-            sut.Properties.ChildIsTooOld.Should().BeTrue();
-            result.Should().Be(sut.Properties.ValidityEndDate.ToString("d MMMM yyyy"));
+            sut.Properties.ChildTooOld.Should().BeTrue();
+            result.Should().Be(WorkingFamiliesResponseDetails.StatusNotApplicable);
+            result.Should().NotBe(sut.Properties.ValidityEndDate.ToString("d MMMM yyyy"));
             result.Should().NotBe(gracePeriodEndDate.ToString("d MMMM yyyy"));
             sut.Properties.GracePeriodEndLabel.Should().Be("Grace period ended");
+        }
+
+        [Test]
+        public void GracePeriodEndDisplay_WhenExpiredWithoutGracePeriod_ShouldReturnNotApplicable()
+        {
+            // Arrange
+            var sut = CreateViewModel(
+                validityEndDate: DateTime.Today.AddDays(-1),
+                isGracePeriodEndDateApplied: false);
+
+            // Act
+            var result = sut.Properties.GracePeriodEndDisplay;
+
+            // Assert
+            result.Should().Be(WorkingFamiliesResponseDetails.StatusNotApplicable);
         }
 
         [Test]
@@ -115,12 +131,12 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             sut.SetBannerValues();
 
             // Assert
-            sut.Properties.ChildIsTooOld.Should().BeTrue();
+            sut.Properties.ChildTooOld.Should().BeTrue();
             sut.Properties.IsNotValidForCurrentTerm.Should().BeTrue();
             sut.CodeStatus.Should().Be(WorkingFamiliesResponseBanner.CodeExpired);
             sut.BannerColour.Should().Be(WorkingFamiliesResponseBanner.ColourOrange);
             sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermExpiredOn} {sut.Properties.ValidityEndDate:d MMMM yyyy}");
-            sut.Properties.GracePeriodEndDisplay.Should().Be(sut.Properties.ValidityEndDate.ToString("d MMMM yyyy"));
+            sut.Properties.GracePeriodEndDisplay.Should().Be(WorkingFamiliesResponseDetails.StatusNotApplicable);
             sut.Properties.GracePeriodEndLabel.Should().Be("Grace period ended");
         }
 
@@ -137,7 +153,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             sut.SetBannerValues();
 
             // Assert
-            sut.Properties.ChildIsTooYoung.Should().BeTrue();
+            sut.Properties.ChildTooYoung.Should().BeTrue();
             sut.Properties.IsNotValidForCurrentTerm.Should().BeTrue();
             sut.CodeStatus.Should().Be(WorkingFamiliesResponseBanner.CodeChildTooYoung);
             sut.BannerColour.Should().Be(WorkingFamiliesResponseBanner.ColourBlue);

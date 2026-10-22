@@ -791,7 +791,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 FosterChildDetailsViewModel = childDetails,
                 FosterApplicationSubmittedDateViewModel = submittedDate,
                 FosterCodePreview = codePreview,
-                CodeProperties = new EligibilityCodeProperties(codePreview)
+                CodeProperties = new EligibilityCodeProperties(codePreview, childDetails.ChildDateOfBirth)
             });
         }
 
@@ -885,7 +885,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 FosterChildDetailsViewModel = fosterChildDetails,
                 FosterApplicationSubmittedDateViewModel = fosterApplicationSubmittedDate,
                 FosterCodePreview = fosterCodePreview,
-                CodeProperties = new EligibilityCodeProperties(fosterCodePreview)
+                CodeProperties = new EligibilityCodeProperties(fosterCodePreview, fosterChildDetails.ChildDateOfBirth)
             };
 
             return View(fosterCarerApplication);
@@ -1024,7 +1024,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
 
             // Ensure reconfirmation is allowed for this child
             if (DateTime.UtcNow.Date < codeProperties.ReconfirmationProperties.StartDate ||
-                codeProperties.ChildIsTooOld)
+                codeProperties.ChildTooOld)
             {
                 return RedirectToAction("Code_Record_FF", new { fosterChildId });
             }
@@ -1077,7 +1077,7 @@ namespace CheckChildcareEligibility.Admin.Controllers
                 }
             );
             viewModel.FosterCodePreview = previewResult;
-            viewModel.CodeProperties = new EligibilityCodeProperties(previewResult);
+            viewModel.CodeProperties = new EligibilityCodeProperties(previewResult, childResponse.ChildDateOfBirth);
             return View("Check_Reconfirm_Details_FF", viewModel);
         }
 
