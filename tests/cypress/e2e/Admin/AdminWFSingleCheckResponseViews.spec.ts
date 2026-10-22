@@ -347,7 +347,7 @@ describe("Single check Working Families response views", () => {
       code,
       "AA123456B",
       "Grace period ended",
-       undefined,
+      "Not applicable",
       "Reconfirm between",
       "Not applicable",
       "Child too old",
