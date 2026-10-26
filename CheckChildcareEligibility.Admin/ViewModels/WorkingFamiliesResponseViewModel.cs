@@ -85,10 +85,9 @@ namespace CheckChildcareEligibility.Admin.ViewModels
             }
             else if (Properties.ChildTooYoung) // Child too young
             {
-                DateTime nineMonthsDate = Properties.ChildDateOfBirth.AddMonths(9);
                 CodeStatus = WorkingFamiliesResponseBanner.CodeChildTooYoung;
                 BannerColour = WorkingFamiliesResponseBanner.ColourBlue;
-                TermValidityDetails = Properties.IsNeverValid ? "" : $"{WorkingFamiliesResponseBanner.TermValidFrom} {nextTermView} {nineMonthsDate.Year}";
+                TermValidityDetails = Properties.IsNeverValid ? "" : $"{WorkingFamiliesResponseBanner.TermValidFrom} {nextTermView} {Properties.NextTerm.StartDate.Year}";
             }
 
             else if (Properties.IsNotValidForCurrentTerm || Properties.IsNeverValid) // Code cannot be used yet
