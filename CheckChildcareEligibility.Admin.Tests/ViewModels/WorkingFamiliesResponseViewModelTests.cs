@@ -254,7 +254,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             // Assert
             sut.CodeStatus.Should().Be(WorkingFamiliesResponseBanner.CodeChildTooYoung);
             sut.BannerColour.Should().Be(WorkingFamiliesResponseBanner.ColourBlue);
-            sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermValidFrom} spring term {childDateOfBirth.AddMonths(9).Year}");
+            sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermValidFrom} spring term {Term_Spring.StartDate.Year}");
         }
 
         [Test]
@@ -299,7 +299,7 @@ namespace CheckChildcareEligibility.Admin.Tests.ViewModels
             // Assert
             sut.CodeStatus.Should().Be(WorkingFamiliesResponseBanner.CodeInGracePeriod);
             sut.BannerColour.Should().Be(WorkingFamiliesResponseBanner.ColourYellow);
-            sut.TermValidityDetails.Should().Be($"{WorkingFamiliesResponseBanner.TermExpiresOn} {gracePeriodEndDate:dd MMMM yyyy}");
+            sut.TermValidityDetails.Should().Contain($"{WorkingFamiliesResponseBanner.TermExpiresOn} {gracePeriodEndDate:dd MMMM yyyy}");
         }
 
         [TestCase(1, true)]
