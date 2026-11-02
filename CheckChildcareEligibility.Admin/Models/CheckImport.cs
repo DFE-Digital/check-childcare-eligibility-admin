@@ -15,11 +15,15 @@ public class CheckRow : CheckRowBase
     public string LastName { get; set; }
 
 }
+public class CheckRowEYPP : CheckRow { 
+    
+    public string NASS { get; set; }
+
+}
 [ExcludeFromCodeCoverage]
 public class CheckRowWorkingFamilies : CheckRowBase {
     public string EligibilityCode { get; set; }
     
-
 }
 
 [ExcludeFromCodeCoverage]
@@ -31,6 +35,18 @@ public class CheckRowRowMap : ClassMap<CheckRow>
         Map(m => m.DOB).Index(1);
         Map(m => m.Ni).Index(2);
         Map(m => m.Reference).Index(3);
+    }
+}
+[ExcludeFromCodeCoverage]
+public class CheckRowRowMapEYPP : ClassMap<CheckRowEYPP>
+{
+    public CheckRowRowMapEYPP()
+    {
+        Map(m => m.LastName).Index(0);
+        Map(m => m.DOB).Index(1);
+        Map(m => m.Ni).Index(2);
+        Map(m => m.NASS).Index(3);
+        Map(m => m.Reference).Index(4);
     }
 }
 [ExcludeFromCodeCoverage]

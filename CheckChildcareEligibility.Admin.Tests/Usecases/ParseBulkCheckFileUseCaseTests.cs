@@ -66,7 +66,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
 
             result.Errors.Should().ContainSingle();
             result.Errors[0].LineNumber.Should().Be(3);
-            result.Errors[0].Message.Should().Be(ValidationMessages.ValidNI);
+            result.Errors[0].Message.Should().Be(ValidationMessages.InvalidNI);
         }
 
         [Test]
@@ -101,7 +101,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
             result.ValidRequests.Should().BeEmpty();
             result.Errors.Should().ContainSingle();
             result.Errors[0].LineNumber.Should().Be(2);
-            result.Errors[0].Message.Should().Be(ValidationMessages.ValidNI);
+            result.Errors[0].Message.Should().Be(ValidationMessages.InvalidNI);
         }
 
         [Test]

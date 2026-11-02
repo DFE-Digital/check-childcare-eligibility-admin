@@ -7,7 +7,6 @@ using CheckYourEligibility.API.Domain.Validation;
 using CsvHelper;
 using CsvHelper.Configuration;
 using FluentValidation;
-using FluentValidation.Results;
 using System.Globalization;
 using System.Text;
 
@@ -85,6 +84,9 @@ namespace CheckChildcareEligibility.Admin.Usecases
                     case CheckEligibilityType.WorkingFamilies:
                         expectedHeaders = ["Eligibility code", "National Insurance number", "Child date of birth", "Reference (optional)"];
                         break;
+                    case CheckEligibilityType.EarlyYearPupilPremium:
+                        expectedHeaders = ["Parent Last Name", "Parent Date of Birth", "Parent National Insurance number", "Parent Asylum Seeker Reference number", "Reference (optional)"];
+                        break;
                     default:
                         expectedHeaders = ["Parent Last Name", "Parent Date of Birth", "Parent National Insurance number", "Reference (optional)"];
                         break;
@@ -109,6 +111,10 @@ namespace CheckChildcareEligibility.Admin.Usecases
                     case CheckEligibilityType.WorkingFamilies:
                         csv.Context.RegisterClassMap<CheckRowRowMapWorkingFamilies>();
                         records = csv.GetRecords<CheckRowWorkingFamilies>().ToList();
+                        break;
+                    case CheckEligibilityType.EarlyYearPupilPremium:
+                        csv.Context.RegisterClassMap<CheckRowRowMapEYPP>();
+                        records = csv.GetRecords<CheckRowEYPP>().ToList();
                         break;
                     default:
                         csv.Context.RegisterClassMap<CheckRowRowMap>();
@@ -141,49 +147,45 @@ namespace CheckChildcareEligibility.Admin.Usecases
 
                     try
                     {
-                        var validationResults = new ValidationResult();
-                       
-                        switch (eligibilityType)
+                        CheckEligibilityRequestDataBase requestData = (eligibilityType, record) switch
                         {
-                            case CheckEligibilityType.WorkingFamilies:
-                                var workingFamilyRow = record as CheckRowWorkingFamilies;
-                                var requestDataWF = new CheckEligibilityRequestWorkingFamiliesData();
-                                requestDataWF.EligibilityCode = workingFamilyRow.EligibilityCode;
-                                requestDataWF.DateOfBirth = workingFamilyRow.DOB;//must remain in original pre-parsed form to go through validator
-                                requestDataWF.NationalInsuranceNumber = workingFamilyRow.Ni;
-                                requestDataWF.Type = eligibilityType;
-                                requestDataWF.Order = sequence;
-                                requestDataWF.Reference = workingFamilyRow.Reference;
-                                validationResults = _validator.Validate(requestDataWF);
-                                if (validationResults.IsValid) {
-                                    //We know this passed parse earlier but it must be translated to correct format (yyyy-MM-dd) for Database to access
-                                    requestDataWF.DateOfBirth = DataValidation.ParseValidDate(record.DOB).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                    requestDataWF.NationalInsuranceNumber =
-                                        NinoValidation.Normalize(requestDataWF.NationalInsuranceNumber)!;
-                                    result.ValidRequests.Add(requestDataWF);
-                                }
-                                break;
-                            default:
-                                var row = record as CheckRow;
-                                var requestData = new CheckEligibilityRequestData();
-                                requestData.LastName = row.LastName;
-                                requestData.DateOfBirth = row.DOB;//must remain in original pre-parsed form to go through validator
-                                requestData.NationalInsuranceNumber = row.Ni;
-                                requestData.Type = eligibilityType;
-                                requestData.Order = sequence;
-                                requestData.Reference = row.Reference;
-                                validationResults = _validator.Validate(requestData);
-                                if (validationResults.IsValid)
+                            (CheckEligibilityType.WorkingFamilies, CheckRowWorkingFamilies row) =>
+                                new CheckEligibilityRequestWorkingFamiliesData
                                 {
-                                    //We know this passed parse earlier but it must be translated to correct format (yyyy-MM-dd) for Database to access
-                                    requestData.DateOfBirth = DataValidation.ParseValidDate(record.DOB).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                    requestData.NationalInsuranceNumber =
-                                        NinoValidation.Normalize(requestData.NationalInsuranceNumber)!;
-                                    result.ValidRequests.Add(requestData);
-                                }
-                                break;
+                                    EligibilityCode = row.EligibilityCode
+                                },
+                            (CheckEligibilityType.EarlyYearPupilPremium, CheckRowEYPP row) =>
+                                new CheckEligibilityRequestData
+                                {
+                                    LastName = row.LastName,
+                                    NationalAsylumSeekerServiceNumber = row.NASS
+                                },
+                            (_, CheckRow row) =>
+                                new CheckEligibilityRequestData
+                                {
+                                    LastName = row.LastName
+                                },
+                            _ => throw new InvalidOperationException(
+                                "The CSV row type does not match the eligibility type.")
+                        };
 
+                        requestData.DateOfBirth = record.DOB; // Keep the original format for validation.
+                        requestData.NationalInsuranceNumber = record.Ni;
+                        requestData.Type = eligibilityType;
+                        requestData.Order = sequence;
+                        requestData.Reference = record.Reference;
+
+                        var validationResults = _validator.Validate(requestData);
+                        if (validationResults.IsValid)
+                        {
+                            // Validation needs the original date format; the database needs yyyy-MM-dd.
+                            requestData.DateOfBirth = DataValidation.ParseValidDate(requestData.DateOfBirth)
+                                .ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                            requestData.NationalInsuranceNumber =
+                                NinoValidation.Normalize(requestData.NationalInsuranceNumber)!;
+                            result.ValidRequests.Add(requestData);
                         }
+
                         if (!validationResults.IsValid)
                         {
                             foreach (var error in validationResults.Errors)

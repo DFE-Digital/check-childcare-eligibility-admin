@@ -2,6 +2,7 @@
 
 using CheckChildcareEligibility.Admin.Boundary.Requests;
 using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckYourEligibility.API.Domain.Validation;
 using FluentValidation;
 using System.Text.RegularExpressions;
@@ -24,19 +25,48 @@ public class CheckEligibilityRequestDataValidator : AbstractValidator<IEligibili
                .Cascade((CascadeMode.Stop))
                .NotEmpty().WithMessage(ValidationMessages.RequiredLastName)
                .Must((x, lastName) => string.IsNullOrEmpty(lastName) || DataValidation.BeAValidName(lastName))
-               .WithMessage(ValidationMessages.ValidLastName);
+               .WithMessage(ValidationMessages.InvalidLastName);
 
             RuleFor(x => ((CheckEligibilityRequestData)x).DateOfBirth)
                 .Cascade((CascadeMode.Stop))
                 .NotEmpty().WithMessage(ValidationMessages.RequiredDOB)
                 .Must((x, dob) => string.IsNullOrEmpty(dob) || DataValidation.BeAValidDate(dob))
-                .WithMessage(ValidationMessages.ValidDOB);
 
-            RuleFor(x => ((CheckEligibilityRequestData)x).NationalInsuranceNumber)
-                .Cascade((CascadeMode.Stop))
-                .NotEmpty().WithMessage(ValidationMessages.RequiredNI)
-                .Must((x, NINumber) => string.IsNullOrEmpty(NINumber) || DataValidation.BeAValidNi(NINumber))
-                .WithMessage(ValidationMessages.ValidNI);
+                .WithMessage(ValidationMessages.InvalidDOB);
+            When(x => ((CheckEligibilityRequestData)x).Type == CheckEligibilityType.TwoYearOffer, () =>
+            {
+                RuleFor(x => ((CheckEligibilityRequestData)x).NationalInsuranceNumber)
+                    .Cascade(CascadeMode.Stop)
+                    .NotEmpty()
+                    .WithMessage(ValidationMessages.RequiredNI)
+                    .Must(DataValidation.BeAValidNi)
+                    .WithMessage(ValidationMessages.InvalidNI);
+            }).Otherwise(() =>
+            {
+                When(x => !string.IsNullOrEmpty(((CheckEligibilityRequestData)x).NationalInsuranceNumber), () =>
+                {
+                    RuleFor(x => ((CheckEligibilityRequestData)x).NationalAsylumSeekerServiceNumber)
+                        .Empty()
+                        .WithMessage(ValidationMessages.NI_and_NASS);
+
+                    RuleFor(x => ((CheckEligibilityRequestData)x).NationalInsuranceNumber)
+                        .Must(DataValidation.BeAValidNi)
+                        .WithMessage(ValidationMessages.InvalidNI);
+
+                }).Otherwise(() =>
+                {
+                    When(x => !string.IsNullOrEmpty(((CheckEligibilityRequestData)x).NationalAsylumSeekerServiceNumber), () =>
+                    {
+                        RuleFor(x => ((CheckEligibilityRequestData)x).NationalAsylumSeekerServiceNumber)
+                            .Must(DataValidation.BeAValidNass)
+                            .WithMessage(ValidationMessages.InvalidNASS);
+                    });
+
+                    RuleFor(x => ((CheckEligibilityRequestData)x).NationalAsylumSeekerServiceNumber)
+                        .NotEmpty()
+                        .WithMessage(ValidationMessages.NI_or_NASS);
+                });
+            });
         });
 
         When(x => x is CheckEligibilityRequestWorkingFamiliesData, () =>
@@ -50,16 +80,14 @@ public class CheckEligibilityRequestDataValidator : AbstractValidator<IEligibili
              .Cascade((CascadeMode.Stop))
              .NotEmpty().WithMessage(ValidationMessages.RequiredNI)
              .Must((x, NINumber) => string.IsNullOrEmpty(NINumber) || DataValidation.BeAValidNi(NINumber))
-             .WithMessage(ValidationMessages.ValidNI);
+             .WithMessage(ValidationMessages.InvalidNI);
 
             RuleFor(x => ((CheckEligibilityRequestWorkingFamiliesData)x).DateOfBirth)
                 .Cascade((CascadeMode.Stop))
                 .NotEmpty().WithMessage(ValidationMessages.RequiredDOB)
                 .Must((x, dob) => string.IsNullOrEmpty(dob) || DataValidation.BeAValidDate(dob))
-                .WithMessage(ValidationMessages.ValidDOB);
-
+                .WithMessage(ValidationMessages.InvalidDOB);
 
         });
-
     }
 }

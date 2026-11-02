@@ -61,10 +61,12 @@ public class BulkCheckController : BaseController
     [HttpGet]
     public IActionResult DownloadTemplate(string eligibilityType)
     {
-        string fileName = eligibilityType == "WF"
-            ? "WFBulkCheckTemplate.csv"
-            : "BulkCheckTemplate.csv";
-
+        string fileName =  eligibilityType switch
+        {
+          "WF" => "WFBulkCheckTemplate.csv",
+          "EYPP" => "EYPPBulkCheckTemplate.csv",
+            _ => "BulkCheckTemplate.csv"
+    };                   
         var path = Path.Combine(_environment.WebRootPath, "documents", fileName);
 
         Response.Headers.CacheControl = "no-store, no-cache, must-revalidate, max-age=0";

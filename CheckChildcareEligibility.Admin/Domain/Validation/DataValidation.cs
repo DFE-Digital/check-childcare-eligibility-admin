@@ -50,6 +50,15 @@ internal static class DataValidation
         return NinoValidation.IsValidInput(NinoValidation.RemoveSpaces(value));
     }
 
+    internal static bool BeAValidNass(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        var regexString = @"^\d{9}$";
+        var rg = new Regex(regexString);
+        var res = rg.Match(value);
+        return res.Success;
+    }
+
     internal static bool BeAValidUkPostcode(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
