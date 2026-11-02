@@ -118,24 +118,25 @@ namespace CheckChildcareEligibility.Admin.Models
         public bool IsReconfirmed => IsEligible && !IsNotValidForCurrentTerm && !IsInGracePeriod && NextTerm.Name != TermName.None;
 
 
-        public string GracePeriodEndDisplay
+        public string GracePeriodEndDisplay => GracePeriodEndDisplayInternal(longDates: true);
+
+        public string GracePeriodEndDisplayShort => GracePeriodEndDisplayInternal(longDates: false);
+
+        private string GracePeriodEndDisplayInternal(bool longDates)
         {
-            get
+            if (ChildTooOld)
             {
-                if (ChildTooOld)
-                {
-                    return WorkingFamiliesResponseDetails.StatusNotApplicable;
-                }
-                if(IsExpired && !IsGracePeriodEndDateApplied)
-                {
-                    return WorkingFamiliesResponseDetails.StatusNotApplicable;
-                }
-                if ((IsEligible && ChildTooYoung) || IsNotValidForCurrentTerm || !IsGracePeriodEndDateApplied)
-                {
-                    return WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable;
-                }
-                return GracePeriodEndDate.ToString("d MMMM yyyy");
+                return WorkingFamiliesResponseDetails.StatusNotApplicable;
             }
+            if(IsExpired && !IsGracePeriodEndDateApplied)
+            {
+                return WorkingFamiliesResponseDetails.StatusNotApplicable;
+            }
+            if ((IsEligible && ChildTooYoung) || IsNotValidForCurrentTerm || !IsGracePeriodEndDateApplied)
+            {
+                return WorkingFamiliesResponseDetails.GracePeriodEndDateNotAvailable;
+            }
+            return longDates ? GracePeriodEndDate.ToString("d MMMM yyyy") : GracePeriodEndDate.ToString("d MMM yyyy");
         }
 
         public string GracePeriodEndLabel => ChildTooOld
