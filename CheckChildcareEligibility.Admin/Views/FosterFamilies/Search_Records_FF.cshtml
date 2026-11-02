@@ -1,5 +1,4 @@
-﻿@using CheckChildcareEligibility.Admin.Domain.Enums.WorkingFamilies
-@using CheckChildcareEligibility.Admin.Helpers
+﻿@using CheckChildcareEligibility.Admin.Helpers
 @using CheckChildcareEligibility.Admin.ViewModels
 @model CheckChildcareEligibility.Admin.ViewModels.SearchFosterFamiliesRecordsViewModel
 @{
@@ -37,13 +36,13 @@
                         {
                             EligibilityCodeProperties codeProperties = new (item);
                             string[] reconfirmStatus = WorkingFamiliesCheckHelper.GetReconfirmStatus(item.ReconfirmationProperties);
-                            string reconfirmBetween = WorkingFamiliesCheckHelper.GetReconfirmBetween(codeProperties);
+                            string reconfirmBetween = WorkingFamiliesCheckHelper.GetReconfirmBetween(codeProperties, longDates: false);
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell">@Html.ActionLink(item.ChildName, "Code_Record_FF", "FosterFamilies", new { item.FosterChildId }, new { @class = "govuk-link" })</td>
-                                <td class="govuk-table__cell">@item.ChildDateOfBirth.ToString("d MMMM yyyy")</td>
+                                <td class="govuk-table__cell">@item.ChildDateOfBirth.ToString("d MMM yyyy")</td>
                                 <td class="govuk-table__cell">@item.EligibilityCode</td>
                                 <td class="govuk-table__cell">@Html.ActionLink(item.CarerName, "Family_Record_FF", "FosterFamilies", new { item.FosterCarerId }, new { @class = "govuk-link" })</td>
-                                <td class="govuk-table__cell">@item.ValidityStartDate.ToString(format: "d MMMM yyyy")</td>
+                                <td class="govuk-table__cell">@item.ValidityStartDate.ToString(format: "d MMM yyyy")</td>
                                 <td class="govuk-table__cell">@reconfirmBetween</td>
                                 <td class="govuk-table__cell">@codeProperties.GracePeriodEndDisplay</td>
                                 <td class="govuk-table__cell">
