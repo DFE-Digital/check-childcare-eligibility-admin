@@ -140,7 +140,7 @@ public class BulkReferenceUploadTests
     }
 
     [TestCase("2YO", CheckEligibilityType.TwoYearOffer, "BulkCheckTemplate.csv")]
-    [TestCase("EYPP", CheckEligibilityType.EarlyYearPupilPremium, "BulkCheckTemplate.csv")]
+    [TestCase("EYPP", CheckEligibilityType.EarlyYearPupilPremium, "EYPPBulkCheckTemplate.csv")]
     [TestCase("WF", CheckEligibilityType.WorkingFamilies, "WFBulkCheckTemplate.csv")]
     public async Task DownloadTemplate_Preserves_Filename_And_Serves_Schema_Accepted_By_Parser(
         string serviceType, CheckEligibilityType type, string fileName)
@@ -175,19 +175,28 @@ public class BulkReferenceUploadTests
         parsed.ValidRequests.Should().ContainSingle().Which.Reference.Should().Be("TEMPLATE-001");
     }
 
-    private static string Header(CheckEligibilityType type) => type == CheckEligibilityType.WorkingFamilies
-        ? "Eligibility code,National Insurance number,Child date of birth,Reference (optional)"
-        : "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)";
+    private static string Header(CheckEligibilityType type) => type switch
+    {
+        CheckEligibilityType.WorkingFamilies => (
+            "Eligibility code,National Insurance number,Child date of birth,Reference (optional)"),
+        CheckEligibilityType.EarlyYearPupilPremium => (
+            "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Parent Asylum Seeker Reference number,Reference (optional)"),
+           _ => ("Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)")
+    };
 
     private static string Row(CheckEligibilityType type, string reference)
     {
         using var writer = new StringWriter(CultureInfo.InvariantCulture);
         using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-        var fields = type == CheckEligibilityType.WorkingFamilies
-            ? new[] { "50173110190", "ab123456c", "2022-01-01", reference }
-            : new[] { "Smith", "1980-01-01", "ab123456c", reference };
-        foreach (var field in fields)
+        var fields =  type switch {
+            CheckEligibilityType.WorkingFamilies => (new[] { "50173110190", "ab123456c", "2022-01-01", reference }),
+            CheckEligibilityType.EarlyYearPupilPremium => (new[] { "Smith", "1980-01-01", "ab123456c","", reference }),
+            _ => (new[] { "Smith", "1980-01-01", "ab123456c", reference })
+        };
+
+        foreach (var field in fields) {
             csv.WriteField(field);
+        } 
         csv.NextRecord();
         return writer.ToString().TrimEnd('\r', '\n');
     }
