@@ -17,26 +17,12 @@ public class CheckEligibilityRequestDataValidatorIdentifierTests
         _sut = new CheckEligibilityRequestDataValidator();
     }
 
-    [TestCase("AB123456C", "")]
-    [TestCase("", "123456789")]
-    public void Validate_Eypp_WithOneValidIdentifier_Passes(
-        string nationalInsuranceNumber,
-        string asylumSupportReference)
-    {
-        var request = CreateRequest(
-            CheckEligibilityType.EarlyYearPupilPremium,
-            nationalInsuranceNumber,
-            asylumSupportReference);
-
-        var result = _sut.Validate(request);
-
-        result.Errors.Should().BeEmpty();
-    }
-
     [TestCase("", "", ValidationMessages.NI_or_NASS)]
     [TestCase("AB123456C", "123456789", ValidationMessages.NI_and_NASS)]
     [TestCase("invalid", "", ValidationMessages.InvalidNI)]
     [TestCase("", "12345", ValidationMessages.InvalidNASS)]
+    [TestCase("", "12/34/5678", ValidationMessages.InvalidNASS)]
+    [TestCase("", "12-34-56789", ValidationMessages.InvalidNASS)]
     public void Validate_Eypp_WithInvalidIdentifierCombination_ReturnsExpectedError(
         string nationalInsuranceNumber,
         string asylumSupportReference,
@@ -52,10 +38,17 @@ public class CheckEligibilityRequestDataValidatorIdentifierTests
         result.Errors.Select(error => error.ErrorMessage).Should().Equal(expectedError);
     }
 
-    [Test]
-    public void Validate_TwoYearOffer_WithValidNationalInsuranceNumber_Passes()
+    [TestCase("AB123456C", "")]
+    [TestCase("", "123456789")]
+    [TestCase("", "12/34/56789")]
+    public void Validate_Eypp_WithOneValidIdentifier_Passes(
+        string nationalInsuranceNumber,
+        string asylumSupportReference)
     {
-        var request = CreateRequest(CheckEligibilityType.TwoYearOffer, "AB123456C");
+        var request = CreateRequest(
+            CheckEligibilityType.EarlyYearPupilPremium,
+            nationalInsuranceNumber,
+            asylumSupportReference);
 
         var result = _sut.Validate(request);
 
@@ -76,31 +69,13 @@ public class CheckEligibilityRequestDataValidatorIdentifierTests
     }
 
     [Test]
-    public void Validate_WorkingFamilies_WithValidEligibilityCode_Passes()
+    public void Validate_TwoYearOffer_WithValidNationalInsuranceNumber_Passes()
     {
-        var request = CreateWorkingFamiliesRequest();
+        var request = CreateRequest(CheckEligibilityType.TwoYearOffer, "AB123456C");
 
         var result = _sut.Validate(request);
 
         result.Errors.Should().BeEmpty();
-    }
-
-    [TestCase("", "1980-01-01", ValidationMessages.RequiredNI)]
-    [TestCase("AB123456C", "", ValidationMessages.RequiredDOB)]
-    [TestCase("invalid", "1980-01-01", ValidationMessages.InvalidNI)]
-    [TestCase("AB123456C", "not-a-date", ValidationMessages.InvalidDOB)]
-    public void Validate_WorkingFamilies_WithInvalidRequiredData_ReturnsExpectedError(
-        string nationalInsuranceNumber,
-        string dateOfBirth,
-        string expectedError)
-    {
-        var request = CreateWorkingFamiliesRequest(
-            nationalInsuranceNumber: nationalInsuranceNumber,
-            dateOfBirth: dateOfBirth);
-
-        var result = _sut.Validate(request);
-
-        result.Errors.Select(error => error.ErrorMessage).Should().Equal(expectedError);
     }
 
     [TestCase("", ValidationMessages.RequiredEligibilityCode)]
@@ -121,17 +96,32 @@ public class CheckEligibilityRequestDataValidatorIdentifierTests
             .Equal(expectedError);
     }
 
-    private static CheckEligibilityRequestWorkingFamiliesData CreateWorkingFamiliesRequest(
-        string eligibilityCode = "12345678901",
-        string nationalInsuranceNumber = "AB123456C",
-        string dateOfBirth = "1980-01-01")
+    [TestCase("", "1980-01-01", ValidationMessages.RequiredNI)]
+    [TestCase("AB123456C", "", ValidationMessages.RequiredDOB)]
+    [TestCase("invalid", "1980-01-01", ValidationMessages.InvalidNI)]
+    [TestCase("AB123456C", "not-a-date", ValidationMessages.InvalidDOB)]
+    public void Validate_WorkingFamilies_WithInvalidRequiredData_ReturnsExpectedError(
+        string nationalInsuranceNumber,
+        string dateOfBirth,
+        string expectedError)
     {
-        return new CheckEligibilityRequestWorkingFamiliesData
-        {
-            EligibilityCode = eligibilityCode,
-            NationalInsuranceNumber = nationalInsuranceNumber,
-            DateOfBirth = dateOfBirth
-        };
+        var request = CreateWorkingFamiliesRequest(
+            nationalInsuranceNumber: nationalInsuranceNumber,
+            dateOfBirth: dateOfBirth);
+
+        var result = _sut.Validate(request);
+
+        result.Errors.Select(error => error.ErrorMessage).Should().Equal(expectedError);
+    }
+
+    [Test]
+    public void Validate_WorkingFamilies_WithValidEligibilityCode_Passes()
+    {
+        var request = CreateWorkingFamiliesRequest();
+
+        var result = _sut.Validate(request);
+
+        result.Errors.Should().BeEmpty();
     }
 
     private static CheckEligibilityRequestData CreateRequest(
@@ -146,6 +136,19 @@ public class CheckEligibilityRequestDataValidatorIdentifierTests
             NationalInsuranceNumber = nationalInsuranceNumber,
             NationalAsylumSeekerServiceNumber = asylumSupportReference,
             Type = eligibilityType
+        };
+    }
+
+    private static CheckEligibilityRequestWorkingFamiliesData CreateWorkingFamiliesRequest(
+            string eligibilityCode = "12345678901",
+        string nationalInsuranceNumber = "AB123456C",
+        string dateOfBirth = "1980-01-01")
+    {
+        return new CheckEligibilityRequestWorkingFamiliesData
+        {
+            EligibilityCode = eligibilityCode,
+            NationalInsuranceNumber = nationalInsuranceNumber,
+            DateOfBirth = dateOfBirth
         };
     }
 }

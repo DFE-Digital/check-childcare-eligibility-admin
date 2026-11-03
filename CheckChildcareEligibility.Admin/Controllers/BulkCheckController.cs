@@ -7,6 +7,7 @@ using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.Usecases;
 using CheckChildcareEligibility.Admin.ViewModels;
+using static CheckChildcareEligibility.Admin.Models.BulkExportBase;
 using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
@@ -319,12 +320,16 @@ public class BulkCheckController : BaseController
             new UTF8Encoding(encoderShouldEmitUTF8Identifier: true)))
         using (var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture))
         {
-            switch (checkEligibilityType) {
+            switch (checkEligibilityType)
+            {
                 case CheckEligibilityType.WorkingFamilies:
                     csvWriter.WriteRecords(records.Cast<BulkExportWorkingFamilies>());
                     break;
+                case CheckEligibilityType.EarlyYearPupilPremium:
+                    csvWriter.WriteRecords(records.Cast<BulkExportEYPP>());
+                    break;
                 default:
-                    csvWriter.WriteRecords(records.Cast<BulkExport>());
+                    csvWriter.WriteRecords(records.Cast<BulkExport2YO>());
                     break;
             }
             streamWriter.Flush();

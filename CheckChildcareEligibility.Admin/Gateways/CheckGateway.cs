@@ -143,7 +143,7 @@ public class CheckGateway : BaseGateway, ICheckGateway
                 break;
 
         }
-        return bulkResult.BulkDataMapper();
+        return bulkResult.BulkDataMapper(eligibilityType);
     }
 
     public async Task<CheckEligibilityResponseBulk> PostBulkCheck(CheckEligibilityRequestBulk requestBody)

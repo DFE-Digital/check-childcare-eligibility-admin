@@ -28,6 +28,7 @@ public class BulkReferenceExportTests : TestBase
         [Values("populated", "blank", "legacy", "empty")] string scenario)
     {
         var workingFamilies = type == CheckEligibilityType.WorkingFamilies;
+        var eypp = type == CheckEligibilityType.EarlyYearPupilPremium;
         string?[] references = scenario == "populated"
             ? ["  MiXeD, \"Référence\"  ", "", " " + new string('a', 100) + " ", "  FIRST\nSECOND  "]
             : [null, "", "   ", ""];
@@ -51,6 +52,7 @@ public class BulkReferenceExportTests : TestBase
                     ["DateOfBirth"] = workingFamilies ? "2022-01-01" : "1980-01-01",
                     ["Status"] = statuses[i],
                     ["EligibilityCode"] = "5017311019" + i,
+                    ["NationalAsylumSeekerServiceNumber"] = "12/34/56789",
                     ["ValidityStartDate"] = "2027-01-01",
                     ["ValidityEndDate"] = "2027-03-31",
                     ["GracePeriodEndDate"] = "2027-08-31"
@@ -115,8 +117,11 @@ public class BulkReferenceExportTests : TestBase
         var headers = workingFamilies
             ? new[] { "Eligibility code", "National Insurance number", "Child date of birth", "Outcome",
                 "Validity start date", "Validity end date", "Grace period ends", "Reference (optional)" }
-            : new[] { "Parent Last Name", "Parent Date of Birth", "Parent National Insurance number",
-                "Outcome", "Reference (optional)" };
+            : eypp
+                ? new[] { "Parent Last Name", "Parent Date of Birth", "Parent National Insurance number",
+                    "Outcome", "Parent Asylum Seeker Reference number", "Reference (optional)" }
+                : new[] { "Parent Last Name", "Parent Date of Birth", "Parent National Insurance number",
+                    "Outcome", "Reference (optional)" };
         csv.HeaderRecord.Should().Equal(headers);
         var rows = new List<string[]>();
         while (csv.Read())
@@ -128,7 +133,10 @@ public class BulkReferenceExportTests : TestBase
             var expected = workingFamilies
                 ? new[] { "5017311019" + i, "AB123456C", "2022-01-01", outcomes[i],
                     "2027-01-01", "2027-03-31", "2027-08-31", reference }
-                : new[] { "Parent" + (i + 1), "1980-01-01", "AB123456C", outcomes[i], reference };
+                : eypp
+                    ? new[] { "Parent" + (i + 1), "1980-01-01", "AB123456C", outcomes[i],
+                        "12/34/56789", reference }
+                    : new[] { "Parent" + (i + 1), "1980-01-01", "AB123456C", outcomes[i], reference };
             rows[i].Should().Equal(expected);
         }
         handler.Protected().Verify("SendAsync", Times.Once(),
