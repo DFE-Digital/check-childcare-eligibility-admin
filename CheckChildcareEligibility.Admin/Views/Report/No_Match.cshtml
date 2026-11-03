@@ -4,7 +4,7 @@
 }
 <div class="govuk-grid-column-two-thirds">
     <a class="govuk-back-link-nolink"></a>
-    <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner" data-govuk-notification-banner-init="">
+    <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
         <div class="govuk-notification-banner__header">
             <h1 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
                 @ViewData["Title"]
@@ -34,7 +34,7 @@
 
     <p>Check that you entered the details correctly.</p>
 
-    <a href="@Url.Action("Code_Search", "Report")" role="button" draggable="false" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">
+    <a href="@Url.Action("Code_Search", "Report")" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
         Try again
     </a>
 
