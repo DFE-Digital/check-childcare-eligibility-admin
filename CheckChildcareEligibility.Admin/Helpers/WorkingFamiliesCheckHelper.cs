@@ -35,17 +35,18 @@ public static class WorkingFamiliesCheckHelper
         );
     }
 
-    public static string GetReconfirmBetween(EligibilityCodeProperties properties)
+    public static string GetReconfirmBetween(EligibilityCodeProperties properties, bool longDates = true)
     {
+        var dateFormat = longDates ? "d MMMM yyyy" : "d MMM yyyy";
         if (properties.Type == EligibilityCodeType.Temporary)
         {
-            return properties.ValidityEndDate.ToString("d MMMM yyyy");
+            return properties.ValidityEndDate.ToString(dateFormat);
         }
         if (properties.ChildTooOld)
         {
             return WorkingFamiliesResponseDetails.StatusNotApplicable;
         }
-        return $"{properties.ReconfirmationProperties?.StartDate:d MMMM yyyy} and {properties.ReconfirmationProperties?.EndDate:d MMMM yyyy}";
+        return $"{properties.ReconfirmationProperties?.StartDate?.ToString(dateFormat)} and {properties.ReconfirmationProperties?.EndDate?.ToString(dateFormat)}";
     }
 
     public static string[] GetReconfirmStatus(ReconfirmationProperties properties)
