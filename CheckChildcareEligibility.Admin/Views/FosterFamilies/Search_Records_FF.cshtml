@@ -14,7 +14,7 @@
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
             <p>Manage foster families claiming Childcare for working families.</p>
 
-            @Html.ActionLink("Add foster family", actionName: "EnterCarer", "FosterFamilies", null, new{ @class = "govuk-button govuk-!-margin-bottom-9" })
+            @Html.ActionLink("Add foster family", "EnterCarer", "FosterFamilies", null, new{ @class = "govuk-button govuk-!-margin-bottom-9" })
             @if (Model.Data != null && Model.Data.Any())
             {
                 <h2 class="govuk-heading-m">Children and eligibility codes</h2>
@@ -46,7 +46,7 @@
                                 <td class="govuk-table__cell">@reconfirmBetween</td>
                                 <td class="govuk-table__cell">@codeProperties.GracePeriodEndDisplayShort</td>
                                 <td class="govuk-table__cell">
-                                    <strong class="govuk-tag govuk-tag--@reconfirmStatus[1]" style="max-width:100%;">
+                                    <strong class="govuk-tag govuk-tag--@reconfirmStatus[1]">
                                         @reconfirmStatus[0]
                                     </strong>
                                 </td>
@@ -70,12 +70,6 @@
                 {
                     <partial name="PaginationPartial" model="paginationModel" />
                 }
-            }
-            @if (Model.Data == null)
-            {
-                <p class="govuk-!-margin-bottom-6">
-                    <a href="/public/csv/childcare/dev/foster-families-codes-YYYY-MM-DD.csv">Download as CSV file</a>
-                </p>
             }
         </div>
     </div>

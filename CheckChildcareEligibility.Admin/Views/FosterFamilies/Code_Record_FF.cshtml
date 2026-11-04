@@ -41,8 +41,7 @@
             !Model.CodeProperties.ChildTooOld)
             {
                 <a href="@Url.ActionLink("Enter_Reconfirm_Date_FF", "FosterFamilies", new { Model.Response.FosterChildId })"
-                   role="button" draggable="false" class="govuk-button" data-module="govuk-button"
-                   data-govuk-button-init="">
+                   role="button" draggable="false" class="govuk-button" data-module="govuk-button">
                     Reconfirm eligibility code
                 </a>
             }
@@ -70,7 +69,7 @@
                                 Reconfirmation status
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                <strong class="govuk-tag govuk-tag--@reconfirmationStatus[1]" style="max-width:100%;">
+                                <strong class="govuk-tag govuk-tag--@reconfirmationStatus[1]">
                                     @reconfirmationStatus[0]
                                 </strong>
                             </dd>

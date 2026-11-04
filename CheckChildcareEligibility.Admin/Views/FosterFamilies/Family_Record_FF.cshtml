@@ -37,15 +37,13 @@
             <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
 
             <a href="@Url.ActionLink("Add_Child_FF", "FosterFamilies", new { Model.Response.FosterCarerId, Model.ContextId })"
-               role="button" draggable="false" class="govuk-button govuk-button" data-module="govuk-button"
-               data-govuk-button-init="">
+               role="button" draggable="false" class="govuk-button govuk-button" data-module="govuk-button">
                 Add child to family
             </a>
             @if (!Model.Response.HasPartner)
             {
                 <a href="@Url.ActionLink("Update_Partner_Details_FF", "FosterFamilies", new { Model.Response.FosterCarerId })"
-                   role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button"
-                   data-govuk-button-init="">
+                   role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button">
                     Add partner
                 </a>
             }
@@ -175,15 +173,19 @@
                                 </dd>
                                 <dd class="govuk-summary-list__actions">
                                     <a class="govuk-link"
-                                       href="@Url.ActionLink("Code_Record_FF", "FosterFamilies", new { child.FosterChildId })">View<span
-                                        class="govuk-visually-hidden">child details</span></a>
-                                    </dd>
-                                </div>
-                                index++;
-                            }
-                        </dl>
-                    </div>
+                                       href="@Url.ActionLink("Code_Record_FF", "FosterFamilies", new { child.FosterChildId })">
+                                        View
+                                        <span class="govuk-visually-hidden">
+                                            child details for @child.FirstName @child.LastName
+                                        </span>
+                                    </a>
+                                </dd>
+                            </div>
+                            index++;
+                        }
+                    </dl>
                 </div>
             </div>
         </div>
     </div>
+</div>
