@@ -1,4 +1,5 @@
-﻿@model CheckChildcareEligibility.Admin.ViewModels.BulkCheckViewModel
+@using CheckChildcareEligibility.Admin.Domain.Constants.Generic
+@model CheckChildcareEligibility.Admin.ViewModels.BulkCheckViewModel
 @{
     ViewData["Title"] = "Run a batch check";
     string eligibilityType = TempData["eligibilityType"] as string;
@@ -10,17 +11,19 @@
     {
         case "WF":
             Model.FieldDescriptions = [
-                "the eligibility code",
-                "a National Insurance number (can be for a parent, guardian or partner)",
-                "the child's date of birth (format DD/MM/YYYY or YYYY-MM-DD)"
+                BulkCheckFieldDescriptionConstants.EligibilityCode,
+                BulkCheckFieldDescriptionConstants.WorkingFamiliesNationalInsuranceNumber,
+                BulkCheckFieldDescriptionConstants.ChildDateOfBirth
           ];
             Model.DocumentTemplatePath = Url.Action("DownloadTemplate", "BulkCheck", new { eligibilityType = "WF" });
             break;
         default:
             Model.FieldDescriptions = [
-                "last name",
-                "date of birth (format DD/MM/YYYY or YYYY-MM-DD)",
-                eligibilityType == "EYPP" ?  "National insurance number or asylum support reference number": "National Insurance number"
+                BulkCheckFieldDescriptionConstants.ParentLastName,
+                BulkCheckFieldDescriptionConstants.ParentDateOfBirth,
+                eligibilityType == "EYPP"
+                    ? BulkCheckFieldDescriptionConstants.NationalInsuranceOrAsylumSupportReferenceNumber
+                    : BulkCheckFieldDescriptionConstants.ParentNationalInsuranceNumber
               ];
             Model.DocumentTemplatePath = Url.Action("DownloadTemplate", "BulkCheck", new { eligibilityType });
             break;
