@@ -20,7 +20,7 @@
             Model.FieldDescriptions = [
                 "last name",
                 "date of birth (format DD/MM/YYYY or YYYY-MM-DD)",
-                "National Insurance number"
+                eligibilityType == "EYPP" ?  "National insurance number or asylum support reference number": "National Insurance number"
               ];
             Model.DocumentTemplatePath = Url.Action("DownloadTemplate", "BulkCheck", new { eligibilityType });
             break;
