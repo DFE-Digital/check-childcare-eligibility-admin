@@ -10,6 +10,7 @@ using FluentAssertions;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Moq;
+using CheckChildcareEligibility.Admin.Boundary.Responses;
 
 namespace CheckChildcareEligibility.Admin.Tests.Usecases
 {
@@ -45,15 +46,19 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
                 new CheckEligibilityRequestDataValidator(),
                 _config.Object);
 
-            var csv = eligibilityType == CheckEligibilityType.WorkingFamilies
-                ? "Eligibility code,National Insurance number,Child date of birth,Reference (optional)\r\n"
-                  + "50173110190,ab123456c,2022-01-01\r\n"
-                  + "50173110191,BG123456C,2022-01-01\r\n"
-                : "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)\r\n"
-                  + "Smith,1980-01-01,ab123456c\r\n"
-                  + "Jones,1980-01-01,BG123456C\r\n";
+            string rows = eligibilityType switch
+            {
+                CheckEligibilityType.WorkingFamilies => (
+                    "50173110190,ab123456c,2022-01-01\r\n"
+                  + "50173110191,BG123456C,2022-01-01\r\n"),
+                _ => (
+                    "Smith,1980-01-01,ab123456c\r\n"
+                  + "Jones,1980-01-01,BG123456C\r\n")             
+            };
 
-            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(csv));
+
+            var csvContent = $"{Header(eligibilityType)}\r\n{rows}\r\n";
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(csvContent));
 
             var result = await parser.Execute(stream, eligibilityType);
 
@@ -66,7 +71,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
 
             result.Errors.Should().ContainSingle();
             result.Errors[0].LineNumber.Should().Be(3);
-            result.Errors[0].Message.Should().Be(ValidationMessages.ValidNI);
+            result.Errors[0].Message.Should().Be(ValidationMessages.InvalidNI);
         }
 
         [Test]
@@ -87,13 +92,18 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
                 new CheckEligibilityRequestDataValidator(),
                 _config.Object);
 
-            var csv = eligibilityType == CheckEligibilityType.WorkingFamilies
-                ? "Eligibility code,National Insurance number,Child date of birth,Reference (optional)\r\n"
-                  + $"50173110190,{nino},2022-01-01\r\n"
-                : "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)\r\n"
-                  + $"Smith,1980-01-01,{nino}\r\n";
+            string row = eligibilityType switch
+            {
+                CheckEligibilityType.WorkingFamilies => (
+                    $"50173110190,{nino},2022-01-01,"),
+                CheckEligibilityType.EarlyYearPupilPremium => ($"Smith,1980-01-01,{nino},,"),
+                _ => ($"Smith,1980-01-01,{nino},")
+            };
 
-            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(csv));
+            var overlongReference = new string('x', 101);
+            var csvContent = $"{Header(eligibilityType)}\r\n{row}\r\n";
+
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(csvContent));
 
             var result = await parser.Execute(stream, eligibilityType);
 
@@ -101,14 +111,14 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
             result.ValidRequests.Should().BeEmpty();
             result.Errors.Should().ContainSingle();
             result.Errors[0].LineNumber.Should().Be(2);
-            result.Errors[0].Message.Should().Be(ValidationMessages.ValidNI);
+            result.Errors[0].Message.Should().Be(ValidationMessages.InvalidNI);
         }
 
         [Test]
         public async Task Given_Bulk_Check_When_FileHasInvalidHeaders_2YO()
         {
             // Arrange
-            var content = Resources.bulkchecktemplate_invalid_headers;
+            var content = Resources.bulkcheck_invalid_headers;
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             writer.Write(content);
@@ -128,7 +138,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
         public async Task Given_Bulk_Check_When_FileHasInvalidHeaders_EYPP()
         {
             // Arrange
-            var content = Resources.bulkchecktemplate_invalid_headers;
+            var content = Resources.bulkcheck_invalid_headers;
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             writer.Write(content);
@@ -146,7 +156,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
         public async Task Given_Bulk_Check_When_FileHasInvalidHeaders_WF()
         {
             // Arrange
-            var content = Resources.bulkchecktemplate_invalid_headers;
+            var content = Resources.bulkcheck_invalid_headers;
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             writer.Write(content);
@@ -165,7 +175,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
         public async Task Given_Bulk_Check_When_FileHasTooManyRecords_Should_ReturnBulkCheckPage()
         {
             // Arrange
-            var content = Resources.bulkchecktemplate_too_many_records;
+            var content = Resources.bulkcheck_too_many_records;
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             writer.Write(content);
@@ -191,7 +201,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
                new CsvRowError{ LineNumber = 5, Message = "Something is wrong!" },
             };
 
-            var content = Resources.bulkchecktemplate_some_invalid_items;
+            var content = Resources.bulkcheck_partially_valid;
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             writer.Write(content);
@@ -227,7 +237,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
             var errors = new List<CsvRowError>();
             var validRows = new List<CheckEligibilityRequestData>();
 
-            var content = Resources.bulkchecktemplate_small_Valid;
+            var content = Resources.bulkcheck_small_valid;
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             writer.Write(content);
@@ -259,7 +269,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
             var errors = new List<CsvRowError>();
             var validRows = new List<CheckEligibilityRequestData>();
 
-            var content = Resources.bulkchecktemplate_small_Valid;
+            var content = Resources.bulkcheck_small_valid;
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             writer.Write(content);
@@ -322,7 +332,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
             var errors = new List<CsvRowError>();
             var validRows = new List<CheckEligibilityRequestData>();
 
-            var content = Resources.bulkchecktemplate_small_Valid;
+            var content = Resources.bulkcheck_eypp_valid;
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             writer.Write(content);
@@ -353,7 +363,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
             var errors = new List<CsvRowError>();
             var validRows = new List<CheckEligibilityRequestData>();
 
-            var content = Resources.bulkchecktemplate_small_Valid;
+            var content = Resources.bulkcheck_small_valid;
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             writer.Write(content);
@@ -382,6 +392,15 @@ namespace CheckChildcareEligibility.Admin.Tests.Usecases
                 sequence++;
             }
         }
+
+        private static string Header(CheckEligibilityType type) => type switch
+        {
+            CheckEligibilityType.WorkingFamilies => (
+                "Eligibility code,National Insurance number,Child date of birth,Reference (optional)"),
+            CheckEligibilityType.EarlyYearPupilPremium => (
+                "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Parent Asylum Seeker Reference number,Reference (optional)"),
+            _ => ("Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)")
+        };    
 
     }
 }

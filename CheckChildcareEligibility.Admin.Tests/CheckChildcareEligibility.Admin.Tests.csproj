@@ -58,6 +58,7 @@
       </None>
       <None Include="..\CheckChildcareEligibility.Admin\wwwroot\documents\BulkCheckTemplate.csv" Link="TemplateWebRoot\documents\BulkCheckTemplate.csv" CopyToOutputDirectory="PreserveNewest" />
       <None Include="..\CheckChildcareEligibility.Admin\wwwroot\documents\WFBulkCheckTemplate.csv" Link="TemplateWebRoot\documents\WFBulkCheckTemplate.csv" CopyToOutputDirectory="PreserveNewest" />
+      <None Include="..\CheckChildcareEligibility.Admin\wwwroot\documents\EYPPBulkCheckTemplate.csv" Link="TemplateWebRoot\documents\EYPPBulkCheckTemplate.csv" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
 </Project>

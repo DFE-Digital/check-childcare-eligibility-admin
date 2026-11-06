@@ -6,9 +6,12 @@ public static class ValidationMessages
     public const string RequiredLastName = "Enter parent or guardian's last name";
     public const string RequiredDOB = "Enter parent or guardian's date of birth";
     public const string RequiredNI = "Enter parent or guardian's National Insurance number";
-    public const string ValidLastName = "Parent or guardian's last name contains an invalid character";
-    public const string ValidDOB = "The date of birth must be in yyyy-mm-dd, dd-mm-yyyy or dd/mm/yyyy format";
-    public const string ValidNI = "Enter a National Insurance number in the correct format";
+    public const string InvalidLastName = "Parent or guardian's last name contains an invalid character";
+    public const string InvalidDOB = "The date of birth must be in yyyy-mm-dd, dd-mm-yyyy or dd/mm/yyyy format";
+    public const string InvalidNI = "Enter a National Insurance number in the correct format";
+    public const string InvalidNASS = "Enter an asylum support reference number in the correct format";
+    public const string NI_and_NASS = "Enter either a National Insurance number or asylum support reference number, not both";
+    public const string NI_or_NASS = "National Insurance number or Asylum support reference number is required";
     public const string ChildDOB = "Child Date of birth is required:- (yyyy-mm-dd)";
     public const string ChildLastName = "Child LastName is required";
     public const string ChildFirstName = "Child FirstName is required";

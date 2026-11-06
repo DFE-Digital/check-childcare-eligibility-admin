@@ -48,7 +48,7 @@ public class BulkDateFormatTests
         result.Errors.Should().ContainSingle().Which.Should().BeEquivalentTo(new CsvRowError
         {
             LineNumber = 2,
-            Message = ValidationMessages.ValidDOB
+            Message = ValidationMessages.InvalidDOB
         });
     }
 
@@ -58,9 +58,12 @@ public class BulkDateFormatTests
             .AddInMemoryCollection(new Dictionary<string, string?> { ["BulkEligibilityCheckLimit"] = "250" })
             .Build();
         var parser = new ParseBulkCheckFileUseCase(new CheckEligibilityRequestDataValidator(), config);
-        var csv = type == CheckEligibilityType.WorkingFamilies
-            ? $"Eligibility code,National Insurance number,Child date of birth,Reference (optional)\r\n50173110190,AB123456C,{date},\r\n"
-            : $"Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)\r\nSmith,{date},AB123456C,\r\n";
+        var csv = type switch {
+            CheckEligibilityType.WorkingFamilies => $"Eligibility code,National Insurance number,Child date of birth,Reference (optional)\r\n50173110190,AB123456C,{date},\r\n",
+            CheckEligibilityType.EarlyYearPupilPremium => $"Parent Last Name,Parent Date of Birth,Parent National Insurance number,Parent Asylum Seeker Reference number,Reference (optional)\r\nSmith,{date},AB123456C,\r\n",
+            _ => $"Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)\r\nSmith,{date},AB123456C,\r\n"
+
+        };
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(csv));
         return await parser.Execute(stream, type);
     }

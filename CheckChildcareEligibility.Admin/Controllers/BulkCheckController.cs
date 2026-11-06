@@ -7,6 +7,7 @@ using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
 using CheckChildcareEligibility.Admin.Usecases;
 using CheckChildcareEligibility.Admin.ViewModels;
+using static CheckChildcareEligibility.Admin.Models.BulkExportBase;
 using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
@@ -61,10 +62,12 @@ public class BulkCheckController : BaseController
     [HttpGet]
     public IActionResult DownloadTemplate(string eligibilityType)
     {
-        string fileName = eligibilityType == "WF"
-            ? "WFBulkCheckTemplate.csv"
-            : "BulkCheckTemplate.csv";
-
+        string fileName =  eligibilityType switch
+        {
+          "WF" => "WFBulkCheckTemplate.csv",
+          "EYPP" => "EYPPBulkCheckTemplate.csv",
+            _ => "BulkCheckTemplate.csv"
+    };                   
         var path = Path.Combine(_environment.WebRootPath, "documents", fileName);
 
         Response.Headers.CacheControl = "no-store, no-cache, must-revalidate, max-age=0";
@@ -317,12 +320,16 @@ public class BulkCheckController : BaseController
             new UTF8Encoding(encoderShouldEmitUTF8Identifier: true)))
         using (var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture))
         {
-            switch (checkEligibilityType) {
+            switch (checkEligibilityType)
+            {
                 case CheckEligibilityType.WorkingFamilies:
                     csvWriter.WriteRecords(records.Cast<BulkExportWorkingFamilies>());
                     break;
+                case CheckEligibilityType.EarlyYearPupilPremium:
+                    csvWriter.WriteRecords(records.Cast<BulkExportEYPP>());
+                    break;
                 default:
-                    csvWriter.WriteRecords(records.Cast<BulkExport>());
+                    csvWriter.WriteRecords(records.Cast<BulkExport2YO>());
                     break;
             }
             streamWriter.Flush();

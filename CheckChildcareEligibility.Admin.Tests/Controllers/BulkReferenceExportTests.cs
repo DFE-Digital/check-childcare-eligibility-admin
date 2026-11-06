@@ -20,6 +20,24 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers;
 [TestFixture]
 public class BulkReferenceExportTests : TestBase
 {
+    private static readonly string[] WorkingFamiliesHeaders =
+    [
+        "Eligibility code", "National Insurance number", "Child date of birth", "Outcome",
+        "Validity start date", "Validity end date", "Grace period ends", "Reference (optional)"
+    ];
+
+    private static readonly string[] EarlyYearPupilPremiumHeaders =
+    [
+        "Parent Last Name", "Parent Date of Birth", "Parent National Insurance number",
+        "Parent Asylum Seeker Reference number", "Outcome", "Reference (optional)"
+    ];
+
+    private static readonly string[] TwoYearOfferHeaders =
+    [
+        "Parent Last Name", "Parent Date of Birth", "Parent National Insurance number",
+        "Outcome", "Reference (optional)"
+    ];
+
     [Test]
     public async Task Download_Preserves_Reference_Column_Row_Association_And_Existing_Fields(
         [Values(CheckEligibilityType.TwoYearOffer, CheckEligibilityType.EarlyYearPupilPremium,
@@ -28,6 +46,7 @@ public class BulkReferenceExportTests : TestBase
         [Values("populated", "blank", "legacy", "empty")] string scenario)
     {
         var workingFamilies = type == CheckEligibilityType.WorkingFamilies;
+        var eypp = type == CheckEligibilityType.EarlyYearPupilPremium;
         string?[] references = scenario == "populated"
             ? ["  MiXeD, \"Référence\"  ", "", " " + new string('a', 100) + " ", "  FIRST\nSECOND  "]
             : [null, "", "   ", ""];
@@ -51,6 +70,7 @@ public class BulkReferenceExportTests : TestBase
                     ["DateOfBirth"] = workingFamilies ? "2022-01-01" : "1980-01-01",
                     ["Status"] = statuses[i],
                     ["EligibilityCode"] = "5017311019" + i,
+                    ["NationalAsylumSeekerServiceNumber"] = "12/34/56789",
                     ["ValidityStartDate"] = "2027-01-01",
                     ["ValidityEndDate"] = "2027-03-31",
                     ["GracePeriodEndDate"] = "2027-08-31"
@@ -113,10 +133,10 @@ public class BulkReferenceExportTests : TestBase
         csv.Read().Should().BeTrue();
         csv.ReadHeader();
         var headers = workingFamilies
-            ? new[] { "Eligibility code", "National Insurance number", "Child date of birth", "Outcome",
-                "Validity start date", "Validity end date", "Grace period ends", "Reference (optional)" }
-            : new[] { "Parent Last Name", "Parent Date of Birth", "Parent National Insurance number",
-                "Outcome", "Reference (optional)" };
+            ? WorkingFamiliesHeaders
+            : eypp
+                ? EarlyYearPupilPremiumHeaders
+                : TwoYearOfferHeaders;
         csv.HeaderRecord.Should().Equal(headers);
         var rows = new List<string[]>();
         while (csv.Read())
@@ -128,7 +148,10 @@ public class BulkReferenceExportTests : TestBase
             var expected = workingFamilies
                 ? new[] { "5017311019" + i, "AB123456C", "2022-01-01", outcomes[i],
                     "2027-01-01", "2027-03-31", "2027-08-31", reference }
-                : new[] { "Parent" + (i + 1), "1980-01-01", "AB123456C", outcomes[i], reference };
+                : eypp
+                    ? new[] { "Parent" + (i + 1), "1980-01-01", "AB123456C", "12/34/56789",
+                        outcomes[i], reference }
+                    : new[] { "Parent" + (i + 1), "1980-01-01", "AB123456C", outcomes[i], reference };
             rows[i].Should().Equal(expected);
         }
         handler.Protected().Verify("SendAsync", Times.Once(),

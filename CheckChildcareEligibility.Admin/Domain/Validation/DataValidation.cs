@@ -8,14 +8,6 @@ namespace CheckYourEligibility.API.Domain.Validation;
 
 internal static class DataValidation
 {
-    internal static bool BeAValidName(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return false;
-
-        return Regex.IsMatch(value, NameAttribute.NameValidationRegex);
-    }
-
     private static readonly string[] DateFormats =
     [
         "yyyy-MM-dd",
@@ -24,25 +16,36 @@ internal static class DataValidation
         "d/M/yyyy"
     ];
 
-    internal static bool BeAValidDate(string value) =>
-        DateTime.TryParseExact(value, DateFormats,
-            System.Globalization.CultureInfo.InvariantCulture,
-            System.Globalization.DateTimeStyles.None, out _);
-
-    internal static DateTime ParseValidDate(string value) =>
-        DateTime.ParseExact(value, DateFormats,
-            System.Globalization.CultureInfo.InvariantCulture,
-            System.Globalization.DateTimeStyles.None);
-
     internal static bool BeAPastDate(DateTime value)
     {
         return value.Date <= DateTime.Today;
     }
 
-    internal static bool BeWithinSubmissionDateWindow(DateTime value)
+    internal static bool BeAValidChildAge(DateTime value)
     {
-        DateTime backdateWindow = DateTime.Today.AddDays(-FosterFamiliesConstants.SubmissionDateWindowDays);
-        return value >= backdateWindow;
+        DateTime fifthBirthday = value.AddYears(5);
+        var (_, termAfterBirthday) = WorkingFamiliesCheckHelper.GetTerms(fifthBirthday);
+        return DateTime.Today < termAfterBirthday.StartDate;
+    }
+
+    internal static bool BeAValidDate(string value) =>
+        DateTime.TryParseExact(value, DateFormats,
+            System.Globalization.CultureInfo.InvariantCulture,
+            System.Globalization.DateTimeStyles.None, out _);
+
+    internal static bool BeAValidName(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        return Regex.IsMatch(value, NameAttribute.NameValidationRegex);
+    }
+
+    internal static bool BeAValidNass(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+
+        return Regex.IsMatch(value, @"\A(?:\d{9}|\d{2}/\d{2}/\d{5})\z");
     }
 
     internal static bool BeAValidNi(string? value)
@@ -64,10 +67,14 @@ internal static class DataValidation
             RegexOptions.Compiled);
     }
 
-    internal static bool BeAValidChildAge(DateTime value)
+    internal static bool BeWithinSubmissionDateWindow(DateTime value)
     {
-        DateTime fifthBirthday = value.AddYears(5);
-        var (_, termAfterBirthday) = WorkingFamiliesCheckHelper.GetTerms(fifthBirthday);
-        return DateTime.Today < termAfterBirthday.StartDate;
+        DateTime backdateWindow = DateTime.Today.AddDays(-FosterFamiliesConstants.SubmissionDateWindowDays);
+        return value >= backdateWindow;
     }
+
+    internal static DateTime ParseValidDate(string value) =>
+                        DateTime.ParseExact(value, DateFormats,
+            System.Globalization.CultureInfo.InvariantCulture,
+            System.Globalization.DateTimeStyles.None);
 }
