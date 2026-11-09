@@ -25,7 +25,7 @@
             <div class="govuk-button-group">
                 <a href="@Url.ActionLink("Family_Record_FF", "FosterFamilies", new { Model.ConflictingFamily.FosterCarerId })"
                    role="button" draggable="false" class="govuk-button govuk-button--inverse"
-                   data-module="govuk-button" data-govuk-button-init="">
+                   data-module="govuk-button">
                     Add child to family
                 </a>
                 @if (!string.IsNullOrEmpty(Model.CarerDetails.ContextId))
