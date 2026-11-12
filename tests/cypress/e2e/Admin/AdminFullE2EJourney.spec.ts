@@ -22,11 +22,11 @@ describe('Full journey of checking eligibility in LA portal', () => {
         cy.get('h1').should('include.text', 'Run a check for one parent or guardian');
         cy.contains('button', 'Early learning for 2-year-olds').click();
 
-        // Consent declaration (if exists in the flow)
+        // Enter Details page
         cy.url().should('include', '/Check/Enter_Details');
 
         //Verify guidance link is present
-        cy.contains('a', 'Parent or guardian is an asylum seeker (opens in new tab)').should('have.attr', 'href').and('include', '/Check/_2yo_Guidance');
+        cy.contains('a', 'Parent or guardian has no recourse to public funds (NRPF)').should('have.attr', 'href').and('include', 'https://www.gov.uk/government/publications/early-years-entitlements');
 
         // Add parent details
         cy.get('#LastName').type(parentLastName);
@@ -83,7 +83,7 @@ describe('Full journey of checking eligibility in LA portal', () => {
         // Enter Details page
         cy.url().should('include', '/Check/Enter_Details');
 
-         //Verify guidance link is present
+        //Verify guidance link is present
         cy.contains('a', 'Parent or guardian is an asylum seeker (opens in new tab)').should('have.attr', 'href').and('include', '/Check/Eypp_Guidance');
         // Add parent details
         cy.get('#LastName').type(parentLastName);
