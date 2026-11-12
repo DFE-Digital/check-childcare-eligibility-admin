@@ -57,7 +57,7 @@ public class CheckEligibilityRequestDataValidatorNameTests
         result.Errors
             .Select(x => x.ErrorMessage)
             .Should()
-            .Equal(ValidationMessages.ValidLastName);
+            .Equal(ValidationMessages.InvalidLastName);
     }
 
     [TestCase(CheckEligibilityType.EarlyYearPupilPremium)]

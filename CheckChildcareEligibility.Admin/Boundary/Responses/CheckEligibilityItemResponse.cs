@@ -2,62 +2,83 @@
 
 namespace CheckChildcareEligibility.Admin.Boundary.Responses;
 
-
 public class CheckEligibilityItemResponseBase
 {
     public CheckEligibilityResponseLinks Links { get; set; }
 }
 
 #region 2YO EYPP
+
 public class CheckEligibilityItem
 {
-    public string? Reference { get; set; }
-
-    public string NationalInsuranceNumber { get; set; }
-
-    public string LastName { get; set; }
+    public DateTime Created { get; set; }
 
     public string DateOfBirth { get; set; }
 
-    public string Status { get; set; }
+    public string LastName { get; set; }
 
-    public DateTime Created { get; set; }
+    public string NationalAsylumSeekerServiceNumber { get; set; }
+
+    public string NationalInsuranceNumber { get; set; }
 
     public int? Order { get; set; }
+
+    public string? Reference { get; set; }
+
+    public string Status { get; set; }
 }
 
 public class CheckEligibilityItemResponse : CheckEligibilityItemResponseBase
 {
     public CheckEligibilityItem Data { get; set; }
 }
-#endregion
+
+#endregion 2YO EYPP
 
 #region Working Families
+
 public class CheckEligibilityItemWorkingFamilies
 {
+    public bool ChildTooOld { get; set; }
+
+    public bool ChildTooYoung { get; set; }
+
+    public DateTime Created { get; set; }
+
+    public string DateOfBirth { get; set; }
+
+    public string EligibilityCode { get; set; }
+
+    public EligibilityCodeType? EligibilityCodeType { get; set; }
+
+    public DateTime GracePeriodEndDate { get; set; }
+
+    public bool? IsDiscretionaryValidityStartDateApplied { get; set; }
+
+    public bool IsGracePeriodEndDateApplied { get; set; }
+
+    public string LastName { get; set; }
+
+    public string NationalInsuranceNumber { get; set; }
+
+    public int? Order { get; set; }
+
+    public ReconfirmationProperties ReconfirmationProperties { get; set; }
+
     public string? Reference { get; set; }
 
-    public TermValidity? TermValidity { get; set; }
-    public ReconfirmationProperties ReconfirmationProperties { get; set; }
-    public bool? IsDiscretionaryValidityStartDateApplied { get; set; }
-    public EligibilityCodeType? EligibilityCodeType { get; set; }
-    public string NationalInsuranceNumber { get; set; }
-    public string LastName { get; set; }
-    public string DateOfBirth { get; set; }
     public string Status { get; set; }
-    public DateTime Created { get; set; }
-    public string EligibilityCode { get; set; }
-    public DateTime ValidityStartDate { get; set; }
+
+    public TermValidity? TermValidity { get; set; }
+
     public DateTime ValidityEndDate { get; set; }
-    public DateTime GracePeriodEndDate { get; set; }
-    public bool IsGracePeriodEndDateApplied { get; set; }
-    public bool ChildTooYoung { get; set; }
-    public bool ChildTooOld { get; set; }
-    public int? Order { get; set; }
+
+    public DateTime ValidityStartDate { get; set; }
 }
 
 public class CheckEligibilityItemWorkingFamiliesResponse : CheckEligibilityItemResponseBase
 {
     public CheckEligibilityItemWorkingFamilies Data { get; set; }
 }
-#endregion
+
+#endregion Working Families

@@ -44,7 +44,7 @@ public class CheckEligibilityRequestDataValidatorDateTests
         result.Errors
             .Select(x => x.ErrorMessage)
             .Should()
-            .Equal(ValidationMessages.ValidDOB);
+            .Equal(ValidationMessages.InvalidDOB);
     }
 
     private static CheckEligibilityRequestData CreateValidRequest(string dateOfBirth)

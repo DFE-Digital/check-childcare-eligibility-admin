@@ -69,7 +69,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
         public async Task Given_Bulk_Check_When_FileData_Invalid_Should_Return_Error_Data_Issue()
         {
             // Arrange
-            var content = Resources.bulkchecktemplate_some_invalid_items;
+            var content = Resources.bulkcheck_partially_valid;
             var fileName = "test.csv";
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -109,6 +109,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
         [TestCase("WF")]
         public async Task Bulk_Check_With_Overlong_Reference_Rejects_Whole_Batch_Without_Using_Upload_Attempt(string serviceType)
         {
+            // Arrange
             var parser = new ParseBulkCheckFileUseCase(
                 new CheckChildcareEligibility.Admin.Domain.Validation.CheckEligibilityRequestDataValidator(),
                 _configMock.Object);
@@ -122,19 +123,32 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
             };
             await controller.GetDfeClaimsAsync();
 
-            var header = serviceType == "WF"
-                ? "Eligibility code,National Insurance number,Child date of birth,Reference (optional)"
-                : "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)";
-            var row = serviceType == "WF" ? "50173110190,AB123456C,2022-01-01," : "Smith,1980-01-01,AB123456C,";
-            using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(
-                header + "\r\n" + row + "VALID\r\n" + row + new string('x', 101)));
+            var (header, rowPrefix) = serviceType switch
+            {
+                "WF" => (
+                    "Eligibility code,National Insurance number,Child date of birth,Reference (optional)",
+                    "50173110190,AB123456C,2022-01-01,"),
+                "EYPP" => (
+                    "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Parent Asylum Seeker Reference number,Reference (optional)",
+                    "Smith,1980-01-01,AB123456C,,"),
+                _ => (
+                    "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)",
+                    "Smith,1980-01-01,AB123456C,")         
+            };
+
+            var overlongReference = new string('x', 101);
+            var csvContent = $"{header}\r\n{rowPrefix}VALID\r\n{rowPrefix}{overlongReference}";
+            using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(csvContent));
+
             var file = new FormFile(stream, 0, stream.Length, "fileUpload", "references.csv")
             {
                 Headers = new HeaderDictionary(), ContentType = "text/csv"
             };
 
+            // Act
             var result = await controller.Bulk_Check(file, serviceType);
 
+            // Assert
             var view = result.Should().BeOfType<ViewResult>().Which;
             view.ViewName.Should().Be("BulkOutcome/Error_Data_Issue");
             var model = view.Model.Should().BeOfType<CheckChildcareEligibility.Admin.ViewModels.BulkCheckErrorsViewModel>().Which;
@@ -232,7 +246,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
             _parseBulkCheckFileUseCaseMock.Setup(x => x.Execute(It.IsAny<Stream>(), It.IsAny<CheckEligibilityType>()))
                 .ReturnsAsync(validBulkCheckCsvResult);
 
-            var content = Resources.bulkchecktemplate_small_Valid;
+            var content = Resources.bulkcheck_small_valid;
             var fileName = "test.csv";
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -346,7 +360,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
                     s => s.PostBulkCheck(It.IsAny<CheckEligibilityRequestBulk>()))
                 .ReturnsAsync(response);
 
-            var content = Resources.bulkchecktemplate_small_Valid;
+            var content = Resources.bulkcheck_small_valid;
 
             var validRequests = new List<CheckEligibilityRequestData>
             {
@@ -414,7 +428,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
             _parseBulkCheckFileUseCaseMock.Setup(x => x.Execute(It.IsAny<Stream>(), It.IsAny<CheckEligibilityType>()))
                 .ReturnsAsync(invalidBulkCheckCsvResult);
 
-            var content = Resources.bulkchecktemplate_some_invalid_items;
+            var content = Resources.bulkcheck_partially_valid;
 
             // Act - upload more failing files than the (very low) attempt limit
             for (var i = 0; i < 5; i++)
@@ -466,7 +480,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
             _checkGatewayMock.Setup(s => s.PostBulkCheck(It.IsAny<CheckEligibilityRequestBulk>()))
                 .ReturnsAsync(new CheckEligibilityResponseBulk());
 
-            var content = Resources.bulkchecktemplate_small_Valid;
+            var content = Resources.bulkcheck_small_valid;
 
             // Act - submission fails more times than the (very low) attempt limit
             for (var i = 0; i < 5; i++)
@@ -506,7 +520,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
                     s => s.PostBulkCheck(It.IsAny<CheckEligibilityRequestBulk>()))
                 .ReturnsAsync(response);
 
-            var content = Resources.bulkchecktemplate_small_Valid;
+            var content = Resources.bulkcheck_small_valid;
 
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);

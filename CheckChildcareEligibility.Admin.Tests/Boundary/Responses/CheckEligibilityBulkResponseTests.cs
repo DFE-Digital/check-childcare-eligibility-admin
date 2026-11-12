@@ -1,7 +1,9 @@
 ﻿using CheckChildcareEligibility.Admin.Boundary.Responses;
+using CheckChildcareEligibility.Admin.Domain.Enums;
 using CheckChildcareEligibility.Admin.Models;
 using FluentAssertions;
 using NUnit.Framework;
+using static CheckChildcareEligibility.Admin.Models.BulkExportBase;
 
 namespace CheckChildcareEligibility.Admin.Tests.Boundary.Responses;
 
@@ -30,13 +32,35 @@ public class CheckEligibilityBulkResponseTests
             ]
         };
 
-        var result = response.BulkDataMapper()
-            .Cast<BulkExport>()
+        var result = response.BulkDataMapper(CheckEligibilityType.TwoYearOffer)
+            .Cast<BulkExport2YO>()
             .ToList();
 
         result.Select(x => x.LastName)
             .Should()
             .Equal("FIRST", "SECOND");
+    }
+
+    [Test]
+    public void BulkDataMapper_EyppResults_IncludesAsylumSeekerReference()
+    {
+        var response = new CheckEligibilityBulkResponse
+        {
+            Data =
+            [
+                new CheckEligibilityItem
+                {
+                    NationalAsylumSeekerServiceNumber = "12/34/56789",
+                    Status = "eligible"
+                }
+            ]
+        };
+
+        var result = response.BulkDataMapper(CheckEligibilityType.EarlyYearPupilPremium)
+            .Cast<BulkExportEYPP>()
+            .Single();
+
+        result.NASS.Should().Be("12/34/56789");
     }
 
     [Test]
@@ -61,7 +85,7 @@ public class CheckEligibilityBulkResponseTests
             ]
         };
 
-        var result = response.BulkDataMapper()
+        var result = response.BulkDataMapper(CheckEligibilityType.WorkingFamilies)
             .Cast<BulkExportWorkingFamilies>()
             .ToList();
 
@@ -86,7 +110,7 @@ public class CheckEligibilityBulkResponseTests
             ]
         };
 
-        var result = response.BulkDataMapper()
+        var result = response.BulkDataMapper(CheckEligibilityType.WorkingFamilies)
             .Cast<BulkExportWorkingFamilies>()
             .Single();
 
