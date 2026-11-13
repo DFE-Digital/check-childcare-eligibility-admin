@@ -93,9 +93,11 @@ public class CheckController : BaseController
                 case IdentifierTypeConstants.Nino:
                     request.NationalAsylumSeekerServiceNumber = null;
                     break;
+
                 case IdentifierTypeConstants.Nass:
                     request.NationalInsuranceNumber = null;
                     break;
+
                 default:
                     request.NationalInsuranceNumber = null;
                     request.NationalAsylumSeekerServiceNumber = null;
@@ -164,7 +166,6 @@ public class CheckController : BaseController
                 TempData["Errors"]?.ToString()
             );
 
-
             string normalizedNino = NinoValidation.Normalize(parent?.NationalInsuranceNumber) ?? string.Empty;
             string normalizedNass = parent?.NationalAsylumSeekerServiceNumber ?? string.Empty;
 
@@ -174,16 +175,13 @@ public class CheckController : BaseController
                 EligibilityTypeLabel = GetEligibilityTypeLabel(eligibilityType),
                 ParentLastName = parent?.LastName ?? string.Empty,
                 ParentDateOfBirth = GetDateOfBirth(parent?.Day, parent?.Month, parent?.Year).ToString(),
-                ParentNino = NinoValidation.Normalize(
-                    parent?.NationalInsuranceNumber) ?? string.Empty,
-                ParentNass = parent?.NationalAsylumSeekerServiceNumber ?? string.Empty,
+                ParentNino = normalizedNino,
+                ParentNass = normalizedNass,
                 IdentifierOutcomeView = new IdentifierOutcomeView(eligibilityType, normalizedNino, normalizedNass)
-
             };
 
             var isLA = _Claims?.Organisation?.Category?.Name == CheckChildcareEligibility.Admin.Models.Constants.CategoryTypeLA; //false=school
 
-           
             switch (outcome.Status)
             {
                 case "eligible":
@@ -221,13 +219,16 @@ public class CheckController : BaseController
                     null
                 );
 
+                string normalizedNino = NinoValidation.Normalize(parent?.NationalInsuranceNumber) ?? string.Empty;
+                string normalizedNass = parent?.NationalAsylumSeekerServiceNumber ?? string.Empty;
+
                 if (parent != null)
                 {
                     eligibilityOutcomeVm.ParentLastName = parent.LastName ?? string.Empty;
                     eligibilityOutcomeVm.ParentDateOfBirth = GetDateOfBirth(parent.Day, parent.Month, parent.Year).ToString();
-                    eligibilityOutcomeVm.ParentNino =
-                        NinoValidation.Normalize(
-                            parent.NationalInsuranceNumber) ?? string.Empty;
+                    eligibilityOutcomeVm.ParentNino = normalizedNino;
+                    eligibilityOutcomeVm.ParentNass = normalizedNass;
+                    eligibilityOutcomeVm.IdentifierOutcomeView = new IdentifierOutcomeView(eligibilityOutcomeVm.EligibilityType, normalizedNino, normalizedNass);
                 }
             }
 
