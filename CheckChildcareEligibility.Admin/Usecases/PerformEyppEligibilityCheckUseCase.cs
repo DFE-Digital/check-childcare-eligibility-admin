@@ -53,7 +53,8 @@ public class PerformEyppEligibilityCheckUseCase : IPerformEyppEligibilityCheckUs
             {
                 Type = CheckEligibilityType.EarlyYearPupilPremium,
                 LastName = parentRequest.LastName,
-                NationalInsuranceNumber = canonicalNino,
+                NationalInsuranceNumber = canonicalNino ?? string.Empty,
+                NationalAsylumSeekerServiceNumber = parentRequest.NationalAsylumSeekerServiceNumber ?? string.Empty,
                 DateOfBirth = dobString
             }
         };
