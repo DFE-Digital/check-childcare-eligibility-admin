@@ -11,7 +11,7 @@ describe('Full journey of checking eligibility in LA portal', () => {
         cy.contains('button', 'Early years pupil premium').click();
         cy.url().should('include', '/Check/Enter_Details');
 
-        cy.get('#LastName').type(parentLastName);
+        cy.get('#LastName').type('Smith');
         cy.get('[id="DateOfBirth.Day"]').type('01');
         cy.get('[id="DateOfBirth.Month"]').type('01');
         cy.get('[id="DateOfBirth.Year"]').type('1990');
@@ -174,11 +174,11 @@ describe('Full journey of checking eligibility in LA portal', () => {
     });
 
     it('Validates the EYPP NASS and completes an eligibility check', () => {
-        checkEyppUsingNass('123456789', '12345');
+        checkEyppUsingNass('120156789', '12345');
     });
 
     it('Accepts the slash-separated EYPP NASS format and completes an eligibility check', () => {
-        checkEyppUsingNass('12/34/56789');
+        checkEyppUsingNass('12/01/56789');
     });
 
     it('Shows Parent Not Found outcome when parent cannot be found', () => {
