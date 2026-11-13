@@ -1,0 +1,111 @@
+﻿@model ParentGuardian
+@using CheckChildcareEligibility.Admin.Domain.Constants
+
+@{
+    var isEypp = ViewData["IsEypp"] is true;
+}
+
+@functions {
+    string InputClass(string fieldName)
+    {
+        return ViewData.ModelState[fieldName]?.Errors.Any() == true
+            ? "govuk-input govuk-!-width-one-third govuk-input--error"
+            : "govuk-input govuk-!-width-one-third";
+    }
+}
+
+@if (isEypp)
+{
+    <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset" aria-describedby="identifierType-hint">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                National Insurance number or asylum support reference
+            </legend>
+
+            <div id="identifierType-hint" class="govuk-hint">
+                Select one option.
+            </div>
+
+            <div class="govuk-radios" data-module="govuk-radios">
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="identifierType-nino" asp-for="IdentifierType" type="radio" value="@IdentifierTypeConstants.Nino"
+                           data-aria-controls="conditional-identifierType-nino">
+                    <label class="govuk-label govuk-radios__label" for="identifierType-nino">
+                        National Insurance number
+                    </label>
+                </div>
+                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-identifierType-nino">
+                    <div class="govuk-form-group">
+                        <h1 class="govuk-label-wrapper">
+                            <label class="govuk-label" for="NationalInsuranceNumber">
+                                National Insurance number
+                            </label>
+                        </h1>
+
+                        <div id="NIN-hint" class="govuk-hint">
+                            For example, ‘QQ 12 34 56 C’
+                        </div>
+
+                        <p class="govuk-error-message">
+                            <span asp-validation-for="NationalInsuranceNumber"></span>
+                        </p>
+                        <input class="@InputClass(nameof(Model.NationalInsuranceNumber))"
+                               id="NationalInsuranceNumber"
+                               aria-describedby="NIN-hint"
+                               asp-for="NationalInsuranceNumber"
+                               type="text"
+                               spellcheck="false"
+                               autocomplete="text">
+                    </div>
+                </div>
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="identifierType-nass" asp-for="IdentifierType" type="radio" value="@IdentifierTypeConstants.Nass"
+                           data-aria-controls="conditional-identifierType-nass">
+                    <label class="govuk-label govuk-radios__label" for="identifierType-nass">
+                        Asylum support reference
+                    </label>
+                </div>
+                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-identifierType-nass">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="NationalAsylumSeekerServiceNumber">
+                            Asylum support reference
+                        </label>
+                        <div id="ASRN-hint" class="govuk-hint">
+                            For example, 123456789 or 12/34/56789
+                        </div>
+                        <p class="govuk-error-message">
+                            <span asp-validation-for="NationalAsylumSeekerServiceNumber"></span>
+                        </p>
+                        <input class="@InputClass(nameof(Model.NationalAsylumSeekerServiceNumber))"
+                               id="NationalAsylumSeekerServiceNumber"
+                               aria-describedby="ASRN-hint"
+                               asp-for="NationalAsylumSeekerServiceNumber"
+                               type="text"
+                               spellcheck="false"
+                               autocomplete="text">
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <script src="/js/eypp-identifier.js"></script>
+}
+else
+{
+    <div class="govuk-form-group">
+        <label class="govuk-label govuk-label--m" for="NationalInsuranceNumber">
+            National Insurance number
+        </label>
+        <div id="ni-number-entered-hint" class="govuk-hint">
+            For example, ‘QQ 12 34 56 C’
+        </div>
+        <p class="govuk-error-message">
+            <span asp-validation-for="NationalInsuranceNumber"></span>
+        </p>
+        <input class="@InputClass(nameof(Model.NationalInsuranceNumber))
+               asp-for="NationalInsuranceNumber"
+               type="text"
+               spellcheck="false"
+               autocomplete="text">
+    </div>
+}

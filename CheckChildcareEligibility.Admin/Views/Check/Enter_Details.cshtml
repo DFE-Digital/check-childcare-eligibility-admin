@@ -3,14 +3,9 @@
 @{
     ViewData["Title"] = "Run a check for one parent or guardian";
 
-    var ninoInputClasses = "govuk-input govuk-!-width-one-third js-nino-input";
-
-    if (ViewData.ModelState["NationalInsuranceNumber"]?.Errors.Count > 0)
-    {
-        ninoInputClasses += " govuk-input--error";
-    }
-
-    var eligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty;
+    var eligibilityType = TempData.Peek("eligibilityType")?.ToString() ?? string.Empty;
+    bool isEypp = string.Equals(eligibilityType, "EYPP", StringComparison.OrdinalIgnoreCase);
+    ViewData["IsEypp"] = isEypp;
 }
 
 <div class="govuk-grid-column-two-thirds">
@@ -26,7 +21,7 @@
     <p class="govuk-body">Enter the details of the parent or guardian to check eligibility for @TempData["eligibilityTypeLabel"].</p>
 
     <form asp-controller="Check" asp-action="Enter_Details" method="post">
-        <input type="hidden" name="eligibilityType" value="@TempData["eligibiltyType"] " />
+        <input type="hidden" name="eligibilityType" value="@eligibilityType" />
         <fieldset class="govuk-fieldset">
             <div class="govuk-form-group">
                 <label class="govuk-label govuk-label--m" for="LastName">
@@ -86,31 +81,14 @@
                     </div>
                 </fieldset>
             </div>
-
-            <div class="govuk-form-group">
-                <label class="govuk-label govuk-label--m" for="NationalInsuranceNumber">
-                    National Insurance number
-                </label>
-                <div id="ni-number-entered-hint" class="govuk-hint">
-                    For example, ‘QQ 12 34 56 C’
-                </div>
-                <p class="govuk-error-message">
-                    <span asp-validation-for="NationalInsuranceNumber"></span>
-                </p>
-                <input class="@ninoInputClasses"
-                       asp-controller="Check"
-                       asp-for="NationalInsuranceNumber"
-                       type="text"
-                       spellcheck="false"
-                       autocomplete="text">
-            </div>
+            <partial name="_IdentifierFieldsPartial" model="Model" />
         </fieldset>
 
         <button class="govuk-button govuk-!-margin-top-5" data-module="govuk-button">
             Run check
         </button>
     </form>
-    @if (eligibilityType == "EYPP")
+    @if (isEypp)
     {
         <p class="govuk-body"><a class="govuk-link" rel="noreferrer noopener" target="_blank" href="@TempData["GuidanceLink"]">Parent or guardian is an asylum seeker (opens in new tab)</a></p>
     }

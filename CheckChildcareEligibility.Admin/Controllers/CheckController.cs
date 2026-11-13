@@ -1,4 +1,5 @@
-﻿using CheckChildcareEligibility.Admin.Domain.Constants;
+﻿using CheckChildcareEligibility.Admin.Attributes;
+using CheckChildcareEligibility.Admin.Domain.Constants;
 using CheckChildcareEligibility.Admin.Domain.Validation;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
@@ -7,20 +8,27 @@ using CheckChildcareEligibility.Admin.UseCases;
 using CheckChildcareEligibility.Admin.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Reflection;
 
 namespace CheckChildcareEligibility.Admin.Controllers;
 
 public class CheckController : BaseController
 {
     private readonly ICheckGateway _checkGateway;
-    private readonly IConfiguration _config;
-    private readonly IGetCheckStatusUseCase _getCheckStatusUseCase;
-    private readonly ILoadParentDetailsUseCase _loadParentDetailsUseCase;
-    private readonly ILogger<CheckController> _logger;
-    private readonly IPerform2YoEligibilityCheckUseCase _perform2YoEligibilityCheckUseCase;
-    private readonly IPerformEyppEligibilityCheckUseCase _performEyppEligibilityCheckUseCase;
-    private readonly IValidateParentDetailsUseCase _validateParentDetailsUseCase;
 
+    private readonly IConfiguration _config;
+
+    private readonly IGetCheckStatusUseCase _getCheckStatusUseCase;
+
+    private readonly ILoadParentDetailsUseCase _loadParentDetailsUseCase;
+
+    private readonly ILogger<CheckController> _logger;
+
+    private readonly IPerform2YoEligibilityCheckUseCase _perform2YoEligibilityCheckUseCase;
+
+    private readonly IPerformEyppEligibilityCheckUseCase _performEyppEligibilityCheckUseCase;
+
+    private readonly IValidateParentDetailsUseCase _validateParentDetailsUseCase;
 
     public CheckController(
         ILogger<CheckController> logger,
@@ -57,7 +65,7 @@ public class CheckController : BaseController
         TempData["eligibilityType"] = eligibilityType;
         var label = EligibilityTypeConstants.Labels.ContainsKey(eligibilityType) ? EligibilityTypeConstants.Labels[eligibilityType] : "Unknown eligibility type";
         var guidanceLink = EligibilityTypeConstants.GuidanceLinks.ContainsKey(eligibilityType) ? EligibilityTypeConstants.GuidanceLinks[eligibilityType] : "Unknown eligibility type";
-        
+
         TempData["eligibilityTypeLabel"] = label;
         TempData["GuidanceLink"] = guidanceLink;
 
@@ -77,7 +85,25 @@ public class CheckController : BaseController
     [HttpPost]
     public async Task<IActionResult> Enter_Details(ParentGuardian request)
     {
-        var validationResult = _validateParentDetailsUseCase.Execute(request, ModelState);
+        var eligibilityType = TempData.Peek("eligibilityType")?.ToString() ?? string.Empty;
+        if (string.Equals(eligibilityType, "EYPP", StringComparison.OrdinalIgnoreCase))
+        {
+            switch (request.IdentifierType?.ToLowerInvariant())
+            {
+                case IdentifierTypeConstants.Nino:
+                    request.NationalAsylumSeekerServiceNumber = null;
+                    break;
+                case IdentifierTypeConstants.Nass:
+                    request.NationalInsuranceNumber = null;
+                    break;
+                default:
+                    request.NationalInsuranceNumber = null;
+                    request.NationalAsylumSeekerServiceNumber = null;
+                    break;
+            }
+        }
+
+        var validationResult = _validateParentDetailsUseCase.Execute(request, ModelState, eligibilityType);
 
         // Add null check for validation result
         if (validationResult == null || !validationResult.IsValid)
@@ -92,8 +118,6 @@ public class CheckController : BaseController
         TempData.Remove("FsmEvidence");
 
         TempData["ParentDetails"] = JsonConvert.SerializeObject(request);
-
-        var eligibilityType = TempData.Peek("EligibilityType")?.ToString() ?? string.Empty;
 
         if (string.IsNullOrEmpty(eligibilityType))
             return View("Outcome/Technical_Error");
@@ -140,6 +164,10 @@ public class CheckController : BaseController
                 TempData["Errors"]?.ToString()
             );
 
+
+            string normalizedNino = NinoValidation.Normalize(parent?.NationalInsuranceNumber) ?? string.Empty;
+            string normalizedNass = parent?.NationalAsylumSeekerServiceNumber ?? string.Empty;
+
             var eligibilityOutcomeVm = new EligibilityOutcomeViewModel
             {
                 EligibilityType = eligibilityType,
@@ -147,10 +175,15 @@ public class CheckController : BaseController
                 ParentLastName = parent?.LastName ?? string.Empty,
                 ParentDateOfBirth = GetDateOfBirth(parent?.Day, parent?.Month, parent?.Year).ToString(),
                 ParentNino = NinoValidation.Normalize(
-                    parent?.NationalInsuranceNumber) ?? string.Empty
+                    parent?.NationalInsuranceNumber) ?? string.Empty,
+                ParentNass = parent?.NationalAsylumSeekerServiceNumber ?? string.Empty,
+                IdentifierOutcomeView = new IdentifierOutcomeView(eligibilityType, normalizedNino, normalizedNass)
+
             };
 
             var isLA = _Claims?.Organisation?.Category?.Name == CheckChildcareEligibility.Admin.Models.Constants.CategoryTypeLA; //false=school
+
+           
             switch (outcome.Status)
             {
                 case "eligible":
@@ -221,6 +254,12 @@ public class CheckController : BaseController
         return DateTime.MinValue;
     }
 
+    public IActionResult Eypp_Guidance()
+    { return View("Guidance/Eypp_Guidance"); }
+
+    public IActionResult _2yo_Guidance()
+    { return View("Guidance/2yo_Guidance"); }
+
     private string GetEligibilityTypeLabel(string eligibilityType)
     {
         if (string.IsNullOrEmpty(eligibilityType))
@@ -230,9 +269,4 @@ public class CheckController : BaseController
             ? EligibilityTypeConstants.Labels[eligibilityType]
             : "eligibility";
     }
-
-    public IActionResult Eypp_Guidance()
-    { return View("Guidance/Eypp_Guidance"); }
-    public IActionResult _2yo_Guidance()
-    { return View("Guidance/2yo_Guidance"); }
 }

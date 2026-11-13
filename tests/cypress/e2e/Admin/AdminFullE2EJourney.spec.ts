@@ -6,6 +6,43 @@ describe('Full journey of checking eligibility in LA portal', () => {
     const parentLastNameNotFound = 'ttySimpson'; // Last name for parent not found scenario
     const parentNinoTechnicalError = 'AA668767B'; // Using an unusual NI number to potentially trigger errors
 
+    const checkEyppUsingNass = (parentNass: string, invalidNass?: string) => {
+        cy.contains('Run a check').click();
+        cy.contains('button', 'Early years pupil premium').click();
+        cy.url().should('include', '/Check/Enter_Details');
+
+        cy.get('#LastName').type(parentLastName);
+        cy.get('[id="DateOfBirth.Day"]').type('01');
+        cy.get('[id="DateOfBirth.Month"]').type('01');
+        cy.get('[id="DateOfBirth.Year"]').type('1990');
+        cy.get('#identifierType-nass').check();
+
+        if (invalidNass) {
+            cy.get('#NationalAsylumSeekerServiceNumber').should('not.be.disabled').type(invalidNass);
+            cy.get('#NationalInsuranceNumber').should('be.disabled');
+            cy.contains('button', 'Run check').click();
+
+            cy.get('#error-summary')
+                .should('contain.text', 'Enter an asylum support reference number in the correct format');
+            cy.get('#identifierType-nass').should('be.checked');
+            cy.get('#NationalAsylumSeekerServiceNumber').clear();
+        }
+
+        cy.get('#NationalAsylumSeekerServiceNumber').should('not.be.disabled').type(parentNass);
+        cy.get('#NationalInsuranceNumber').should('be.disabled');
+        cy.contains('button', 'Run check').click();
+
+        cy.url().should('include', 'Check/Loader');
+        cy.get('#content[data-type="Eligible_LA"], #content[data-type="Not_Eligible"], #content[data-type="Not_Found"]', { timeout: 80000 })
+            .should('exist');
+
+        cy.get('.govuk-summary-list').within(() => {
+            cy.contains('.govuk-summary-list__key', 'Asylum support reference number')
+                .siblings('.govuk-summary-list__value')
+                .should('contain.text', parentNass);
+        });
+    };
+
     beforeEach(() => {
         // Login with LA session
         cy.checkSession('LA');
@@ -72,7 +109,7 @@ describe('Full journey of checking eligibility in LA portal', () => {
         cy.contains('Run a check for one parent or guardian').should('exist');
     });
 
-    it('Allows an LA user to check EYPP eligibility with not eligible outcome and print option', () => {
+    it('Validates the EYPP NINO and completes an eligibility check', () => {
         // Navigate to run a check
         cy.contains('Run a check').click();
 
@@ -90,7 +127,15 @@ describe('Full journey of checking eligibility in LA portal', () => {
         cy.get('[id="DateOfBirth.Day"]').type('01');
         cy.get('[id="DateOfBirth.Month"]').type('01');
         cy.get('[id="DateOfBirth.Year"]').type('1990');
-        cy.get('#NationalInsuranceNumber').type(parentNinoNotEligible);
+        cy.get('#identifierType-nino').check();
+        cy.get('#NationalInsuranceNumber').should('not.be.disabled').type('invalid');
+        cy.get('#NationalAsylumSeekerServiceNumber').should('be.disabled');
+        cy.contains('button', 'Run check').click();
+
+        cy.get('#error-summary')
+            .should('contain.text', 'Enter a National Insurance number in the correct format');
+        cy.get('#identifierType-nino').should('be.checked');
+        cy.get('#NationalInsuranceNumber').clear().type(parentNinoNotEligible);
         cy.contains('button', 'Run check').click();
 
         // Loader page
@@ -128,6 +173,14 @@ describe('Full journey of checking eligibility in LA portal', () => {
         cy.url().should('include', '/MenuSingleCheck');
     });
 
+    it('Validates the EYPP NASS and completes an eligibility check', () => {
+        checkEyppUsingNass('123456789', '12345');
+    });
+
+    it('Accepts the slash-separated EYPP NASS format and completes an eligibility check', () => {
+        checkEyppUsingNass('12/34/56789');
+    });
+
     it('Shows Parent Not Found outcome when parent cannot be found', () => {
         // Navigate to run a check
         cy.contains('Run a check').click();
@@ -144,6 +197,7 @@ describe('Full journey of checking eligibility in LA portal', () => {
         cy.get('[id="DateOfBirth.Day"]').type('01');
         cy.get('[id="DateOfBirth.Month"]').type('01');
         cy.get('[id="DateOfBirth.Year"]').type('1990');
+        cy.get('#identifierType-nino').check();
         cy.get('#NationalInsuranceNumber').type(parentNinoParentNotFound);
         cy.contains('button', 'Run check').click();
 

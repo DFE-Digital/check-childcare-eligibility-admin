@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using CheckChildcareEligibility.Admin.Boundary.Responses;
 using CheckChildcareEligibility.Admin.Controllers;
+using CheckChildcareEligibility.Admin.Domain.Constants;
 using CheckChildcareEligibility.Admin.Gateways.Interfaces;
 using CheckChildcareEligibility.Admin.Infrastructure;
 using CheckChildcareEligibility.Admin.Models;
@@ -165,7 +166,7 @@ public class CheckControllerTests : TestBase
         };
 
         _validateParentDetailsUseCaseMock
-            .Setup(x => x.Execute(request, It.IsAny<ModelStateDictionary>()))
+            .Setup(x => x.Execute(request, It.IsAny<ModelStateDictionary>(), It.IsAny<string?>()))
             .Returns(validationResult);
 
         // Act
@@ -182,7 +183,45 @@ public class CheckControllerTests : TestBase
 
         // Verify the mock was called with correct parameters
         _validateParentDetailsUseCaseMock.Verify(
-            x => x.Execute(request, It.IsAny<ModelStateDictionary>()),
+            x => x.Execute(request, It.IsAny<ModelStateDictionary>(), It.IsAny<string?>()),
+            Times.Once);
+    }
+
+    [TestCase(IdentifierTypeConstants.Nino)]
+    [TestCase(IdentifierTypeConstants.Nass)]
+    public async Task Enter_Details_Post_When_EyppIdentifierSelected_OnlyPassesSelectedIdentifier(
+        string identifierType)
+    {
+        var request = new ParentGuardian
+        {
+            IdentifierType = identifierType,
+            NationalInsuranceNumber = "AB123456C",
+            NationalAsylumSeekerServiceNumber = "123456789"
+        };
+        _tempData["eligibilityType"] = "EYPP";
+        _validateParentDetailsUseCaseMock
+            .Setup(x => x.Execute(It.IsAny<ParentGuardian>(), It.IsAny<ModelStateDictionary>(), "EYPP"))
+            .Returns(new ValidationResult
+            {
+                IsValid = false,
+                Errors = new Dictionary<string, List<string>>()
+            });
+
+        await _sut.Enter_Details(request);
+
+        if (identifierType == IdentifierTypeConstants.Nino)
+        {
+            request.NationalInsuranceNumber.Should().Be("AB123456C");
+            request.NationalAsylumSeekerServiceNumber.Should().BeNull();
+        }
+        else
+        {
+            request.NationalInsuranceNumber.Should().BeNull();
+            request.NationalAsylumSeekerServiceNumber.Should().Be("123456789");
+        }
+
+        _validateParentDetailsUseCaseMock.Verify(
+            x => x.Execute(request, It.IsAny<ModelStateDictionary>(), "EYPP"),
             Times.Once);
     }
 
@@ -210,7 +249,7 @@ public class CheckControllerTests : TestBase
         var checkEligibilityResponse = _fixture.Create<CheckEligibilityResponse>();
 
         _validateParentDetailsUseCaseMock
-            .Setup(x => x.Execute(request, It.IsAny<ModelStateDictionary>()))
+            .Setup(x => x.Execute(request, It.IsAny<ModelStateDictionary>(), It.IsAny<string?>()))
             .Returns(validationResult);
 
         _perform2YoEligibilityCheckUseCaseMock
@@ -227,7 +266,7 @@ public class CheckControllerTests : TestBase
         _sut.TempData["Response"].Should().NotBeNull();
 
         _validateParentDetailsUseCaseMock.Verify(
-            x => x.Execute(request, It.IsAny<ModelStateDictionary>()),
+            x => x.Execute(request, It.IsAny<ModelStateDictionary>(), It.IsAny<string?>()),
             Times.Once);
 
         _perform2YoEligibilityCheckUseCaseMock.Verify(
@@ -257,7 +296,7 @@ public class CheckControllerTests : TestBase
         var checkEligibilityResponse = _fixture.Create<CheckEligibilityResponse>();
 
         _validateParentDetailsUseCaseMock
-            .Setup(x => x.Execute(request, It.IsAny<ModelStateDictionary>()))
+            .Setup(x => x.Execute(request, It.IsAny<ModelStateDictionary>(), It.IsAny<string?>()))
             .Returns(validationResult);
 
         _perform2YoEligibilityCheckUseCaseMock
@@ -278,7 +317,7 @@ public class CheckControllerTests : TestBase
         _sut.TempData["Response"].Should().NotBeNull();
 
         _validateParentDetailsUseCaseMock.Verify(
-            x => x.Execute(request, It.IsAny<ModelStateDictionary>()),
+            x => x.Execute(request, It.IsAny<ModelStateDictionary>(), It.IsAny<string?>()),
             Times.Once);
 
         _perform2YoEligibilityCheckUseCaseMock.Verify(
