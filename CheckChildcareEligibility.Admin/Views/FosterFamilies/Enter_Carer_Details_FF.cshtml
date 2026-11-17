@@ -42,9 +42,8 @@
                 <p class="govuk-error-message">
                     <span asp-validation-for="CarerFirstName"></span>
                 </p>
-                <input
-                class="govuk-input govuk-input--width-20 @(ViewData.ModelState["CarerFirstName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                asp-for="CarerFirstName" type="text">
+                <input class="govuk-input govuk-input--width-20 @(ViewData.ModelState["CarerFirstName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                       asp-for="CarerFirstName" type="text" autocomplete="given-name">
             </div>
 
             <div class="govuk-form-group">
@@ -54,9 +53,8 @@
                 <p class="govuk-error-message">
                     <span asp-validation-for="CarerLastName"></span>
                 </p>
-                <input
-                class="govuk-input govuk-input--width-20 @(ViewData.ModelState["CarerLastName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                asp-for="CarerLastName" type="text">
+                <input class="govuk-input govuk-input--width-20 @(ViewData.ModelState["CarerLastName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                       asp-for="CarerLastName" type="text" autocomplete="family-name">
             </div>
 
             <div class="govuk-form-group">
@@ -87,10 +85,9 @@
                                 <label class="govuk-label govuk-date-input__label" for="CarerDateOfBirth.Day">
                                     Day
                                 </label>
-                                <input
-                                class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["CarerDateOfBirth.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                asp-for="Day" id="CarerDateOfBirth.Day" aria-describedby="dob-hint-day" type="text"
-                                inputmode="numeric" maxlength="2" />
+                                <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["CarerDateOfBirth.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                       asp-for="Day" id="CarerDateOfBirth.Day" aria-describedby="dob-hint-day" type="text"
+                                       inputmode="numeric" maxlength="2" autocomplete="bday-day" />
                             </div>
                         </div>
 
@@ -100,23 +97,21 @@
                                 <label class="govuk-label govuk-date-input__label" for="CarerDateOfBirth.Month">
                                     Month
                                 </label>
-                                <input
-                                class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["CarerDateOfBirth.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                asp-for="Month" id="CarerDateOfBirth.Month" aria-describedby="dob-hint-month"
-                                type="text" inputmode="numeric" maxlength="2" />
+                                <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["CarerDateOfBirth.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                       asp-for="Month" id="CarerDateOfBirth.Month" aria-describedby="dob-hint-month"
+                                       type="text" inputmode="numeric" maxlength="2" autocomplete="bday-month" />
                             </div>
                         </div>
 
-                        <span id="dob-hint-month" class="govuk-visually-hidden">For example 1980</span>
+                        <span id="dob-hint-year" class="govuk-visually-hidden">For example 1980</span>
                         <div class="govuk-date-input__item">
                             <div class="govuk-form-group">
                                 <label class="govuk-label govuk-date-input__label" for="CarerDateOfBirth.Year">
                                     Year
                                 </label>
-                                <input
-                                class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["CarerDateOfBirth.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                asp-for="Year" id="CarerDateOfBirth.Year" aria-describedby="dob-hint-year"
-                                type="text" inputmode="numeric" maxlength="4" />
+                                <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["CarerDateOfBirth.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                       asp-for="Year" id="CarerDateOfBirth.Year" aria-describedby="dob-hint-year"
+                                       type="text" inputmode="numeric" maxlength="4" autocomplete="bday-year" />
                             </div>
                         </div>
                     </div>
@@ -134,7 +129,7 @@
                     <span asp-validation-for="CarerNationalInsuranceNumber"></span>
                 </p>
                 <input class="@ninoInputClasses" asp-controller="Check" asp-for="CarerNationalInsuranceNumber"
-                       type="text" spellcheck="false" autocomplete="text">
+                       type="text" spellcheck="false">
             </div>
             @if (!isUpdate)
             {
