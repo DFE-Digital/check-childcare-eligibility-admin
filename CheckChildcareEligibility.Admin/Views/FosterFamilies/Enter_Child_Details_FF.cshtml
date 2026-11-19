@@ -71,9 +71,8 @@
                         <p class="govuk-error-message">
                             <span asp-validation-for="ChildFirstName"></span>
                         </p>
-                        <input
-                        class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["ChildFirstName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                        asp-for="ChildFirstName" type="text">
+                        <input class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["ChildFirstName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                               asp-for="ChildFirstName" type="text" autocomplete="given-name">
                     </div>
 
                     <div class="govuk-form-group">
@@ -83,9 +82,8 @@
                         <p class="govuk-error-message">
                             <span asp-validation-for="ChildLastName"></span>
                         </p>
-                        <input
-                        class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["ChildLastName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                        asp-for="ChildLastName" type="text">
+                        <input class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["ChildLastName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                               asp-for="ChildLastName" type="text" autocomplete="family-name">
                     </div>
 
                     <div class="govuk-form-group">
@@ -116,10 +114,9 @@
                                         <label class="govuk-label govuk-date-input__label" for="ChildDateOfBirth.Day">
                                             Day
                                         </label>
-                                        <input
-                                        class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["ChildDateOfBirth.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                        asp-for="Day" id="ChildDateOfBirth.Day" aria-describedby="dob-hint-day"
-                                        type="text" inputmode="numeric" maxlength="2" />
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["ChildDateOfBirth.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                               asp-for="Day" id="ChildDateOfBirth.Day" aria-describedby="dob-hint-day"
+                                               type="text" inputmode="numeric" maxlength="2" autocomplete="bday-day" />
                                     </div>
                                 </div>
 
@@ -129,24 +126,22 @@
                                         <label class="govuk-label govuk-date-input__label" for="ChildDateOfBirth.Month">
                                             Month
                                         </label>
-                                        <input
-                                        class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["ChildDateOfBirth.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                        asp-for="Month" id="ChildDateOfBirth.Month"
-                                        aria-describedby="dob-hint-month" type="text" inputmode="numeric"
-                                        maxlength="2" />
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["ChildDateOfBirth.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                               asp-for="Month" id="ChildDateOfBirth.Month"
+                                               aria-describedby="dob-hint-month" type="text" inputmode="numeric"
+                                               maxlength="2" autocomplete="bday-month" />
                                     </div>
                                 </div>
 
-                                <span id="dob-hint-month" class="govuk-visually-hidden">For example 1980</span>
+                                <span id="dob-hint-year" class="govuk-visually-hidden">For example 1980</span>
                                 <div class="govuk-date-input__item">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label govuk-date-input__label" for="ChildDateOfBirth.Year">
                                             Year
                                         </label>
-                                        <input
-                                        class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["ChildDateOfBirth.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                        asp-for="Year" id="ChildDateOfBirth.Year" aria-describedby="dob-hint-year"
-                                        type="text" inputmode="numeric" maxlength="4" />
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["ChildDateOfBirth.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                               asp-for="Year" id="ChildDateOfBirth.Year" aria-describedby="dob-hint-year"
+                                               type="text" inputmode="numeric" maxlength="4" autocomplete="bday-year" />
                                     </div>
                                 </div>
                             </div>
@@ -160,9 +155,8 @@
                         <p class="govuk-error-message">
                             <span asp-validation-for="ChildPostCode"></span>
                         </p>
-                        <input
-                        class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["ChildPostCode"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                        asp-for="ChildPostCode" type="text">
+                        <input class="govuk-input govuk-!-width-one-third @(ViewData.ModelState["ChildPostCode"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                               asp-for="ChildPostCode" type="text" autocomplete="postal-code">
                     </div>
                 </fieldset>
 
