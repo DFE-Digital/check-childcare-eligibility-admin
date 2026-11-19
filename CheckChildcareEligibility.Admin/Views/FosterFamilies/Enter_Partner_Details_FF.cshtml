@@ -48,9 +48,8 @@
                         <p class="govuk-error-message">
                             <span asp-validation-for="PartnerFirstName"></span>
                         </p>
-                        <input
-                        class="govuk-input govuk-input--width-20 @(ViewData.ModelState["PartnerFirstName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                        asp-for="PartnerFirstName" type="text">
+                        <input class="govuk-input govuk-input--width-20 @(ViewData.ModelState["PartnerFirstName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                               asp-for="PartnerFirstName" type="text" autocomplete="given-name">
                     </div>
 
                     <div class="govuk-form-group">
@@ -60,9 +59,8 @@
                         <p class="govuk-error-message">
                             <span asp-validation-for="PartnerLastName"></span>
                         </p>
-                        <input
-                        class="govuk-input govuk-input--width-20 @(ViewData.ModelState["PartnerLastName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                        asp-for="PartnerLastName" type="text">
+                        <input class="govuk-input govuk-input--width-20 @(ViewData.ModelState["PartnerLastName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                               asp-for="PartnerLastName" type="text" autocomplete="family-name">
                     </div>
 
                     <div class="govuk-form-group">
@@ -80,8 +78,7 @@
                             @if (!string.IsNullOrEmpty(TempData["DateError"]?.ToString())) //Hide whitespace if no error
                             {
                                 <p class="govuk-error-message">
-                                    <span
-                                    asp-validation-for="PartnerDateOfBirth.Day">@Html.Raw(TempData["DateError"])</span>
+                                    <span asp-validation-for="PartnerDateOfBirth.Day">@Html.Raw(TempData["DateError"])</span>
                                 </p>
                             }
 
@@ -94,10 +91,9 @@
                                         <label class="govuk-label govuk-date-input__label" for="PartnerDateOfBirth.Day">
                                             Day
                                         </label>
-                                        <input
-                                        class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["PartnerDateOfBirth.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                        asp-for="Day" id="PartnerDateOfBirth.Day" aria-describedby="dob-hint-day"
-                                        type="text" inputmode="numeric" maxlength="2" />
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["PartnerDateOfBirth.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                               asp-for="Day" id="PartnerDateOfBirth.Day" aria-describedby="dob-hint-day"
+                                               type="text" inputmode="numeric" maxlength="2" autocomplete="bday-day" />
                                     </div>
                                 </div>
 
@@ -108,25 +104,23 @@
                                                for="PartnerDateOfBirth.Month">
                                             Month
                                         </label>
-                                        <input
-                                        class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["PartnerDateOfBirth.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                        asp-for="Month" id="PartnerDateOfBirth.Month"
-                                        aria-describedby="dob-hint-month" type="text" inputmode="numeric"
-                                        maxlength="2" />
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["PartnerDateOfBirth.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                               asp-for="Month" id="PartnerDateOfBirth.Month"
+                                               aria-describedby="dob-hint-month" type="text" inputmode="numeric"
+                                               maxlength="2" autocomplete="bday-month" />
                                     </div>
                                 </div>
 
-                                <span id="dob-hint-month" class="govuk-visually-hidden">For example 1980</span>
+                                <span id="dob-hint-year" class="govuk-visually-hidden">For example 1980</span>
                                 <div class="govuk-date-input__item">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label govuk-date-input__label"
                                                for="PartnerDateOfBirth.Year">
                                             Year
                                         </label>
-                                        <input
-                                        class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["PartnerDateOfBirth.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                        asp-for="Year" id="PartnerDateOfBirth.Year" aria-describedby="dob-hint-year"
-                                        type="text" inputmode="numeric" maxlength="4" />
+                                        <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["PartnerDateOfBirth.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                               asp-for="Year" id="PartnerDateOfBirth.Year" aria-describedby="dob-hint-year"
+                                               type="text" inputmode="numeric" maxlength="4" autocomplete="bday-year" />
                                     </div>
                                 </div>
                             </div>
@@ -138,13 +132,13 @@
                             National Insurance number
                         </label>
                         <div id="PartnerNationalInsuranceNumber-hint" class="govuk-hint">
-                            For example, ‘QQ 12 34 56 C’
+                            For example, 'QQ 12 34 56 C'
                         </div>
                         <p class="govuk-error-message">
                             <span asp-validation-for="PartnerNationalInsuranceNumber"></span>
                         </p>
                         <input class="@ninoInputClasses" asp-controller="Check" asp-for="PartnerNationalInsuranceNumber"
-                               type="text" spellcheck="false" autocomplete="text">
+                               type="text" spellcheck="false">
                     </div>
                 </fieldset>
                 @if (!isUpdate)
@@ -156,8 +150,8 @@
                 else
                 {
                     <div class="govuk-inset-text">
-                        After an eligibility code has been issued, you can correct mistakes to a partner’s name, date of
-                        birth or National Insurance number. If the carer’s partner changes, you should remove the partner
+                        After an eligibility code has been issued, you can correct mistakes to a partner's name, date of
+                        birth or National Insurance number. If the carer's partner changes, you should remove the partner
                         and add a new one. You cannot swap the identity of a partner to that of the carer.
                     </div>
                     <button type="submit" class="govuk-button" data-module="govuk-button">

@@ -31,7 +31,7 @@
                     <span asp-validation-for="LastName"></span>
                 </p>
                 <input class="govuk-input govuk-input--width-20 @(ViewData.ModelState["LastName"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                       asp-for="LastName" type="text" aria-label="Last name in full">
+                       asp-for="LastName" type="text" aria-label="Last name in full" autocomplete="family-name">
             </div>
 
             <div class="govuk-form-group">
@@ -55,7 +55,7 @@
                                     Day
                                 </label>
                                 <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["DateOfBirth.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                       asp-for="Day" id="DateOfBirth.Day" type="text" inputmode="numeric" maxlength="2" />
+                                       asp-for="Day" id="DateOfBirth.Day" type="text" inputmode="numeric" maxlength="2" autocomplete="bday-day" />
                             </div>
                         </div>
 
@@ -65,7 +65,7 @@
                                     Month
                                 </label>
                                 <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["DateOfBirth.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                       asp-for="Month" id="DateOfBirth.Month" type="text" inputmode="numeric" maxlength="2" />
+                                       asp-for="Month" id="DateOfBirth.Month" type="text" inputmode="numeric" maxlength="2" autocomplete="bday-month" />
                             </div>
                         </div>
 
@@ -75,7 +75,7 @@
                                     Year
                                 </label>
                                 <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["DateOfBirth.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                       asp-for="Year" id="DateOfBirth.Year" type="text" inputmode="numeric" maxlength="4" />
+                                       asp-for="Year" id="DateOfBirth.Year" type="text" inputmode="numeric" maxlength="4" autocomplete="bday-year" />
                             </div>
                         </div>
                     </div>

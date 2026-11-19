@@ -30,7 +30,7 @@
                 @if (Model != null)
                 {
                     <input asp-for="ContextId" type="hidden" />
-                    if(Model.FosterCarerId != Guid.Empty)
+                    if (Model.FosterCarerId != Guid.Empty)
                     {
                         <input asp-for="FosterCarerId" type="hidden" />
                     }
@@ -91,10 +91,8 @@
                                                                for="SubmissionDate.Day">
                                                             Day
                                                         </label>
-                                                        <input
-                                                        class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["SubmissionDate.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                                        asp-for="Day" id="SubmissionDate.Day" type="text"
-                                                        inputmode="numeric" maxlength="2" />
+                                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["SubmissionDate.Day"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                                               asp-for="Day" id="SubmissionDate.Day" type="text" inputmode="numeric" maxlength="2" autocomplete="bday-day" />
                                                     </div>
                                                 </div>
 
@@ -104,10 +102,8 @@
                                                                for="SubmissionDate.Month">
                                                             Month
                                                         </label>
-                                                        <input
-                                                        class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["SubmissionDate.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                                        asp-for="Month" id="SubmissionDate.Month" type="text"
-                                                        inputmode="numeric" maxlength="2" />
+                                                        <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState["SubmissionDate.Month"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                                               asp-for="Month" id="SubmissionDate.Month" type="text" inputmode="numeric" maxlength="2" autocomplete="bday-month" />
                                                     </div>
                                                 </div>
 
@@ -117,10 +113,8 @@
                                                                for="SubmissionDate.Year">
                                                             Year
                                                         </label>
-                                                        <input
-                                                        class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["SubmissionDate.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
-                                                        asp-for="Year" id="SubmissionDate.Year" type="text"
-                                                        inputmode="numeric" maxlength="4" />
+                                                        <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState["SubmissionDate.Year"]?.Errors.Count > 0 ? "govuk-input--error" : "")"
+                                                               asp-for="Year" id="SubmissionDate.Year" type="text" inputmode="numeric" maxlength="4" autocomplete="bday-year" />
                                                     </div>
                                                 </div>
                                             </div>
