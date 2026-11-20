@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CheckChildcareEligibility.Admin.Domain.Constants.ErrorMessages;
 using CheckChildcareEligibility.Admin.Domain.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace CheckChildcareEligibility.Admin.Attributes;
 
@@ -8,7 +9,7 @@ public class NinoAttribute : ValidationAttribute
 {
     public NinoAttribute()
     {
-        ErrorMessage = "Enter a National Insurance number in the correct format";
+        ErrorMessage = ValidationMessages.InvalidNI;
     }
 
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
@@ -39,7 +40,7 @@ public class NinoAttribute : ValidationAttribute
 
         if (!NinoValidation.IsValidInput(despacedNino))
         {
-            return new ValidationResult("Enter a National Insurance number in the correct format");
+            return new ValidationResult(ValidationMessages.InvalidNI);
         }
 
         return ValidationResult.Success;

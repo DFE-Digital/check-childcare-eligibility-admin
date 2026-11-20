@@ -22,4 +22,10 @@ public class ParentGuardian
 
     [Nino]
     public string? NationalInsuranceNumber { get; set; }
+
+    [Nass]
+    public string? NationalAsylumSeekerServiceNumber { get; set; }
+
+    [NotMapped]
+    public string? IdentifierType { get; set; }
 }

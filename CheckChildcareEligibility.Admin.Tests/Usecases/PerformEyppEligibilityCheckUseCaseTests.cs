@@ -125,6 +125,26 @@ public class PerformEyppEligibilityCheckUseCaseTests
     }
 
     [Test]
+    public async Task Execute_WithNass_ShouldIncludeItInRequest()
+    {
+        _parent.NationalInsuranceNumber = null;
+        _parent.NationalAsylumSeekerServiceNumber = "123456789";
+        CheckEligibilityRequest? capturedRequest = null;
+
+        _checkGatewayMock
+            .Setup(g => g.PostCheck(It.IsAny<CheckEligibilityRequest>()))
+            .Callback<CheckEligibilityRequest>(request => capturedRequest = request)
+            .ReturnsAsync(_eligibilityResponse);
+
+        await _sut.Execute(_parent, _sessionMock.Object);
+
+        var data = capturedRequest!.Data.Should()
+            .BeOfType<CheckEligibilityRequestData>().Subject;
+        data.NationalAsylumSeekerServiceNumber.Should().Be("123456789");
+        data.NationalInsuranceNumber.Should().BeEmpty();
+    }
+
+    [Test]
     public async Task Execute_WhenApiThrowsException_ShouldThrow()
     {
         // Arrange
