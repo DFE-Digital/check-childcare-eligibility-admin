@@ -22,6 +22,8 @@ public class CheckEligibilityRequestDataValidatorNameTests
     [TestCase("O'Connor")]
     [TestCase("O\u2019Connor")]
     [TestCase("Smith-Jones")]
+    [TestCase("Søren")]
+    [TestCase("Østergaard")]
     public void Validate_EyppSupportedLastName_Passes(string lastName)
     {
         var request = CreateValidRequest(
@@ -33,12 +35,12 @@ public class CheckEligibilityRequestDataValidatorNameTests
         result.Errors.Should().BeEmpty();
     }
 
-    [Test]
-    public void Validate_TwoYearOfferAccentedLastName_Passes()
+    [TestCase("García")]
+    [TestCase("Søren")]
+    [TestCase("Østergaard")]
+    public void Validate_TwoYearOfferAccentedLastName_Passes(string lastName)
     {
-        var request = CreateValidRequest(
-            CheckEligibilityType.TwoYearOffer,
-            "García");
+        var request = CreateValidRequest(CheckEligibilityType.TwoYearOffer, lastName);
 
         var result = _sut.Validate(request);
 
