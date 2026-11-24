@@ -35,6 +35,12 @@ foreach (var m in Model)
         {
             field = "submission-date-radios-Today";
         }
+        if (ViewData["IsEypp"] is true &&
+            (originalField == nameof(ParentGuardian.NationalInsuranceNumber) ||
+             originalField == nameof(ParentGuardian.NationalAsylumSeekerServiceNumber)))
+        {
+            field = "radios-identifierType";
+        }
         errors.Add(new ValidationError
         {
             Field = field,
