@@ -129,7 +129,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Controllers
                     "Eligibility code,National Insurance number,Child date of birth,Reference (optional)",
                     "50173110190,AB123456C,2022-01-01,"),
                 "EYPP" => (
-                    "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Parent Asylum Seeker Reference number,Reference (optional)",
+                    "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Parent asylum support reference number,Reference (optional)",
                     "Smith,1980-01-01,AB123456C,,"),
                 _ => (
                     "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)",

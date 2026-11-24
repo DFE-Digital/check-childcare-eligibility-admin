@@ -61,7 +61,7 @@ namespace CheckChildcareEligibility.Admin.Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parent Last Name,Parent Date of Birth,Parent National Insurance number,Parent Asylum Seeker Reference number,Reference (optional)
+        ///   Looks up a localized string similar to Parent Last Name,Parent Date of Birth,Parent National Insurance number,Parent asylum support reference number,Reference (optional)
         ///SIMPSON,01/01/1990,AB123456C,
         ///smith,01/01/1990,AB123456D,.
         /// </summary>

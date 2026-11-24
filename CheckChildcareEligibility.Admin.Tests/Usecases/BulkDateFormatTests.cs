@@ -60,7 +60,7 @@ public class BulkDateFormatTests
         var parser = new ParseBulkCheckFileUseCase(new CheckEligibilityRequestDataValidator(), config);
         var csv = type switch {
             CheckEligibilityType.WorkingFamilies => $"Eligibility code,National Insurance number,Child date of birth,Reference (optional)\r\n50173110190,AB123456C,{date},\r\n",
-            CheckEligibilityType.EarlyYearPupilPremium => $"Parent Last Name,Parent Date of Birth,Parent National Insurance number,Parent Asylum Seeker Reference number,Reference (optional)\r\nSmith,{date},AB123456C,\r\n",
+            CheckEligibilityType.EarlyYearPupilPremium => $"Parent Last Name,Parent Date of Birth,Parent National Insurance number,Parent asylum support reference number,Reference (optional)\r\nSmith,{date},AB123456C,\r\n",
             _ => $"Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)\r\nSmith,{date},AB123456C,\r\n"
 
         };

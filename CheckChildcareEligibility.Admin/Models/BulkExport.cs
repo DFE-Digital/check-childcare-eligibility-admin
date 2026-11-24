@@ -27,7 +27,7 @@ public class BulkExportBase : IBulkExport
 
     public class BulkExportEYPP : BulkExportBase
     {
-        [Index(3), Name("Parent Asylum Seeker Reference number")]
+        [Index(3), Name("Parent asylum support reference number")]
         public string NASS { get; set; }
 
         [Index(4), Name("Outcome")]
