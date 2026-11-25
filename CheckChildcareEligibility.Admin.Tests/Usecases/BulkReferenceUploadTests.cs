@@ -180,7 +180,7 @@ public class BulkReferenceUploadTests
         CheckEligibilityType.WorkingFamilies => (
             "Eligibility code,National Insurance number,Child date of birth,Reference (optional)"),
         CheckEligibilityType.EarlyYearPupilPremium => (
-            "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Parent Asylum Seeker Reference number,Reference (optional)"),
+            "Parent Last Name,Parent Date of Birth,Parent National Insurance number,Parent asylum support reference number,Reference (optional)"),
            _ => ("Parent Last Name,Parent Date of Birth,Parent National Insurance number,Reference (optional)")
     };
 

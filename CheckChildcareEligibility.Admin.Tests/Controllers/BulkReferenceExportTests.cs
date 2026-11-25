@@ -29,7 +29,7 @@ public class BulkReferenceExportTests : TestBase
     private static readonly string[] EarlyYearPupilPremiumHeaders =
     [
         "Parent Last Name", "Parent Date of Birth", "Parent National Insurance number",
-        "Parent Asylum Seeker Reference number", "Outcome", "Reference (optional)"
+        "Parent asylum support reference number", "Outcome", "Reference (optional)"
     ];
 
     private static readonly string[] TwoYearOfferHeaders =
