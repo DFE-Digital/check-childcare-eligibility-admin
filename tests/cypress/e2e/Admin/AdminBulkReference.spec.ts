@@ -100,7 +100,7 @@ services.forEach((service) => {
 
     it("identifies the missing Reference header even when reference values would be blank", () => {
       upload(service.uploadHeaders.slice(0, -1).join(",") + "\r\n" + row, "missing-reference.csv");
-      cy.get("#file-upload-1-error").should("contain.text",
+      cy.get(".govuk-error-message").should("contain.text",
         "The selected file must include the column heading Reference (optional).");
     });
 

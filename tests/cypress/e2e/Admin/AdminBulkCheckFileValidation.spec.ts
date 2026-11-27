@@ -21,7 +21,7 @@ describe("Admin Bulk Check File Validation Journey", () => {
       }
     );
     cy.contains("Run check").click();
-    cy.get("#file-upload-1-error").as("errorMessage");
+    cy.get(".govuk-error-message").as("errorMessage");
     cy.get("@errorMessage").should(($p) => {
       expect($p.first()).to.contain(
         "The selected file must contain fewer than 250 rows"
@@ -42,7 +42,7 @@ describe("Admin Bulk Check File Validation Journey", () => {
       }
     );
     cy.contains("Run check").click();
-    cy.get("#file-upload-1-error").as("errorMessage");
+    cy.get(".govuk-error-message").as("errorMessage");
     cy.get("@errorMessage").should(($p) => {
       expect($p.first()).to.contain(
         "The column headings in the selected file must exactly match the template"
@@ -63,7 +63,7 @@ describe("Admin Bulk Check File Validation Journey", () => {
       }
     );
     cy.contains("Run check").click();
-    cy.get("#file-upload-1-error").as("errorMessage");
+    cy.get(".govuk-error-message").as("errorMessage");
     cy.get("@errorMessage").should(($p) => {
       expect($p.first()).to.contain(
         "The selected file must be smaller than 10MB"
@@ -84,7 +84,7 @@ describe("Admin Bulk Check File Validation Journey", () => {
       }
     );
     cy.contains("Run check").click();
-    cy.get("#file-upload-1-error").as("errorMessage");
+    cy.get(".govuk-error-message").as("errorMessage");
     cy.get("@errorMessage").should(($p) => {
       expect($p.first()).to.contain(
         "The selected file is empty"
@@ -105,7 +105,7 @@ describe("Admin Bulk Check File Validation Journey", () => {
       }
     );
     cy.contains("Run check").click();
-    cy.get("#file-upload-1-error").as("errorMessage");
+    cy.get(".govuk-error-message").as("errorMessage");
     cy.get("@errorMessage").should(($p) => {
       expect($p.first()).to.contain(
         "The selected file must be a CSV"
@@ -115,7 +115,7 @@ describe("Admin Bulk Check File Validation Journey", () => {
 
   it("will return an error message if not file is selected", () => {
     cy.contains("Run check").click();
-    cy.get("#file-upload-1-error").as("errorMessage");
+    cy.get(".govuk-error-message").as("errorMessage");
     cy.get("@errorMessage").should(($p) => {
       expect($p.first()).to.contain(
         "Select a CSV file"
@@ -140,7 +140,7 @@ describe("Admin Bulk Check File Validation Journey", () => {
       );
       cy.contains("Run check").click();
 
-      cy.get("#file-upload-1-error")
+      cy.get(".govuk-error-message")
         .should("contain", "The selected file must contain fewer than 250 rows")
         .and(
           "not.contain",

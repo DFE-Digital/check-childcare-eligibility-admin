@@ -22,7 +22,7 @@ describe("Admin Working Families Bulk Check Content Validation Journey", () => {
       }
     );
     cy.contains("Run check").click();
-    cy.get("#file-upload-1-error").as("errorMessage");
+    cy.get(".govuk-error-message").as("errorMessage");
     cy.get("@errorMessage").should(($p) => {
       expect($p.first()).to.contain(
         "The column headings in the selected file must exactly match the template"
